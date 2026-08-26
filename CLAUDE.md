@@ -237,3 +237,21 @@ Back Burner at 9**.
 The other kind of falloff, where a chance-based effect nears 100%, or flat damage stops
 mattering against a large pool, is **not in the files**. That is a judgement and belongs in
 the curated layer with a visible byline, never mixed in with these numbers.
+
+---
+
+## Two corrections worth carrying forward
+
+**Boon icons are in `GUI.pkg`.** An earlier note in `assets/README.md` said they were not,
+because grepping the package manifests for `Boon_` returned nothing. The packed sprites drop
+the prefix: the data says `Boon_Aphrodite_27`, the file is `Aphrodite_27.png`. Matching the
+trait data against the extraction finds **435 of 579 icons**.
+
+**Gold is not a Hades II chrome colour.** Sampled 247,921 chrome pixels across ten `GUI/`
+folders. Silver 26.8%, jade 18.9%, gold band 15.1%, but that band is mostly parchment and
+shadow, and its bright quarter is pale yellow highlight rather than metal. Real brass is
+about 2.6%. `BoonSelect` is 55% silver and 0.1% gold. `--brass` stays deleted.
+
+Both errors have the same shape, and it is the shape of the `MaxGodsPerRun` mistake:
+**a negative result from a search proves something about the search.** Extract, then match
+against the data. Never conclude absence from a naming assumption.

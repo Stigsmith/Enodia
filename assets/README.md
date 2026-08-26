@@ -84,12 +84,39 @@ Still open:
 
 | Missing | Expected | Have | Why it matters | Where to look |
 |---|---:|---:|---|---|
-| **Boon icons** | ~300+ | 199 | The largest remaining gap | **Not in any package.** Searched all 85 manifests for `Boon_`, zero hits, and the per-god packages hold portraits rather than icons. The wiki stays the source here |
-| **Selene Hexes** | 9 | 0 | Hex is a build anchor | `TraitData_Spell.lua` names them `Boon_Selene_27` through `_34` plus `_110`, so they share the boon-icon problem above |
+| ~~**Boon icons**~~ | ~~300+~~ | ~~199~~ | **Solved, see below** | |
+| ~~**Selene Hexes**~~ | ~~9~~ | ~~0~~ | **Solved, see below** | |
 | **Familiars** | 5 | 0 | Roster art | `GUI.pkg` has only cosmetic effigies. Try `CatFamiliar.pkg`, `FrogFamiliar.pkg`, `HoundFamiliar.pkg`, `PolecatFamiliar.pkg`, `RavenFamiliar.pkg` |
 | **Status effect icons** | ~15 | 0 | Needed for tag filtering | Not yet located |
 | **Biome: Tartarus** | 1 | 0 | Hole in the region strip | `BiomeMap.pkg` (24 MB) is the next thing to extract |
 | **Resource icons** | ~10 | 3 | Ash, Psyche, Bones, Moon Dust, Nectar, Grasp | Partly in `GUI/Icons`, worth a second pass |
+
+### Correction, 27 August 2026: the boon icons were there all along
+
+This document previously said boon icons were **"not in any package"**, on the basis that
+grepping all 85 `.pkg_manifest` files for `Boon_` returned zero hits.
+
+That conclusion was wrong, and the method was the problem. **The packed sprites drop the
+prefix.** The trait data says `Boon_Aphrodite_27`; the file is `Aphrodite_27.png`, sitting in
+`GUI/Screens/BoonIcons/`, which holds **537 stills**.
+
+Matching every `Icon` field in the trait data against the full extraction, stripping the
+`Boon_`, `Keepsake_`, `Hammer_` and `Shop_` prefixes:
+
+| | |
+|---|---|
+| Traits carrying an `Icon` | 579 |
+| Icon file present in `GUI.pkg` | **435** |
+| Still unmatched | 144 |
+
+The Selene Hexes go with it, since they are `Boon_Selene_*` and share the same prefix rule.
+
+The 144 that remain are almost entirely `Hammer_*` and `Shop_*`. The wiki already covers the
+hammers at 114 files, so the real remaining gap is much smaller than this document claimed.
+
+**The lesson, and it is the same one as the god cap.** A grep that returns zero is evidence
+about the grep, not about the world. Extract first, then match against the data, and never
+conclude absence from a naming assumption.
 
 ### Arcana naming
 

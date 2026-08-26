@@ -221,6 +221,15 @@ working around it.
    not exhaustive. Sample a few `GUI/Screens/` subfolders before committing the tokens. If a
    major screen uses gold prominently, the brass decision is wrong
 
+   > **Verified 27 August 2026. The brass decision holds.** Sampled 247,921 chrome pixels
+   > across ten folders, content art excluded. Silver leads at 26.8%, jade 18.9%, and the
+   > gold hue band 15.1%. But that band is mostly not gold: 34% is pale tan parchment, 25%
+   > dark brown shadow, and the "bright" quarter reads `#D2D280`, `#E1E18A`, `#FFFFA0`,
+   > which is pale yellow **highlight**, not metal. Genuine mid-brass is about 2.6% of
+   > chrome. `BoonSelect`, the screen this tool's Exit block is modelled on, is **55% silver
+   > and 0.1% gold**. The bright end of that band is also evidence for the light-not-hue
+   > rule above, since it behaves as a highlight rather than a colour.
+
 2. **`CLAUDE.md` says `extracted/` is "scratch, not source".** This brief uses it as the
    primary art reference, which contradicts that line. That is a decision for the owner, not
    a fact to check, and it should be settled before the ornament is lifted out of
