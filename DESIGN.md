@@ -668,6 +668,22 @@ someone onto a weapon they have avoided for a hundred hours.
 
 Reading posture is the constraint: mid run, four seconds, one hand, phone beside a keyboard.
 
+### Outside the run
+
+The run surface is what the tool is for, but it is not the whole app. Two things sit around
+it.
+
+**The entry flow is pick, set up, run.** A run starts by choosing what you are trying to do,
+a build or just a weapon. That choice feeds Setup, and Setup opens the run. Three steps in
+one direction, no branching.
+
+**The menu is one button, top left, opening a dropdown.** It holds everything that is not
+the current run: restart, browse saved builds, create a build. It covers like an overlay and
+returns you where you were, so it is never a place the run navigates to.
+
+> Sketched, not settled. What "pick a build" offers before the Phase 2 archetypes exist, and
+> whether weapon-only entry is its own path or simply an empty build, are open.
+
 ### The run is one surface
 
 Setup happens once, before the run, and is its own screen. Everything after it is a single
