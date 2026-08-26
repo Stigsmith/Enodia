@@ -1,0 +1,92 @@
+/* Enodia design tokens.
+ *
+ * THIS FILE IS THE SOURCE. dist/index.html inlines a copy because no build
+ * exists yet. When they disagree, this one is right.
+ *
+ * Every value is sampled from the game, and project/briefs/visual-language.md
+ * names the file each one came from. Do not invent a colour here.
+ *
+ * Ramps are POSITIONAL, never literal. --jade-hot means "the brightest living
+ * light", not "#8fd4c4". That is what lets a per-god theme swap one ramp
+ * without touching anything else.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * GROUND. From GUI/HUD/TraitTrayBacking.png and GUI/Tooltip_Backing_01.png.
+   * Near-black leaning teal-green, hue 180 to 210. Fixed under every theme:
+   * the Crossroads does not change colour because you took Ares.
+   * ------------------------------------------------------------- */
+  --ink-950: #080d0f;
+  --ink-900: #0c1416;
+  --ink-850: #111c1f;
+  --ink-800: #182629;
+  --ink-700: #23393d;
+
+  /* DIVIDERS. From GUI/HorizontalDivider.png. Hue 180 to 189. */
+  --div-1: #262d2d;
+  --div-2: #2b3232;
+  --div-3: #2f3738;
+  --div-4: #353e3f;
+  --div-5: #424d4f;
+
+  /* ---------------------------------------------------------------
+   * SILVER. From assets/rarity/common.png, which came out of the game.
+   * Hue 231 to 235 throughout: this game's metal is violet-leaning, not
+   * neutral grey. A neutral grey next to real game art looks wrong.
+   * ------------------------------------------------------------- */
+  --silver-hi: #9aa1cd;
+  --silver: #686f9b;
+  --silver-sh: #333546;
+  --silver-deep: #22232e;
+
+  /* ---------------------------------------------------------------
+   * JADE, the living light. From Hecate's portrait.
+   * THE ONLY RAMP A PER-GOD THEME SWAPS. Everything else stays put.
+   * ------------------------------------------------------------- */
+  --jade-dim: #3d6b63;
+  --jade: #649c97;
+  --jade-hot: #8fd4c4;
+
+  /* ---------------------------------------------------------------
+   * RIM LIGHT, events only. The edge lighting in the character art is
+   * magenta and cyan, never gold. Never used for anything ambient, and
+   * fixed under every theme because an event means the same thing in all
+   * of them.
+   * ------------------------------------------------------------- */
+  --rim-magenta: #c96aa8;
+  --rim-cyan: #5ad4d4;
+
+  /* TEXT. */
+  --bone: #ede7da;
+  --bone-dim: #a8b3ae;
+  --bone-faint: #6b7a76;
+
+  /* ---------------------------------------------------------------
+   * NOT A PALETTE COLOUR. Dora's hard hat, and the only thing that may
+   * ever be this yellow. Named for its meaning so it cannot be reused as
+   * gold, which the brief deleted: gold is Olympus and arrives with the
+   * boon art, never with the furniture.
+   * ------------------------------------------------------------- */
+  --unbuilt: #e5c33c;
+
+  /* TYPE. Cinzel and Spectral are lookalikes, not the game's own fonts. */
+  --display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --body: "Spectral", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* RADII. Mixed on purpose: the game pairs hand-drawn circles for boons
+   * with heavily rounded card frames and flat text strips. */
+  --r-hair: 3px;
+  --r-soft: 10px;
+  --r-card: 16px;
+  --r-pill: 999px;
+
+  /* MOTION, four tiers. Ambient and emphasis stop entirely under
+   * prefers-reduced-motion. Event and response degrade to an instant state
+   * change instead, because they carry meaning. */
+  --t-response: 160ms;
+  --e-response: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-sheen: 5.5s;
+  --t-ambient: 9s;
+}
