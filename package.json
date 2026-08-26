@@ -1,0 +1,13 @@
+{
+  "name": "enodia",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "In-run build companion for Hades II",
+  "scripts": {
+    "extract": "node scripts/extract.mjs"
+  },
+  "dependencies": {
+    "wasmoon": "^1.16.0"
+  }
+}

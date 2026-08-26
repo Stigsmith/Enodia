@@ -1,0 +1,1666 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "MetaUpgradeCardData"
+ },
+ "data": {
+  "CastBuff": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Furies.",
+      "Cue": "/VO/Melinoe_2984"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerFBoss": 1,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "CastBuff_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Furies.",
+      "Cue": "/VO/Melinoe_2984"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "InsideCastBuffMetaUpgrade",
+   "Type": "Death",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 3
+   },
+   "Image": "CardArt_06",
+   "StartUnlocked": false,
+   "Cost": 2,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "ChanneledCast": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Sorceress.",
+      "Cue": "/VO/Melinoe_0781"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 1
+    },
+    {
+     "MixerHBoss": 1,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "ChanneledCast_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Sorceress.",
+      "Cue": "/VO/Melinoe_0781"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "ChannelSlowMetaUpgrade",
+   "Type": "Time",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 1
+   },
+   "Image": "CardArt_01",
+   "StartUnlocked": false,
+   "Cost": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "MetaToRunUpgrade": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Artificer.",
+      "Cue": "/VO/Melinoe_2989"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerNBoss": 2,
+     "CardUpgradePoints": 5
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "MetaToRunUpgrade_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Artificer.",
+      "Cue": "/VO/Melinoe_2989"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "MetaToRunMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 35
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaToRunUses",
+   "Image": "CardArt_18",
+   "Cost": 3,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "MaxHealthPerRoom": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Centaur.",
+      "Cue": "/VO/Melinoe_2986"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "MaxHealthPerRoom_AutoEquip",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerOBoss": 1,
+     "CardUpgradePoints": 6
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "MaxHealthPerRoom_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Centaur.",
+      "Cue": "/VO/Melinoe_2986"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "ChamberHealthMetaUpgrade",
+   "ResourceCost": {
+    "MixerFBoss": 1,
+    "MetaCardPointsCommon": 30
+   },
+   "AutoEquipRequirements": {
+    "HasCostsThrough": 5
+   },
+   "Image": "CardArt_13",
+   "Cost": 0,
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "TradeOff": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Fates.",
+      "Cue": "/VO/Melinoe_1456"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "TradeOff_AutoEquip",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerNBoss": 2,
+     "CardUpgradePoints": 6
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "TradeOff_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "AutoEquipRequirements": {
+    "MetaUpgradeName": "TradeOff",
+    "SurroundAllEquipped": true
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaUpgradeRerolls",
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Fates.",
+      "Cue": "/VO/Melinoe_1456"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "RerollTradeOffMetaUpgrade",
+   "OnGrantedFunctionName": "GrantMetaUpgradeRerolls",
+   "ResourceCost": {
+    "MixerNBoss": 1,
+    "MetaCardPointsCommon": 30
+   },
+   "RequiredCardNames": [
+    "ScreenReroll",
+    "DoorReroll"
+   ],
+   "Image": "CardArt_16",
+   "Cost": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "BaseMetaUpgrade": {
+   "DebugOnly": true,
+   "ResourceCost": {
+    "MetaCardPointsCommon": 10
+   },
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "CardUpgradePoints": 4
+    }
+   ],
+   "IconScale": 0.2,
+   "Image": "Codex_Portrait_SurfaceBiome",
+   "Cost": 1
+  },
+  "CardDraw": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Judgment.",
+      "Cue": "/VO/Melinoe_2991"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "CardDraw_AutoEquip",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 10
+    },
+    {
+     "MetaFabric": 20,
+     "CardUpgradePoints": 20
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "CardDraw_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Judgment.",
+      "Cue": "/VO/Melinoe_2991"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "BossProgressionMetaUpgrade",
+   "ResourceCost": {
+    "MixerPBoss": 1,
+    "MetaCardPointsCommon": 50
+   },
+   "AutoEquipRequirements": {
+    "RequiredMetaUpgradesMin": 1,
+    "RequiredMetaUpgradesMax": 3
+   },
+   "Image": "CardArt_25",
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "EpicRarityBoost": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Divinity.",
+      "Cue": "/VO/Melinoe_2990"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "EpicRarity_AutoEquip_Alt",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 5
+    },
+    {
+     "MixerPBoss": 2,
+     "CardUpgradePoints": 10
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "EpicRarityBoost_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Divinity.",
+      "Cue": "/VO/Melinoe_2990"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "EpicRarityBoostMetaUpgrade",
+   "ResourceCost": {
+    "MixerOBoss": 1,
+    "MetaCardPointsCommon": 45
+   },
+   "AutoEquipRequirements": {
+    "CardsRequired": 5,
+    "MetaUpgradeName": "EpicRarityBoost",
+    "OtherRowOrColumnEquipped": true
+   },
+   "Image": "CardArt_24",
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "BonusDodge": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Messenger.",
+      "Cue": "/VO/Melinoe_0998"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 1
+    },
+    {
+     "MixerPBoss": 1,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "BonusDodge_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Messenger.",
+      "Cue": "/VO/Melinoe_0998"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "DodgeBonusMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 20
+   },
+   "CustomTrayText": "DodgeBonusMetaUpgrade_Tray",
+   "Image": "CardArt_08",
+   "Cost": 1,
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "DoorReroll": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Enchantress.",
+      "Cue": "/VO/Melinoe_4067"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerGBoss": 2,
+     "CardUpgradePoints": 5
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "DoorReroll_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Enchantress.",
+      "Cue": "/VO/Melinoe_4067"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "DoorRerollMetaUpgrade",
+   "OnGrantedFunctionName": "GrantMetaUpgradeRerolls",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 25
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaUpgradeRerolls",
+   "Image": "CardArt_21",
+   "Cost": 3,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "LowHealthBonus": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Strength.",
+      "Cue": "/VO/Melinoe_2988"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "ShowLastStandWarning": true,
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 6
+    },
+    {
+     "MixerPBoss": 2,
+     "CardUpgradePoints": 12
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "LowHealthBonus_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Strength.",
+      "Cue": "/VO/Melinoe_2988"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "LowHealthBuffMetaUpgrade",
+   "OnGrantedFunctionName": "GrantedLowHealthBonusBuffStatePresentation",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 40
+   },
+   "Image": "CardArt_23",
+   "Cost": 4,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "StartingGold": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Boatman.",
+      "Cue": "/VO/Melinoe_2792"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 5
+    },
+    {
+     "CharonPoints": 1,
+     "CardUpgradePoints": 10
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "StartingGold_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Boatman.",
+      "Cue": "/VO/Melinoe_2792"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "StartingGoldMetaUpgrade",
+   "OnGrantedFunctionName": "GrantMetaUpgradeCurrency",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 30
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaUpgradeCurrency",
+   "Image": "CardArt_17",
+   "Cost": 5,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "BonusHealth": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Persistence.",
+      "Cue": "/VO/Melinoe_4022"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerPBoss": 1,
+     "CardUpgradePoints": 4
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "BonusHealth_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Persistence.",
+      "Cue": "/VO/Melinoe_4022"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "HealthManaBonusMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 10
+   },
+   "CustomTrayText": "HealthManaBonusMetaUpgrade_Tray",
+   "Image": "CardArt_07",
+   "Cost": 2,
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "SorceryRegenUpgrade": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Moon.",
+      "Cue": "/VO/Melinoe_1145"
+     },
+     "2": {
+      "Text": "The Moon.",
+      "Cue": "/VO/Melinoe_2791"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "SorceryRegenUpgrade_AutoEquip",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerGBoss": 2,
+     "CardUpgradePoints": 6
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "SorceryRegenUpgrade_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Moon.",
+      "Cue": "/VO/Melinoe_2791"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "SorceryRegenMetaUpgrade",
+   "ResourceCost": {
+    "MixerGBoss": 1,
+    "MetaCardPointsCommon": 30
+   },
+   "AutoEquipRequirements": {
+    "MetaUpgradeName": "SorceryRegenUpgrade",
+    "SurroundEquipped": true
+   },
+   "Image": "CardArt_05",
+   "Cost": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "ScreenReroll": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Champions.",
+      "Cue": "/VO/Melinoe_1457"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 5
+    },
+    {
+     "MixerOBoss": 2,
+     "CardUpgradePoints": 10
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "ScreenReroll_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Champions.",
+      "Cue": "/VO/Melinoe_1457"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "PanelRerollMetaUpgrade",
+   "OnGrantedFunctionName": "GrantMetaUpgradeRerolls",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 35
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaUpgradeRerolls",
+   "Image": "CardArt_22",
+   "Cost": 4,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "CastCount": {
+   "RandomDrawChance": 0.1,
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Eternity.",
+      "Cue": "/VO/Melinoe_0997"
+     },
+     "2": {
+      "Text": "Eternity.",
+      "Cue": "/VO/Melinoe_0785"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerHBoss": 2,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "CastCount_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Eternity.",
+      "Cue": "/VO/Melinoe_0997"
+     },
+     "2": {
+      "Text": "Eternity.",
+      "Cue": "/VO/Melinoe_0785"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "CastDamageMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 25
+   },
+   "Image": "CardArt_12",
+   "Cost": 3,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "HealthRegen": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Wayward Son.",
+      "Cue": "/VO/Melinoe_2983"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerFBoss": 1,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "HealthRegen_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "CustomTextWithShrineUpgrade": {
+    "CardTitle": "HealthRegen_Vow",
+    "ShrineUpgradeName": "HealingReductionShrineUpgrade"
+   },
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Wayward Son.",
+      "Cue": "/VO/Melinoe_2983"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "DoorHealMetaUpgrade",
+   "Type": "Life",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 3
+   },
+   "CustomTrayText": "DodgeBonusMetaUpgrade_Tray",
+   "StartUnlocked": false,
+   "Image": "CardArt_02",
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "BaseBonusMetaUpgrade": {
+   "DebugOnly": true,
+   "ResourceCost": {
+    "MetaCardPointsCommon": 10
+   },
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "CardUpgradePoints": 4
+    }
+   ],
+   "IconScale": 0.2,
+   "Image": "CardArt_01",
+   "Cost": 0
+  },
+  "BonusRarity": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Queen.",
+      "Cue": "/VO/Melinoe_2790"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "AutoEquipText": "BonusRarity_AutoEquip",
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerGBoss": 2,
+     "CardUpgradePoints": 4
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "BonusRarity_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Queen.",
+      "Cue": "/VO/Melinoe_2790"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "DuoRarityBoostMetaUpgrade",
+   "CustomTrayText": "DuoRarityBoostMetaUpgrade_Tray",
+   "ResourceCost": {
+    "MixerHBoss": 1,
+    "MetaCardPointsCommon": 45
+   },
+   "AutoEquipRequirements": {
+    "MaxDuplicateCount": 2,
+    "RequiredMetaUpgradesMin": 1
+   },
+   "Image": "CardArt_20",
+   "Cost": 0,
+   "InheritFrom": [
+    "BaseBonusMetaUpgrade"
+   ]
+  },
+  "MagicCrit": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Night.",
+      "Cue": "/VO/Melinoe_2987"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "Mixer6Common": 1,
+     "CardUpgradePoints": 4
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "MagicCrit_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Night.",
+      "Cue": "/VO/Melinoe_2987"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "MagicCritMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 35
+   },
+   "Image": "CardArt_04",
+   "Cost": 2,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "RarityBoost": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Excellence.",
+      "Cue": "/VO/Melinoe_1460"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 4
+    },
+    {
+     "MixerNBoss": 2,
+     "CardUpgradePoints": 6
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "RarityBoost_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Excellence.",
+      "Cue": "/VO/Melinoe_1460"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "RarityBoostMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 40
+   },
+   "Image": "CardArt_19",
+   "Cost": 5,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "LowManaDamageBonus": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Huntress.",
+      "Cue": "/VO/Melinoe_1147"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 2
+    },
+    {
+     "MixerNBoss": 2,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "LowManaDamageBonus_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Huntress.",
+      "Cue": "/VO/Melinoe_1147"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "LowManaDamageMetaupgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 15
+   },
+   "Cost": 2,
+   "Image": "CardArt_03",
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "ChanneledBlock": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Lovers.",
+      "Cue": "/VO/Melinoe_1459"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 3
+    },
+    {
+     "MixerHBoss": 2,
+     "CardUpgradePoints": 5
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "ChanneledBlock_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Lovers.",
+      "Cue": "/VO/Melinoe_1459"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "BossShieldMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 40
+   },
+   "Image": "CardArt_15",
+   "Cost": 3,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "ManaOverTime": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Unseen.",
+      "Cue": "/VO/Melinoe_2985"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 5
+    },
+    {
+     "MixerHBoss": 2,
+     "CardUpgradePoints": 10
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "ManaOverTime_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Unseen.",
+      "Cue": "/VO/Melinoe_2985"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "ManaOverTimeMetaUpgrade",
+   "Type": "Soul",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 30
+   },
+   "Image": "CardArt_09",
+   "Cost": 5,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "StatusVulnerability": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Origination.",
+      "Cue": "/VO/Melinoe_2789"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 5
+    },
+    {
+     "MixerShadow": 1,
+     "CardUpgradePoints": 10
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "StatusVulnerability_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Origination.",
+      "Cue": "/VO/Melinoe_2789"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "EffectVulnerabilityMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 35
+   },
+   "Image": "CardArt_14",
+   "Cost": 5,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "LastStand": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "Death.",
+      "Cue": "/VO/Melinoe_1455"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 6
+    },
+    {
+     "Mixer5Common": 1,
+     "CardUpgradePoints": 12
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "LastStand_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "Death.",
+      "Cue": "/VO/Melinoe_1455"
+     },
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "LastStandSlowTimeMetaUpgrade",
+   "OnGrantedFunctionName": "GrantMetaUpgradeLastStands",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 25
+   },
+   "OnUpgradedFunctionName": "UpgradeMetaUpgradeLastStands",
+   "Image": "CardArt_10",
+   "Cost": 4,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  },
+  "SprintShield": {
+   "EquipVoiceLines": [
+    {
+     "1": {
+      "Text": "The Swift Runner.",
+      "Cue": "/VO/Melinoe_0996"
+     },
+     "2": {
+      "Text": "The Swift Runner.",
+      "Cue": "/VO/Melinoe_0784"
+     },
+     "Cooldowns": [
+      {
+       "Name": "MelinoeAnyQuipSpeech"
+      }
+     ],
+     "SuccessiveChanceToPlay": 0.2,
+     "PreLineWait": 0.3,
+     "BreakIfPlayed": true
+    },
+    {
+     "GlobalVoiceLines": "CardInspectVoiceLines"
+    }
+   ],
+   "UpgradeResourceCost": [
+    {
+     "CardUpgradePoints": 1
+    },
+    {
+     "MixerFBoss": 1,
+     "CardUpgradePoints": 3
+    }
+   ],
+   "FlavorTextData": [
+    {
+     "Name": "DodgeSprint_FlavorText01",
+     "GameStateRequirements": [
+      {}
+     ]
+    }
+   ],
+   "ActiveWhileDead": true,
+   "UnlockedCardVoiceLines": [
+    {
+     "1": {
+      "Text": "The Swift Runner.",
+      "Cue": "/VO/Melinoe_0996"
+     },
+     "2": {
+      "Text": "The Swift Runner.",
+      "Cue": "/VO/Melinoe_0784"
+     },
+     "RandomRemaining": true,
+     "SkipAnim": true,
+     "PreLineWait": 0.65,
+     "UsePlayerSource": true
+    },
+    {
+     "GlobalVoiceLines": "AllCardsUnlockedVoiceLines"
+    }
+   ],
+   "TraitName": "SprintShieldMetaUpgrade",
+   "ResourceCost": {
+    "MetaCardPointsCommon": 15
+   },
+   "Image": "CardArt_11",
+   "Cost": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ]
+  }
+ }
+}

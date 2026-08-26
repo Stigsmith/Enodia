@@ -1,0 +1,37 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "TraitElementData"
+ },
+ "data": {
+  "Earth": {
+   "Icon": "EarthTraitSmall",
+   "Keyword": "EarthBoonKeyword",
+   "BaseElement": true
+  },
+  "Air": {
+   "Icon": "AirTraitSmall",
+   "Keyword": "AirBoonKeyword",
+   "BaseElement": true
+  },
+  "Water": {
+   "Icon": "WaterTraitSmall",
+   "Keyword": "WaterBoonKeyword",
+   "BaseElement": true
+  },
+  "Fire": {
+   "Icon": "FireTraitSmall",
+   "Keyword": "FireBoonKeyword",
+   "BaseElement": true
+  },
+  "Aether": {
+   "Icon": "AetherTraitSmall",
+   "Keyword": "AetherBoonKeyword",
+   "BaseElement": false
+  }
+ }
+}

@@ -1,0 +1,2182 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Game/Text/en/ScreenText.en.sjson",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch."
+ },
+ "data": {
+  "Menu_Exit": {
+   "name": "{CN} EXIT"
+  },
+  "Menu_Close": {
+   "name": "{CN} CLOSE"
+  },
+  "Menu_Continue": {
+   "name": "{CN} CONTINUE"
+  },
+  "Menu_NextCategory": {
+   "name": "{MR} NEXT"
+  },
+  "Menu_MoreContents": {
+   "name": "{MR} MORE..."
+  },
+  "Menu_PrevCategory": {
+   "name": "{ML} PREVIOUS"
+  },
+  "Menu_FewerContents": {
+   "name": "{ML} PREVIOUS"
+  },
+  "Menu_CloseSubmenu": {
+   "name": "{CN} RETURN"
+  },
+  "Menu_Buy": {
+   "name": "{SL} PURCHASE"
+  },
+  "Menu_Rush": {
+   "name": "{SL} EXPEDITE"
+  },
+  "Menu_Order": {
+   "name": "{SL} ORDER"
+  },
+  "Menu_Sell": {
+   "name": "{SL} SELL ONE"
+  },
+  "Menu_SellAll": {
+   "name": "{IP} SELL ALL"
+  },
+  "Menu_Exchange": {
+   "name": "{SL} RECYCLE"
+  },
+  "Menu_ExchangeAll": {
+   "name": "{IP} RECYCLE ALL"
+  },
+  "Menu_Purge": {
+   "name": "{SL} PURGE"
+  },
+  "Menu_Unlock": {
+   "name": "{SL} UNLOCK"
+  },
+  "Menu_Plant": {
+   "name": "{SL} PLANT"
+  },
+  "Menu_MultiPlant": {
+   "name": "{IP} PLANT x{$TempTextData.PlantAmount}"
+  },
+  "Menu_Gift": {
+   "name": "{SL} GIFT"
+  },
+  "Menu_Pin": {
+   "name": "{IP} FORGET-ME-NOT"
+  },
+  "Menu_PinBoon_On": {
+   "name": "{IP} TRACK"
+  },
+  "Menu_PinBoon_Off": {
+   "name": "{IP} UN-TRACK"
+  },
+  "Menu_SaveKeepsake": {
+   "name": "{IP} PRIORITIZE"
+  },
+  "Menu_UnSaveKeepsake": {
+   "name": "{IP} DEPRIORITIZE"
+  },
+  "Menu_TraitPin": {
+   "name": "{SL} PIN"
+  },
+  "Menu_TraitUnPin": {
+   "name": "{SL} UN-PIN"
+  },
+  "Menu_BoonInfo": {
+   "name": "{MX} BOON LIST"
+  },
+  "Menu_TraitList": {
+   "name": "{MX} OFFERINGS"
+  },
+  "Menu_QuestLog": {
+   "name": "{SL} CLAIM"
+  },
+  "Menu_QuestLogWatch": {
+   "name": "{SL} LISTEN"
+  },
+  "Menu_Equip": {
+   "name": "{SL} EQUIP"
+  },
+  "Menu_ChangeAspect": {
+   "name": "{SL} CHOOSE"
+  },
+  "Menu_Unequip": {
+   "name": "{SL} REMOVE"
+  },
+  "Menu_Upgrade": {
+   "name": "{SL} UPGRADE"
+  },
+  "Menu_Info": {
+   "name": "{MX} INFO"
+  },
+  "Menu_OpenTraitTray": {
+   "name": "{AT} BOON INFO"
+  },
+  "Menu_Sort": {
+   "name": "{MX} SORT"
+  },
+  "Shop_ItemCost": {
+   "name": "{$TempTextData.Amount}{!Icons.Currency}"
+  },
+  "Shop_Purchased": {
+   "name": "{!Icons.PurchasedCheckmark}"
+  },
+  "Shop_Removable": {
+   "name": "{!Icons.DefaultPurchasedCheckmark}"
+  },
+  "Shop_ReAdd": {
+   "name": "{!Icons.MirrorInactive}"
+  },
+  "ResourceCost": {
+   "name": "{$TempTextData.Amount}{!TempTextData.IconPath}"
+  },
+  "ResourceCostSelling": {
+   "name": "+{$TempTextData.Amount}{!TempTextData.IconPath}"
+  },
+  "ResourceCostFraction": {
+   "name": "{$TempTextData.Current} {#ShopCostFormat}/ {$TempTextData.Amount}"
+  },
+  "ResourceCostInventoryAmount": {
+   "name": "{!Icons.InventoryIcon}x{$TempTextData.InventoryAmount}"
+  },
+  "Boon_Common": {
+   "name": " "
+  },
+  "Boon_Rare": {
+   "name": "Rare"
+  },
+  "Boon_Epic": {
+   "name": "Epic"
+  },
+  "Boon_Heroic": {
+   "name": "Heroic"
+  },
+  "Boon_Legendary": {
+   "name": "Legendary"
+  },
+  "Boon_Duo": {
+   "name": "Duo"
+  },
+  "Boon_Infusion": {
+   "name": "Infusion"
+  },
+  "UpgradeChoiceMenu_Title": {
+   "name": "Boons of {{GodName}}"
+  },
+  "UpgradeChoiceMenu_Artemis": {
+   "name": "Boons of Artemis"
+  },
+  "UpgradeChoiceMenu_Chaos": {
+   "name": "Boons of Chaos"
+  },
+  "UpgradeChoiceMenu_Dionysus": {
+   "name": "Boons of Dionysus"
+  },
+  "UpgradeChoiceMenu_Athena": {
+   "name": "Boons of Athena"
+  },
+  "UpgradeChoiceMenu_Hades": {
+   "name": "Boons of Hades"
+  },
+  "StackUpgradeChoiceMenu_Title": {
+   "name": "Pom of Power"
+  },
+  "WeaponUpgradeChoiceMenu_Title": {
+   "name": "Daedalus Hammer"
+  },
+  "CurrentRunDepth": {
+   "name": "location {$CurrentRun.RunDepthCache}"
+  },
+  "Boon_Select": {
+   "name": "{SL} CHOOSE"
+  },
+  "Talent_Select": {
+   "name": "{SL} CHOOSE"
+  },
+  "Talent_Deselect": {
+   "name": "{SL} REMOVE"
+  },
+  "Boon_Sacrifice": {
+   "name": "{SL} ACCEPT"
+  },
+  "Boon_Upgrade": {
+   "name": "{RY} RARIFY"
+  },
+  "Boon_Upgrade_Count": {
+   "name": "{RY} RARIFY {#StatFormat}\\[{$TempTextData.Amount}\\]"
+  },
+  "Boon_Reroll": {
+   "name": "{RR} RE-OFFER {#StatFormat}\\[-{$TempTextData.Amount}{!Icons.ReRoll}\\]"
+  },
+  "TraitRarityUpgrade": {
+   "name": "{$Keywords.RarityUpgrade}"
+  },
+  "ZeusUpgrade": {
+   "name": "Zeus",
+   "description": "King of the Olympians"
+  },
+  "ZeusUpgrade_FlavorText01": {
+   "name": "once he led his fellow gods to victory against the titans, and so intends again."
+  },
+  "ZeusUpgrade_FlavorText02": {
+   "name": "the heavens themselves could split asunder if he so willed."
+  },
+  "ZeusUpgrade_FlavorText03": {
+   "name": "the patriarch of mount olympus did not rise to his station by mere happenstance."
+  },
+  "HeraUpgrade": {
+   "name": "Hera",
+   "description": "Queen of the Olympians"
+  },
+  "HeraUpgrade_FlavorText01": {
+   "name": "the goddess of unions knows even the strongest bonds can break."
+  },
+  "HeraUpgrade_FlavorText02": {
+   "name": "she alone has the capacity to keep the other gods in check."
+  },
+  "HeraUpgrade_FlavorText03": {
+   "name": "her powers over the intangible are never to be underestimated."
+  },
+  "PoseidonUpgrade": {
+   "name": "Poseidon",
+   "description": "God of the Sea"
+  },
+  "PoseidonUpgrade_FlavorText01": {
+   "name": "the vast seas roil when he wills it thus, and the mountains tremble."
+  },
+  "PoseidonUpgrade_FlavorText02": {
+   "name": "the surface of the world in its entirety is his domain by fate."
+  },
+  "PoseidonUpgrade_FlavorText03": {
+   "name": "the raw might of a crashing wave; a simple manifesting of his awesome strength."
+  },
+  "ApolloUpgrade": {
+   "name": "Apollo",
+   "description": "God of Light"
+  },
+  "ApolloUpgrade_FlavorText01": {
+   "name": "brilliance without measure, talent without equal."
+  },
+  "ApolloUpgrade_FlavorText02": {
+   "name": "he has yet to find a skill at which he does not excel."
+  },
+  "ApolloUpgrade_FlavorText03": {
+   "name": "music and poetry would both be void of life if not for him."
+  },
+  "AphroditeUpgrade": {
+   "name": "Aphrodite",
+   "description": "Goddess of Love"
+  },
+  "AphroditeUpgrade_FlavorText01": {
+   "name": "she instills in mortalkind the longing that inspires them and spurs them to action."
+  },
+  "AphroditeUpgrade_FlavorText02": {
+   "name": "her power is such that, even in the realm of the dead, a certain beauty thrives."
+  },
+  "AphroditeUpgrade_FlavorText03": {
+   "name": "mortals can perhaps survive without her power; but without it, cannot truly live."
+  },
+  "DemeterUpgrade": {
+   "name": "Demeter",
+   "description": "Goddess of Seasons"
+  },
+  "DemeterUpgrade_FlavorText01": {
+   "name": "she controls the very cycle of life and death; of abundance and decay."
+  },
+  "DemeterUpgrade_FlavorText02": {
+   "name": "with the turning of the seasons can come hope and renewal, or desolation beyond words."
+  },
+  "DemeterUpgrade_FlavorText03": {
+   "name": "the mistress of seasons holds sway over everything between heaven and earth."
+  },
+  "HestiaUpgrade": {
+   "name": "Hestia",
+   "description": "Goddess of Flame"
+  },
+  "HestiaUpgrade_FlavorText01": {
+   "name": "from the comfort of the hearth, to the rage of an inferno."
+  },
+  "HestiaUpgrade_FlavorText02": {
+   "name": "the eldest, most reclusive olympian has fire in her heart."
+  },
+  "HestiaUpgrade_FlavorText03": {
+   "name": "her flames bring quaint comfort, or ruinous destruction."
+  },
+  "HestiaUpgrade_SacrificeBoon": {
+   "name": "Burnt Offering"
+  },
+  "HestiaUpgrade_SacrificeBoon_FlavorText": {
+   "name": "make your sacrifice to the goddess of the hearth."
+  },
+  "Hestia_UpgradeChoice_Sacrifice": {
+   "name": "{SL} CHOOSE"
+  },
+  "HephaestusUpgrade": {
+   "name": "Hephaestus",
+   "description": "God of the Forge"
+  },
+  "HephaestusUpgrade_FlavorText01": {
+   "name": "the forge-god's volcanic furnace births the world's finest arms."
+  },
+  "HephaestusUpgrade_FlavorText02": {
+   "name": "the strongest metal still bends effortlessly to his will."
+  },
+  "HephaestusUpgrade_FlavorText03": {
+   "name": "the incomparable arms and armor that he fashions are prized even by gods."
+  },
+  "HermesUpgrade": {
+   "name": "Hermes",
+   "description": "God of Swiftness"
+  },
+  "HermesUpgrade_FlavorText01": {
+   "name": "the family messenger is often tasked with spreading vital news, or keeping vital secrets."
+  },
+  "HermesUpgrade_FlavorText02": {
+   "name": "none can travel as swiftly from the peaks of olympus to the depths of the underworld."
+  },
+  "HermesUpgrade_FlavorText03": {
+   "name": "the herald of the gods is never one to sit idly by when opportunity awaits."
+  },
+  "ArtemisUpgrade": {
+   "name": "Artemis",
+   "description": "Goddess of the Hunt"
+  },
+  "ArtemisUpgrade_FlavorText01": {
+   "name": "the lone huntress moves in moonlight to the rhythms of the earth."
+  },
+  "ArtemisUpgrade_FlavorText02": {
+   "name": "she moves through the woods like a flash of silver, lethal to her prey."
+  },
+  "ArtemisUpgrade_FlavorText03": {
+   "name": "the hunt means knowing when to be utterly still, and knowing when to strike."
+  },
+  "DionysusUpgrade_FlavorText01": {
+   "name": "mirth is needed more than ever in the darkest of times."
+  },
+  "DionysusUpgrade_FlavorText02": {
+   "name": "the greatest joys cannot be contained and are to be shared."
+  },
+  "DionysusUpgrade_FlavorText03": {
+   "name": "moments spent in good company and cheer are to be savored."
+  },
+  "AthenaUpgrade_FlavorText01": {
+   "name": "however fraught the path to victory may be, she always finds the way."
+  },
+  "AthenaUpgrade_FlavorText02": {
+   "name": "with wisdom, many challenges may be overcome; and many more, avoided."
+  },
+  "AthenaUpgrade_FlavorText03": {
+   "name": "she who bears the aegis is protector of the heavens and the righteous."
+  },
+  "AresUpgrade": {
+   "name": "Ares",
+   "description": "God of War"
+  },
+  "AresUpgrade_FlavorText01": {
+   "name": "he stokes his violent conflicts so that mortalkind can never multiply too quickly."
+  },
+  "AresUpgrade_FlavorText02": {
+   "name": "violence is a force of nature in and of itself, and not merely a consequence."
+  },
+  "AresUpgrade_FlavorText03": {
+   "name": "the impulse to harm and eliminate can be as powerful as the impulse to nurture and create."
+  },
+  "HadesUpgrade_FlavorText01": {
+   "name": "his is an infernal strength flowing from darkest depths."
+  },
+  "HadesUpgrade_FlavorText02": {
+   "name": "the living and the dead yet fear his very name."
+  },
+  "HadesUpgrade_FlavorText03": {
+   "name": "his surpassing might once overwhelmed the titans."
+  },
+  "SpellScreenMenu_Title": {
+   "name": "Gifts of the Moon"
+  },
+  "SpellScreenMenu_Subtitle": {
+   "name": "you received:"
+  },
+  "SpellDrop_FlavorText01": {
+   "name": "she in her silver chariot conceals ferocious power known to few."
+  },
+  "SpellDrop_FlavorText02": {
+   "name": "the eye of night watches silently, taking stock of all that transpires."
+  },
+  "SpellDrop_FlavorText03": {
+   "name": "her distant silver light is a guiding beacon to all those who move in shadow."
+  },
+  "Spell_Select": {
+   "name": "{SL} CHOOSE"
+  },
+  "TrialUpgrade": {
+   "name": "Chaos",
+   "description": "Primordial Originator"
+  },
+  "TrialUpgrade_FlavorText01": {
+   "name": "all once sprang from the infinite void, even time itself."
+  },
+  "TrialUpgrade_FlavorText02": {
+   "name": "from an unfathomable abyss emerged creation and life, gods and mortals."
+  },
+  "TrialUpgrade_FlavorText03": {
+   "name": "the darkness from which all existence emerged yet remains."
+  },
+  "WeaponUpgrade_FlavorText01": {
+   "name": "the ever-reclusive artisan lets his masterwork do the talking."
+  },
+  "WeaponUpgrade_FlavorText02": {
+   "name": "no mere weaponsmith can hone the nocturnal arms; only one of talent to surpass the gods."
+  },
+  "WeaponUpgrade_FlavorText03": {
+   "name": "his surpassing skill as craftsman and inventor was well-recognized even in death."
+  },
+  "WeaponUpgradeScreen_Kills": {
+   "name": "Foes Vanquished:"
+  },
+  "WeaponUpgradeScreen_Clears": {
+   "name": "Nights Prevailed:"
+  },
+  "WeaponUpgradeScreen_ClearTimeRecord_Underworld": {
+   "name": "{!Icons.UnderworldIcon} Swiftest Victory:"
+  },
+  "WeaponUpgradeScreen_ClearTimeRecord_Surface": {
+   "name": "{!Icons.SurfaceIcon} Swiftest Victory:"
+  },
+  "WeaponUpgradeScreen_ShrinePointRecord_Underworld": {
+   "name": "{!Icons.UnderworldIcon} Highest {!Icons.ShrinePoint}{#BoldFormatGraft}Fear{#Prev}:"
+  },
+  "WeaponUpgradeScreen_ShrinePointRecord_Surface": {
+   "name": "{!Icons.SurfaceIcon} Highest {!Icons.ShrinePoint}{#BoldFormatGraft}Fear{#Prev}:"
+  },
+  "StackUpgrade_FlavorText01": {
+   "name": "its each and every seed, like a drop of blood; life as well as death."
+  },
+  "StackUpgrade_FlavorText02": {
+   "name": "whether they sprang from the surface or from underworld, who now can say?"
+  },
+  "StackUpgrade_FlavorText03": {
+   "name": "the power of the warmth of spring; the strength of dark of the earth."
+  },
+  "TalentScreenMenu_Title": {
+   "name": "Path of Stars"
+  },
+  "TalentDrop_FlavorText01": {
+   "name": "one's possibilities for growth are as innumerable as the stars."
+  },
+  "TalentDrop_FlavorText02": {
+   "name": "the constant stars above, eternal in their multitude and possibility."
+  },
+  "TalentDrop_FlavorText03": {
+   "name": "even the moon must find her way across the sky by certain means."
+  },
+  "AdditionalTalentPointDisplay": {
+   "name": "Talent Point(s)"
+  },
+  "UseQuestLog": {
+   "name": "{I} Foresee"
+  },
+  "QuestLogScreen_Title": {
+   "name": "The Fated List"
+  },
+  "QuestLogScreen_Flavor": {
+   "name": "“The Weavings of the Three Fates Invariably Come to Pass”"
+  },
+  "QuestLogReward": {
+   "name": "{#HighlightQuestReward}{#Prev}+{$TempTextData.Amount}{!TempTextData.Icon}"
+  },
+  "QuestLog_SelectHint": {
+   "name": "A Prophecy Shall be Selected"
+  },
+  "QuestLog_SelectHintAllClear": {
+   "name": "\\n\\n All Minor Prophecies Fulfilled \\n\\n Thank You For Ensuring Fate"
+  },
+  "QuestLog_ProgressCountIncomplete": {
+   "name": "{!Icons.QuestProgressIncomplete} {$TempTextData.Current} {!Icons.SlashDark} {$TempTextData.Goal}"
+  },
+  "QuestLog_ProgressCountComplete": {
+   "name": "{!Icons.QuestProgressComplete} {$TempTextData.Current} {!Icons.Slash} {$TempTextData.Goal}"
+  },
+  "QuestLog_QuestProgressIncomplete": {
+   "name": "{!Icons.QuestProgressIncomplete}"
+  },
+  "QuestLog_QuestProgressComplete": {
+   "name": "{!Icons.QuestProgressComplete}"
+  },
+  "QuestLog_QuestProgressRequirement": {
+   "name": "{$TempTextData.Requirement}"
+  },
+  "QuestLog_QuestAdded": {
+   "name": "Prophecy Foretold..."
+  },
+  "QuestLog_QuestUpdated": {
+   "name": "Prophecy Advanced..."
+  },
+  "QuestLog_QuestComplete": {
+   "name": "Prophecy Fulfilled!!"
+  },
+  "UseBountyBoard": {
+   "name": "{I} Scry"
+  },
+  "UseBountyBoard_Locked": {
+   "name": "{I} {#LockedFormat}Check?"
+  },
+  "BountyIntro": {
+   "name": "Chaos Trials",
+   "description": ""
+  },
+  "BountyLogScreen_Title": {
+   "name": "Pitch-Black Stone"
+  },
+  "BountyLogScreen_Flavor": {
+   "name": "“To Serve Chaos is to Improve One's Own Reality”"
+  },
+  "BountyBoard_StartChallenge": {
+   "name": "{SL} COMMENCE"
+  },
+  "BountyBoard_RepeatChallenge": {
+   "name": "{SL} RECOMMENCE"
+  },
+  "BountyBoard_ClearMessage": {
+   "name": "clears: {$TempTextData.ClearCount}        best time: {$TempTextData.BestClearTimeString}"
+  },
+  "BountyBoard_ClearMessageStreaks": {
+   "name": "current streak: {$TempTextData.CurrentStreak}        best streak: {$TempTextData.BestStreak}"
+  },
+  "BountyBoard_ClearMessage_NonRepeatable": {
+   "name": "cleared!!"
+  },
+  "BountyBoard_RandomWeapon": {
+   "name": "Random Weapon"
+  },
+  "BountyBoard_RandomKeepsake": {
+   "name": "Random Keepsake"
+  },
+  "BountyBoard_UnderworldRun": {
+   "name": "Underworld"
+  },
+  "BountyBoard_SurfaceRun": {
+   "name": "Surface"
+  },
+  "BountyBoard_Reward": {
+   "name": "{#HighlightFormatGraft}reward: {#Prev}{#LegendaryFormat}+{$TempTextData.Amount}{!TempTextData.Icon}"
+  },
+  "BountyBoard_RewardEarned": {
+   "name": "{#HighlightFormatGraft}reward claimed"
+  },
+  "InventoryScreen_GiftNotWanted": {
+   "name": "Not Interested",
+   "description": "This does not seem a suitable gift."
+  },
+  "InventoryScreen_GiftNotAvailable": {
+   "name": "None Left",
+   "description": "This could be gifted if you had any."
+  },
+  "InventoryScreen_SeedNotWanted": {
+   "name": "Cannot Be Planted",
+   "description": "This does not seem a suitable seed."
+  },
+  "InventoryScreen_SeedNotAvailable": {
+   "name": "Unavailable",
+   "description": "You have nothing to plant at this time."
+  },
+  "InventoryScreen_NoPinsHint": {
+   "name": "No Forget-Me-Nots tracked. \\n\\n Press {IP} on recipes to track what you need for them."
+  },
+  "InventoryScreen_LineHistoryTab": {
+   "name": "Recent Remarks"
+  },
+  "InventoryScreen_ResourcesTab": {
+   "name": "Reagents"
+  },
+  "InventoryScreen_GiftsTab": {
+   "name": "Indulgences"
+  },
+  "InventoryScreen_GardenTab": {
+   "name": "Greeneries"
+  },
+  "InventoryScreen_FishTab": {
+   "name": "Fishings"
+  },
+  "InventoryScreen_PinTab": {
+   "name": "Forget-Me-Nots"
+  },
+  "InventoryScreen_RemovePin": {
+   "name": "{IP} REMOVE"
+  },
+  "InventoryScreen_UnknownDetails": {
+   "name": "· ? ? ?"
+  },
+  "ArachneCostumeMenu_Title": {
+   "name": "Silken Fineries"
+  },
+  "ArachneCostumeMenu_FlavorText01": {
+   "name": "supple garments, dyes, and fabrics rivaling those of the gods themselves."
+  },
+  "NarcissusGiftsMenu_Title": {
+   "name": "Second-Hand Gifts"
+  },
+  "NarcissusGiftsMenu_FlavorText01": {
+   "name": "would-be suitors lavished him, yet such love cannot be bought at any price."
+  },
+  "EchoChoiceMenu_Title": {
+   "name": "Plaintive Echoes"
+  },
+  "EchoChoiceMenu_FlavorText01": {
+   "name": "only others can give voice to her desires; but she, in turn, can lend them potency."
+  },
+  "MedeaCurseMenu_Title": {
+   "name": "Nightly Curses"
+  },
+  "MedeaCurseMenu_FlavorText01": {
+   "name": "those who shunned or scorned her served only to inspire her more."
+  },
+  "CirceChoiceMenu_Title": {
+   "name": "Changes & Fortunes"
+  },
+  "CirceChoiceMenu_FlavorText01": {
+   "name": "how best to transform oneself and others is a limitless pursuit."
+  },
+  "IcarusChoiceMenu_Title": {
+   "name": "Latest Inventions"
+  },
+  "IcarusChoiceMenu_FlavorText01": {
+   "name": "even the gods can benefit from craftwork of a certain skill."
+  },
+  "ResourceShopScreen_Title": {
+   "name": "Wretched Broker"
+  },
+  "MarketScreen_Hint": {
+   "name": "vital reagents and resources, in exchange for the bones of the dead"
+  },
+  "MarketScreen_FlavorText01": {
+   "name": "the bones of the deceased retain a certain kind of power, and a certain pride."
+  },
+  "MarketScreen_FlavorText02": {
+   "name": "in the realm of the dead, one currency is valued above all."
+  },
+  "MarketScreen_FlavorText03": {
+   "name": "the longer the dead persist, the more they value remnants of their mortal lives."
+  },
+  "Market_LimitedTimeOffer": {
+   "name": "{!Icons.LimitedTimeOffer}"
+  },
+  "MarketScreen_Resources": {
+   "name": "Reagent Market"
+  },
+  "MarketScreen_Sell": {
+   "name": "Bone Exchange"
+  },
+  "MarketScreen_Gifts": {
+   "name": "Exotic Goods"
+  },
+  "MarketScreen_Exchange": {
+   "name": "Recycling Service"
+  },
+  "MarketScreen_BuyAmount": {
+   "name": "x{$TempTextData.BuyAmount}"
+  },
+  "MarketScreen_SellAmount": {
+   "name": "-1"
+  },
+  "MarketScreen_InventoryAmount": {
+   "name": "{!Icons.InventoryIcon} x{$TempTextData.InventoryAmount}"
+  },
+  "MarketScreen_Cost": {
+   "name": "{$TempTextData.CostAmount} {$TempTextData.CostIcon}"
+  },
+  "MarketScreen_CurrentAmountsHeader": {
+   "name": "You Have"
+  },
+  "MarketScreen_BuyingHeader": {
+   "name": "Purchase Price"
+  },
+  "MarketScreen_SellingHeader": {
+   "name": "Trade-In Value"
+  },
+  "MarketScreen_SellAllPrompt": {
+   "name": "Confirm Exchange",
+   "description": "You shall donate {#BoldFormatGraft}{$TempTextData.SellAmount}{!TempTextData.SellResourceIcon} {#Prev}to the {$Keywords.Broker}. \\n\\n You shall receive {#UpgradeFormat}+{$TempTextData.BuyAmount}{!TempTextData.BuyResourceIcon} {#Prev}in exchange. \\n\\n All trades are final."
+  },
+  "MarketScreen_ConfirmSellAll": {
+   "name": "Proceed"
+  },
+  "MarketScreen_CancelSellAll": {
+   "name": "Cancel"
+  },
+  "TradeScreen_Title": {
+   "name": "Fair Trade"
+  },
+  "TradeScreen_Subtitle": {
+   "name": "the incarnate of retribution ensures all get their just deserts."
+  },
+  "TradeScreen_GiveHint": {
+   "name": "you give:"
+  },
+  "TradeScreen_GetHint": {
+   "name": "you take:"
+  },
+  "TradeScreen_CurrentMoney": {
+   "name": "you have: {#MoneyFormatBold}{$TempTextData.Amount}{!Icons.Currency}"
+  },
+  "TradeScreen_CurrentMoney_CantAfford": {
+   "name": "you have: {#MoneyFormatCantAffordBold}{$TempTextData.Amount}{!Icons.Currency}"
+  },
+  "TradeScreen_Accept": {
+   "name": "{CF} ACCEPT"
+  },
+  "TradeScreen_Decline": {
+   "name": "{CN} DECLINE"
+  },
+  "TradeScreen_TradeCost": {
+   "name": "{$TooltipData.Cost} {$TooltipData.ResourceName}",
+   "description": "A price in {!Icons.Currency}, in exchange for what {$Keywords.CharNemesis} has to offer."
+  },
+  "TradeScreen_ResourceCost": {
+   "name": "{$TooltipData.ResourceName} {#TooltipUpgradeFormat}({$TooltipData.Cost})"
+  },
+  "TradeScreen_DamageAmount": {
+   "name": "{#AltPenaltyFormat}Free Hit",
+   "description": "Invite {$Keywords.CharNemesis} to take her best shot. She will deal {#AltPenaltyFormat}{$TooltipData.DamageAmount} {#Prev}damage."
+  },
+  "Choice_MorosBecomingCloser01": {
+   "name": "{#Emph}Remain with Moros? {#DialogChoiceInstructionFormat}(Follow your heart...)"
+  },
+  "Choice_MorosAccept": {
+   "name": "{CF} AGREE"
+  },
+  "Choice_MorosDecline": {
+   "name": "{CN} REFUSE"
+  },
+  "Choice_NemesisBecomingCloser01": {
+   "name": "{#Emph}Stay with Nemesis? {#DialogChoiceInstructionFormat}(Follow your heart...)"
+  },
+  "Choice_NemesisAccept": {
+   "name": "{CF} GO TO HER"
+  },
+  "Choice_NemesisDecline": {
+   "name": "{CN} HOLD OFF"
+  },
+  "Choice_ErisBecomingCloser01": {
+   "name": "{#Emph}Be with Eris? {#DialogChoiceInstructionFormat}(Follow your heart...)"
+  },
+  "Choice_ErisAccept": {
+   "name": "{CF} WHY NOT"
+  },
+  "Choice_ErisDecline": {
+   "name": "{CN} NO THANKS"
+  },
+  "Choice_IcarusBecomingCloser01": {
+   "name": "{#Emph}Go to Icarus? {#DialogChoiceInstructionFormat}(Follow your heart...)"
+  },
+  "Choice_IcarusAccept": {
+   "name": "{CF} VERY WELL"
+  },
+  "Choice_IcarusDecline": {
+   "name": "{CN} SORRY..."
+  },
+  "Choice_Accept": {
+   "name": "{CF} ACCEPT"
+  },
+  "Choice_Decline": {
+   "name": "{CN} DECLINE"
+  },
+  "UseMailbox": {
+   "name": "{I} Check"
+  },
+  "UseMailbox_DeliveryPending": {
+   "name": "{I} {#LockedFormat}Check?"
+  },
+  "UseMailbox_DeliveryReady": {
+   "name": "{I} Claim"
+  },
+  "MailboxScreen_Title": {
+   "name": "Gold Rewards"
+  },
+  "MailboxScreen_Hint": {
+   "name": "spending {#LegendaryFormat}{$ScreenData.MailboxScreen.MoneySpentPerCharonPoint}{#Prev}{!Icons.Currency} earns you {#UpgradeFormat}1{#Prev}{!Icons.CharonPoints}, redeemed here for supplies {#ItalicFormat}(that soon arrive)"
+  },
+  "MailboxScreen_DeliveryTime": {
+   "name": "delivered in {$TempTextData.DeliveryTime}{!Icons.Clock}"
+  },
+  "MailboxStatus_DeliveryPending": {
+   "name": "{$TempTextData.TimeRemaining}{!Icons.Clock}"
+  },
+  "GhostAdminScreen_Title": {
+   "name": "Crossroads Cauldron"
+  },
+  "GhostAdminUnlock": {
+   "name": "INCANTATION COMPLETE"
+  },
+  "RepeatableUnlock": {
+   "name": "ALCHEMY COMPLETE"
+  },
+  "GhostAdminScreen_Hint": {
+   "name": "with pure intention, scant reagents, and the proper words, anything can be achieved."
+  },
+  "GhostAdmin_CategoryEmpty": {
+   "name": "more incantations required"
+  },
+  "WorldUpgradeScreen_Critical": {
+   "name": "INCANTATIONS"
+  },
+  "WorldUpgradeScreen_Repeatable": {
+   "name": "ALCHEMY"
+  },
+  "CosmeticMainHall": {
+   "name": "VISIONS"
+  },
+  "CosmeticLounge": {
+   "name": "ALTERATIONS"
+  },
+  "CosmeticBedroom": {
+   "name": "RECIPES"
+  },
+  "WeaponShopItemConfirm": {
+   "name": "{SL} Reveal..."
+  },
+  "Menu_CauldronUnlock": {
+   "name": "{SL} INCANT"
+  },
+  "Menu_CosmeticsUnlock": {
+   "name": "{SL} APPROVE"
+  },
+  "Menu_CosmeticsRemove": {
+   "name": "{SL} REMOVE"
+  },
+  "Menu_CosmeticsReAdd": {
+   "name": "{SL} CHOOSE"
+  },
+  "MetaUpgrade_Locked": {
+   "name": "? ? ?"
+  },
+  "MetaUpgrade_CostPrefix": {
+   "name": "Psyche:"
+  },
+  "Unlock_MetaUpgrade": {
+   "name": "Unlock"
+  },
+  "IncreaseMetaUpgradeLimit": {
+   "name": "{#MemFormat}+{$TempTextData.Amount} {#Prev}Grasp"
+  },
+  "Max_MetaUpgrade": {
+   "name": "{#MemFormat}MAX"
+  },
+  "Max_MetaUpgrade_FlavorText01": {
+   "name": "We each have our limits; usually far beyond what we believe them to be, but nevertheless there."
+  },
+  "MetaUpgrade_Slash": {
+   "name": " {!Icons.Slash}"
+  },
+  "MetaUpgrade_EquipAvailable": {
+   "name": "Untapped Potential!",
+   "description": ""
+  },
+  "MetaUpgrade_CardUnlocksAvailable": {
+   "name": "Reveal the Cards!",
+   "description": "You have the means to use {#BoldFormatGraft}Arcana Cards{#Prev}. Each one you activate makes you stronger in a unique way.\r\n\r\n        Select a revealed {#BoldFormatGraft}Card {#Prev}to permanently unlock it."
+  },
+  "MetaUpgradeEquip_CardUnlockBack": {
+   "name": "Unlock Cards"
+  },
+  "MetaUpgradeEquip_Proceed": {
+   "name": "Exit Anyway"
+  },
+  "MetaUpgradeEquip_Back": {
+   "name": "Use More Cards"
+  },
+  "MetaUpgradeTable_UnableToEquip": {
+   "name": "{#MemFormat}Grasp {#Prev}Limit Reached!",
+   "description": ""
+  },
+  "MetaUpgradeTable_UnableToEquip_Alt": {
+   "name": "{#MemFormat}Grasp {#Prev}Limit Reached!",
+   "description": ""
+  },
+  "MetaUpgradeTable_UnableToEquip_Alt2": {
+   "name": "Reach Beyond!",
+   "description": ""
+  },
+  "MetaUpgrade_UpgradesAvailable": {
+   "name": "{#BoldFormatGraft}Insights {#Prev}Unlocked!",
+   "description": "You may now use {!Icons.CardUpgradePoints} {#BoldFormatGraft}{$ResourceData.CardUpgradePoints.Name} {#Prev}to unlock the full potential of each of your {#BoldFormatGraft}Arcana Cards{#Prev}. \\n\\n Using the {#BoldFormatGraft}Altar{#Prev}, press {CF} to switch to {#BoldFormatGraft}Insights{#Prev}."
+  },
+  "MetaUpgrade_UpgradesAvailable_Close": {
+   "name": "Continue"
+  },
+  "ElementalPrompt": {
+   "name": "{#BoldFormatGraft}Elements {#Prev}Revealed!",
+   "description": ""
+  },
+  "ElementalPrompt_Close": {
+   "name": "Continue"
+  },
+  "MetaUpgrade_Ineligible": {
+   "name": "-"
+  },
+  "MetaUpgrade_Equip": {
+   "name": "{SL} ACTIVATE"
+  },
+  "MetaUpgrade_Unequip": {
+   "name": "{SL} DEACTIVATE"
+  },
+  "MetaUpgrade_Unlock": {
+   "name": "{SL} UNLOCK"
+  },
+  "MetaUpgradeMem_Upgrade": {
+   "name": "{SL} EXTEND"
+  },
+  "MetaUpgradeCard_Upgrade": {
+   "name": "{SL} IMPROVE"
+  },
+  "MetaUpgradeCard_Inspect": {
+   "name": "{IP} INSPECT"
+  },
+  "MetaUpgradeMem_UpgradeMode": {
+   "name": "{CF} INSIGHTS {#StatFormat}\\[{$TempTextData.Amount}{!Icons.CardUpgradePoints}\\]"
+  },
+  "MetaUpgrade_PrevLayout": {
+   "name": "{PL} PREVIOUS SET"
+  },
+  "MetaUpgrade_NextLayout": {
+   "name": "{NL} NEXT SET"
+  },
+  "MetaUpgrade_SwapLayoutArt": {
+   "name": "{IP} THEME"
+  },
+  "MetaUpgrade_SwapLayoutArtSelect": {
+   "name": "{SL} SET"
+  },
+  "MetaUpgradeMem_ExitUpgradeMode": {
+   "name": "{CF} RETURN"
+  },
+  "MetaUpgradeMem_Exit": {
+   "name": "{CN} EXIT"
+  },
+  "MetaUpgrade_Hidden": {
+   "name": "{#ItalicFormat}Unlock an adjacent Card to reveal this"
+  },
+  "MetaUpgrade_Pin": {
+   "name": "{IP} FORGET-ME-NOT"
+  },
+  "MetaUpgrade_StartSwap": {
+   "name": "{A3} START SWAP"
+  },
+  "MetaUpgrade_EndSwap": {
+   "name": "{A3} CONFIRM SWAP"
+  },
+  "MetaUpgrade_CancelSwap": {
+   "name": "{A3} CANCEL SWAP"
+  },
+  "MetaUpgradeCardLimit_Upgrade": {
+   "name": "Grasp of the Arcana"
+  },
+  "UseWeaponShop": {
+   "name": "{I} Inspect"
+  },
+  "WeaponShopScreen_Title": {
+   "name": "Silver Pool"
+  },
+  "WeaponShopUnlock": {
+   "name": "ARTIFACT AWAKENED"
+  },
+  "WeaponShopAspectUnlock": {
+   "name": "ASPECT REVEALED"
+  },
+  "ToolShopUnlock": {
+   "name": "TOOL RETRIEVED"
+  },
+  "ToolShopUpgrade": {
+   "name": "TOOL RESTORED"
+  },
+  "WeaponShop_Weapons": {
+   "name": "Nocturnal Arms",
+   "description": ""
+  },
+  "WeaponShop_StaffUpgrades": {
+   "name": "Aspects of the Witch's Staff",
+   "description": ""
+  },
+  "WeaponShop_DaggerUpgrades": {
+   "name": "Aspects of the Sister Blades",
+   "description": ""
+  },
+  "WeaponShop_TorchUpgrades": {
+   "name": "Aspects of the Umbral Flames",
+   "description": ""
+  },
+  "WeaponShop_AxeUpgrades": {
+   "name": "Aspects of the Moonstone Axe",
+   "description": ""
+  },
+  "WeaponShop_LobUpgrades": {
+   "name": "Aspects of the Argent Skull",
+   "description": ""
+  },
+  "WeaponShop_SuitUpgrades": {
+   "name": "Aspects of the Black Coat",
+   "description": ""
+  },
+  "WeaponShop_Tools": {
+   "name": "Gathering Tools",
+   "description": ""
+  },
+  "WeaponShop_ToolUpgrades": {
+   "name": "Tool Refinements",
+   "description": ""
+  },
+  "WeaponShopScreen_Hint": {
+   "name": "“Look Deep Within, Bearer of the Nocturnal Arms”"
+  },
+  "FamiliarShopUnlock": {
+   "name": "Familiar Bonds"
+  },
+  "FamiliarShopScreen_Title": {
+   "name": "Familiar Bonds"
+  },
+  "FamiliarShopScreen_Hint": {
+   "name": "with proper training and diet, a witch's familiar can grow mighty indeed"
+  },
+  "FamiliarShopUpgrade": {
+   "name": "{$TooltipData.UpgradeName} {#AltUpgradeFormat}{$TooltipData.AspectRarityText}"
+  },
+  "FamiliarShop_Select": {
+   "name": "{SL} CHOOSE"
+  },
+  "Menu_FamiliarCostumeUnlock": {
+   "name": "{SL} TRANSFORM"
+  },
+  "Menu_FamiliarCostumeReAdd": {
+   "name": "{SL} SWITCH"
+  },
+  "StoryResetIntro": {
+   "name": "Myths Retold",
+   "description": ""
+  },
+  "StoryReset_Title": {
+   "name": "UNDO STORY PROGRESS?"
+  },
+  "StoryReset_Details": {
+   "name": "Proceed if you wish to reset key events in the story. \\n\\n {#WarningHighlightFormat}This action cannot be undone."
+  },
+  "StoryReset_Confirm": {
+   "name": "PROCEED"
+  },
+  "StoryReset_Cancel": {
+   "name": "CANCEL"
+  },
+  "DreamRunIntro": {
+   "name": "Dream Dives",
+   "description": ""
+  },
+  "Codex_NextEntry": {
+   "name": "{DN} Next Entry"
+  },
+  "Codex_PrevEntry": {
+   "name": "{UP} Previous Entry"
+  },
+  "Codex_NextChapter": {
+   "name": "{MR} NEXT"
+  },
+  "Codex_PrevChapter": {
+   "name": "{ML} PREVIOUS"
+  },
+  "Codex_EntryLocked": {
+   "name": "Undiscovered"
+  },
+  "Codex_EntryUnlocked": {
+   "name": "{CX} Updated"
+  },
+  "Codex_DefaultGiftHint": {
+   "name": "{$TempTextData.CharacterName} would welcome an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_KeepGoingHint": {
+   "name": "{$TempTextData.CharacterName} would welcome an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_LockedActivityHint": {
+   "name": "{$TempTextData.CharacterName} would be open to {!TempTextData.ResourceIcon} when possible. You may need to grow closer..."
+  },
+  "Codex_FishingGiftHint": {
+   "name": "{$TempTextData.CharacterName} may be open to a visit to the Fishing Pier if you offer {!TempTextData.ResourceIcon}."
+  },
+  "Codex_HotSpringsGiftHint": {
+   "name": "{$TempTextData.CharacterName} may be open to a visit to the Hot Springs if you offer {!TempTextData.ResourceIcon}."
+  },
+  "Codex_TavernaGiftHint": {
+   "name": "{$TempTextData.CharacterName} may be open to a visit to the Taverna if you offer {!TempTextData.ResourceIcon}."
+  },
+  "Codex_TavernaGiftHintEris": {
+   "name": "{$TempTextData.CharacterName} would relish a visit to the Taverna again if you offer {!TempTextData.ResourceIcon}."
+  },
+  "Codex_FishNextHint": {
+   "name": "{$TempTextData.CharacterName} would rather do something else before accepting {!TempTextData.ResourceIcon}."
+  },
+  "Codex_UnavailableHint": {
+   "name": "{$TempTextData.CharacterName} wants nothing more from you for now {#ItalicLightFormat}(perhaps in the future...)."
+  },
+  "Codex_AlreadyReceivedGift": {
+   "name": "{$TempTextData.CharacterName} wants nothing more from you this night."
+  },
+  "Codex_DoesntWantGiftHint": {
+   "name": "Now seems not the time to offer gifts to {$TempTextData.CharacterName}."
+  },
+  "Codex_TimePassesGiftUsed": {
+   "name": "There is not time enough this night to invite {$TempTextData.CharacterName} for an outing."
+  },
+  "Codex_GrowingCloser01": {
+   "name": "{$TempTextData.CharacterName} may feel more deeply about you after an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_TrustDeepened01": {
+   "name": "{$TempTextData.CharacterName} feels closer to you now and may soon be open to another offering."
+  },
+  "Codex_NyxHint01": {
+   "name": "{$TempTextData.CharacterName} desires only your continued service to the realm."
+  },
+  "Codex_PreBondForgedHecate": {
+   "name": "{$TempTextData.CharacterName} still is holding something back... perhaps you may grow closer still if you knew why."
+  },
+  "Codex_BondForgedHecate": {
+   "name": "You and {$TempTextData.CharacterName} share an inseparable bond."
+  },
+  "Codex_BondForgedOdysseus": {
+   "name": "You and {$TempTextData.CharacterName} share a bond of many turns."
+  },
+  "Codex_BondForgedSkelly": {
+   "name": "You and {$TempTextData.CharacterName} share a disciplined bond."
+  },
+  "Codex_BondForgedDora": {
+   "name": "You and {$TempTextData.CharacterName} share a supernatural bond."
+  },
+  "Codex_BondForgedNemesis": {
+   "name": "You and {$TempTextData.CharacterName} share a reciprocal bond."
+  },
+  "Codex_BondForgedCharon": {
+   "name": "You and {$TempTextData.CharacterName} share an unspeakable bond."
+  },
+  "Codex_BondForgedMoros": {
+   "name": "You and {$TempTextData.CharacterName} share a fateful bond."
+  },
+  "Codex_BondForgedEris": {
+   "name": "You and {$TempTextData.CharacterName} share a troubling bond."
+  },
+  "Codex_BondForgedHermes": {
+   "name": "You and {$TempTextData.CharacterName} share a steadfast bond."
+  },
+  "Codex_BondForgedArtemis": {
+   "name": "You and {$TempTextData.CharacterName} share an unwavering bond."
+  },
+  "Codex_BondForgedSelene": {
+   "name": "You and {$TempTextData.CharacterName} share a constant bond."
+  },
+  "Codex_BondForgedZeus": {
+   "name": "You and {$TempTextData.CharacterName} share a crackling bond."
+  },
+  "Codex_BondForgedHera": {
+   "name": "You and {$TempTextData.CharacterName} share a highborn bond."
+  },
+  "Codex_BondForgedPoseidon": {
+   "name": "You and {$TempTextData.CharacterName} share a deep bond."
+  },
+  "Codex_BondForgedDemeter": {
+   "name": "You and {$TempTextData.CharacterName} share an evergreen bond."
+  },
+  "Codex_BondForgedApollo": {
+   "name": "You and {$TempTextData.CharacterName} share a brilliant bond."
+  },
+  "Codex_BondForgedAphrodite": {
+   "name": "You and {$TempTextData.CharacterName} share a lovely bond."
+  },
+  "Codex_BondForgedHephaestus": {
+   "name": "You and {$TempTextData.CharacterName} share a durable bond."
+  },
+  "Codex_BondForgedHestia": {
+   "name": "You and {$TempTextData.CharacterName} share a comforting bond."
+  },
+  "Codex_BondForgedAres": {
+   "name": "You and {$TempTextData.CharacterName} share a blood bond."
+  },
+  "Codex_BondForgedAthena": {
+   "name": "You and {$TempTextData.CharacterName} share a glorious bond."
+  },
+  "Codex_BondForgedDionysus": {
+   "name": "You and {$TempTextData.CharacterName} share a delirious bond."
+  },
+  "Codex_BondForgedArachne": {
+   "name": "You and {$TempTextData.CharacterName} share a delicate bond."
+  },
+  "Codex_BondForgedNarcissus": {
+   "name": "You and {$TempTextData.CharacterName} share an unbelievably attractive bond."
+  },
+  "Codex_BondForgedEcho": {
+   "name": "You and {$TempTextData.CharacterName} share a bond... bond... bond..."
+  },
+  "Codex_BondForgedHeracles": {
+   "name": "You and {$TempTextData.CharacterName} share the mightiest of bonds."
+  },
+  "Codex_BondForgedMedea": {
+   "name": "You and {$TempTextData.CharacterName} share a dark bond."
+  },
+  "Codex_BondForgedCirce": {
+   "name": "You and {$TempTextData.CharacterName} share an immutable bond."
+  },
+  "Codex_BondForgedIcarus": {
+   "name": "You and {$TempTextData.CharacterName} share a soaring bond."
+  },
+  "Codex_BondForgedZagreus": {
+   "name": "You and {$TempTextData.CharacterName} share a timeless bond."
+  },
+  "Codex_BondForgedHadesPersephone": {
+   "name": "You and {$TempTextData.CharacterName} share a regal bond."
+  },
+  "Codex_BondForgedPersephoneAlt": {
+   "name": "You and {$TempTextData.CharacterName} share a flourishing bond."
+  },
+  "Codex_BondForgedChronos": {
+   "name": "You and {$TempTextData.CharacterName} share an inevitable bond."
+  },
+  "Codex_BondForgedChaos": {
+   "name": "You and {$TempTextData.CharacterName} share an ancient bond."
+  },
+  "Codex_DoraNotInTent": {
+   "name": "{$TempTextData.CharacterName} is not inclined to accept {!TempTextData.ResourceIcon} outside the comfort of your tent."
+  },
+  "Codex_DoraNotInMain": {
+   "name": "{$TempTextData.CharacterName} is not inclined to accept {!TempTextData.ResourceIcon} all the way over here in the Training Grounds."
+  },
+  "Codex_DoraUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in an offering of {!TempTextData.ResourceIcon} in the confines of your tent."
+  },
+  "Codex_DoraUnlockHint02": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} once you help her recall something important."
+  },
+  "Codex_DionysusGiftHint01": {
+   "name": "{$TempTextData.CharacterName} is practically desperate for an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_DionysusGiftHint02": {
+   "name": "{$TempTextData.CharacterName} is eagerly anticipating an offering of exactly {$UnitSetData.NPC_Dionysus.NPC_Dionysus_01.GiftTextLineSets.DionysusGift07.Cost.SuperGiftPoints}{!TempTextData.ResourceIcon}."
+  },
+  "Codex_DionysusUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} would be very interested in {!TempTextData.ResourceIcon}, once he remembers a key detail."
+  },
+  "Codex_AthenaUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in an offering of {!TempTextData.ResourceIcon} but only on Olympus."
+  },
+  "Codex_AthenaUnlockHint02": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} in time after her immediate concerns subside."
+  },
+  "Codex_ArachneGiftHint01": {
+   "name": "{$TempTextData.CharacterName} is not receptive to {!TempTextData.ResourceIcon} until you better understand each other."
+  },
+  "Codex_CharonGiftHint01": {
+   "name": "{$TempTextData.CharacterName} would not say no to an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_CharonUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may not say no to {!TempTextData.ResourceIcon} after earning more {!Icons.WeaponPointsRare} and using {!Icons.CharonPoints} to redeem rewards."
+  },
+  "Codex_NemesisGiftHint01": {
+   "name": "{$TempTextData.CharacterName} would grudgingly accept an offering of {!TempTextData.ResourceIcon}."
+  },
+  "Codex_NemesisHotSpringsGiftHint": {
+   "name": "{$TempTextData.CharacterName} may be persuaded to visit the Hot Springs if you have {!TempTextData.ResourceIcon}."
+  },
+  "Codex_NemesisHotSpringsGiftHintAlt": {
+   "name": "{$TempTextData.CharacterName} would join you at the Hot Springs again if you have {!TempTextData.ResourceIcon}."
+  },
+  "Codex_NemesisUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after more battles together."
+  },
+  "Codex_MorosUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after further conversation and prophecies fulfilled."
+  },
+  "Codex_HecateUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} would perhaps be interested in {!TempTextData.ResourceIcon} once your great task is less of a concern."
+  },
+  "Codex_ArtemisUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} would be interested in {!TempTextData.ResourceIcon} if you sing with her and fight alongside her more."
+  },
+  "Codex_IcarusUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} is reluctant to accept {!TempTextData.ResourceIcon} until you've had more time to reconnect."
+  },
+  "Codex_IcarusUnlockHint02": {
+   "name": "{$TempTextData.CharacterName} longs to be whole again, and {!TempTextData.ResourceIcon} may help him achieve it."
+  },
+  "Codex_ErisUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after more victories against her."
+  },
+  "Codex_OdysseusUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after he settles up with a few old acquaintances."
+  },
+  "Codex_ArachneUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} once she is no longer preoccupied with her condition and the gods."
+  },
+  "Codex_SkellyUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may accept {!TempTextData.ResourceIcon} after you master enough Nocturnal Arms to spur his desire for change."
+  },
+  "Codex_MedeaUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after you help her brew a certain concoction."
+  },
+  "Codex_CirceUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} once she is convinced your grasp of the Arcana is complete."
+  },
+  "Codex_HeraclesGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may consider an offering of {!TempTextData.ResourceIcon} after you prove your worth on a fearful night."
+  },
+  "Codex_NarcissusUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after you aid in certain other matters."
+  },
+  "Codex_EchoUnlockHint01": {
+   "name": "{$TempTextData.CharacterName} may be interested in {!TempTextData.ResourceIcon} after she makes peace with part of her past."
+  },
+  "Codex_ZeusGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} in time after his immediate concerns subside."
+  },
+  "Codex_HeraDemeterGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} in time after her immediate concerns subside."
+  },
+  "Codex_PoseidonGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you prove your prowess with the {$WeaponShopItemData.ToolFishingRod.Name}."
+  },
+  "Codex_ApolloGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} after you keep vanquishing your greatest foes."
+  },
+  "Codex_AphroditeGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you deepen more relationships with those closest to you."
+  },
+  "Codex_HephaestusGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you fully upgrade more Nocturnal Arms."
+  },
+  "Codex_HestiaGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you decorate the Crossroads more."
+  },
+  "Codex_AresGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you vanquish more foes."
+  },
+  "Codex_SeleneGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept {!TempTextData.ResourceIcon} once you prove your worth with a certain weapon in her Aspect."
+  },
+  "Codex_HermesGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept {!TempTextData.ResourceIcon} after his immediate concerns subside and you spend enough at his Shrines."
+  },
+  "Codex_ChaosGiftHint01": {
+   "name": "{$TempTextData.CharacterName} may accept an offering of {!TempTextData.ResourceIcon} once you clear more {$Keywords.PackagedBounties}."
+  },
+  "Codex_HadesGiftHint": {
+   "name": "{$TempTextData.CharacterName} is not exactly interested in {!TempTextData.ResourceIcon} at this time."
+  },
+  "Codex_ZagreusGiftHint": {
+   "name": "{$TempTextData.CharacterName} is too preoccupied with Underworld business to accept {!TempTextData.ResourceIcon} at this time."
+  },
+  "Codex_ChronosGiftHint": {
+   "name": "{$TempTextData.CharacterName} is reluctant to accept {!TempTextData.ResourceIcon} at this time."
+  },
+  "Codex_Boon_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by accepting boons from {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Wield_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by slaying foes with the {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Slay_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by slaying the {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_SlayAlt_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by vanquishing {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Interact_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by conversing with {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Enter_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by entering {$TempTextData.Name}: {#CodexPreReqNumberFormat}{$TempTextData.Amount} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Mystery_Locked": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by awaiting further instruction... {#Prev}\\]"
+  },
+  "Codex_Custom_Relationship_Requirement": {
+   "name": "\\n {#CodexStandardFormat}\\[ {#CodexPreReqFormat} learn more by deepening your connection with {$TempTextData.Name} {#CodexStandardFormat} \\]"
+  },
+  "Codex_Custom_Story_Requirement": {
+   "name": "\\n {#CodexStandardFormat}{!Icons.CodexEntryIncompleteIcon}  {#CodexChapterClearFormat}More is to be learned... {#CodexStandardFormat}"
+  },
+  "Codex_Complete": {
+   "name": "\\n {#CodexStandardFormat}{!Icons.CodexEntryCompleteIcon}{#CodexStandardFormat}"
+  },
+  "Codex_ChthonicGodsChapter": {
+   "name": "The Unseen"
+  },
+  "Codex_OlympianGodsChapter": {
+   "name": "The Olympians"
+  },
+  "Codex_OtherDenizensChapter": {
+   "name": "The Rest"
+  },
+  "Codex_EnemiesUWChapter": {
+   "name": "Stygian Dangers"
+  },
+  "Codex_EnemiesSFChapter": {
+   "name": "Surface Threats"
+  },
+  "Codex_WeaponsChapter": {
+   "name": "Nocturnal Arms"
+  },
+  "Codex_FamiliarsChapter": {
+   "name": "Familiars"
+  },
+  "Codex_BiomesChapter": {
+   "name": "Places of Interest"
+  },
+  "Codex_ItemsChapter": {
+   "name": "Artifacts"
+  },
+  "Codex_FishChapter": {
+   "name": "Fished Findings"
+  },
+  "Codex_GiftChapter": {
+   "name": "Fables"
+  },
+  "UnknownCodexChapter": {
+   "name": "Undiscovered"
+  },
+  "Codex_EnemyStats": {
+   "name": "— vanquished: {#CodexVanquishedFormat}{$TempTextData.KillCount}"
+  },
+  "Codex_BoonInfo_Title": {
+   "name": "Boons of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Title_Hammer": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Staff": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Dagger": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Torch": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Axe": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Lob": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Title_Hammer_Suit": {
+   "name": "{$TempTextData.WeaponName} Enchantments"
+  },
+  "Codex_BoonInfo_Selene": {
+   "name": "Hexes of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Arachne": {
+   "name": "Garments of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Narcissus": {
+   "name": "Gifts of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Echo": {
+   "name": "Blessings of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Medea": {
+   "name": "Curses of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Circe": {
+   "name": "Fortunes of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Icarus": {
+   "name": "Inventions of {$TempTextData.BoonName}"
+  },
+  "Codex_BoonInfo_Charon": {
+   "name": "Wares of {$TempTextData.BoonName}"
+  },
+  "BoonInfo_BulletPoint": {
+   "name": "{!Icons.Bullet}{$TempTextData.TraitName}"
+  },
+  "BoonInfo_BulletPoint_NoTraitName": {
+   "name": "{!Icons.Bullet}"
+  },
+  "BoonInfo_Requirements": {
+   "name": "Offering Requirements"
+  },
+  "BoonInfo_NoRequirements": {
+   "name": "(None In Particular)"
+  },
+  "BoonInfo_OneOf_Singular": {
+   "name": "The Following:"
+  },
+  "BoonInfo_OneOf": {
+   "name": "One of the Following:"
+  },
+  "BoonInfo_TwoOf": {
+   "name": "Two of the Following:"
+  },
+  "BoonInfo_LinkedGod_Boon": {
+   "name": "{!Icons.Bullet}Any Boon of {$TempTextData.LinkedGod}"
+  },
+  "BoonInfo_CountRequirement": {
+   "name": "{!Icons.Bullet}{$TempTextData.FinalKey}: {$TempTextData.Value}"
+  },
+  "BoonInfo_CountRequirementIcon": {
+   "name": "{$TempTextData.Value}{!TempTextData.FinalKeyIcon}"
+  },
+  "BoonInfo_Elements": {
+   "name": "Elements:"
+  },
+  "BoonInfo_GodBoonRarities": {
+   "name": "Rarities:"
+  },
+  "BoonInfo_HighestBaseElementCount": {
+   "name": "{$TempTextData.Value}{!Icons.EarthNoTooltip}, {$TempTextData.Value}{!Icons.WaterNoTooltip}, {$TempTextData.Value}{!Icons.AirNoTooltip}, or {$TempTextData.Value}{!Icons.FireNoTooltip}"
+  },
+  "BoonInfo_NoneOf": {
+   "name": "None of the Following:"
+  },
+  "BoonInfo_PageNumber": {
+   "name": "{$TempTextData.CurrentPageNum} {!Icons.Slash} {$TempTextData.NumPages}"
+  },
+  "BoonInfo_ShowTooltips": {
+   "name": "{CF} SHOW TIPS"
+  },
+  "BoonInfo_ShowRequirements": {
+   "name": "{CF} SHOW REQS"
+  },
+  "AwardMenu_Title": {
+   "name": "Keepsakes"
+  },
+  "AwardMenu_SubTitle": {
+   "name": "“Here, Even Mortal Companionship Can Be Eternal”"
+  },
+  "Keepsake_Level_1": {
+   "name": "rank   {!Icons.AwardRank1}"
+  },
+  "Keepsake_Level_2": {
+   "name": "rank   {!Icons.AwardRank2}"
+  },
+  "Keepsake_Level_3": {
+   "name": "rank   {!Icons.AwardRank3}"
+  },
+  "LegendaryKeepsake_Level_1": {
+   "name": "rank   {!Icons.LegendaryAwardRank1}"
+  },
+  "LegendaryKeepsake_Level_2": {
+   "name": "rank   {!Icons.LegendaryAwardRank2}"
+  },
+  "LegendaryKeepsake_Level_3": {
+   "name": "rank   {!Icons.LegendaryAwardRank3}"
+  },
+  "LegendaryKeepsake_Level_4": {
+   "name": "rank   {!Icons.LegendaryAwardRank4}"
+  },
+  "LegendaryKeepsake_Level_5": {
+   "name": "rank   {!Icons.LegendaryAwardRank5}"
+  },
+  "Keepsake_Level_Progress": {
+   "name": "Clear {#BoldFormatGraft}{$TempTextData.Chambers} {#Prev}{$Keywords.Encounter} with this to {#BoldFormatGraft}rank up{#Prev}!"
+  },
+  "Keepsake_Level_Progress_Few": {
+   "name": "Clear {#BoldFormatGraft}{$TempTextData.Chambers} {#Prev}{$Keywords.EncounterPlural} with this to {#BoldFormatGraft}rank up{#Prev}!"
+  },
+  "Keepsake_Level_Progress_Many": {
+   "name": "Clear {#BoldFormatGraft}{$TempTextData.Chambers} {#Prev}{$Keywords.EncounterPlural} with this to {#BoldFormatGraft}rank up{#Prev}!"
+  },
+  "Keepsake_Level_Progress_Other": {
+   "name": "Clear {#BoldFormatGraft}{$TempTextData.Chambers} {#Prev}{$Keywords.EncounterPlural} with this to {#BoldFormatGraft}rank up{#Prev}!"
+  },
+  "Legendary_Keepsake_Level_Progress": {
+   "name": "Make an offering of {!Icons.SuperGiftPoints} to {#BoldFormatGraft}rank up{#Prev}!"
+  },
+  "Keepsake_Level_Progress_Max": {
+   "name": " "
+  },
+  "Equipped_Subtitle": {
+   "name": "Equipped!"
+  },
+  "Keepsake_Blocked_Subtitle": {
+   "name": "Expired (for Now...)"
+  },
+  "Hades_Keepsake_Blocked_Subtitle": {
+   "name": "Locked (Olympian Aid Chosen)"
+  },
+  "NewTraitUnlocked_Subtitle": {
+   "name": "{$TempTextData.Gift}"
+  },
+  "NewGiftPrefix": {
+   "name": "New!"
+  },
+  "UnknownAward": {
+   "name": "(Empty Slot)",
+   "description": "Give someone a gift to earn this Keepsake."
+  },
+  "UnknownLegendaryAward": {
+   "name": "(Secret Stash)",
+   "description": "Give someone {!Icons.SuperGiftPoints} to earn the Companion that goes here."
+  },
+  "UnknownLegendaryAward_Hidden": {
+   "name": "(Secret Stash)",
+   "description": "Whatever this may contain remains to be discovered..."
+  },
+  "UnknownLegendaryAward_Locked": {
+   "name": "(Secret Stash)",
+   "description": "The Companion that goes here is not yet available. \\n\\n {#ItalicFormatDark}Ongoing Underworld renovations are likely to blame for this limitation."
+  },
+  "UnknownLegendaryAward_Locked_Hidden": {
+   "name": "(Secret Stash)",
+   "description": "Whatever this may contain is not yet available due to ongoing Underworld renovations. \\n\\n {#ItalicFormatDark}Ongoing Underworld renovations are likely to blame for this limitation."
+  },
+  "GameStatsScreen_Title": {
+   "name": "Archived Trivia"
+  },
+  "GameStats_Weapons": {
+   "name": "Nocturnal Arms"
+  },
+  "GameStats_Boons": {
+   "name": "Olympian Boons"
+  },
+  "GameStats_WeaponUpgrades": {
+   "name": "Hammer Upgrades"
+  },
+  "GameStats_Aspects": {
+   "name": "Alternate Aspects"
+  },
+  "GameStats_Keepsakes": {
+   "name": "Special Keepsakes"
+  },
+  "GameStats_Familiars": {
+   "name": "Familiars"
+  },
+  "GameStatsScreen_Usage": {
+   "name": "Times Used"
+  },
+  "GameStats_Missing": {
+   "name": "--"
+  },
+  "RunHistoryScreen_Title": {
+   "name": "Past Deeds"
+  },
+  "RunHistoryScreen_RunName": {
+   "name": "{$TempTextData.RouteName} Night {$TempTextData.RunNum}"
+  },
+  "RunHistoryScreen_Num": {
+   "name": "Night"
+  },
+  "RunHistoryScreen_RouteF": {
+   "name": "{!Icons.UnderworldIcon}"
+  },
+  "RunHistoryScreen_RouteN": {
+   "name": "{!Icons.SurfaceIcon}"
+  },
+  "RunHistoryScreen_RouteBounty": {
+   "name": "{!Icons.ChaosIcon}"
+  },
+  "RunHistoryScreen_RouteDream": {
+   "name": "{!Icons.DreamIcon}"
+  },
+  "RunHistoryScreen_RunErased": {
+   "name": "{#LockedFormat}Lost in Time..."
+  },
+  "RunHistoryScreen_Cleared": {
+   "name": "{#RunHistorySuccessFormat}Prevailed!!"
+  },
+  "RunHistoryScreenResult_Erebus": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.F.BaseF.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Erebus_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.F.BaseF.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Oceanus": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.G.BaseG.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Oceanus_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.G.BaseG.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Fields": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.H.BaseH.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Fields_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.H.BaseH.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_ClockworkTartarus": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.I.BaseI.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_ClockworkTartarus_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.I.BaseI.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Ephyra": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.N.BaseN.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Ephyra_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.N.BaseN.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Thessaly": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.O.BaseO.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Thessaly_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.O.BaseO.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Olympus": {
+   "name": "Failed on {#RunHistoryFailureFormat}{$RoomSetData.P.BaseP.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Olympus_Dream": {
+   "name": "Failed on {#RunHistoryFailureFormat}{$RoomSetData.P.BaseP.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Q": {
+   "name": "Failed on {#RunHistoryFailureFormat}{$RoomSetData.Q.BaseQ.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Q_Dream": {
+   "name": "Failed on {#RunHistoryFailureFormat}{$RoomSetData.Q.BaseQ.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Anomaly": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.Anomaly.BaseAnomaly.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Secret": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.Chaos.BaseChaos.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Secret_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.Chaos.BaseChaos.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Elysium": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.C.C_Boss01.SaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_Elysium_Dream": {
+   "name": "Failed in {#RunHistoryFailureFormat}{$RoomSetData.C.C_Boss01.DreamSaveProfileLocationText}{#Prev}"
+  },
+  "RunHistoryScreenResult_BountyFailed": {
+   "name": "{#RunHistoryFailureFormat}Failed"
+  },
+  "RunHistoryScreenResult_BountyCleared": {
+   "name": "{#RunHistorySuccessFormat}Cleared!"
+  },
+  "RunHistoryScreen_PackagedBounty": {
+   "name": "- {$TooltipData.BountyName} -"
+  },
+  "RunHistoryScreen_DreamBiomeVisitOrder": {
+   "name": "- {!TooltipData[1]} {!TooltipData[2]} {!TooltipData[3]} {!TooltipData[4]} -"
+  },
+  "RunHistoryScreen_Weapon": {
+   "name": "Weapon"
+  },
+  "RunHistoryScreen_Keepsake": {
+   "name": "Keepsake"
+  },
+  "RunHistoryScreen_KeepsakePlural": {
+   "name": "Keepsakes"
+  },
+  "RunHistoryScreen_Assist": {
+   "name": "Familiar"
+  },
+  "RunClearScreen_Title": {
+   "name": "V i c t o r y !"
+  },
+  "RunClearScreen_Title_Surface": {
+   "name": "G l o r y !"
+  },
+  "RunClearScreen_EasyModeLevel": {
+   "name": "{!Icons.EasyModeIcon}"
+  },
+  "RunClearScreen_ClearTime": {
+   "name": "Clear Time:"
+  },
+  "RunClearScreen_RunStats": {
+   "name": "Results"
+  },
+  "RunClearScreen_ClearTimeRecord": {
+   "name": "Best Time:"
+  },
+  "RunClearScreen_ShrinePoints": {
+   "name": "{!Icons.ShrinePoint} Used:"
+  },
+  "RunClearScreen_ShrinePointsRecord": {
+   "name": "{!Icons.ShrinePoint} Best:"
+  },
+  "RunClearScreen_DamageDealt": {
+   "name": "Most Damage Inflicted"
+  },
+  "RunClearScreen_DamageDealtAllies": {
+   "name": "Allies"
+  },
+  "RunClearScreen_DamageTaken": {
+   "name": "Most Damage Suffered"
+  },
+  "RunClearScreen_TotalClears": {
+   "name": "Total Clears:"
+  },
+  "RunClearScreen_ClearStreak": {
+   "name": "Current Streak:"
+  },
+  "RunClearScreen_ClearStreakRecord": {
+   "name": "Best Streak:"
+  },
+  "RunClearScreen_NewRecord": {
+   "name": "New Record!"
+  },
+  "RunClearScreen_Header_Weapon": {
+   "name": "Weapon"
+  },
+  "RunClearScreen_Header_Clears": {
+   "name": "Clears"
+  },
+  "RunClearScreen_Header_RecordClearTime_Underworld": {
+   "name": "{!Icons.UnderworldIcon}"
+  },
+  "RunClearScreen_Header_RecordShrinePoints_Underworld": {
+   "name": "{!Icons.UnderworldFearIcon}"
+  },
+  "RunClearScreen_Header_RecordClearTime_Surface": {
+   "name": "{!Icons.SurfaceIcon}"
+  },
+  "RunClearScreen_Header_RecordShrinePoints_Surface": {
+   "name": "{!Icons.SurfaceFearIcon}"
+  },
+  "HeroSkyTouchdown": {
+   "name": "Olympic Slam"
+  },
+  "WeaponMorphedAttack": {
+   "name": "Sheep Strike"
+  },
+  "WeaponMorphedAttack_Pig": {
+   "name": "Pig Rush"
+  },
+  "WeaponMorphedAttack_Rat": {
+   "name": "Rat Scratch"
+  },
+  "Menu_MusicPlayerPurchase": {
+   "name": "{SL} UNLOCK"
+  },
+  "Menu_MusicPlayerPlay": {
+   "name": "{SL} PERFORM"
+  },
+  "Menu_MusicPlayerPause": {
+   "name": "{SL} CEASE"
+  },
+  "Menu_MusicPlayerShuffle": {
+   "name": "{CF} RANDOMIZE"
+  },
+  "ClearRequiredTraitsZeus": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Zeus{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsHera": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Hera{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsPoseidon": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Poseidon{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsApollo": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Apollo{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsDemeter": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Demeter{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsAphrodite": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Aphrodite{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsHephaestus": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Hephaestus{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsHestia": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Hestia{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsHermes": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Hermes{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsAres": {
+   "name": "{!Icons.RunClearDotsLeft}Hand of Ares{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredTraitsChaos": {
+   "name": "{!Icons.RunClearDotsLeft}Agent of Chaos{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumOne": {
+   "name": "{!Icons.RunClearDotsLeft}Titan Slayer{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumTen": {
+   "name": "{!Icons.RunClearDotsLeft}Ten Times{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumFifty": {
+   "name": "{!Icons.RunClearDotsLeft}Fifty Times{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumOneHundred": {
+   "name": "{!Icons.RunClearDotsLeft}Hundred Times{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumTwoFifty": {
+   "name": "{!Icons.RunClearDotsLeft}Two-Fifty Times{!Icons.RunClearDotsRight}"
+  },
+  "ClearUnderworldNumFiveHundred": {
+   "name": "{!Icons.RunClearDotsLeft}Five-Hundred Times{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumOne": {
+   "name": "{!Icons.RunClearDotsLeft}Surface Scourer{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumTen": {
+   "name": "{!Icons.RunClearDotsLeft}Ten Ascents{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumFifty": {
+   "name": "{!Icons.RunClearDotsLeft}Fifty Ascents{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumOneHundred": {
+   "name": "{!Icons.RunClearDotsLeft}Hundred Ascents{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumTwoFifty": {
+   "name": "{!Icons.RunClearDotsLeft}Two-Fifty Ascents{!Icons.RunClearDotsRight}"
+  },
+  "ClearSurfaceNumFiveHundred": {
+   "name": "{!Icons.RunClearDotsLeft}Five Hundred Ascents{!Icons.RunClearDotsRight}"
+  },
+  "ClearNearDeath": {
+   "name": "{!Icons.RunClearDotsLeft}Hair's Breadth{!Icons.RunClearDotsRight}"
+  },
+  "ClearFullHealth": {
+   "name": "{!Icons.RunClearDotsLeft}In Perfect Health{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighArmor": {
+   "name": "{!Icons.RunClearDotsLeft}Heavy Armor{!Icons.RunClearDotsRight}"
+  },
+  "ClearTimeFast": {
+   "name": "{!Icons.RunClearDotsLeft}Quick Silver{!Icons.RunClearDotsRight}"
+  },
+  "ClearTimeVeryFast": {
+   "name": "{!Icons.RunClearDotsLeft}Faster Than Darkness{!Icons.RunClearDotsRight}"
+  },
+  "ClearTimeSlow": {
+   "name": "{!Icons.RunClearDotsLeft}Meticulous Planner{!Icons.RunClearDotsRight}"
+  },
+  "ClearMoneyNone": {
+   "name": "{!Icons.RunClearDotsLeft}{$ConstantsData.OneHundred}% Gold-Free{!Icons.RunClearDotsRight}"
+  },
+  "ClearMoneyHigh": {
+   "name": "{!Icons.RunClearDotsLeft}Swimming in Gold{!Icons.RunClearDotsRight}"
+  },
+  "ClearAllUnderworldStoryRooms": {
+   "name": "{!Icons.RunClearDotsLeft}Friends In Low Places{!Icons.RunClearDotsRight}"
+  },
+  "ClearAllSurfaceStoryRooms": {
+   "name": "{!Icons.RunClearDotsLeft}Friends In High Places{!Icons.RunClearDotsRight}"
+  },
+  "ClearAllUnderworldReprieveRooms": {
+   "name": "{!Icons.RunClearDotsLeft}Fountain Finder Award{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighMaxHealth": {
+   "name": "{!Icons.RunClearDotsLeft}Thick-Skinned{!Icons.RunClearDotsRight}"
+  },
+  "ClearSynergyTraits": {
+   "name": "{!Icons.RunClearDotsLeft}Dynamic Duos{!Icons.RunClearDotsRight}"
+  },
+  "ClearLegendaryTraits": {
+   "name": "{!Icons.RunClearDotsLeft}Pride of Olympus{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredIntactArachneDress": {
+   "name": "{!Icons.RunClearDotsLeft}Silk-Saver{!Icons.RunClearDotsRight}"
+  },
+  "ClearNoOlympianBoons": {
+   "name": "{!Icons.RunClearDotsLeft}Godless Goddess{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighSacrificeBoons": {
+   "name": "{!Icons.RunClearDotsLeft}Sacrifice Savant{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighMaxMana": {
+   "name": "{!Icons.RunClearDotsLeft}Mistress of Magick{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighSpentLastStands": {
+   "name": "{!Icons.RunClearDotsLeft}Death Defier{!Icons.RunClearDotsRight}"
+  },
+  "ClearElementalTraits": {
+   "name": "{!Icons.RunClearDotsLeft}Mega-Infused{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighOlympianBoons": {
+   "name": "{!Icons.RunClearDotsLeft}Family Gatherer{!Icons.RunClearDotsRight}"
+  },
+  "ClearNoNPCs": {
+   "name": "{!Icons.RunClearDotsLeft}Without Comrades{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighFear": {
+   "name": "{!Icons.RunClearDotsLeft}Terrifying Night{!Icons.RunClearDotsRight}"
+  },
+  "ClearRequiredIntactIcarusArmor": {
+   "name": "{!Icons.RunClearDotsLeft}Custom Coated{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighHammerCount": {
+   "name": "{!Icons.RunClearDotsLeft}Hammer Hoarder{!Icons.RunClearDotsRight}"
+  },
+  "ClearLowMetaUpgradeTraits": {
+   "name": "{!Icons.RunClearDotsLeft}Who Needs Arcana?{!Icons.RunClearDotsRight}"
+  },
+  "ClearHighMetaUpgradeTraits": {
+   "name": "{!Icons.RunClearDotsLeft}Full Arcana{!Icons.RunClearDotsRight}"
+  },
+  "ClearNoDamageTakenFromBosses": {
+   "name": "{!Icons.RunClearDotsLeft}Untouchable{!Icons.RunClearDotsRight}"
+  },
+  "ClearDreamRun": {
+   "name": "{!TooltipData[1]} {!TooltipData[2]} {!TooltipData[3]} {!TooltipData[4]}"
+  },
+  "UseShrineObject": {
+   "name": "{I} Kneel"
+  },
+  "UseOrSpecialShrineObject": {
+   "name": "{I} Kneel\\n {SI} Salute"
+  },
+  "ShrineIntro": {
+   "name": "The Oath",
+   "description": ""
+  },
+  "ShrineScreen_BountyHeader": {
+   "name": "{$Keywords.Bounties} ({$TempTextData.Completed} {!Icons.Slash} {$TempTextData.Total})"
+  },
+  "ShrineMenu_Flavor": {
+   "name": "“A Healthy Fear Keeps Gods and Mortals Well in Check”"
+  },
+  "ShrineMenu_Info": {
+   "name": "Info"
+  },
+  "ShrineScreen_NextRankPoints": {
+   "name": "+{$TempTextData.NextRankPoints}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_BountyShrinePoints": {
+   "name": "{$TempTextData.RequiredShrinePoints}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_RankMaxed": {
+   "name": "MAX"
+  },
+  "ShrineScreen_Activate": {
+   "name": "{SL} ACTIVATE"
+  },
+  "ShrineScreen_RankUp": {
+   "name": "{SL} INTENSIFY"
+  },
+  "ShrineScreen_RankDown": {
+   "name": "{RD} RESCIND"
+  },
+  "ShrineScreen_ResetAll": {
+   "name": "{ML} RESET"
+  },
+  "ShrineScreen_UpgradeMaxed": {
+   "name": "max"
+  },
+  "ShrineScreen_BountyProgress": {
+   "name": "{#LockedFormat}Enacted: {#Prev}{#BoldFormat}{$TempTextData.Completed} {!Icons.Slash} {$TempTextData.Total}"
+  },
+  "ShrineScreen_ActivePoints": {
+   "name": "{$GameState.SpentShrinePointsCache}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_SkellyHeader": {
+   "name": "Become {#VowScreenNightsChampion}Night's Champion{#Prev}!"
+  },
+  "ShrineScreen_SkellyHeader_Complete": {
+   "name": "We Salute {#VowScreenNightsChampion}Night's Champion{#Prev}!"
+  },
+  "ShrineScreen_SkellyStatueSurface_Incomplete": {
+   "name": "Conquer the {#BoldFormatGraft}Surface {#Prev}— {#ShrineHighlightFormat}{$ActiveScreens.Shrine.NextSurfaceSkellyShrinePointGoal}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_SkellyStatueSurface_Insufficient": {
+   "name": "Conquer the {#BoldFormatGraft}Surface {#Prev}— {#ShrineHighlightInsufficientFormat}{$ActiveScreens.Shrine.NextSurfaceSkellyShrinePointGoal}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_SkellyStatueUnderworld_Incomplete": {
+   "name": "Conquer the {#BoldFormatGraft}Underworld {#Prev}— {#ShrineHighlightFormat}{$ActiveScreens.Shrine.NextUnderworldSkellyShrinePointGoal}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_SkellyStatueUnderworld_Insufficient": {
+   "name": "Conquer the {#BoldFormatGraft}Underworld {#Prev}— {#ShrineHighlightInsufficientFormat}{$ActiveScreens.Shrine.NextUnderworldSkellyShrinePointGoal}{!Icons.ShrinePoint}"
+  },
+  "ShrineScreen_NoBountyAvailable_Staff": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} stirs..."
+  },
+  "ShrineScreen_NoBountyAvailable_Dagger": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} shine..."
+  },
+  "ShrineScreen_NoBountyAvailable_Torch": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} flare..."
+  },
+  "ShrineScreen_NoBountyAvailable_Axe": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} hungers..."
+  },
+  "ShrineScreen_NoBountyAvailable_Lob": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} leers..."
+  },
+  "ShrineScreen_NoBountyAvailable_Suit": {
+   "name": "No {$Keywords.Bounties} for your current weapon. But the {$TempTextData.WeaponName} thrums..."
+  },
+  "ShrineScreen_BountyAvailable_ZeroPoints": {
+   "name": "Activate Vows to mark a {$Keywords.Bounty}."
+  },
+  "ShrineScreen_BountyAvailable_BelowPoints": {
+   "name": "More {$Keywords.ShrinePoints} required for the next {$Keywords.Bounty}."
+  },
+  "ShrineScreen_BountyAvailable_ExactPoints": {
+   "name": "{$Keywords.Bounty} marked. Enact it, and earn Night's reward."
+  },
+  "ShrineScreen_BountyAvailable_ExcessPoints1": {
+   "name": "{$Keywords.Bounty} marked. {$Keywords.ShrinePoints} exceeds the requirement."
+  },
+  "ShrineScreen_BountyAvailable_ExcessPoints2": {
+   "name": "{$Keywords.Bounty} marked. {$Keywords.ShrinePoints} exceeds the requirement by a lot."
+  },
+  "ShrineScreen_BountyAvailable_ExcessPoints3": {
+   "name": "{$Keywords.Bounty} marked. {$Keywords.ShrinePoints} exceeds the requirement, not that you care."
+  },
+  "ShrineScreen_BountyAvailable_MaxPoints": {
+   "name": "{$Keywords.Bounty} marked. {$Keywords.ShrinePoints} is for the weak, is that what you think?"
+  },
+  "WellShop_Title": {
+   "name": "Well of Charon"
+  },
+  "UseWell_Unlocked": {
+   "name": "{I} Shop"
+  },
+  "UseWell_Locked": {
+   "name": "{I} {#UseTextDisabledFormat}Shop?"
+  },
+  "UseStore": {
+   "name": "{I} Shop"
+  },
+  "WellShop_FlavorText01": {
+   "name": "not even the ravages of time can spoil the boatman's quality goods."
+  },
+  "WellShop_FlavorText02": {
+   "name": "the boundless riches of the underworld are never simple to secure."
+  },
+  "WellShop_FlavorText03": {
+   "name": "the deathless boatman of the river styx yet plies his ancient trade."
+  },
+  "UseTraitShop_Unlocked": {
+   "name": "{I} Sell"
+  },
+  "UseTraitShop_Locked": {
+   "name": "{I} {#UseTextDisabledFormat}Sell?"
+  },
+  "SellTrait_Title": {
+   "name": "Pool of Purging"
+  },
+  "SellTraitPrefix": {
+   "name": "Purge"
+  },
+  "Sell_ItemCost": {
+   "name": "+{$TempTextData.Amount} {!Icons.Currency}"
+  },
+  "SellTrait_Hint": {
+   "name": "sacrifice your boons in exchange for {!Icons.Currency}."
+  },
+  "SellTrait_FlavorText01": {
+   "name": "one can free oneself from even the most compelling influences."
+  },
+  "SellTrait_FlavorText02": {
+   "name": "the will of the olympians is tenuous, at best, within the underworld."
+  },
+  "SellTrait_FlavorText03": {
+   "name": "the gift of the gods is worth a tidy sum in the land of the dead."
+  },
+  "SurfaceShop_Title": {
+   "name": "Shrine of Hermes"
+  },
+  "Store_Hint": {
+   "name": "upon retreat, all {!Icons.Currency} will be lost. all sales final."
+  },
+  "PendingDeliveryDuration": {
+   "name": "{#LockedFormat}In Stock. {#Prev}{#PropertyFormat}Delivered after {#BoldFormat}{$TempTextData.Delay} {#Prev}{$Keywords.Encounter}."
+  },
+  "SpeedUpDelivery": {
+   "name": "{#LegendaryFormat}Ordered! {#Prev}{#PropertyFormat}Arriving after {#BoldFormat}{$TempTextData.Delay} {$Keywords.Encounter}{#Prev}, or Pay Extra to Get It {#BoldFormatGraft}Now{#Prev}!!"
+  },
+  "Interstitial_SkipPrompt": {
+   "name": "{SL} SKIP"
+  }
+ }
+}
