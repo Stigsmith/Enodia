@@ -114,6 +114,29 @@ magenta #c96aa8     cyan #5ad4d4
 
 Reserved for the at-risk flicker and the dead crack. Never used for anything ambient.
 
+### One token swaps, the rest do not
+
+Per-god themes are wanted later, an Ares skin and so on. Nothing needs building for that
+now, but it decides how these tokens are grouped, so it is written down here.
+
+The split is the one this brief already opens with. **The chrome is the Crossroads and the
+content is Olympus**, so the furniture is fixed and the light is not.
+
+| Group | Under a theme |
+|---|---|
+| Ground, dividers, silver | **Fixed.** The Crossroads does not change colour because you took Ares |
+| Jade, the living light | **Swaps.** This is the per-god hue, and the only one |
+| Rim light, magenta and cyan | **Fixed.** It signals events, and an event means the same thing in every theme |
+
+So a theme is one ramp of three values replacing `--jade` dim, mid and hot. That is what
+"a theme is a token set, not a rewrite" means in practice, and it is why the ramps have to
+stay positional. `--jade-hot` must mean the brightest living light in every theme, never a
+literal colour.
+
+Corollary worth stating: **verdict colour cannot come from the theme.** DEAD, at risk and on
+track have to read identically whether the player is running Ares or Demeter, which is
+another reason the brief puts verdict in light rather than hue.
+
 ### Delete `--brass`
 
 `--brass:#C0A15C` in the placeholder. Seven interface files were sampled out of
@@ -306,7 +329,7 @@ working around it.
 ## Two things this brief does not cover
 
 Raised in the same conversation, both needing a document change rather than code, and both
-running through `project/enodia_workflow_decision.md`:
+running through `project/workflow-decision.md`:
 
 1. **The run surfaces are now one timeline, not four screens.** `DESIGN.md` 8 lists Setup,
    Exit, Targets, Held and Briefing. The design conversation replaced that with a single

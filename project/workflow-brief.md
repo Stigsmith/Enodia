@@ -140,7 +140,7 @@ The owner reports what he saw, usually in a sentence. Three outcomes:
 
 | Outcome | Next move |
 |---|---|
-| It does what the brief said | If it settled anything, run `enodia_workflow_decision.md` |
+| It does what the brief said | If it settled anything, run `project/workflow-decision.md` |
 | It does what the brief said, and the brief was wrong | The design was wrong, not the code. Redesign here, then a new brief |
 | An assumption came back wrong | Record the correction first. A wrong mechanic that reached a brief will reach a page next |
 

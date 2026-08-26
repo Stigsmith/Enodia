@@ -12,7 +12,7 @@ The project exists and is currently empty. Two steps set it up.
 
 ### 1. Custom instructions
 
-Paste the whole of `enodia_instructions.md` into the project's instructions field.
+Paste the whole of `project/instructions.md` into the project's instructions field.
 
 ### 2. Project knowledge
 
@@ -23,9 +23,9 @@ Upload six files:
 | `CLAUDE.md` | repo root | Rules, verified mechanics with sources, current build state |
 | `REQUIREMENTS.md` | repo root | What the product is, scope by phase, dead positions |
 | `DESIGN.md` | repo root | Architecture, engines, build order, open items |
-| `hades-2-companion-lessons learned.md` | repo root | The D.D.S. engineering discipline |
-| `enodia_workflow_brief.md` | this folder | Turning a decision into a brief for Claude Code |
-| `enodia_workflow_decision.md` | this folder | Turning a settled conversation into repo document text |
+| `LESSONS.md` | repo root | The D.D.S. engineering discipline |
+| `project/workflow-brief.md` | this folder | Turning a decision into a brief for Claude Code |
+| `project/workflow-decision.md` | this folder | Turning a settled conversation into repo document text |
 
 The four repo documents go up **verbatim**. They are the original, the uploads are copies,
 and nothing gets summarised on the way. Two versions of the same truth would drift, which
@@ -42,7 +42,7 @@ Three things were considered and left out.
 **No decision log.** The repo already carries seven structures that record decisions:
 `Decisions already taken`, `Dead positions`, `Errors made so far`, `Verified mechanics`,
 `To verify before writing any data`, `Open items`, and the dated inline correction. A
-parallel log would compete with all of them. `enodia_workflow_decision.md` routes into what
+parallel log would compete with all of them. `project/workflow-decision.md` routes into what
 exists.
 
 **No state-of-play file.** `CLAUDE.md` already opens with where the build is. Keeping a
@@ -56,7 +56,7 @@ The uploads go stale the moment a repo document changes. The instructions tell t
 never to assert where the build has got to, and to state its assumption in one line instead.
 
 Re-upload after a decision changes a document. Batching three at a time is fine.
-`enodia_workflow_decision.md` names the file to re-upload at the end of each decision.
+`project/workflow-decision.md` names the file to re-upload at the end of each decision.
 
 ---
 

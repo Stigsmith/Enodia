@@ -1,17 +1,10 @@
 # Enodia
 
-An in-run build companion for Hades II. Read `REQUIREMENTS.md` for what it is and why,
-`DESIGN.md` for how it is built, `assets/README.md` for the image library.
+An in-run build companion for Hades II. **`ROADMAP.md` is the status view**: what is done,
+what is next, what is blocked, and where every document lives. This file is the rules.
 
-Nothing is implemented yet. `dist/index.html` is a placeholder and roadmap page, published
-as an Artifact and deployed to Netlify.
-
-**Start at `DESIGN.md` section 10, the Phase 1 build order.** Step 1 is the Lua extractor,
-and steps 1 to 3 are all data plumbing that everything else depends on. Step 8, the Targets
-screen, is the first point where the tool is useful to a player.
-
-Open questions that block nothing but are worth settling early are in `DESIGN.md` section
-12, and the asset gaps are in `assets/README.md`.
+`REQUIREMENTS.md` for what it is and why, `DESIGN.md` for how it is built, `VISUAL.md` for
+how it looks, `assets/README.md` for the image library.
 
 ---
 
@@ -155,7 +148,9 @@ the play experience cannot see.
 
 ---
 
-## Extractor, step 1 of the build order: done
+## The extractor, and what it took to build
+
+Status lives in `ROADMAP.md`. This is the reference.
 
 `npm run extract` runs `scripts/extract.mjs`, which loads the game's Lua in a
 [wasmoon](https://www.npmjs.com/package/wasmoon) state and writes `data/generated/*.json`.

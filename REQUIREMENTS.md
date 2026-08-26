@@ -1,7 +1,7 @@
 # Enodia: Requirements
 
 Draft 1, 22 August 2026. Companion documents: `assets/README.md` for the image library,
-`hades-2-companion-lessons learned.md` for the engineering discipline carried over from
+`LESSONS.md` for the engineering discipline carried over from
 the owner's previous loadout tool, referred to throughout as D.D.S.
 
 ---

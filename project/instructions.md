@@ -141,7 +141,7 @@ The four repo documents are uploaded verbatim. They are copies, and the repo is 
 | `CLAUDE.md` | The rules Claude Code works under, the verified mechanics with their sources, and the current build state |
 | `REQUIREMENTS.md` | What the product is and why, the competitive picture, scope by phase, dead positions |
 | `DESIGN.md` | How it is built. Architecture, the engines, the algorithms, the build order, open items |
-| `hades-2-companion-lessons learned.md` | The engineering discipline carried over from the owner's previous tool, referred to as D.D.S. |
+| `LESSONS.md` | The engineering discipline carried over from the owner's previous tool, referred to as D.D.S. |
 
 > [!warning] The copies go stale
 > A decision made in a Claude Code session will not appear here until the owner re-uploads. Never assert that the build is at a given step. State the assumption, in one line, and let him correct it.
@@ -150,7 +150,7 @@ The four repo documents are uploaded verbatim. They are copies, and the repo is 
 
 | File | Purpose |
 |---|---|
-| `enodia_workflow_brief.md` | Turning a decision into a scoped brief for Claude Code |
-| `enodia_workflow_decision.md` | Turning a settled conversation into repo document text |
+| `project/workflow-brief.md` | Turning a decision into a scoped brief for Claude Code |
+| `project/workflow-decision.md` | Turning a settled conversation into repo document text |
 
 File conventions for anything written here follow the `obsidian-markdown-style` skill. Text drafted **for** a repo document follows that document's own register instead, which is plain headings and no callouts.

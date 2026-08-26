@@ -25,7 +25,7 @@ A parallel log would compete with all seven and lose. **Write into the structure
 # **Steps**
 
 1. **State the decision in one line.** If it takes a paragraph, it is not settled yet
-2. **Check it does not rest on an unverified mechanic.** If it does, it is not a decision. It is a question for Claude Code, and it goes through `enodia_workflow_brief.md` first
+2. **Check it does not rest on an unverified mechanic.** If it does, it is not a decision. It is a question for Claude Code, and it goes through `project/workflow-brief.md` first
 3. **Say what it kills.** A choice that closes nothing was not a decision. Whatever it closes goes on the record with it
 4. **Route it** using the table below
 5. **Write the replacement text**, in the target document's register, ready to paste
