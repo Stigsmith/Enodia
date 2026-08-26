@@ -1,0 +1,351 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaSource": "TraitLogic.GetProcessedValue + TraitMultiplierData",
+  "note": "Only traits with an explicit IdenticalMultiplier appear here. Everything else stacks linearly and has no diminishing point.",
+  "defaults": {
+   "decay": 0.5,
+   "floor": 0.1
+  }
+ },
+ "data": {
+  "LinkedDeathDamageBoon": {
+   "name": "Dying Wish",
+   "curves": [
+    {
+     "properties": [
+      "OnEnemyDeathFunction.FunctionArgs.DamageAmount"
+     ],
+     "value": -0.5,
+     "decay": 0.8,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 9
+    }
+   ]
+  },
+  "ApolloSpecialBoon": {
+   "name": "Nova Flourish",
+   "curves": [
+    {
+     "properties": [
+      "AddOutgoingDamageModifiers.ValidWeaponMultiplier"
+     ],
+     "value": -0.67,
+     "decay": 0.5,
+     "floor": 0.17,
+     "firstExtraMultiplier": 0.33,
+     "shape": "floors",
+     "worthTaking": 2
+    }
+   ]
+  },
+  "DoorHealToFullBoon": {
+   "name": "Healthy Rebound",
+   "curves": [
+    {
+     "properties": [
+      "DoorFullHealThreshold"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "WeakVulnerabilityBoon": {
+   "name": "Sweet Surrender",
+   "curves": [
+    {
+     "properties": [
+      "AddOutgoingDamageModifiers.ValidWeaponMultiplier"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "ApolloBlindBoon": {
+   "name": "Back Burner",
+   "curves": [
+    {
+     "properties": [
+      "AddOutgoingDamageModifiers.HitVulnerabilityMultiplier"
+     ],
+     "value": -0.5,
+     "decay": 0.8,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 9
+    }
+   ]
+  },
+  "ElementalDamageCapBoon": {
+   "name": "Frosty Veneer",
+   "curves": [
+    {
+     "properties": [
+      "ActivatedDamageReduction"
+     ],
+     "value": -1,
+     "decay": 0.5,
+     "floor": -2,
+     "firstExtraMultiplier": 0,
+     "shape": "none",
+     "worthTaking": 1
+    }
+   ]
+  },
+  "ManaBurstBoon": {
+   "name": "Heart Breaker",
+   "curves": [
+    {
+     "properties": [
+      "OnManaSpendAction.FunctionArgs.DamageMultiplier"
+     ],
+     "value": -0.75,
+     "decay": 0.8,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.25,
+     "shape": "floors",
+     "worthTaking": 6
+    }
+   ]
+  },
+  "PerfectDamageBonusBoon": {
+   "name": "Perfect Image",
+   "curves": [
+    {
+     "properties": [
+      "AddOutgoingDamageModifiers.UndamagedMultiplier"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "ApolloRetaliateBoon": {
+   "name": "Light Smite",
+   "curves": [
+    {
+     "properties": [
+      "OnSelfDamagedFunction.FunctionArgs.DamageMultiplier"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "CastAnywhereBoon": {
+   "name": "Lightning Lance",
+   "curves": [
+    {
+     "properties": [
+      "PropertyChanges.1"
+     ],
+     "value": -0.6,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.4,
+     "shape": "floors",
+     "worthTaking": 3
+    }
+   ]
+  },
+  "BoltRetaliateBoon": {
+   "name": "Divine Vengeance",
+   "curves": [
+    {
+     "properties": [
+      "OnSelfDamagedFunction.FunctionArgs.MaxStrikes"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "RoomRewardBonusBoon": {
+   "name": "Buried Treasure",
+   "curves": [
+    {
+     "properties": [
+      "RoomRewardBonus.MetaCurrency",
+      "RoomRewardBonus.MetaCardPointsCommon",
+      "RoomRewardBonus.MemPointsCommon"
+     ],
+     "value": -0.9,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.1,
+     "shape": "immediate",
+     "worthTaking": 1
+    },
+    {
+     "properties": [
+      "MoneyRewardBonus"
+     ],
+     "value": -0.9,
+     "decay": 0.5,
+     "floor": 0.02,
+     "firstExtraMultiplier": 0.1,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "ApolloSprintBoon": {
+   "name": "Blinding Rush",
+   "curves": [
+    {
+     "properties": [
+      "PropertyChanges.0",
+      "PropertyChanges.1"
+     ],
+     "value": -0.75,
+     "decay": 0.5,
+     "floor": 0.25,
+     "firstExtraMultiplier": 0.25,
+     "shape": "immediate",
+     "worthTaking": 1
+    }
+   ]
+  },
+  "WeakPotencyBoon": {
+   "name": "Broken Resolve",
+   "curves": [
+    {
+     "properties": [
+      "EffectModifier.AmountAddition"
+     ],
+     "value": -0.8,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.2,
+     "shape": "floors",
+     "worthTaking": 2
+    }
+   ]
+  },
+  "ApolloCastAreaBoon": {
+   "name": "Super Nova",
+   "curves": [
+    {
+     "properties": [
+      "CastProjectileModifiers.AreaIncrease"
+     ],
+     "value": -0.75,
+     "decay": 0.75,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.25,
+     "shape": "floors",
+     "worthTaking": 5
+    }
+   ]
+  },
+  "CastLobBoon": {
+   "name": "Tipsy Shot",
+   "curves": [
+    {
+     "properties": [
+      "PropertyChanges.1"
+     ],
+     "value": -0.75,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.25,
+     "shape": "floors",
+     "worthTaking": 3
+    }
+   ]
+  },
+  "CommonGlobalDamageBoon": {
+   "name": "Uncommon Grace",
+   "curves": [
+    {
+     "properties": [
+      "AddOutgoingDamageModifiers.GameStateMultiplier"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "BurnExplodeBoon": {
+   "name": "Flash Fry",
+   "curves": [
+    {
+     "properties": [
+      "OnEnemyDeathFunction.FunctionArgs.ProjectileDamageMultiplier"
+     ],
+     "value": -0.75,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.25,
+     "shape": "floors",
+     "worthTaking": 3
+    }
+   ]
+  },
+  "RootDurationBoon": {
+   "name": "Cold Storage",
+   "curves": [
+    {
+     "properties": [
+      "RootDurationExtension"
+     ],
+     "value": -0.5,
+     "decay": 0.5,
+     "floor": 0.1,
+     "firstExtraMultiplier": 0.5,
+     "shape": "floors",
+     "worthTaking": 4
+    }
+   ]
+  },
+  "ReserveManaHitShieldBoon": {
+   "name": "Snow Queen",
+   "curves": [
+    {
+     "properties": [
+      "SetupFunction.Args.ManaReservationCost"
+     ],
+     "value": -1.1666666666666667,
+     "decay": 0.5,
+     "floor": -1,
+     "firstExtraMultiplier": -0.1667,
+     "shape": "converges",
+     "worthTaking": null
+    }
+   ]
+  }
+ }
+}

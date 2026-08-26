@@ -1,0 +1,47 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "MetaUpgradeDefaultCardLayout"
+ },
+ "data": [
+  [
+   "ChanneledCast",
+   "HealthRegen",
+   "LowManaDamageBonus",
+   "CastCount",
+   "SorceryRegenUpgrade"
+  ],
+  [
+   "CastBuff",
+   "BonusHealth",
+   "BonusDodge",
+   "ManaOverTime",
+   "MagicCrit"
+  ],
+  [
+   "SprintShield",
+   "LastStand",
+   "MaxHealthPerRoom",
+   "StatusVulnerability",
+   "ChanneledBlock"
+  ],
+  [
+   "DoorReroll",
+   "StartingGold",
+   "MetaToRunUpgrade",
+   "RarityBoost",
+   "BonusRarity"
+  ],
+  [
+   "TradeOff",
+   "ScreenReroll",
+   "LowHealthBonus",
+   "EpicRarityBoost",
+   "CardDraw"
+  ]
+ ]
+}

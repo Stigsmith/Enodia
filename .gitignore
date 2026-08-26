@@ -1,0 +1,17 @@
+# Scratch. deppth2 output from the game packages, 443 MB and regenerable.
+# Re-create with the deppth2 commands in assets/README.md.
+extracted/
+
+# Reference art pulled for the mascot work. Regenerable from extracted/.
+reference/
+
+node_modules/
+
+# NOTE: dist/ is currently HAND AUTHORED. dist/index.html is the live placeholder
+# page deployed to Netlify, so it must stay in version control for now.
+# Uncomment the line below only once Vite is generating dist/ from src/.
+# dist/
+
+*.local
+.DS_Store
+Thumbs.db

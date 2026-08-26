@@ -1,0 +1,107 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-26",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "TraitRarityData"
+ },
+ "data": {
+  "AspectRarityText": [
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl2",
+   "TraitLevel_AspectLvl3",
+   "TraitLevel_AspectLvl4",
+   "TraitLevel_AspectLvl5",
+   "TraitLevel_AspectLvl6"
+  ],
+  "RarityValues": {
+   "Duo": 5,
+   "Rare": 2,
+   "Perfect": 6,
+   "Common": 1,
+   "Heroic": 4,
+   "Epic": 3,
+   "Legendary": 5
+  },
+  "BoonRarityRollOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Duo",
+   "Legendary"
+  ],
+  "WeaponRarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic",
+   "Legendary",
+   "Perfect"
+  ],
+  "TalentRarity": [
+   "TraitLevel_TalentLvl1",
+   "TraitLevel_TalentLvl2",
+   "TraitLevel_TalentLvl3",
+   "TraitLevel_TalentLvl4",
+   "TraitLevel_TalentLvl5"
+  ],
+  "BoonRarityReverseRollOrder": [
+   "Legendary",
+   "Duo",
+   "Epic",
+   "Rare",
+   "Common"
+  ],
+  "TalentRarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic",
+   "Legendary"
+  ],
+  "ShrineRarityText": [
+   "ShrineLevel0",
+   "ShrineLevel1",
+   "ShrineLevel2",
+   "ShrineLevel3",
+   "ShrineLevel4",
+   "ShrineLevel5"
+  ],
+  "LegacyGameStateRequirements": [
+   {}
+  ],
+  "HammerRarityText": [
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl2",
+   "TraitLevel_AspectLvl3"
+  ],
+  "ElementalGameStateRequirements": [
+   {
+    "PathTrue": [
+     "GameState",
+     "WorldUpgradesAdded",
+     "WorldUpgradeElementalBoons"
+    ]
+   },
+   {
+    "PathFalse": [
+     "CurrentRun",
+     "CurrentRoom",
+     "TextLinesRecord",
+     "HermesFirstPickUp"
+    ]
+   }
+  ],
+  "RarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic"
+  ]
+ }
+}
