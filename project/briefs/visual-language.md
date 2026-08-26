@@ -17,7 +17,7 @@ guess about it, and `dist/index.html` is rebuilt in that language as the proof.
 
 Outside `DESIGN.md` section 10, which sequences engines and data. This is the layer every
 one of steps 7 through 11 renders into. Doing it now is cheap because one page exists.
-Doing it after step 11 means restyling five surfaces.
+Doing it after step 11 means restyling the whole run surface, its rail and its overlays.
 
 ---
 
