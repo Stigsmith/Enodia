@@ -84,8 +84,10 @@ These are real and none of them block step 2.
 - ~~Aspect numbering in `assets/aspects/` unverified~~. **Resolved by matching pictures,
   not by assuming.** 24 game icons plus 23 wiki renders, all named by aspect. The Black
   Coat's base render is unusable and is the one real gap left
-- Missing: familiars, status effect icons, Tartarus region art, and a usable Black Coat
-  base render. The 4 hammer icons turned out to be present all along
+- Missing: familiars and status effect icons. Tartarus came out of the run history icons,
+  and the 4 hammer icons turned out to be present all along
+- **Waiting on the owner:** five candidates for the Black Coat base image sit in
+  `assets/aspects/` as `coat-melinoe-alt-*`. Pick one, delete the rest
 - 17 wiki images lost their manifest row when someone moved them between categories.
   `npm run assets` names them
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,

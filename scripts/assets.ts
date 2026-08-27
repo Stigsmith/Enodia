@@ -174,23 +174,29 @@ function runFill(): { copied: number; unsourced: { id: string; name: string; ico
 
 function rebuildManifest(): Manifest {
   const previous = existsSync(MANIFEST) ? (readJson(MANIFEST) as Manifest) : { assets: [] }
+  // Provenance is carried forward by path, and by checksum when the path has
+  // moved. Renaming 25 aspect renders dropped their wiki source pages the first
+  // time, because a rename changes the path and not one byte of the file.
   const carried = new Map<string, ManifestEntry>()
+  const carriedByHash = new Map<string, ManifestEntry>()
   for (const entry of previous.assets ?? []) {
     if (typeof entry?.file === 'string') carried.set(entry.file, entry)
+    if (typeof entry?.sha256 === 'string' && entry.sourceFile) carriedByHash.set(entry.sha256, entry)
   }
 
   const entries: ManifestEntry[] = assetFiles().map((file) => {
     const bytes = readFileSync(join(ASSETS, file))
     const category = file.slice(0, file.indexOf('/'))
     const id = file.slice(file.indexOf('/') + 1).replace(IMAGE, '')
-    const before = carried.get(file)
+    const sha256 = createHash('sha256').update(bytes).digest('hex')
+    const before = carried.get(file) ?? carriedByHash.get(sha256)
 
     const entry: ManifestEntry = {
       id,
       category,
       file,
       bytes: bytes.length,
-      sha256: createHash('sha256').update(bytes).digest('hex'),
+      sha256,
       // The extension says where an image came from and it has held for every
       // file so far: the wiki scrape wrote .webp, deppth2 writes .png.
       source: file.endsWith('.png') ? 'game' : 'wiki',
