@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -8,44 +8,51 @@
   "luaTable": "LinkedTraitData"
  },
  "data": {
+  "AphroditeCoreTraits": [
+   "AphroditeWeaponBoon",
+   "AphroditeSpecialBoon",
+   "AphroditeCastBoon",
+   "AphroditeSprintBoon",
+   "AphroditeManaBoon"
+  ],
+  "AphroditeWeakTraits": [
+   "AphroditeCastBoon",
+   "AphroditeSprintBoon",
+   "AphroditeManaBoon"
+  ],
+  "ApolloBlindTraits": [
+   "ApolloCastBoon",
+   "ApolloSprintBoon",
+   "ApolloRetaliateBoon",
+   "BlindChanceBoon"
+  ],
+  "ApolloCoreTraits": [
+   "ApolloWeaponBoon",
+   "ApolloSpecialBoon",
+   "ApolloCastBoon",
+   "ApolloSprintBoon",
+   "ApolloManaBoon"
+  ],
   "AresBloodDropTraits": [
    "AresManaBoon",
    "BloodDropRevengeBoon"
   ],
-  "ZeusBoltTraits": [
-   "ZeusWeaponBoon",
-   "ZeusSpecialBoon",
-   "ZeusCastBoon",
-   "ZeusSprintBoon",
-   "ZeusManaBoltBoon",
-   "BoltRetaliateBoon",
-   "CastAnywhereBoon"
+  "AresCoreTraits": [
+   "AresWeaponBoon",
+   "AresSpecialBoon",
+   "AresCastBoon",
+   "AresSprintBoon",
+   "AresManaBoon"
   ],
-  "PoseidonKnockbackAmplifyTraits": [
-   "PoseidonCastBoon",
-   "PoseidonStatusBoon"
+  "AresRendTraits": [
+   "AresWeaponBoon",
+   "AresSpecialBoon"
   ],
-  "ZeusEchoTraits": [
-   "ZeusWeaponBoon",
-   "ZeusSpecialBoon"
-  ],
-  "HestiaBurnTraits": [
-   "HestiaWeaponBoon",
-   "HestiaSpecialBoon",
-   "HestiaCastBoon"
-  ],
-  "HeraLinkTraits": [
-   "HeraWeaponBoon",
-   "HeraSpecialBoon",
-   "HeraCastBoon",
-   "HeraSprintBoon"
-  ],
-  "HeraCoreTraits": [
-   "HeraWeaponBoon",
-   "HeraSpecialBoon",
-   "HeraCastBoon",
-   "HeraSprintBoon",
-   "HeraManaBoon"
+  "AresSwordTraits": [
+   "AresCastBoon",
+   "AresSprintBoon",
+   "OmegaDelayedDamageBoon",
+   "RendBloodDropBoon"
   ],
   "CastTraits": [
    "AphroditeCastBoon",
@@ -58,24 +65,17 @@
    "ZeusCastBoon",
    "AresCastBoon"
   ],
-  "AphroditeWeakTraits": [
-   "AphroditeCastBoon",
-   "AphroditeSprintBoon",
-   "AphroditeManaBoon"
+  "DemeterCoreTraits": [
+   "DemeterWeaponBoon",
+   "DemeterSpecialBoon",
+   "DemeterCastBoon",
+   "DemeterSprintBoon",
+   "DemeterManaBoon"
   ],
-  "HestiaCoreTraits": [
-   "HestiaWeaponBoon",
-   "HestiaSpecialBoon",
-   "HestiaCastBoon",
-   "HestiaSprintBoon",
-   "HestiaManaBoon"
-  ],
-  "AphroditeCoreTraits": [
-   "AphroditeWeaponBoon",
-   "AphroditeSpecialBoon",
-   "AphroditeCastBoon",
-   "AphroditeSprintBoon",
-   "AphroditeManaBoon"
+  "DemeterRootTraits": [
+   "DemeterWeaponBoon",
+   "DemeterSpecialBoon",
+   "DemeterCastBoon"
   ],
   "HephaestusCoreTraits": [
    "HephaestusWeaponBoon",
@@ -89,54 +89,30 @@
    "HephaestusSpecialBoon",
    "HephaestusSprintBoon"
   ],
-  "AresSwordTraits": [
-   "AresCastBoon",
-   "AresSprintBoon",
-   "OmegaDelayedDamageBoon",
-   "RendBloodDropBoon"
-  ],
-  "ApolloBlindTraits": [
-   "ApolloCastBoon",
-   "ApolloSprintBoon",
-   "ApolloRetaliateBoon",
-   "BlindChanceBoon"
-  ],
-  "DemeterCoreTraits": [
-   "DemeterWeaponBoon",
-   "DemeterSpecialBoon",
-   "DemeterCastBoon",
-   "DemeterSprintBoon",
-   "DemeterManaBoon"
-  ],
-  "WeaponTraits": [
-   "AphroditeWeaponBoon",
-   "ApolloWeaponBoon",
-   "DemeterWeaponBoon",
-   "HephaestusWeaponBoon",
+  "HeraCoreTraits": [
    "HeraWeaponBoon",
+   "HeraSpecialBoon",
+   "HeraCastBoon",
+   "HeraSprintBoon",
+   "HeraManaBoon"
+  ],
+  "HeraLinkTraits": [
+   "HeraWeaponBoon",
+   "HeraSpecialBoon",
+   "HeraCastBoon",
+   "HeraSprintBoon"
+  ],
+  "HestiaBurnTraits": [
    "HestiaWeaponBoon",
-   "PoseidonWeaponBoon",
-   "ZeusWeaponBoon",
-   "AresWeaponBoon"
+   "HestiaSpecialBoon",
+   "HestiaCastBoon"
   ],
-  "ZeusCoreTraits": [
-   "ZeusWeaponBoon",
-   "ZeusSpecialBoon",
-   "ZeusCastBoon",
-   "ZeusSprintBoon",
-   "ZeusManaBoon"
-  ],
-  "PoseidonKnockbackTraits": [
-   "PoseidonWeaponBoon",
-   "PoseidonSpecialBoon",
-   "PoseidonCastBoon",
-   "PoseidonSprintBoon",
-   "PoseidonExCastBoon"
-  ],
-  "DemeterRootTraits": [
-   "DemeterWeaponBoon",
-   "DemeterSpecialBoon",
-   "DemeterCastBoon"
+  "HestiaCoreTraits": [
+   "HestiaWeaponBoon",
+   "HestiaSpecialBoon",
+   "HestiaCastBoon",
+   "HestiaSprintBoon",
+   "HestiaManaBoon"
   ],
   "PoseidonCoreTraits": [
    "PoseidonWeaponBoon",
@@ -145,12 +121,16 @@
    "PoseidonSprintBoon",
    "PoseidonManaBoon"
   ],
-  "AresCoreTraits": [
-   "AresWeaponBoon",
-   "AresSpecialBoon",
-   "AresCastBoon",
-   "AresSprintBoon",
-   "AresManaBoon"
+  "PoseidonKnockbackAmplifyTraits": [
+   "PoseidonCastBoon",
+   "PoseidonStatusBoon"
+  ],
+  "PoseidonKnockbackTraits": [
+   "PoseidonWeaponBoon",
+   "PoseidonSpecialBoon",
+   "PoseidonCastBoon",
+   "PoseidonSprintBoon",
+   "PoseidonExCastBoon"
   ],
   "PoseidonSplashTraits": [
    "PoseidonWeaponBoon",
@@ -167,16 +147,36 @@
    "ZeusSpecialBoon",
    "AresSpecialBoon"
   ],
-  "ApolloCoreTraits": [
+  "WeaponTraits": [
+   "AphroditeWeaponBoon",
    "ApolloWeaponBoon",
-   "ApolloSpecialBoon",
-   "ApolloCastBoon",
-   "ApolloSprintBoon",
-   "ApolloManaBoon"
+   "DemeterWeaponBoon",
+   "HephaestusWeaponBoon",
+   "HeraWeaponBoon",
+   "HestiaWeaponBoon",
+   "PoseidonWeaponBoon",
+   "ZeusWeaponBoon",
+   "AresWeaponBoon"
   ],
-  "AresRendTraits": [
-   "AresWeaponBoon",
-   "AresSpecialBoon"
+  "ZeusBoltTraits": [
+   "ZeusWeaponBoon",
+   "ZeusSpecialBoon",
+   "ZeusCastBoon",
+   "ZeusSprintBoon",
+   "ZeusManaBoltBoon",
+   "BoltRetaliateBoon",
+   "CastAnywhereBoon"
+  ],
+  "ZeusCoreTraits": [
+   "ZeusWeaponBoon",
+   "ZeusSpecialBoon",
+   "ZeusCastBoon",
+   "ZeusSprintBoon",
+   "ZeusManaBoon"
+  ],
+  "ZeusEchoTraits": [
+   "ZeusWeaponBoon",
+   "ZeusSpecialBoon"
   ]
  }
 }
