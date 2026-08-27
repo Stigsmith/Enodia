@@ -5,7 +5,8 @@
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
   "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
-  "luaTable": "TraitRarityData"
+  "luaTable": "TraitRarityData",
+  "sha256": "4052e1c684f12bab451822f94db4aea6a02ba12bd4c65535df611f48c1c8c964"
  },
  "data": {
   "AspectRarityText": [

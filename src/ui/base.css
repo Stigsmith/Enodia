@@ -1,0 +1,56 @@
+/* Base layer. Reset, ground and type scale, all through tokens.
+ * No literal colour here: VISUAL.md rule 2 keeps every value in tokens.css. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ink-950);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+.shell {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(2rem, 8vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--jade-hot);
+}
+
+.tagline {
+  margin: 0.5rem 0 2rem;
+  color: var(--bone-dim);
+}
+
+.state {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--div-3);
+  border-left: 2px solid var(--unbuilt);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}

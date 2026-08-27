@@ -3,7 +3,8 @@
 An in-run build companion for **Hades II**. Not a build planner and not a wiki: it answers
 the question you have while standing at an Exit with fifteen seconds to decide.
 
-Nothing is implemented yet beyond the data layer. `dist/index.html` is a placeholder.
+Nothing is implemented yet beyond the data layer and its validator. `placeholder/index.html`
+is the hand-authored page that stands in for the app.
 
 **Start with [`ROADMAP.md`](ROADMAP.md)** for where the build is, then
 [`CLAUDE.md`](CLAUDE.md) for the rules that matter most.
@@ -33,10 +34,14 @@ decisions/         dated decision records. applied to the docs, kept for the rea
 project/           config for the companion Claude.ai project, not for the product
 
 scripts/extract.mjs   runs the game's Lua, writes data/generated
-data/generated/       extracted game data. never hand edited
-src/ui/tokens.css     the design tokens. dist inlines a copy until a build exists
+scripts/validate.ts   the validator, wired into prebuild. rules live in scripts/validate/
+data/generated/       extracted game data. never hand edited, checksummed
+data/curated/         hand-authored judgement, joined on id. see its README
+data/baseline.json    the structural counts the validator holds the extractor to
+src/                  the app. tokens.css is the source for every colour
 assets/               567 images, see assets/README.md
-dist/                 the placeholder page, hand authored, live on Netlify
+placeholder/          the hand-authored page, live on Netlify until the app ships
+dist/                 build output. Vite owns it, git ignores it
 ```
 
 Three folders are deliberately absent from version control: `extracted/` is 443 MB of
@@ -47,14 +52,21 @@ Three folders are deliberately absent from version control: `extracted/` is 443 
 ## Commands
 
 ```bash
-npm run extract
+npm run dev        # vite, port 5173
+npm run build      # validates first, then builds. a broken reference stops it
+npm run validate   # the validator on its own
+npm test           # vitest
+npm run extract    # re-read the game's Lua into data/generated
+npm run typecheck
 ```
 
-Loads the game's Lua in a [wasmoon](https://www.npmjs.com/package/wasmoon) state and writes
-`data/generated/*.json`. Needs Hades II installed. Re-run it after a game patch.
+`npm run extract` loads the game's Lua in a
+[wasmoon](https://www.npmjs.com/package/wasmoon) state and writes `data/generated/*.json`.
+Needs Hades II installed. Re-run it after a game patch, then read the validator's count
+diff as a patch note before accepting it with
+`npm run validate -- --update-baseline`.
 
-To serve the placeholder page locally, use the `placeholder` config in
-`.claude/launch.json`, which serves `dist/` on port 8777.
+The old page is served by the `placeholder` config in `.claude/launch.json`, on port 8777.
 
 ---
 

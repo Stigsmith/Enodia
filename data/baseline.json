@@ -1,0 +1,19 @@
+{
+  "_note": "Structural counts the validator holds the extractor to. A game patch may move these. Read the diff as a patch note, then re-run npm run validate -- --update-baseline. DESIGN.md 11.",
+  "gameVersion": "138174",
+  "counts": {
+    "traits": 651,
+    "requirements": 78,
+    "duos": 37,
+    "legendaries": 10,
+    "hexDuos": 9,
+    "gated": 32,
+    "linkedSets": 26,
+    "arcanaCards": 27,
+    "stackingCurves": 20
+  },
+  "coverage": {
+    "traitsWithDisplayName": 567,
+    "traitsWithIcon": 579
+  }
+}

@@ -4,7 +4,8 @@
   "gameVersion": "138174",
   "source": "Game/Text/en/HelpText.en.sjson",
   "generatedBy": "scripts/extract.mjs",
-  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch."
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "sha256": "f057de247ac4512735ffb947efaed797d6f21a050aef0e11da07e33eee8c0e59"
  },
  "data": {
   "PlayerUnit": {

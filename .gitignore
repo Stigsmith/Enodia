@@ -7,10 +7,11 @@ reference/
 
 node_modules/
 
-# NOTE: dist/ is currently HAND AUTHORED. dist/index.html is the live placeholder
-# page deployed to Netlify, so it must stay in version control for now.
-# Uncomment the line below only once Vite is generating dist/ from src/.
-# dist/
+# Build output. Vite owns dist/ now.
+# The hand-authored page that used to live here is placeholder/index.html, still
+# in version control and still the thing deployed to Netlify until the app ships.
+# Serve it on 8777 with the `placeholder` config in .claude/launch.json.
+dist/
 
 *.local
 .DS_Store

@@ -8,6 +8,7 @@
 
 import { LuaFactory } from 'wasmoon'
 import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join, resolve } from 'node:path'
 
 const GAME = 'C:/Program Files (x86)/Steam/steamapps/common/Hades II/Content'
@@ -213,6 +214,19 @@ const provenance = {
   warning: 'Generated. Never hand edit. Re-run npm run extract after a game patch.',
 }
 
+// Every generated file carries a sha256 of its own data payload. The validator
+// recomputes it and rejects a file whose payload was hand edited, which is the
+// one thing DESIGN.md 2.1 says must never happen to this directory. The hash
+// covers `data` only, since it cannot cover the block it sits in.
+function writeGenerated(fileName, extraProvenance, data) {
+  const payload = JSON.stringify(data)
+  const sha256 = createHash('sha256').update(payload).digest('hex')
+  writeFileSync(
+    join(OUT, `${fileName}.json`),
+    JSON.stringify({ _provenance: { ...provenance, ...extraProvenance, sha256 }, data }, null, 1)
+  )
+}
+
 const tables = {
   traits: 'TraitData',
   requirements: 'TraitRequirements',
@@ -233,10 +247,7 @@ const summary = []
 for (const [fileName, luaName] of Object.entries(tables)) {
   const data = grab(luaName)
   const count = data && typeof data === 'object' ? Object.keys(data).length : 0
-  writeFileSync(
-    join(OUT, `${fileName}.json`),
-    JSON.stringify({ _provenance: { ...provenance, luaTable: luaName }, data }, null, 1)
-  )
+  writeGenerated(fileName, { luaTable: luaName }, data)
   summary.push([fileName, luaName, count])
 }
 
@@ -283,10 +294,7 @@ for (const [fileName, sjson] of Object.entries(textFiles)) {
     textSummary.push([fileName, sjson, 0])
     continue
   }
-  writeFileSync(
-    join(OUT, `${fileName}.json`),
-    JSON.stringify({ _provenance: { ...provenance, source: `Game/Text/en/${sjson}` }, data }, null, 1)
-  )
+  writeGenerated(fileName, { source: `Game/Text/en/${sjson}` }, data)
   textSummary.push([fileName, sjson, Object.keys(data).length])
 }
 
@@ -371,22 +379,15 @@ for (const [id, trait] of Object.entries(allTraits)) {
   }
 }
 
-writeFileSync(
-  join(OUT, 'stacking.json'),
-  JSON.stringify(
-    {
-      _provenance: {
-        ...provenance,
-        luaSource: 'TraitLogic.GetProcessedValue + TraitMultiplierData',
-        note:
-          'Only traits with an explicit IdenticalMultiplier appear here. Everything else stacks linearly and has no diminishing point.',
-        defaults: { decay: DECAY, floor: FLOOR },
-      },
-      data: stacking,
-    },
-    null,
-    1
-  )
+writeGenerated(
+  'stacking',
+  {
+    luaSource: 'TraitLogic.GetProcessedValue + TraitMultiplierData',
+    note:
+      'Only traits with an explicit IdenticalMultiplier appear here. Everything else stacks linearly and has no diminishing point.',
+    defaults: { decay: DECAY, floor: FLOOR },
+  },
+  stacking
 )
 
 // how much of the trait data can actually be named

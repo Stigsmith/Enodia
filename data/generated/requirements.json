@@ -5,7 +5,8 @@
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
   "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
-  "luaTable": "TraitRequirements"
+  "luaTable": "TraitRequirements",
+  "sha256": "d1ebeed7dbe6bfb13b0bcf4522fe4b6a58b37d2d8e33c6d5db2e225f1c3e7c4a"
  },
  "data": {
   "AllCloseBoon": {

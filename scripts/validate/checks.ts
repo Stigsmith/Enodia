@@ -1,0 +1,865 @@
+/**
+ * Every check the validator runs, as pure functions over a Bundle.
+ *
+ * Nothing here reads a file, hashes anything or prints. That is what makes each
+ * one testable against a fixture, and it is the same purity rule DESIGN.md 1
+ * puts on engine/. scripts/validate.ts does the IO and the report.
+ *
+ * A `fail` finding fails the build. A `warn` is printed and does not.
+ */
+
+import type { Bundle, Finding, SourceFile } from './types.ts'
+
+type Dict = Record<string, unknown>
+
+// ---------------------------------------------------------------------------
+// Small readers. The generated JSON is the game's own shape, so everything
+// arrives as unknown and gets narrowed here rather than cast at the call site.
+// ---------------------------------------------------------------------------
+
+export function isDict(value: unknown): value is Dict {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+export function dictOf(value: unknown): Dict {
+  return isDict(value) ? value : {}
+}
+
+/** Members of a Lua array that are strings. Anything else is ignored. */
+export function stringsOf(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : []
+}
+
+export function generatedData(bundle: Bundle, name: string): Dict {
+  const file = bundle.generated.find((f) => f.name === name)
+  return dictOf(file?.data)
+}
+
+function fail(check: string, message: string, detail?: string[]): Finding {
+  return { check, severity: 'fail', message, ...(detail ? { detail } : {}) }
+}
+
+function warn(check: string, message: string, detail?: string[]): Finding {
+  return { check, severity: 'warn', message, ...(detail ? { detail } : {}) }
+}
+
+function info(check: string, message: string, detail?: string[]): Finding {
+  return { check, severity: 'info', message, ...(detail ? { detail } : {}) }
+}
+
+/** Keep a report readable. The full list is one --verbose away. */
+function cap(lines: string[], limit = 12): string[] {
+  if (lines.length <= limit) return lines
+  return [...lines.slice(0, limit), `...and ${lines.length - limit} more`]
+}
+
+// ---------------------------------------------------------------------------
+// 1. Provenance. DESIGN.md 2.1: the validator rejects a generated file whose
+//    checksum does not match its recorded provenance.
+// ---------------------------------------------------------------------------
+
+const REQUIRED_PROVENANCE = ['extractedOn', 'gameVersion', 'source', 'generatedBy', 'sha256']
+
+export function checkProvenance(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  const versions = new Map<string, string[]>()
+
+  for (const file of bundle.generated) {
+    const p = file.provenance
+    if (!p) {
+      out.push(fail('provenance', `${file.name}.json has no _provenance block`))
+      continue
+    }
+
+    const missing = REQUIRED_PROVENANCE.filter((key) => typeof p[key] !== 'string' || p[key] === '')
+    if (missing.length) {
+      out.push(
+        fail('provenance', `${file.name}.json provenance is missing ${missing.join(', ')}`, [
+          'Generated files are written by scripts/extract.mjs, never by hand. Re-run npm run extract.',
+        ]),
+      )
+    }
+
+    const recorded = p.sha256
+    if (typeof recorded === 'string' && recorded !== file.payloadSha256) {
+      out.push(
+        fail('provenance', `${file.name}.json payload does not match its recorded checksum`, [
+          `recorded ${recorded.slice(0, 16)}`,
+          `actual   ${file.payloadSha256.slice(0, 16)}`,
+          'Either the file was hand edited or it predates the current extractor. Re-run npm run extract.',
+        ]),
+      )
+    }
+
+    const version = typeof p.gameVersion === 'string' ? p.gameVersion : '(none)'
+    const named = versions.get(version) ?? []
+    named.push(file.name)
+    versions.set(version, named)
+  }
+
+  if (versions.size > 1) {
+    out.push(
+      fail(
+        'provenance',
+        `data/generated holds ${versions.size} different game versions, so it is only half re-extracted`,
+        [...versions.entries()].map(([v, names]) => `${v}: ${names.join(', ')}`),
+      ),
+    )
+  }
+
+  if (!out.length && bundle.generated.length) {
+    const version = [...versions.keys()][0] ?? '(none)'
+    out.push(
+      info(
+        'provenance',
+        `${bundle.generated.length} generated files, all from game build ${version}, every checksum matches`,
+      ),
+    )
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 2. References. Build order step 2: a broken reference fails the build.
+// ---------------------------------------------------------------------------
+
+export type Reference = { where: string; id: string }
+
+/** Every trait id referenced anywhere in the generated data, with its site. */
+export function collectTraitReferences(bundle: Bundle): Reference[] {
+  const out: Reference[] = []
+  const push = (where: string, ids: string[]) => {
+    for (const id of ids) out.push({ where, id })
+  }
+
+  // Requirements, both forms. The key counts too: a prerequisite table entry
+  // for a trait that does not exist is as broken as a dangling member.
+  for (const [traitId, requirement] of Object.entries(generatedData(bundle, 'requirements'))) {
+    out.push({ where: 'requirements.json key', id: traitId })
+    const req = dictOf(requirement)
+    push(`requirements.json ${traitId}.OneOf`, stringsOf(req.OneOf))
+    if (Array.isArray(req.OneFromEachSet)) {
+      req.OneFromEachSet.forEach((set, i) => {
+        push(`requirements.json ${traitId}.OneFromEachSet[${i}]`, stringsOf(set))
+      })
+    }
+  }
+
+  // The named sets the requirements are built out of.
+  for (const [setName, members] of Object.entries(generatedData(bundle, 'linked-trait-sets'))) {
+    push(`linked-trait-sets.json ${setName}`, stringsOf(members))
+  }
+
+  // Which god offers what. Two levels: the loot set, then the loot record.
+  // Chaos names its pool in three fields of its own rather than in Traits.
+  const TRAIT_FIELDS = [
+    'Traits',
+    'PriorityUpgrades',
+    'WeaponUpgrades',
+    'PermanentTraits',
+    'TemporaryTraits',
+    'TraitSortOrder',
+  ]
+  for (const [setName, set] of Object.entries(generatedData(bundle, 'loot'))) {
+    for (const [recordName, record] of Object.entries(dictOf(set))) {
+      const rec = dictOf(record)
+      for (const field of TRAIT_FIELDS) {
+        push(`loot.json ${setName}.${recordName}.${field}`, stringsOf(rec[field]))
+      }
+    }
+  }
+
+  // Inheritance inside the trait data itself.
+  for (const [traitId, trait] of Object.entries(generatedData(bundle, 'traits'))) {
+    push(`traits.json ${traitId}.InheritFrom`, stringsOf(dictOf(trait).InheritFrom))
+  }
+
+  // Stacking curves are keyed by trait id.
+  for (const traitId of Object.keys(generatedData(bundle, 'stacking'))) {
+    out.push({ where: 'stacking.json key', id: traitId })
+  }
+
+  // Arcana cards grant a trait.
+  for (const [cardId, card] of Object.entries(generatedData(bundle, 'arcana-cards'))) {
+    const traitName = dictOf(card).TraitName
+    if (typeof traitName === 'string') {
+      out.push({ where: `arcana-cards.json ${cardId}.TraitName`, id: traitName })
+    }
+  }
+
+  return out
+}
+
+export function checkReferences(bundle: Bundle): Finding[] {
+  const traits = generatedData(bundle, 'traits')
+  if (!Object.keys(traits).length) {
+    return [fail('references', 'traits.json is empty or missing, so nothing can be resolved')]
+  }
+
+  const known = new Set(Object.keys(traits))
+  const references = collectTraitReferences(bundle)
+  const unresolved = references.filter((r) => !known.has(r.id))
+
+  const out: Finding[] = []
+  if (unresolved.length) {
+    out.push(
+      fail(
+        'references',
+        `${unresolved.length} trait references do not resolve to a record in traits.json`,
+        cap(unresolved.map((r) => `${r.id}  <-  ${r.where}`)),
+      ),
+    )
+  } else {
+    out.push(
+      info('references', `${references.length} trait references across the generated data, all resolve`),
+    )
+  }
+
+  // Arcana are their own id space: the layout grid and card inheritance point
+  // at card ids, not trait ids.
+  const cards = generatedData(bundle, 'arcana-cards')
+  const cardIds = new Set(Object.keys(cards))
+  const cardRefs: Reference[] = []
+  const layout = bundle.generated.find((f) => f.name === 'arcana-layout')?.data
+  if (Array.isArray(layout)) {
+    layout.forEach((row, i) => {
+      for (const id of stringsOf(row)) cardRefs.push({ where: `arcana-layout.json row ${i}`, id })
+    })
+  }
+  for (const [cardId, card] of Object.entries(cards)) {
+    for (const parent of stringsOf(dictOf(card).InheritFrom)) {
+      cardRefs.push({ where: `arcana-cards.json ${cardId}.InheritFrom`, id: parent })
+    }
+  }
+  const badCards = cardRefs.filter((r) => !cardIds.has(r.id))
+  if (badCards.length) {
+    out.push(
+      fail(
+        'references',
+        `${badCards.length} Arcana references do not resolve to a card`,
+        cap(badCards.map((r) => `${r.id}  <-  ${r.where}`)),
+      ),
+    )
+  } else if (cardRefs.length) {
+    out.push(info('references', `${cardRefs.length} Arcana references resolve to ${cardIds.size} cards`))
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 3. Classification. The extractor's step 1 criteria, kept as a standing check.
+//
+//    Classify by the marker the game itself uses, not by counting prerequisite
+//    sets. A trait is a duo because it inherits SynergyTrait, which carries
+//    IsDuoBoon = true and Frame = "Duo". Counting OneFromEachSet blocks with
+//    two sets misses the four duos that state three.
+// ---------------------------------------------------------------------------
+
+/** Transitive InheritFrom closure for one trait. */
+export function ancestorsOf(traits: Dict, id: string): Set<string> {
+  const seen = new Set<string>()
+  const walk = (current: string) => {
+    for (const parent of stringsOf(dictOf(traits[current]).InheritFrom)) {
+      if (seen.has(parent)) continue
+      seen.add(parent)
+      walk(parent)
+    }
+  }
+  walk(id)
+  return seen
+}
+
+export type Classification = {
+  /** inherit SynergyTrait: the Olympian duo boons */
+  duos: string[]
+  /** inherit LegendaryTrait: three prerequisite sets inside one god */
+  legendaries: string[]
+  /** IsDuoBoon on the record itself: Selene's Hex duos, gated by game state */
+  hexDuos: string[]
+  /** a requirement of the OneOf form */
+  gated: string[]
+}
+
+export function classifyTraits(traits: Dict, requirements: Dict): Classification {
+  const duos: string[] = []
+  const legendaries: string[] = []
+  const hexDuos: string[] = []
+
+  for (const [id, record] of Object.entries(traits)) {
+    const rec = dictOf(record)
+    // A base template is not a boon. SynergyTrait and LegendaryTrait are both
+    // DebugOnly, which is how the game marks something never granted directly.
+    if (rec.DebugOnly === true) continue
+
+    const ancestors = ancestorsOf(traits, id)
+    if (ancestors.has('SynergyTrait')) duos.push(id)
+    else if (ancestors.has('LegendaryTrait')) legendaries.push(id)
+    else if (rec.IsDuoBoon === true) hexDuos.push(id)
+  }
+
+  const gated = Object.entries(requirements)
+    .filter(([, req]) => Array.isArray(dictOf(req).OneOf))
+    .map(([id]) => id)
+
+  return {
+    duos: duos.sort(),
+    legendaries: legendaries.sort(),
+    hexDuos: hexDuos.sort(),
+    gated: gated.sort(),
+  }
+}
+
+/** Which loot sets offer a given trait. Used to check a duo spans two gods. */
+export function offeredBy(loot: Dict): Map<string, string[]> {
+  const out = new Map<string, string[]>()
+  for (const [setName, set] of Object.entries(loot)) {
+    for (const record of Object.values(dictOf(set))) {
+      for (const traitId of stringsOf(dictOf(record).Traits)) {
+        const gods = out.get(traitId) ?? []
+        if (!gods.includes(setName)) gods.push(setName)
+        out.set(traitId, gods)
+      }
+    }
+  }
+  return out
+}
+
+export function checkClassification(bundle: Bundle): Finding[] {
+  const traits = generatedData(bundle, 'traits')
+  const requirements = generatedData(bundle, 'requirements')
+  if (!Object.keys(traits).length) return []
+
+  const found = classifyTraits(traits, requirements)
+  const out: Finding[] = []
+
+  out.push(
+    info(
+      'classification',
+      `${found.duos.length} duos, ${found.legendaries.length} legendaries, ${found.hexDuos.length} Hex duos, ${found.gated.length} gated boons`,
+      [
+        'duo: inherits SynergyTrait, which carries IsDuoBoon and Frame "Duo"',
+        'legendary: inherits LegendaryTrait',
+        'Hex duo: IsDuoBoon on the record, gated by GameStateRequirements rather than TraitRequirements',
+        'gated: a TraitRequirements entry of the OneOf form',
+      ],
+    ),
+  )
+
+  // Every duo and legendary should state its prerequisites in TraitRequirements.
+  // The Hex duos deliberately do not: theirs are GameStateRequirements.
+  const missing = [...found.duos, ...found.legendaries].filter((id) => !requirements[id])
+  if (missing.length) {
+    out.push(
+      fail(
+        'classification',
+        `${missing.length} duo or legendary boons have no entry in requirements.json`,
+        cap(missing),
+      ),
+    )
+  }
+
+  // A duo spans two gods. The two Ransom boons are the known exception: each is
+  // offered by one god only, so they are reported rather than treated as broken.
+  const offers = offeredBy(generatedData(bundle, 'loot'))
+  const oddSpans = found.duos
+    .map((id) => ({ id, gods: offers.get(id) ?? [] }))
+    .filter((d) => d.gods.length !== 2)
+  if (oddSpans.length) {
+    out.push(
+      warn(
+        'classification',
+        `${oddSpans.length} duo boons are not offered by exactly two gods`,
+        oddSpans.map((d) => `${d.id}: ${d.gods.length ? d.gods.join(', ') : 'offered by nobody'}`),
+      ),
+    )
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 4. Counts against the baseline. DESIGN.md 11: a diff is a patch note, and is
+//    reviewed rather than accepted. So drift fails, and clearing it is a
+//    deliberate act: npm run validate -- --update-baseline.
+// ---------------------------------------------------------------------------
+
+export function countsOf(bundle: Bundle): Record<string, number> {
+  const traits = generatedData(bundle, 'traits')
+  const requirements = generatedData(bundle, 'requirements')
+  const found = classifyTraits(traits, requirements)
+  return {
+    traits: Object.keys(traits).length,
+    requirements: Object.keys(requirements).length,
+    duos: found.duos.length,
+    legendaries: found.legendaries.length,
+    hexDuos: found.hexDuos.length,
+    gated: found.gated.length,
+    linkedSets: Object.keys(generatedData(bundle, 'linked-trait-sets')).length,
+    arcanaCards: Object.keys(generatedData(bundle, 'arcana-cards')).length,
+    stackingCurves: Object.keys(generatedData(bundle, 'stacking')).length,
+  }
+}
+
+export function coverageOf(bundle: Bundle): Record<string, number> {
+  const traits = generatedData(bundle, 'traits')
+  const names = generatedData(bundle, 'text-traits')
+  let named = 0
+  let iconed = 0
+  for (const [id, record] of Object.entries(traits)) {
+    if (typeof dictOf(names[id]).name === 'string') named += 1
+    if (typeof dictOf(record).Icon === 'string') iconed += 1
+  }
+  return { traitsWithDisplayName: named, traitsWithIcon: iconed }
+}
+
+export function checkCounts(bundle: Bundle): Finding[] {
+  const counts = countsOf(bundle)
+  const coverage = coverageOf(bundle)
+  const total = counts.traits ?? 0
+
+  const out: Finding[] = [
+    info(
+      'counts',
+      `${coverage.traitsWithDisplayName} of ${total} traits have a display name, ${coverage.traitsWithIcon} have an icon`,
+    ),
+  ]
+
+  const baseline = bundle.baseline
+  if (!baseline) {
+    out.push(
+      warn('counts', 'no data/baseline.json, so nothing holds the extractor to its last known output', [
+        'Write one with npm run validate -- --update-baseline',
+      ]),
+    )
+    return out
+  }
+
+  const version = bundle.generated[0]?.provenance?.gameVersion
+  const versionChanged = typeof version === 'string' && version !== baseline.gameVersion
+
+  const drift: string[] = []
+  const unrecorded: string[] = []
+  for (const [key, value] of Object.entries({ ...counts, ...coverage })) {
+    const expected = { ...baseline.counts, ...baseline.coverage }[key]
+    if (expected === undefined) unrecorded.push(`${key}: ${value}`)
+    else if (expected !== value) drift.push(`${key}: ${expected} -> ${value}`)
+  }
+
+  // A count the baseline has never seen is the validator learning to measure
+  // something new, not the data moving. Say so, do not stop the build.
+  if (unrecorded.length) {
+    out.push(
+      warn('counts', `${unrecorded.length} counts are not in the baseline yet`, [
+        ...unrecorded,
+        'Record them with npm run validate -- --update-baseline',
+      ]),
+    )
+  }
+
+  if (drift.length) {
+    out.push(
+      fail('counts', `${drift.length} structural counts moved since the baseline`, [
+        ...drift,
+        versionChanged
+          ? `Game build changed, ${baseline.gameVersion} to ${version}. Read the diff as a patch note, then npm run validate -- --update-baseline`
+          : `Game build is unchanged at ${baseline.gameVersion}, so this is the extractor changing shape, not the game. Find out why before updating the baseline.`,
+      ]),
+    )
+  } else if (versionChanged) {
+    out.push(
+      warn('counts', `game build changed, ${baseline.gameVersion} to ${version}, and no count moved`, [
+        'Update the baseline stamp with npm run validate -- --update-baseline',
+      ]),
+    )
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 5. Vocabulary. DESIGN.md 2.4: the build fails on any UI string containing
+//    "door", "room" or "biome", because the game publishes a player-facing word
+//    for all three. Code identifiers may use the internal word, so this reads
+//    strings and text nodes rather than grepping the file.
+// ---------------------------------------------------------------------------
+
+export const BANNED_WORDS: { pattern: RegExp; internal: string; use: string }[] = [
+  { pattern: /\bdoors?\b/i, internal: 'Door', use: 'Exit' },
+  { pattern: /\brooms?\b/i, internal: 'Room', use: 'Location' },
+  { pattern: /\bbiomes?\b/i, internal: 'Biome', use: 'Region' },
+]
+
+/** A line that says so opts out, for the rare place the internal word is right. */
+export const VOCAB_ESCAPE = 'enodia-vocab-ok'
+
+export type UiString = { line: number; text: string }
+
+/**
+ * Strings a reader could end up seeing. Deliberately generous: a false positive
+ * costs one escape comment, a false negative ships "door" to a player.
+ */
+export function extractUiStrings(file: SourceFile): UiString[] {
+  const out: UiString[] = []
+  const lines = file.text.split(/\r?\n/)
+
+  let inBlockComment = false
+  let inScriptOrStyle = false
+  let inTemplate = false
+
+  lines.forEach((raw, i) => {
+    const line = raw
+    const at = i + 1
+    const add = (text: string) => {
+      const trimmed = text.trim()
+      if (trimmed) out.push({ line: at, text: trimmed })
+    }
+
+    if (file.kind === 'html') {
+      if (inScriptOrStyle) {
+        if (/<\/(script|style)>/i.test(line)) inScriptOrStyle = false
+        return
+      }
+      // A whole block on one line, then a block that opens and runs on.
+      const withoutBlocks = line.replace(/<(script|style)[^>]*>.*?<\/>/gi, ' ')
+      if (/<(script|style)[\s>]/i.test(withoutBlocks)) {
+        inScriptOrStyle = true
+        return
+      }
+      if (inBlockComment) {
+        if (line.includes('-->')) inBlockComment = false
+        return
+      }
+      if (line.includes('<!--') && !line.includes('-->')) {
+        inBlockComment = true
+        return
+      }
+      let stripped = withoutBlocks.replace(/<!--.*?-->/g, '')
+      // Attributes a reader sees, then whatever sits between tags.
+      for (const m of stripped.matchAll(/\b(?:title|alt|aria-label|placeholder|content)\s*=\s*"([^"]*)"/gi)) {
+        add(m[1] ?? '')
+      }
+      stripped = stripped.replace(/<[^>]*>/g, ' ')
+      for (const chunk of stripped.split(' ')) add(chunk)
+      return
+    }
+
+    if (file.kind === 'css') {
+      for (const m of line.matchAll(/content\s*:\s*["']([^"']*)["']/g)) add(m[1] ?? '')
+      return
+    }
+
+    // TypeScript and TSX. Walk the line so a quote inside a comment, and a
+    // slash inside a string, both behave.
+    let text = ''
+    for (let c = 0; c < line.length; c += 1) {
+      const ch = line[c]
+      const next = line[c + 1]
+
+      if (inBlockComment) {
+        if (ch === '*' && next === '/') {
+          inBlockComment = false
+          c += 1
+        }
+        continue
+      }
+      if (inTemplate) {
+        if (ch === '\\') {
+          c += 1
+          continue
+        }
+        if (ch === '`') {
+          inTemplate = false
+          add(text)
+          text = ''
+          continue
+        }
+        text += ch
+        continue
+      }
+      if (ch === '/' && next === '/') break
+      if (ch === '/' && next === '*') {
+        inBlockComment = true
+        c += 1
+        continue
+      }
+      if (ch === '`') {
+        inTemplate = true
+        text = ''
+        continue
+      }
+      if (ch === '"' || ch === "'") {
+        const quote = ch
+        let literal = ''
+        c += 1
+        while (c < line.length && line[c] !== quote) {
+          if (line[c] === '\\') c += 1
+          else literal += line[c]
+          c += 1
+        }
+        add(literal)
+        continue
+      }
+    }
+
+    // JSX text nodes, read off the raw line. Anything between a > and a < that
+    // is not markup or an expression is copy a player reads.
+    for (const m of line.matchAll(/>([^<>{}]+)</g)) add(m[1] ?? '')
+  })
+
+  return out
+}
+
+export function checkVocabulary(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  const hits: { file: SourceFile; line: number; text: string; use: string; internal: string }[] = []
+
+  for (const file of bundle.sources) {
+    const lines = file.text.split(/\r?\n/)
+    for (const found of extractUiStrings(file)) {
+      if ((lines[found.line - 1] ?? '').includes(VOCAB_ESCAPE)) continue
+      for (const banned of BANNED_WORDS) {
+        if (banned.pattern.test(found.text)) {
+          hits.push({ file, line: found.line, text: found.text, use: banned.use, internal: banned.internal })
+          break
+        }
+      }
+    }
+  }
+
+  const describe = (h: (typeof hits)[number]) =>
+    `${h.file.path}:${h.line}  say "${h.use}", not "${h.internal}"  ${h.text.slice(0, 70)}`
+
+  const live = hits.filter((h) => !h.file.legacy)
+  const legacy = hits.filter((h) => h.file.legacy)
+
+  if (live.length) {
+    out.push(fail('vocabulary', `${live.length} UI strings use an internal word`, cap(live.map(describe))))
+  }
+  if (legacy.length) {
+    out.push(
+      warn(
+        'vocabulary',
+        `${legacy.length} UI strings in the hand-authored page use an internal word`,
+        [...cap(legacy.map(describe)), 'That page predates the app and is copy the owner owns, so this reports rather than fails.'],
+      ),
+    )
+  }
+  if (!hits.length && bundle.sources.length) {
+    out.push(info('vocabulary', `${bundle.sources.length} source files carry no internal word in a UI string`))
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 6. Roster. DESIGN.md 3.1: do not hard-code who exists. The extractor emits
+//    the roster and the validator checks the app has not grown an assumption.
+// ---------------------------------------------------------------------------
+
+/**
+ * Gods, from the loot data, with inheritance resolved.
+ *
+ * GodLoot decides whether a god counts toward MaxGodsPerRun, and it is
+ * inherited: Poseidon and Zeus never state it and pick up true from BaseLoot,
+ * while Hermes and Chaos state false outright and Selene's SpellDrop inherits
+ * from nothing at all. Reading the flag without following InheritFrom would
+ * drop two Olympians.
+ */
+export function rosterFromLoot(loot: Dict): { gods: string[]; olympians: string[] } {
+  // Flatten to record name -> record, since InheritFrom names records.
+  const records = new Map<string, Dict>()
+  const owner = new Map<string, string>()
+  for (const [setName, set] of Object.entries(loot)) {
+    for (const [recordName, record] of Object.entries(dictOf(set))) {
+      if (!isDict(record)) continue
+      records.set(recordName, record)
+      owner.set(recordName, setName)
+    }
+  }
+
+  const godLootOf = (recordName: string, seen = new Set<string>()): boolean => {
+    if (seen.has(recordName)) return false
+    seen.add(recordName)
+    const record = records.get(recordName)
+    if (!record) return false
+    if (typeof record.GodLoot === 'boolean') return record.GodLoot
+    for (const parent of stringsOf(record.InheritFrom)) {
+      if (records.has(parent) && godLootOf(parent, seen)) return true
+    }
+    return false
+  }
+
+  // Speaker is the discriminator, not Traits. The shared WeaponUpgrade pool
+  // holds 92 traits and has no Speaker, and Selene has a Speaker and no Traits
+  // because her Hexes are declared in TraitData_Spell instead.
+  const gods: string[] = []
+  const olympians: string[] = []
+  for (const [recordName, record] of records) {
+    if (typeof record.Speaker !== 'string') continue
+    const setName = owner.get(recordName) ?? recordName
+    if (!gods.includes(setName)) gods.push(setName)
+    if (godLootOf(recordName) && !olympians.includes(setName)) olympians.push(setName)
+  }
+  return { gods: gods.sort(), olympians: olympians.sort() }
+}
+
+export function checkRoster(bundle: Bundle): Finding[] {
+  const loot = generatedData(bundle, 'loot')
+  if (!Object.keys(loot).length) return []
+
+  const { gods, olympians } = rosterFromLoot(loot)
+  const out: Finding[] = [
+    info('roster', `${olympians.length} Olympians count toward the cap, out of ${gods.length} gods with a loot set`, [
+      `Olympian: ${olympians.join(', ')}`,
+      `Offers boons but does not count: ${gods.filter((g) => !olympians.includes(g)).join(', ') || 'none'}`,
+    ]),
+  ]
+
+  // An app file naming three or more of them has grown a roster of its own.
+  const names = new Set(gods.map((g) => g.toLowerCase()))
+  for (const file of bundle.sources) {
+    if (file.legacy || (file.kind !== 'ts' && file.kind !== 'tsx')) continue
+    if (file.text.includes(VOCAB_ESCAPE)) continue
+    const mentioned = new Set<string>()
+    for (const found of extractUiStrings(file)) {
+      const key = found.text.trim().toLowerCase()
+      if (names.has(key)) mentioned.add(key)
+    }
+    if (mentioned.size >= 3) {
+      out.push(
+        fail('roster', `${file.path} names ${mentioned.size} gods as string literals`, [
+          [...mentioned].join(', '),
+          'Read the roster from data/generated/loot.json instead. DESIGN.md 3.1.',
+        ]),
+      )
+    }
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 7. Curated records. REQUIREMENTS.md 9 and DESIGN.md 2.2 and 5.
+//    Schema breaks fail. Orphans are reported, never silently dropped.
+// ---------------------------------------------------------------------------
+
+const CURATED_SOURCES = ['curator', 'wiki']
+
+export function checkCurated(bundle: Bundle): Finding[] {
+  if (!bundle.curated.length) {
+    return [
+      info('curated', 'no curated files yet', [
+        'data/curated/ holds what the game cannot state: ratings, tags, archetypes, rule packs.',
+      ]),
+    ]
+  }
+
+  const out: Finding[] = []
+  const knownIds = new Set([
+    ...Object.keys(generatedData(bundle, 'traits')),
+    ...Object.keys(generatedData(bundle, 'arcana-cards')),
+  ])
+
+  for (const file of bundle.curated) {
+    const doc = dictOf(file.json)
+
+    if (!Array.isArray(doc.knownGaps)) {
+      out.push(
+        fail('curated', `${file.path} has no knownGaps array`, [
+          'A gap recorded in chat is a gap nobody reads again. LESSONS.md.',
+        ]),
+      )
+    }
+
+    const records = Array.isArray(doc.records) ? doc.records : []
+    if (!Array.isArray(doc.records)) {
+      out.push(fail('curated', `${file.path} has no records array`))
+      continue
+    }
+
+    const orphans: string[] = []
+    records.forEach((entry, i) => {
+      const record = dictOf(entry)
+      const at = `${file.path} records[${i}]`
+      const id = record.id
+
+      if (typeof id !== 'string' || !id) {
+        out.push(fail('curated', `${at} has no id`))
+        return
+      }
+      if (!Array.isArray(record.aliases)) {
+        out.push(
+          fail('curated', `${at} (${id}) has no aliases array`, [
+            'Every record carries one so a rename keeps saved runs resolving. REQUIREMENTS.md 9.',
+          ]),
+        )
+      }
+      if (record.source !== undefined && !CURATED_SOURCES.includes(String(record.source))) {
+        out.push(
+          fail('curated', `${at} (${id}) has source "${String(record.source)}"`, [
+            `Only ${CURATED_SOURCES.join(' or ')} is allowed. Our opinions never look like sourced facts.`,
+          ]),
+        )
+      }
+      // A rule that cannot explain itself is a score nobody should trust.
+      const isRule = record.delta !== undefined || record.when !== undefined || record.match !== undefined
+      if (isRule && (typeof record.say !== 'string' || !record.say.trim())) {
+        out.push(
+          fail('curated', `${at} (${id}) is a rule with no say`, [
+            'DESIGN.md 5: the Exit UI renders the sentence, not the number.',
+          ]),
+        )
+      }
+      if (knownIds.size && !knownIds.has(id) && !stringsOf(record.aliases).some((a) => knownIds.has(a))) {
+        orphans.push(id)
+      }
+    })
+
+    if (orphans.length) {
+      out.push(
+        warn('curated', `${orphans.length} records in ${file.path} resolve to nothing generated`, [
+          ...cap(orphans),
+          'Reported, not dropped. A renamed id belongs in that record aliases array.',
+        ]),
+      )
+    }
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 8. The charset meta. A missing one mangled every interpunct on the live site,
+//    and it is invisible to a DOM query. Cheap to check, so check it forever.
+// ---------------------------------------------------------------------------
+
+export function checkCharset(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  for (const file of bundle.sources) {
+    if (file.kind !== 'html') continue
+    const metas = [...file.text.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0])
+    const first = metas[0]
+    if (!first || !/charset\s*=\s*["']?utf-8/i.test(first)) {
+      const finding = first
+        ? `${file.path} first meta is not the charset: ${first.slice(0, 60)}`
+        : `${file.path} has no meta tags at all`
+      out.push(file.legacy ? warn('charset', finding) : fail('charset', finding))
+    }
+  }
+  if (!out.length) out.push(info('charset', 'every page opens with <meta charset="utf-8">'))
+  return out
+}
+
+// ---------------------------------------------------------------------------
+
+export function runAllChecks(bundle: Bundle): Finding[] {
+  return [
+    ...checkProvenance(bundle),
+    ...checkReferences(bundle),
+    ...checkClassification(bundle),
+    ...checkCounts(bundle),
+    ...checkVocabulary(bundle),
+    ...checkRoster(bundle),
+    ...checkCurated(bundle),
+    ...checkCharset(bundle),
+  ]
+}

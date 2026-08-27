@@ -821,10 +821,14 @@ before it does.
 Each step is verifiable before the next begins.
 
 1. **Extractor.** Lua host, stub the SGG globals, emit `generated/*.json`. Verified by:
-   the duo count matches the count of `OneFromEachSet` blocks with two sets, and every
-   trait id referenced inside `LinkedTraitData` resolves to a real trait
+   the duo count matches the traits inheriting `SynergyTrait`, and every trait id referenced
+   inside `LinkedTraitData` resolves to a real trait. **Counting `OneFromEachSet` blocks
+   with two sets is not that check.** It reads 33 where the game marks 37, because four duos
+   state three sets
 2. **Validator into prebuild.** Broken reference fails the build. Orphaned curated records
-   reported
+   reported. It also holds the generated payloads to their recorded checksums, holds the
+   structural counts to `data/baseline.json`, and fails a UI string carrying an internal
+   word. Rules live in `scripts/validate/checks.ts` as pure functions, each one unit tested
 3. **Asset join.** Every trait has an icon or is listed in `knownGaps`. Reports the gap
    count against `assets/manifest.json`
 4. **`engine/slots.ts` and the type layer**
