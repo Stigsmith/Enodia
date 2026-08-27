@@ -1,17 +1,26 @@
 # Enodia: Image Library
 
-567 images in 16 categories, categorised and slug-named.
+643 images in 17 categories, categorised and slug-named.
 
-Two sources, and the difference matters:
+Two sources, and the difference matters. **The file extension tells you which:**
 
-- **Wiki** (`../hades.fandom.com/` zips, deduplicated by SHA-256, `.webp`): boons, duos,
-  keepsakes, hammers, gods, characters, aspects, biomes, elements, slots, infusions,
-  artifacts
-- **Game files** (extracted with `deppth2`, `.png`, full resolution): `arcana/`, `rarity/`,
-  `vows/`
+- **Wiki** (`../hades.fandom.com/` zips, deduplicated by SHA-256, always `.webp`)
+- **Game files** (extracted with `deppth2`, always `.png`, full resolution): all of
+  `arcana/`, `hexes/`, `rarity/` and `vows/`, plus the 82 boon icons the wiki scrape
+  never had
 
-`build-lib.ps1` rebuilds only the wiki half and is coded to leave the game-file categories
-alone. Do not remove that guard.
+`boons/` and `duos/` are mixed, so a category is no longer a source. The extension is.
+
+Two scripts touch this directory and they do different jobs:
+
+| Script | Job |
+|---|---|
+| `build-lib.ps1` | Rebuilds the **wiki half** out of the saved-page zips. Deletes `.webp` only, and never enters `arcana/`, `hexes/`, `rarity/` or `vows/`. **Do not remove that guard** |
+| `npm run assets` | Writes `manifest.json`, and the **only** thing that writes it. `--fill` copies missing icons out of the game extraction first |
+
+The guard used to delete whole directories, which would have taken the game art in
+`boons/` and `duos/` with it. It now deletes by extension, which is the same rule stated
+above.
 
 > Game art is copyright Supergiant Games. This is an unofficial, non-commercial fan
 > project, not affiliated with or endorsed by Supergiant Games.
@@ -26,34 +35,47 @@ assets/<category>/<slug>.webp
 become hyphens, apostrophes and periods are dropped, the wiki's `_II` suffix is stripped,
 and the `Melino%3F` mojibake is normalised back to `melinoe`.
 
-The slug **is the join key**. `assets/boons/lightning-strike.webp` pairs with the record
-whose `id` ends `lightning-strike` in `boons.json`. Never key on a display name, and when
-Supergiant renames something, add the old slug to that record's `aliases` array rather
-than renaming the file.
+The slug **is the join key**. `assets/boons/lightning-strike.webp` pairs with the boon the
+game calls "Lightning Strike". Never key a record on a display name, and when Supergiant
+renames something, add the old slug to that record's `aliases` array rather than renaming
+the file.
+
+**One implementation, in `src/data/icons.ts`.** It slugifies a display name the same way
+`build-lib.ps1` slugifies a wiki filename, so both ends of the join agree without either
+knowing about the other. The validator, the fill script and the UI all call it. A second
+copy of a rule like this is how the previous tool ended up printing numbers from a formula
+two versions out of date.
+
+When the rule cannot reach a file, `data/curated/icons.json` carries an override keyed by
+trait id. There is one today: four wiki filenames kept the percent-encoded apostrophe, so
+`Executioner's Chop` was saved as `executioner-27s-chop.webp`. The other three
+(`pauper-27s`, `king-27s-ransom`, `queen-27s-ransom`) are now duplicated by correctly
+named game art and can be deleted on the next wiki rebuild.
 
 Every file is listed in `manifest.json` with its category, byte size, SHA-256, the original
 wiki filename, and the wiki page it was scraped from.
 
 ## Categories
 
-| Category | Files | Contents | Status |
-|---|---:|---|---|
-| `boons/` | 200 | Olympian boon icons | partial, see gaps |
-| `hammers/` | 114 | Daedalus Hammer upgrade icons, scraped per weapon page | 101 need verification |
-| `duos/` | 47 | Duo boon icons | looks complete |
-| `keepsakes/` | 42 | Keepsake icons | complete, 2 strays |
-| `aspects/` | 29 | Weapon aspect icons plus aspect character portraits | numbering unverified |
-| `characters/` | 28 | Non-boon-granting character portraits | good |
-| `gods/` | 16 | Boon-granting god portraits | complete |
-| `infusions/` | 11 | Elemental infusion boons | unverified count |
-| `artifacts/` | 9 | Consumables and run items | partial |
-| `biomes/` | 6 | Region art | missing Tartarus |
-| `elements/` | 6 | Aether, Air, Earth, Fire, Water, Elemental Essence | complete |
-| `ui/` | 6 | Wiki section icons | low value, replace |
-| `slots/` | 5 | Attack, Special, Cast, Dash, Magick | complete |
-| `arcana/` | 25 | Arcana cards, named, from game files | complete |
-| `vows/` | 19 | Oath of the Unseen, from game files | complete |
-| `rarity/` | 4 | Common/Rare/Epic/Heroic, from game files | complete |
+| Category | Files | Source | Contents | Status |
+|---|---:|---|---|---|
+| `boons/` | 259 | mixed, 188 wiki and 71 game | Olympian boon icons, wiki plus game | complete for every boon a run can offer |
+| `hammers/` | 114 | wiki | Daedalus Hammer upgrade icons, scraped per weapon page | 101 need verification, 4 missing |
+| `duos/` | 48 | mixed, 46 wiki and 2 game | Duo boon icons | complete, 37 of 37 |
+| `keepsakes/` | 33 | wiki | Keepsake icons | complete |
+| `aspects/` | 29 | wiki | Weapon aspect icons plus aspect character portraits | numbering unverified |
+| `characters/` | 27 | wiki | Non-boon-granting character portraits | good |
+| `gods/` | 16 | wiki | Boon-granting god portraits | complete |
+| `infusions/` | 11 | wiki | Elemental infusion boons | unverified count |
+| `artifacts/` | 11 | wiki | Consumables and run items | partial |
+| `biomes/` | 8 | wiki | Region art | missing Tartarus |
+| `elements/` | 6 | wiki | Aether, Air, Earth, Fire, Water, Elemental Essence | complete |
+| `ui/` | 19 | wiki | Wiki section icons | low value, replace |
+| `slots/` | 5 | wiki | Attack, Special, Cast, Dash, Magick | complete |
+| `arcana/` | 25 | game | Arcana cards, named, from game files | complete |
+| `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
+| `rarity/` | 4 | game | Common/Rare/Epic/Heroic, from game files | complete |
+| `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
 
 ### Aspect naming
 
@@ -80,12 +102,21 @@ Closed on 23 August 2026 by extracting `GUI.pkg`:
 | Rarity frames | **4 of 4** | `CardRarityIcon_Common/Rare/Epic/Heroic` |
 | Vow icons | **19** | Full Oath of the Unseen set, needed for the Fear model |
 
+Closed on 27 August 2026 by the asset join, build order step 3:
+
+| Was missing | Now | How |
+|---|---|---|
+| Boon icons the wiki never had | **82 copied in** | `npm run assets -- --fill` matches each trait's `Icon` field against the extraction, stripping the packed prefix |
+| Selene Hexes on disk | **9 of 9**, in `hexes/` | Same pass. They are `Boon_Selene_*` and were always findable, they were just never copied over |
+| A manifest that described the directory | **643 of 643** | `scripts/assets.ts` walks the real directory. The old manifest listed 523 and named 27 files that no longer existed |
+
 Still open:
 
 | Missing | Expected | Have | Why it matters | Where to look |
 |---|---:|---:|---|---|
 | ~~**Boon icons**~~ | ~~300+~~ | ~~199~~ | **Solved, see below** | |
 | ~~**Selene Hexes**~~ | ~~9~~ | ~~0~~ | **Solved, see below** | |
+| **Hammer icons** | 4 | 0 | Four Daedalus Hammer upgrades a run can offer. Recorded in `data/curated/icons.json`, which is what keeps the build green | Not in `GUI.pkg`. Rapid Hack, Phantom Brand, Helheim Charge, Melting Break. The wiki pages have siblings of each, so this is a hole in the scrape |
 | **Familiars** | 5 | 0 | Roster art | `GUI.pkg` has only cosmetic effigies. Try `CatFamiliar.pkg`, `FrogFamiliar.pkg`, `HoundFamiliar.pkg`, `PolecatFamiliar.pkg`, `RavenFamiliar.pkg` |
 | **Status effect icons** | ~15 | 0 | Needed for tag filtering | Not yet located |
 | **Biome: Tartarus** | 1 | 0 | Hole in the region strip | `BiomeMap.pkg` (24 MB) is the next thing to extract |
@@ -147,8 +178,13 @@ The remaining twenty follow the same pattern and are listed in `manifest.json`.
 
 ### Strays to remove
 
-`keepsakes/boonii.webp`, `keepsakes/healthbar-1upmoros.webp`,
-`keepsakes/healthbar-1upskelly.webp` are not keepsakes. `ui/icon-*` are wiki furniture.
+`ui/boonii.webp`, `ui/healthbar-1upmoros.webp`, `ui/healthbar-1upskelly.webp` are not game
+content. `ui/icon-*` are wiki furniture.
+
+`npm run assets` also reports **17 wiki images with no source page recorded**. They were
+moved between categories by hand after the manifest was written, so the file survived and
+its provenance row did not. Harmless, and worth fixing on the next wiki rebuild since
+`build-lib.ps1` will re-derive the rows.
 
 ## Refetching: use the game, not the wiki
 

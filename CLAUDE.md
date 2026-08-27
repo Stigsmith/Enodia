@@ -147,8 +147,15 @@ the play experience cannot see.
   screenshot
 - **`dist/index.html` must keep its own `<meta charset="utf-8">`.** The Artifact wrapper
   injects one, so encoding bugs are invisible there and live on Netlify
-- `assets/build-lib.ps1` rebuilds only the wiki-sourced categories and is coded to preserve
-  `arcana/`, `rarity/` and `vows/`, which came from the game. Do not remove that guard
+- `assets/build-lib.ps1` rebuilds only the wiki half. **The guard is by file extension
+  now:** it deletes `.webp` and never `.png`, and stays out of `arcana/`, `hexes/`,
+  `rarity/` and `vows/`. Deleting whole directories, which it used to do, would take the
+  game art in `boons/` and `duos/` with it. Do not remove that guard
+- **`npm run assets` is the only writer of `assets/manifest.json`.** The PowerShell used to
+  write it too, which is why the manifest went stale the moment a category held art the
+  PowerShell never sees. `--fill` copies missing icons out of `extracted/` first
+- **The asset join lives in `src/data/icons.ts` and nowhere else.** Slug from display name,
+  one rule, shared by the validator, the fill script and the UI
 - `extracted/` holds 364 MB of `GUI.pkg` output and is scratch, not source
 
 ---
@@ -253,6 +260,12 @@ the curated layer with a visible byline, never mixed in with these numbers.
 because grepping the package manifests for `Boon_` returned nothing. The packed sprites drop
 the prefix: the data says `Boon_Aphrodite_27`, the file is `Aphrodite_27.png`. Matching the
 trait data against the extraction finds **435 of 579 icons**.
+
+**Followed through on 27 August 2026.** The asset join copied 82 of those icons out of the
+extraction into `assets/`. Of the **310 traits a run can put in front of a player**, 306 now
+have art. The other 4 are hammer upgrades in neither source and sit in
+`data/curated/icons.json` where the validator can see them. The library is 643 images and
+`assets/manifest.json` finally describes it.
 
 **Gold is not a Hades II chrome colour.** Sampled 247,921 chrome pixels across ten `GUI/`
 folders. Silver 26.8%, jade 18.9%, gold band 15.1%, but that band is mostly parchment and

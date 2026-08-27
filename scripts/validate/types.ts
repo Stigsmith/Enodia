@@ -6,6 +6,8 @@
  * lets every check below be unit tested against a hand-built fixture.
  */
 
+import type { Manifest } from '../../src/data/icons.ts'
+
 export type Severity = 'fail' | 'warn' | 'info'
 
 export type Finding = {
@@ -57,4 +59,8 @@ export type Bundle = {
   curated: CuratedFile[]
   sources: SourceFile[]
   baseline: Baseline | null
+  /** assets/manifest.json, written by scripts/assets.ts */
+  manifest: Manifest | null
+  /** every image actually on disk, as a path under assets/ */
+  assetFiles: string[]
 }

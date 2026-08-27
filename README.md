@@ -39,7 +39,7 @@ data/generated/       extracted game data. never hand edited, checksummed
 data/curated/         hand-authored judgement, joined on id. see its README
 data/baseline.json    the structural counts the validator holds the extractor to
 src/                  the app. tokens.css is the source for every colour
-assets/               567 images, see assets/README.md
+assets/               643 images and their manifest, see assets/README.md
 placeholder/          the hand-authored page, live on Netlify until the app ships
 dist/                 build output. Vite owns it, git ignores it
 ```
@@ -57,6 +57,7 @@ npm run build      # validates first, then builds. a broken reference stops it
 npm run validate   # the validator on its own
 npm test           # vitest
 npm run extract    # re-read the game's Lua into data/generated
+npm run assets     # rebuild assets/manifest.json. --fill copies icons from extracted/
 npm run typecheck
 ```
 

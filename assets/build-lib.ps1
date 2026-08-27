@@ -4,10 +4,15 @@ $dest = "C:\Dev\Hades 2\assets"
 
 # Categories sourced from the game files via deppth2, NOT from the wiki zips.
 # This script must never delete them. See README "Refetching".
-$keep = @('arcana','rarity','vows')
+$keep = @('arcana','rarity','vows','hexes')
 
+# The wiki half is every .webp. Game art is .png, including the icons
+# scripts/assets.ts --fill copies into boons/ and duos/, and it has to survive
+# a wiki rebuild. Deleting whole directories here would have taken it with them.
 if (Test-Path $dest) {
-  Get-ChildItem $dest -Directory | Where-Object { $keep -notcontains $_.Name } | Remove-Item -Recurse -Force
+  Get-ChildItem $dest -Directory | Where-Object { $keep -notcontains $_.Name } | ForEach-Object {
+    Get-ChildItem $_.FullName -File -Filter *.webp | Remove-Item -Force
+  }
   Get-ChildItem $dest -File | Where-Object { $_.Extension -eq '.webp' } | Remove-Item -Force
 }
 
@@ -89,17 +94,12 @@ foreach ($r in ($final | Sort-Object cat, slug)) {
   $out += [pscustomobject]$rec
 }
 
-$manifest = [ordered]@{
-  generated  = (Get-Date -Format 'yyyy-MM-dd')
-  source     = "hades.fandom.com saved-page archives"
-  gamePatch  = "UNVERIFIED"
-  license    = "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games."
-  count      = $out.Count
-  categories = ($out | Group-Object category | Sort-Object Name | ForEach-Object { [ordered]@{ name=$_.Name; count=$_.Count } })
-  assets     = $out
-}
-$manifest | ConvertTo-Json -Depth 6 | Out-File "$dest\manifest.json" -Encoding utf8
-
+# The manifest is NOT written here any more. scripts/assets.ts walks the real
+# assets/ directory, which is the only way it can describe a library that holds
+# game art this script never sees. Run it after this:
+#
+#   npm run assets
+#
 Write-Output "=== $($out.Count) unique assets ==="
 $out | Group-Object category | Sort-Object Count -Descending | ForEach-Object { Write-Output ("{0,4}  {1}" -f $_.Count, $_.Name) }
 Write-Output ""

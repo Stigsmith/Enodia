@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 
 import {
+  checkAssets,
   checkCharset,
   checkCounts,
   checkCurated,
@@ -10,6 +11,7 @@ import {
   checkRoster,
   checkVocabulary,
   classifyTraits,
+  offerableTraits,
   extractUiStrings,
   rosterFromLoot,
 } from './checks.ts'
@@ -38,7 +40,15 @@ function generated(name: string, data: unknown, provenance: Record<string, unkno
 }
 
 function bundle(parts: Partial<Bundle> = {}): Bundle {
-  return { generated: [], curated: [], sources: [], baseline: null, ...parts }
+  return {
+    generated: [],
+    curated: [],
+    sources: [],
+    baseline: null,
+    manifest: null,
+    assetFiles: [],
+    ...parts,
+  }
 }
 
 const messages = (findings: Finding[], severity: Finding['severity']) =>
@@ -265,12 +275,28 @@ describe('vocabulary', () => {
     expect(messages(scan('const raw = "door" // enodia-vocab-ok, quoting the Lua field'), 'fail')).toEqual([])
   })
 
+  // A block that opens and closes on one line must not swallow what follows.
+  // An earlier version did, and this test read as passing because the next
+  // line happened to carry the closing tag.
   it('reads html text nodes but not its script or style blocks', () => {
     const html = [
       '<style>#doors button{color:red}</style>',
-      '<script>var DOORS = {}; var room = 1;</script>',
       '<p>Ten rooms in</p>',
+      '<script>var DOORS = {}; var room = 1;</script>',
+      '<p>Pick a door</p>',
     ].join('\n')
+    const findings = checkVocabulary(bundle({ sources: [source('page.html', 'html', html)] }))
+    expect(messages(findings, 'fail')).toEqual(['2 UI strings use an internal word'])
+  })
+
+  it('skips a multi-line script block and resumes after it', () => {
+    const html = ['<script>', 'var room = 1;', 'var door = 2;', '</script><p>Ten rooms in</p>'].join('\n')
+    const findings = checkVocabulary(bundle({ sources: [source('page.html', 'html', html)] }))
+    expect(messages(findings, 'fail')).toEqual(['1 UI strings use an internal word'])
+  })
+
+  it('skips an html comment and resumes after it', () => {
+    const html = ['<!-- a note about the door', 'and the room -->', '<p>Ten rooms in</p>'].join('\n')
     const findings = checkVocabulary(bundle({ sources: [source('page.html', 'html', html)] }))
     expect(messages(findings, 'fail')).toEqual(['1 UI strings use an internal word'])
   })
@@ -396,6 +422,110 @@ describe('curated records', () => {
   it('fails a file with no knownGaps array', () => {
     const findings = checkCurated(curatedFile({ records: [] }))
     expect(messages(findings, 'fail')).toEqual(['data/curated/x.json has no knownGaps array'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('the offerable set', () => {
+  const traits = {
+    SynergyTrait: { DebugOnly: true, IsDuoBoon: true },
+    ZeusWeaponBoon: {},
+    HermesWeaponBoon: {},
+    ChaosBlessingBoon: {},
+    StormRingBoon: { InheritFrom: ['SynergyTrait'] },
+    NotOfferedTemplate: {},
+  }
+  const loot = {
+    Zeus: { ZeusUpgrade: { Traits: ['ZeusWeaponBoon'], WeaponUpgrades: ['ZeusWeaponBoon'] } },
+    Hermes: { HermesUpgrade: { Traits: ['HermesWeaponBoon'] } },
+    Chaos: { TrialUpgrade: { PermanentTraits: ['ChaosBlessingBoon'], TemporaryTraits: [] } },
+  }
+
+  it('gathers every pool, including the two fields only Chaos uses', () => {
+    expect(offerableTraits(traits, loot)).toContain('ChaosBlessingBoon')
+    expect(offerableTraits(traits, loot)).toContain('HermesWeaponBoon')
+  })
+
+  it('adds the kinds that arrive by prerequisite rather than from a pool', () => {
+    expect(offerableTraits(traits, loot)).toContain('StormRingBoon')
+  })
+
+  it('leaves out a trait no pool offers', () => {
+    expect(offerableTraits(traits, loot)).not.toContain('NotOfferedTemplate')
+  })
+
+  it('leaves out a pool entry the trait data does not define', () => {
+    const withGhost = { Zeus: { ZeusUpgrade: { Traits: ['ZeusWeaponBoon', 'GhostBoon'] } } }
+    expect(offerableTraits(traits, withGhost)).not.toContain('GhostBoon')
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('assets', () => {
+  const traits = { ZeusWeaponBoon: {}, RapidHackTrait: {} }
+  const loot = { Zeus: { ZeusUpgrade: { Traits: ['ZeusWeaponBoon', 'RapidHackTrait'] } } }
+  const names = { ZeusWeaponBoon: { name: 'Heaven Strike' }, RapidHackTrait: { name: 'Rapid Hack' } }
+  const generatedFiles = [
+    generated('traits', traits),
+    generated('loot', loot),
+    generated('text-traits', names),
+    generated('requirements', {}),
+  ]
+  const manifest = {
+    assets: [{ id: 'heaven-strike', category: 'boons', file: 'boons/heaven-strike.webp' }],
+  }
+  const withAssets = (parts: Partial<Bundle> = {}) =>
+    bundle({ generated: generatedFiles, manifest, assetFiles: ['boons/heaven-strike.webp'], ...parts })
+
+  it('fails a trait that has neither art nor a recorded gap', () => {
+    const findings = checkAssets(withAssets())
+    expect(messages(findings, 'fail')).toEqual(['1 offerable traits have neither art nor a recorded gap'])
+  })
+
+  it('accepts a gap that is recorded, with its reason', () => {
+    const curated = [
+      {
+        path: 'data/curated/icons.json',
+        json: { knownGaps: [{ id: 'RapidHackTrait', why: 'not in GUI.pkg and the wiki scrape missed it' }], records: [] },
+      },
+    ]
+    const findings = checkAssets(withAssets({ curated }))
+    expect(messages(findings, 'fail')).toEqual([])
+    expect(findings[0]?.message).toContain('1 of 2 offerable traits have art, 1 gaps recorded')
+  })
+
+  it('accepts an override onto a file the slug rule cannot reach', () => {
+    const curated = [
+      {
+        path: 'data/curated/icons.json',
+        json: { knownGaps: [], records: [{ id: 'RapidHackTrait', aliases: [], asset: 'hammers/rapid-27s-hack.webp' }] },
+      },
+    ]
+    expect(messages(checkAssets(withAssets({ curated })), 'fail')).toEqual([])
+  })
+
+  it('warns when a recorded gap has quietly been filled', () => {
+    const curated = [
+      { path: 'data/curated/icons.json', json: { knownGaps: ['ZeusWeaponBoon', 'RapidHackTrait'], records: [] } },
+    ]
+    expect(messages(checkAssets(withAssets({ curated })), 'warn')).toEqual(['1 recorded gaps now have art'])
+  })
+
+  it('fails a manifest that names a file which is not on disk', () => {
+    const findings = checkAssets(withAssets({ assetFiles: [] }))
+    expect(messages(findings, 'fail')).toContain('1 manifest entries name a file that is not on disk')
+  })
+
+  it('fails an image on disk that the manifest does not list', () => {
+    const findings = checkAssets(withAssets({ assetFiles: ['boons/heaven-strike.webp', 'boons/stray.webp'] }))
+    expect(messages(findings, 'fail')).toContain('1 images on disk are not in the manifest')
+  })
+
+  it('fails when there is no manifest at all', () => {
+    const findings = checkAssets(bundle({ generated: generatedFiles }))
+    expect(messages(findings, 'fail')).toEqual(['no assets/manifest.json'])
   })
 })
 
