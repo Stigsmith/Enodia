@@ -161,6 +161,14 @@ almost invisible and it is the entire reason the panel reads as made rather than
 Take the motif from `TraitTrayBacking.png` directly. It is the same art under the same
 licence as everything else in `assets/`. Do not author a substitute.
 
+**The game already has a worked example of this, and it is now in `assets/chrome/`.** The
+Daedalus Hammer screen puts one medallion image on screen twice, at `OffsetX 900` and
+`OffsetX -900`, counter-rotating at `RotationSpeed 0.5` and `-0.5` while it scales from 1.3
+to 1.1 and 1.1 to 0.8, then drifts feathers over the top. The source is
+`Game/Animations/GUI_Portraits_VFX.sjson`, animations `HammerScreen_Medallion01` and
+`02`. Big, slow, off-centre, bleeding past the edge, and quiet enough that nobody looking at
+the hammers ever notices it. That is the brief above, built by the people who wrote it.
+
 ### 2. The lit edge, and the sheen
 
 The panel border is not a uniform hairline. It is a thin edge that catches light, brightest
@@ -197,7 +205,7 @@ bring Karla back for numerals only and say so.
 
 | Tier | What | Where |
 |---|---|---|
-| Ambient | Drifting motes, breathing glow, slow pan | Always running, never asks for attention |
+| Ambient | Drifting motes, breathing glow, slow pan, the counter-rotating medallion | Always running, never asks for attention |
 | Emphasis | The silver sheen sweep | The recommended card, lit rail slots |
 | Event | The snuff, the crack | Only when something dies |
 | Response | Lift on press, dim the rest | One curve, one duration, everywhere |
