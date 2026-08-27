@@ -172,6 +172,15 @@ CosmeticsData = autotable( "CosmeticsData" )
 PresetEventArgs = autotable( "PresetEventArgs" )
 HeroVoiceLines  = autotable( "HeroVoiceLines" )
 GlobalVoiceLines= autotable( "GlobalVoiceLines" )
+UIData          = autotable( "UIData" )
+
+-- Screen geometry. UpgradeChoiceData lays its boon cards out with arithmetic on
+-- these. The values are irrelevant to anything extracted, only that they are
+-- numbers rather than nil.
+ScreenWidth = 1920
+ScreenHeight = 1080
+ScreenCenterX = 960
+ScreenCenterY = 540
 
 -- Namespaces the data files populate themselves.
 TraitData     = TraitData or {}
@@ -214,6 +223,8 @@ function loadOrder() {
     'TraitData.lua',
     ...pick(/^TraitData_.*\.lua$/),
     'MetaUpgradeData.lua',
+    // Assigns ScreenData.UpgradeChoice, which is where MaxChoices lives.
+    'UpgradeChoiceData.lua',
   ]
 }
 
@@ -352,6 +363,36 @@ writeGenerated(
       'Every InheritFrom followed, the way the game does it at load. Use this to ask what a trait is. Use traits.json to see what the file actually declares.',
   },
   resolvedTraits
+)
+
+// ---------------------------------------------------------------------------
+// The constants the engines run on, pulled out so they are sourced rather than
+// typed into a TypeScript file from memory. Small, and worth watching: a patch
+// that moves ReplaceChance or MaxChoices changes what the tool tells a player.
+// ---------------------------------------------------------------------------
+
+await lua.doString(`
+__offerRules = {
+  maxChoices = ScreenData.UpgradeChoice.MaxChoices,
+  maxGodsPerRun = HeroData.MaxGodsPerRun,
+  replaceChance = HeroData.BoonData.ReplaceChance,
+  replaceUnlockedAfterRuns = HeroData.BoonData.GameStateRequirements[1].Value,
+  rarityUpgradeOrder = TraitRarityData.RarityUpgradeOrder,
+  rarityValues = TraitRarityData.RarityValues,
+  boonRarityRollOrder = TraitRarityData.BoonRarityRollOrder,
+  rarityChances = HeroData.BoonData.RarityChances,
+}
+`)
+
+writeGenerated(
+  'offer-rules',
+  {
+    luaSource:
+      'ScreenData.UpgradeChoice.MaxChoices, HeroData.MaxGodsPerRun, HeroData.BoonData, TraitRarityData',
+    note:
+      'The numbers the offer and the slot lockout turn on. GetPriorityTraits blocks a core boon whose slot is filled, GetReplacementTraits can still swap into it at replaceChance, and rarityUpgradeOrder ends at Heroic, which is where a slot locks for good.',
+  },
+  grab('__offerRules')
 )
 
 // ---------------------------------------------------------------------------

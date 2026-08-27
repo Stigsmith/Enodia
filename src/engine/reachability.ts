@@ -176,6 +176,17 @@ export function obtainability(
   return record({ route: 'offer', why: offer.why })
 }
 
+/**
+ * `HasTraitRequirements`, as a pure function.
+ *
+ * OneOf wants one member held. OneFromEachSet wants one from every set. A trait
+ * with no requirement is always satisfied.
+ */
+export function satisfiesRequirement(requires: Trait['requires'], held: ReadonlySet<TraitId>): boolean {
+  if (!requires) return true
+  return requirementSets(requires).every((set) => set.some((id) => held.has(id)))
+}
+
 /** Both requirement forms as a list of sets. OneOf is one set of options. */
 export function requirementSets(requires: NonNullable<Trait['requires']>): TraitId[][] {
   return 'oneOf' in requires ? [requires.oneOf] : requires.oneFromEachSet

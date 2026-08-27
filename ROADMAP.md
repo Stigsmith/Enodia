@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 5 of 11 complete, step 6 next |
+| **Build order step** | 6 of 11 complete, step 7 next |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -34,8 +34,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
 | 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority. 114 tests, and it runs against the real 47 targets |
-| 6 | `engine/runsim.ts` | Next |
-| 7 | Setup screen, and the rail | |
+| 6 | `engine/runsim.ts` | **Done.** Seeded, legal runs. The dead-stays-dead property holds over 25 of them |
+| 7 | Setup screen, and the rail | Next |
 | 8 | **The timeline shell.** First shippable point | |
 | 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | |
 | 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | |
