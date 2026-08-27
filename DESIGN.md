@@ -214,7 +214,11 @@ DoubleExManaBoon =                      -- Apollo legendary
 ```
 
 Duos are two sets spanning two gods. Legendaries are three sets within one god. That is the
-entire prerequisite system, and it is a set-cover problem.
+entire prerequisite system as the data uses it, and it is a set-cover problem.
+
+**One caveat.** `HasTraitRequirements` (RunLogic.lua:57) reads a third form, `TwoOf`, which
+no trait in build 138174 uses. A form the engine does not evaluate would read as satisfied,
+so the validator fails the build if a patch ever introduces one.
 
 ### 3.3 Run context
 
@@ -452,6 +456,27 @@ The originating complaint, "I kept trying for that Zeus legendary, turns out I n
 my Cast", is exactly `unobtainable(t)` clause two: the Cast slot was filled, so every trait
 in one required set was unobtainable, so the set was unsatisfiable, so the legendary was
 DEAD several rooms before the player found out.
+
+**Corrected 28 August 2026, from the source. A filled slot is usually not a proof.**
+`UpgradeChoiceLogic.GetPriorityTraits` does block it: a god's core boon is offered only when
+`not occupiedSlots[TraitData[name].Slot]`, so a Cast held by Zeus removes every other god's
+Cast boon from the normal offer. But `GetReplacementTraits` offers a **swap** into an
+occupied slot, on `RandomChance(CurrentRun.Hero.BoonData.ReplaceChance)`, which is `0.1`,
+once `GameState.CompletedRunsCache >= 2`. The swap needs `GetUpgradedRarity(heldRarity)` to
+exist and `TraitRarityData.RarityUpgradeOrder` is `Common, Rare, Epic, Heroic`.
+
+So the states are:
+
+| The slot holds | The other god's boon is |
+|---|---|
+| nothing | offered normally |
+| a Common, Rare or Epic boon | reachable only as a swap, at roughly one offer in ten |
+| a **Heroic** boon | **unobtainable, and this one is a proof** |
+
+A swap replaces rather than adds: `HandleUpgradeChoiceSelection` calls
+`RemoveWeaponTrait(TraitToReplace)` first, so taking one closes whatever the old boon was
+feeding. `engine/slots.ts` returns `offer`, `swap` or `locked` for exactly this reason, and
+reachability must not collapse the middle one into DEAD.
 
 ### 4.3 Confidence bands
 

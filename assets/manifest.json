@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 699,
+ "count": 696,
  "categories": [
   {
    "name": "arcana",
@@ -18,10 +18,10 @@
   },
   {
    "name": "aspects",
-   "count": 56,
+   "count": 53,
    "source": "mixed",
-   "wiki": 30,
-   "game": 26
+   "wiki": 29,
+   "game": 24
   },
   {
    "name": "biomes",
@@ -625,34 +625,6 @@
    "bytes": 11636,
    "sha256": "437c8cc4e7a4374b4bd2a4317ad5f723f2c654af3e33e797ec110a64d34793cd",
    "source": "game"
-  },
-  {
-   "id": "coat-melinoe-alt-codex-card",
-   "category": "aspects",
-   "file": "aspects/coat-melinoe-alt-codex-card.png",
-   "bytes": 120576,
-   "sha256": "0d6ad1d73d6862119eaf7c874039da178795030044d233d7dbf0b912947a00c6",
-   "source": "game"
-  },
-  {
-   "id": "coat-melinoe-alt-shrine-mark",
-   "category": "aspects",
-   "file": "aspects/coat-melinoe-alt-shrine-mark.png",
-   "bytes": 2057,
-   "sha256": "1f863466e9bae6246ed12f48168a5261fc661bb566bdb2a3773abc1d94031dd8",
-   "source": "game"
-  },
-  {
-   "id": "coat-melinoe-alt-wiki-icon",
-   "category": "aspects",
-   "file": "aspects/coat-melinoe-alt-wiki-icon.webp",
-   "bytes": 3852,
-   "sha256": "59a3cc2c19918cec3368a18fa20863305fac1d5619ff420f5b863151c5e180f6",
-   "source": "wiki",
-   "sourceFile": "Coat_Melino-3F.webp",
-   "sourcePage": "Black Coat",
-   "weapon": "coat",
-   "needsVerification": true
   },
   {
    "id": "coat-melinoe-render",

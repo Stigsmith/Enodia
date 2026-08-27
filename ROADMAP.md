@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 3 of 11 complete, step 4 next |
+| **Build order step** | 4 of 11 complete, step 5 next |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -32,8 +32,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 1 | Extractor, Lua to `data/generated` | **Done.** 57 files, zero failures. Text and stacking curves included |
 | 2 | Validator wired into prebuild | **Done.** 8 checks, 38 unit tests. `npm run build` stops on a broken reference |
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
-| 4 | `engine/slots.ts` and the type layer | Next |
-| 5 | `engine/reachability.ts` | |
+| 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
+| 5 | `engine/reachability.ts` | Next |
 | 6 | `engine/runsim.ts` | |
 | 7 | Setup screen, and the rail | |
 | 8 | **The timeline shell.** First shippable point | |
@@ -63,11 +63,11 @@ These are real and none of them block step 2.
 
 **Data**
 
-- Inheritance is not resolved in the extractor. Only 49 of 651 traits carry `Slot`
-  directly, the rest inherit it. The game's own `ProcessDataInheritance` at
-  `RunData.lua:1363` should do it. The validator now walks `InheritFrom` itself for
-  classification and for `GodLoot`, which is a second implementation and wants folding back
-  into the extractor when step 4 needs resolved traits anyway
+- ~~Inheritance is not resolved in the extractor~~. **Done.** The extractor runs the game's
+  own `ProcessDataInheritance` and writes `traits-resolved.json`. 49 traits state a `Slot`,
+  122 carry one afterwards. The validator still walks `InheritFrom` itself for
+  classification and `GodLoot`, which is now a redundant second implementation and should
+  read the resolved file instead
 - `traits.json` is eight entity types in one file. The game tags every one via
   `InheritFrom`, so splitting is mechanical
 - 84 of 651 traits have no display name. Believed to be base templates, unverified
@@ -86,12 +86,20 @@ These are real and none of them block step 2.
   Coat's base render is unusable and is the one real gap left
 - Missing: familiars and status effect icons. Tartarus came out of the run history icons,
   and the 4 hammer icons turned out to be present all along
-- **Waiting on the owner:** five candidates for the Black Coat base image sit in
-  `assets/aspects/` as `coat-melinoe-alt-*`. Pick one, delete the rest
+- The Black Coat has no good base render in any source, and five framings were rejected.
+  The owner will hunt for one personally. The game's aspect icon carries it until then
 - 17 wiki images lost their manifest row when someone moved them between categories.
   `npm run assets` names them
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,
   and the app now imports it directly
+
+**Engine**
+
+- A filled slot is not a proof of impossible. A swap can still arrive at `ReplaceChance`
+  0.1, so `engine/reachability.ts` must carry `swap` as a state between REACHABLE and DEAD
+  rather than collapsing it. `DESIGN.md` 4.2 has the corrected table
+- `src/data/load.ts` does not exist. `engine/slots.ts` takes its index as an argument, so
+  nothing has had to decide yet how the app gets its data into memory. Step 7 will
 
 **Open questions**
 

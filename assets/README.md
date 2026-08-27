@@ -262,19 +262,10 @@ assembled-weapon pose to find. Every source was checked: `GUI.pkg`, `WeaponSuit.
 `Melinoe.pkg` hold Fx frames and portraits, and the weapon itself is a Granny model, which
 is 3D and not an image.
 
-So the choice is between framings, not between compositions. All of them are in
-`aspects/` for the owner to pick from:
-
-| File | What it is |
-|---|---|
-| `coat-melinoe.png` | The game's 90x90 aspect icon. Clean, framed, consistent with the other 23 |
-| `coat-melinoe-alt-codex-card.png` | The whole Codex card, 369x492, parchment and all |
-| `coat-melinoe-alt-shrine-mark.png` | The 90x50 silhouette from the Oath of the Unseen screen. Tiny and very legible |
-| `coat-melinoe-alt-wiki-icon.webp` | The wiki's 88x88 copy of the aspect icon |
-| `coat-melinoe-render.webp` | The wiki cutout, kept for comparison |
-
-Once one is chosen the others should go, and the choice belongs under `coat-melinoe` or
-`coat-melinoe-render` so the join keeps working without an override.
+Five framings were put in front of the owner on 27 August 2026, from the Codex card to the
+shrine silhouette. **None of them was good enough**, so the candidates were removed and the
+owner will hunt for a better source personally. Nothing is blocked: `coat-melinoe.png`, the
+game's own 90x90 aspect icon, is the working image and it is consistent with the other 23.
 
 ### The animated plates
 
