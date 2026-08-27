@@ -31,7 +31,7 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 |---:|---|---|
 | 1 | Extractor, Lua to `data/generated` | **Done.** 57 files, zero failures. Text and stacking curves included |
 | 2 | Validator wired into prebuild | **Done.** 8 checks, 38 unit tests. `npm run build` stops on a broken reference |
-| 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 306 of 310 offerable traits have art, 4 gaps recorded |
+| 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | Next |
 | 5 | `engine/reachability.ts` | |
 | 6 | `engine/runsim.ts` | |
@@ -81,8 +81,11 @@ These are real and none of them block step 2.
   310 traits a run can offer have art. The remaining 4 are Daedalus Hammer upgrades that
   are in neither the game package nor the wiki scrape, and they are recorded in
   `data/curated/icons.json` so the build stays honest about them
-- Aspect numbering in `assets/aspects/` unverified. The extractor can now resolve it
-- Missing: familiars, status effect icons, Tartarus region art, and 4 hammer icons
+- ~~Aspect numbering in `assets/aspects/` unverified~~. **Resolved by matching pictures,
+  not by assuming.** 24 game icons plus 23 wiki renders, all named by aspect. The Black
+  Coat's base render is unusable and is the one real gap left
+- Missing: familiars, status effect icons, Tartarus region art, and a usable Black Coat
+  base render. The 4 hammer icons turned out to be present all along
 - 17 wiki images lost their manifest row when someone moved them between categories.
   `npm run assets` names them
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,

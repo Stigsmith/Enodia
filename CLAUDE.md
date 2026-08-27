@@ -261,11 +261,19 @@ because grepping the package manifests for `Boon_` returned nothing. The packed 
 the prefix: the data says `Boon_Aphrodite_27`, the file is `Aphrodite_27.png`. Matching the
 trait data against the extraction finds **435 of 579 icons**.
 
-**Followed through on 27 August 2026.** The asset join copied 82 of those icons out of the
-extraction into `assets/`. Of the **310 traits a run can put in front of a player**, 306 now
-have art. The other 4 are hammer upgrades in neither source and sit in
-`data/curated/icons.json` where the validator can see them. The library is 643 images and
-`assets/manifest.json` finally describes it.
+**Followed through on 27 August 2026.** The asset join copied 106 icons out of the
+extraction into `assets/`. **310 of 310 traits a run can offer, and 24 of 24 weapon aspects,
+now have art.** Zero recorded gaps. The library is 669 images and `assets/manifest.json`
+finally describes it.
+
+**And the same mistake again, one layer down.** The first pass concluded four hammer
+upgrades and every aspect icon were absent, because the prefix rule stripped `Hammer_` the
+way it strips `Boon_`. `Boon_Apollo_37` packs as `Apollo_37`, but `Hammer_Suit_01` packs as
+`HammerSuit_01`: only the underscore goes. One rule was assumed to cover both. Try every
+shape of a name before believing an absence, which is now what `scripts/assets.ts` does.
+
+**Six aspects are called "Aspect of Melinoë"**, one per weapon, so a display-name join
+resolves five of them to the wrong picture. Aspect keys are `<weapon>-<aspect>`.
 
 **Gold is not a Hades II chrome colour.** Sampled 247,921 chrome pixels across ten `GUI/`
 folders. Silver 26.8%, jade 18.9%, gold band 15.1%, but that band is mostly parchment and

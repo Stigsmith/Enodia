@@ -481,7 +481,7 @@ describe('assets', () => {
 
   it('fails a trait that has neither art nor a recorded gap', () => {
     const findings = checkAssets(withAssets())
-    expect(messages(findings, 'fail')).toEqual(['1 offerable traits have neither art nor a recorded gap'])
+    expect(messages(findings, 'fail')).toEqual(['1 traits have neither art nor a recorded gap'])
   })
 
   it('accepts a gap that is recorded, with its reason', () => {
@@ -493,7 +493,7 @@ describe('assets', () => {
     ]
     const findings = checkAssets(withAssets({ curated }))
     expect(messages(findings, 'fail')).toEqual([])
-    expect(findings[0]?.message).toContain('1 of 2 offerable traits have art, 1 gaps recorded')
+    expect(findings[0]?.message).toContain('1 of 2 offerable traits and 0 of 0 weapon aspects have art')
   })
 
   it('accepts an override onto a file the slug rule cannot reach', () => {
@@ -521,6 +521,32 @@ describe('assets', () => {
   it('fails an image on disk that the manifest does not list', () => {
     const findings = checkAssets(withAssets({ assetFiles: ['boons/heaven-strike.webp', 'boons/stray.webp'] }))
     expect(messages(findings, 'fail')).toContain('1 images on disk are not in the manifest')
+  })
+
+  it('warns when one slug is claimed by two different images', () => {
+    const shadowing = {
+      assets: [
+        { id: 'coat-melinoe', category: 'aspects', file: 'aspects/coat-melinoe.png', sha256: 'aaa' },
+        { id: 'coat-melinoe', category: 'hammers', file: 'hammers/coat-melinoe.webp', sha256: 'bbb' },
+      ],
+    }
+    const findings = checkAssets(
+      withAssets({ manifest: shadowing, assetFiles: ['aspects/coat-melinoe.png', 'hammers/coat-melinoe.webp'] }),
+    )
+    expect(messages(findings, 'warn')).toContain('1 slugs are claimed by two different images')
+  })
+
+  it('stays quiet about the same picture shelved twice', () => {
+    const twice = {
+      assets: [
+        { id: 'arterial-spray', category: 'boons', file: 'boons/arterial-spray.webp', sha256: 'same' },
+        { id: 'arterial-spray', category: 'duos', file: 'duos/arterial-spray.webp', sha256: 'same' },
+      ],
+    }
+    const findings = checkAssets(
+      withAssets({ manifest: twice, assetFiles: ['boons/arterial-spray.webp', 'duos/arterial-spray.webp'] }),
+    )
+    expect(messages(findings, 'warn')).not.toContain('1 slugs are claimed by two different images')
   })
 
   it('fails when there is no manifest at all', () => {

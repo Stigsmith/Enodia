@@ -22,9 +22,9 @@ import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
-import { buildIconIndex, resolveIcon, slugify } from '../src/data/icons.ts'
+import { aspectIconKeys, buildIconIndex, resolveIcon, slugify } from '../src/data/icons.ts'
 import type { Manifest, ManifestEntry } from '../src/data/icons.ts'
-import { classifyTraits, dictOf, offerableTraits } from './validate/checks.ts'
+import { aspectTraits, classifyTraits, dictOf, offerableTraits } from './validate/checks.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const ASSETS = join(ROOT, 'assets')
@@ -36,10 +36,26 @@ const fill = process.argv.includes('--fill')
 const IMAGE = /\.(webp|png|jpg|jpeg)$/i
 /** A four digit tail is an animation frame, not a still. assets/README.md. */
 const ANIMATION_FRAME = /\d{4}\.png$/i
-/** The packed sprites drop these prefixes. The data says Boon_Apollo_37, the
- *  file is Apollo_37.png. Concluding absence from the prefix is the mistake
- *  that kept 435 icons hidden for a week. */
-const ICON_PREFIX = /^(Boon|Keepsake|Hammer|Shop)_/
+/**
+ * What an Icon field is called inside the package, every shape it might take.
+ *
+ * There is no single rule, which is the whole trap. `Boon_Apollo_37` is packed
+ * as `Apollo_37`, prefix gone. `Hammer_Suit_01` is packed as `HammerSuit_01`,
+ * only the underscore gone. Assuming the first shape held for both left every
+ * aspect icon and four hammer upgrades looking absent while they sat right
+ * there. Try every shape, then believe the answer.
+ */
+const ICON_PREFIXES = ['Boon', 'Keepsake', 'Hammer', 'Shop']
+
+function packedNames(icon: string): string[] {
+  const out = [icon]
+  for (const prefix of ICON_PREFIXES) {
+    if (!icon.startsWith(`${prefix}_`)) continue
+    const rest = icon.slice(prefix.length + 1)
+    out.push(rest, `${prefix}${rest}`)
+  }
+  return out
+}
 
 const readJson = (path: string): unknown =>
   JSON.parse(readFileSync(path, 'utf8').replace(/^﻿/, '')) as unknown
@@ -84,7 +100,8 @@ function extractionIndex(): Map<string, string> {
 // ---------------------------------------------------------------------------
 
 /** Where a filled image lands. Category is organisation, the slug is the join. */
-function categoryFor(traitId: string, duos: Set<string>, hexDuos: Set<string>): string {
+function categoryFor(traitId: string, duos: Set<string>, hexDuos: Set<string>, aspects: Set<string>): string {
+  if (aspects.has(traitId)) return 'aspects'
   if (duos.has(traitId)) return 'duos'
   if (hexDuos.has(traitId)) return 'hexes'
   return 'boons'
@@ -95,38 +112,53 @@ function runFill(): { copied: number; unsourced: { id: string; name: string; ico
   const names = generated('text-traits')
   const loot = generated('loot')
 
-  const manifest = existsSync(MANIFEST) ? (readJson(MANIFEST) as Manifest) : { assets: [] }
-  const index = buildIconIndex(manifest)
-  // The manifest can lag the directory, so consider what is actually there too.
-  for (const file of assetFiles()) {
-    const slug = file.slice(file.indexOf('/') + 1).replace(IMAGE, '')
-    if (!index.has(slug)) index.set(slug, { id: slug, category: file.slice(0, file.indexOf('/')), file })
-  }
+  // Index the directory, not the manifest. The manifest is derived from the
+  // directory and is written at the end of this run, so reading it here means
+  // reading a file that is one rename behind. That skipped four Black Coat
+  // aspects the first time, because the manifest still claimed art that had
+  // just been renamed away.
+  const index = buildIconIndex({
+    assets: assetFiles().map((file) => ({
+      id: file.slice(file.indexOf('/') + 1).replace(IMAGE, ''),
+      category: file.slice(0, file.indexOf('/')),
+      file,
+    })),
+  })
 
   const found = classifyTraits(traits, generated('requirements'))
   const duos = new Set(found.duos)
   const hexDuos = new Set(found.hexDuos)
+  const aspects = new Set(aspectTraits(traits))
 
   const extraction = extractionIndex()
   let copied = 0
   const unsourced: { id: string; name: string; icon: string }[] = []
 
-  for (const traitId of offerableTraits(traits, loot)) {
+  // Everything a player picks or is offered: the run pools, and the aspects
+  // they equip before it starts.
+  const wanted = [...new Set([...offerableTraits(traits, loot), ...aspects])].sort()
+
+  for (const traitId of wanted) {
     const displayName = dictOf(names[traitId]).name
     const name = typeof displayName === 'string' ? displayName : null
-    if (resolveIcon(traitId, name, index).found) continue
+    const weapon = dictOf(traits[traitId]).RequiredWeapon
+    const keys = name && typeof weapon === 'string' ? aspectIconKeys(name, weapon) : []
+    if (resolveIcon(traitId, name, index, { keys }).found) continue
 
     const icon = dictOf(traits[traitId]).Icon
     const iconName = typeof icon === 'string' ? icon : ''
-    const source = extraction.get(iconName.replace(ICON_PREFIX, '')) ?? extraction.get(iconName)
+    const source = packedNames(iconName)
+      .map((candidate) => extraction.get(candidate))
+      .find((path) => path !== undefined)
 
     if (!source || !name) {
       unsourced.push({ id: traitId, name: name ?? '(no display name)', icon: iconName || '(no Icon field)' })
       continue
     }
 
-    const category = categoryFor(traitId, duos, hexDuos)
-    const slug = slugify(name)
+    // An aspect is filed under its weapon, since six of them share a name.
+    const category = categoryFor(traitId, duos, hexDuos, aspects)
+    const slug = keys[0] ?? slugify(name)
     mkdirSync(join(ASSETS, category), { recursive: true })
     copyFileSync(source, join(ASSETS, category, `${slug}.png`))
     console.log(`  ${category}/${slug}.png  <-  ${relative(ROOT, source).replaceAll('\\', '/')}`)

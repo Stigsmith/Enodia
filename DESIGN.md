@@ -880,8 +880,10 @@ identical health check output before and after.
 
 Not blocking Phase 1, listed so they are not forgotten.
 
-1. **Aspect numbering.** `assets/aspects/staff-01..04` are unverified. The extractor will
-   resolve this from `TraitData_Aspect.lua` and the files should be renamed to match
+1. ~~**Aspect numbering.**~~ **Closed 27 August 2026.** Every aspect is named, two images
+   each: `<weapon>-<aspect>.png` from the game and `<weapon>-<aspect>-render.webp` from the
+   wiki. The pairing was measured rather than assumed, and Sister Blades turned out not to
+   follow icon order. Method and result in `assets/README.md`
 2. **Arcana art.** 4 of ~25. The biggest asset gap and it blocks the Phase 2 setup screen
 3. **Selene Hex art.** 0 of 9
 4. **Rarity frames.** 0 of 6, and every boon card needs one
