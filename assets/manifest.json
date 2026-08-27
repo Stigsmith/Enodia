@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 669,
+ "count": 683,
  "categories": [
   {
    "name": "arcana",
@@ -39,6 +39,11 @@
    "name": "characters",
    "count": 27,
    "source": "wiki"
+  },
+  {
+   "name": "chrome",
+   "count": 14,
+   "source": "game"
   },
   {
    "name": "duos",
@@ -3705,6 +3710,118 @@
    "source": "wiki",
    "sourceFile": "FP_Zagreus_II.webp",
    "sourcePage": "Characters-Hades II"
+  },
+  {
+   "id": "hammer-feathers",
+   "category": "chrome",
+   "file": "chrome/hammer-feathers.png",
+   "bytes": 212449,
+   "sha256": "ce515dd31c6e75997ac9a1f9e39f61dd18eecfcca9c9932604d793cc18ad8d87",
+   "source": "game"
+  },
+  {
+   "id": "icon-backing",
+   "category": "chrome",
+   "file": "chrome/icon-backing.png",
+   "bytes": 19982,
+   "sha256": "f1971e71d86a106c7981c373e3f44ed965f5a3f155bc5b595eaa2a6926acff8b",
+   "source": "game"
+  },
+  {
+   "id": "item-consume",
+   "category": "chrome",
+   "file": "chrome/item-consume.png",
+   "bytes": 33952,
+   "sha256": "dc6f12dca5c2a9df3ad2eabf3c8446945f87cbc650213bad7a1110e3fd7c9e9c",
+   "source": "game"
+  },
+  {
+   "id": "location-artemis",
+   "category": "chrome",
+   "file": "chrome/location-artemis.png",
+   "bytes": 308601,
+   "sha256": "130e89ebaccca4fb78a496de9a9717cf0f0c3b7ebf72df683cb2b50f30cc4681",
+   "source": "game"
+  },
+  {
+   "id": "location-athena",
+   "category": "chrome",
+   "file": "chrome/location-athena.png",
+   "bytes": 312744,
+   "sha256": "882c548ee221bd8062e702c924a36915728a07ace5280a7c672a13388a10f93f",
+   "source": "game"
+  },
+  {
+   "id": "location-gradient",
+   "category": "chrome",
+   "file": "chrome/location-gradient.png",
+   "bytes": 200506,
+   "sha256": "d8fae9df981fdf8e8cdd3971eb23e315f44fdbd311334094d38133e3f6af572c",
+   "source": "game"
+  },
+  {
+   "id": "location-minos",
+   "category": "chrome",
+   "file": "chrome/location-minos.png",
+   "bytes": 301806,
+   "sha256": "5fd6b7883dbacb9c90b942588e4fc4a6447e08721f2bae3b126fe93aaa8ec83c",
+   "source": "game"
+  },
+  {
+   "id": "location-star",
+   "category": "chrome",
+   "file": "chrome/location-star.png",
+   "bytes": 2792,
+   "sha256": "639dff6478e7bddcc8e422341076a22d7fbfab32efe26c63766028179b4a1b10",
+   "source": "game"
+  },
+  {
+   "id": "location-zagreus",
+   "category": "chrome",
+   "file": "chrome/location-zagreus.png",
+   "bytes": 271717,
+   "sha256": "a489e03b4cd3d47930063a0b99d6597bc2aabf9e36cd3ada5f82dedc2a4c50e0",
+   "source": "game"
+  },
+  {
+   "id": "medallion",
+   "category": "chrome",
+   "file": "chrome/medallion.png",
+   "bytes": 674282,
+   "sha256": "78211cd751666e5dfa329a234ee4426a1b941cec1b3a493ac934ee233f3ca449",
+   "source": "game"
+  },
+  {
+   "id": "subtitle-backing",
+   "category": "chrome",
+   "file": "chrome/subtitle-backing.png",
+   "bytes": 6546,
+   "sha256": "deb62f39bffa41894e12bd7e75cfbc44c55bdc912dffffa966057c52ea8160de",
+   "source": "game"
+  },
+  {
+   "id": "subtitle-generic",
+   "category": "chrome",
+   "file": "chrome/subtitle-generic.png",
+   "bytes": 18534,
+   "sha256": "bf3d402d8c6a6c10ded0d44ac92a15d2e83e97ed901a8ca76cac9266cb28584f",
+   "source": "game"
+  },
+  {
+   "id": "victory-surface",
+   "category": "chrome",
+   "file": "chrome/victory-surface.png",
+   "bytes": 274814,
+   "sha256": "22a14560cf13e74c27c1a47ad81d65f097e372d3a6539442dc509b62ebdbd7b9",
+   "source": "game"
+  },
+  {
+   "id": "victory-underworld",
+   "category": "chrome",
+   "file": "chrome/victory-underworld.png",
+   "bytes": 284537,
+   "sha256": "1c7b5e8645acdf701eb79324705c3140e1620c26f0573800d53e32b92695acbb",
+   "source": "game"
   },
   {
    "id": "aphrodite-symbol",

@@ -1,6 +1,6 @@
 # Enodia: Image Library
 
-669 images in 17 categories, categorised and slug-named.
+683 images in 18 categories, categorised and slug-named.
 
 Two sources, and the difference matters. **The file extension tells you which:**
 
@@ -76,6 +76,7 @@ wiki filename, and the wiki page it was scraped from.
 | `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic, from game files | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
+| `chrome/` | 14 | game | The game's own furniture: the Hammer screen medallion and feathers, location title plates, the victory banners, the item-consume burst | a starting set, see below |
 
 ### Aspect naming, resolved 27 August 2026
 
@@ -217,6 +218,56 @@ wrong shelf, and they shadowed the game art under the same slug. Removed, and
 moved between categories by hand after the manifest was written, so the file survived and
 its provenance row did not. Harmless, and worth fixing on the next wiki rebuild since
 `build-lib.ps1` will re-derive the rows.
+
+## What else is in the extraction, and where
+
+`extracted/` is **392 MB of scratch and is not in version control.** It holds 2,452 stills
+and 9,795 animation frames. Anything wanted has to be copied into `assets/`, or it is gone
+the next time the directory is cleared. This is the map so nobody has to re-extract to find
+out what is there.
+
+| Where | Stills | Frames | Holds |
+|---|---:|---:|---|
+| `gui/textures/GUI/Screens` | 1454 | 1457 | Boon icons, boon-select furniture, the shop, the Codex frames, the Arcana screen |
+| `gui/textures/GUI/HUD` | 111 | 3405 | Health, Magick and Armor bars, every fill state at 400 frames each |
+| `gui/textures/Items/Resources` | 249 | 1710 | Ash, Psyche, Bones, Moon Dust and the rest, with their pickup animations |
+| `gui/textures/Items/Loot` | 46 | 1785 | Loot pickups |
+| `gui/textures/Portraits/Codex` | 180 | 0 | **Codex portraits.** Every character, higher resolution than the wiki grabs |
+| `gui/textures/GUI/LocationBackings` | 9 | 183 | Location title plates, animated. See below |
+| `hecate/textures/Portraits/Hecate` | 6 | 359 | Hecate, including a 30 frame frozen sequence |
+| `gui/textures/GUI/Icons` | 181 | 170 | Rarity frames, resource icons, small chrome |
+
+### The medallion, since it came up
+
+`Screens/UpgradeChoice/Medallion_01.png` is the **Daedalus Hammer screen's backdrop**, and
+the game uses one image twice. `Game/Animations/GUI_Portraits_VFX.sjson` defines
+`HammerScreen_Medallion01` at `OffsetX 900` with `RotationSpeed 0.5`, and
+`HammerScreen_Medallion02` at `OffsetX -900` with `RotationSpeed -0.5`, scaling 1.3 to 1.1
+and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains to
+`HammerScreen_Feathers`, which is `HammerBackground.png`.
+
+That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
+ornament that brief says the page is missing. Both images are now in `chrome/`.
+
+### The animated plates
+
+Each is a full in-and-out sequence: it starts empty, peaks, and fades back out. `chrome/`
+holds the peak frame of each, which is the resting look.
+
+| Sequence | Frames | Size | What it is |
+|---|---:|---:|---|
+| `LocationBackings/MinosLocationBacking` | 44 | 9 MB | A location title plate |
+| `LocationBackings/ZagreusBacking` | 44 | 8 MB | The death plate, red and black |
+| `LocationBackings/ArtemisBacking` | 25 | 5 MB | Artemis's plate, bows and leaves |
+| `LocationBackings/AthenaBacking` | 25 | 5 MB | Athena's plate |
+| `LocationBackings/GenericSubtitle` | 45 | 1 MB | The subtitle plate under a title |
+| `GUI/ItemConsume` | 37 | 1 MB | A 320x320 burst, for something being taken or spent |
+| `Screens/BoonEntranceDuo` and `BoonEntranceLegendary` | 30 each | 5 MB each | The flourish behind a duo or legendary offer |
+| `Screens/InfoToast/InfoToastLoop` | 140 | 9 MB | A looping toast |
+
+**Every frame is there, so an animation can be rebuilt rather than approximated.** That is
+a real option for the event tier in `VISUAL.md`, and it costs nothing until it is used: the
+frames stay in scratch, and only what ships gets copied in.
 
 ## Refetching: use the game, not the wiki
 
