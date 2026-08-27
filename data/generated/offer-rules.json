@@ -1,0 +1,46 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-27",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaSource": "ScreenData.UpgradeChoice.MaxChoices, HeroData.MaxGodsPerRun, HeroData.BoonData, TraitRarityData",
+  "note": "The numbers the offer and the slot lockout turn on. GetPriorityTraits blocks a core boon whose slot is filled, GetReplacementTraits can still swap into it at replaceChance, and rarityUpgradeOrder ends at Heroic, which is where a slot locks for good.",
+  "sha256": "91d9f42aa5c0933fea59ef1083bc0ca70b346013feb119258b12360308735874"
+ },
+ "data": {
+  "boonRarityRollOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Duo",
+   "Legendary"
+  ],
+  "maxChoices": 3,
+  "maxGodsPerRun": 4,
+  "rarityChances": {
+   "Duo": 0.12,
+   "Epic": 0.05,
+   "Legendary": 0.1,
+   "Rare": 0.1
+  },
+  "rarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic"
+  ],
+  "rarityValues": {
+   "Common": 1,
+   "Duo": 5,
+   "Epic": 3,
+   "Heroic": 4,
+   "Legendary": 5,
+   "Perfect": 6,
+   "Rare": 2
+  },
+  "replaceChance": 0.1,
+  "replaceUnlockedAfterRuns": 2
+ }
+}

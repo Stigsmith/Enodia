@@ -89,6 +89,31 @@ export function godsByTrait(loot: Raw): Map<TraitId, GodId[]> {
   return out
 }
 
+/** What one god can put in front of you: the five core boons, then the rest. */
+export type GodPool = { priority: TraitId[]; pool: TraitId[] }
+
+/**
+ * Each god's offer pools.
+ *
+ * `PriorityUpgrades` is the five core boons, which `GetPriorityTraits` filters
+ * by slot. `Traits` is everything the god can offer, which fills the rest of
+ * the choices once the priority options run out.
+ */
+export function godPoolsFrom(loot: Raw): Map<GodId, GodPool> {
+  const out = new Map<GodId, GodPool>()
+  for (const [setName, set] of Object.entries(loot)) {
+    for (const record of Object.values(dict(set))) {
+      const entry = dict(record)
+      if (typeof entry.Speaker !== 'string') continue
+      const priority = strings(entry.PriorityUpgrades)
+      const pool = strings(entry.Traits)
+      if (!priority.length && !pool.length) continue
+      out.set(setName, { priority, pool })
+    }
+  }
+  return out
+}
+
 /**
  * The Olympians, meaning the gods that count toward `MaxGodsPerRun`.
  *
