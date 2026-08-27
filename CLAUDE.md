@@ -84,9 +84,11 @@ Do not restate these without the citation. Do not extend them without checking.
 
 | Fact | Source |
 |---|---|
-| Duo and legendary prerequisites are `OneOf` / `OneFromEachSet`. Duos span two Olympians, legendaries use three sets from one | `TraitData.lua`, `LinkedTraitData` |
+| Duo and legendary prerequisites are `OneOf` / `OneFromEachSet`. **The set count does not classify them.** A duo is a duo because it inherits `SynergyTrait`, a legendary because it inherits `LegendaryTrait` | `TraitData.lua`, `LinkedTraitData`, `SynergyTrait.IsDuoBoon` |
+| **37 duos, 10 legendaries, 9 Hex duos.** 33 duos state two prerequisite sets and 4 state three. 9 legendaries state three sets and 1, Hermes' Paid Dues, states `OneOf`. The Hex duos carry `IsDuoBoon` themselves and are gated by `GameStateRequirements` with `SeleneDuosUnlocked`, not by `TraitRequirements` | `InheritFrom` closure over `TraitData`, checked by `scripts/validate.ts` |
 | A run allows **four Olympians**. At the cap the Exit pool freezes to those held | `HeroData.MaxGodsPerRun`, `ReachedMaxGods` |
 | Hermes, Chaos, Selene and the Encounter gods do **not** count toward the cap | `GodLoot = false`, and no `LootData` entry at all for Artemis, Athena, Dionysus, Hades |
+| **`GodLoot` is inherited.** Poseidon and Zeus never state it and pick up `true` from `BaseLoot`. Selene's `SpellDrop` inherits from nothing, so it has no flag to pick up. Reading the field without following `InheritFrom` drops two Olympians | `LootData.BaseLoot`, read at `RunLogic.lua:1823` inside `GetInteractedGodsThisRun` |
 | Ordinary Exit rewards are **uniform random**. No weighting toward held gods | `RewardLogic.ChooseLoot` |
 | Devotion Encounters draw **both** offers from gods already held | `SetupRoomReward`, `GetInteractedGodThisRun` |
 | Rarity scaling differs per boon. Heaven Strike 0.8 to 2.0, Storm Ring 1.0 to 1.6 | `RarityLevels` in `TraitData_Zeus.lua` |
@@ -114,6 +116,9 @@ the play experience cannot see.
 2. Described an Exit as offering three boons. You pick an Exit, then the god behind it offers three
 3. Claimed a cap of four gods. It is four Olympians
 4. Used "door" throughout for something the game calls an Exit
+5. Counted 33 duos and 13 legendaries by counting prerequisite sets. The game marks both
+   itself and the real split is 37 and 10. Same shape as error 3: a proxy for the property,
+   never checked against the property
 
 ---
 
@@ -175,19 +180,26 @@ Verified against the criteria in `DESIGN.md` section 10:
 | Check | Result |
 |---|---|
 | `TraitRequirements` entries | 78 |
-| Duos, `OneFromEachSet` with 2 sets | **33** |
-| Legendaries, 3 or more sets | **13** |
+| Duos, inheriting `SynergyTrait` | **37** |
+| Legendaries, inheriting `LegendaryTrait` | **10** |
+| Hex duos, `IsDuoBoon` on the record | **9**, one per Olympian |
 | Gated boons, `OneOf` | 32 |
-| `LinkedTraitData` ids resolving to a real trait | **118 of 118** |
+| Trait references resolving, across every generated file | **2203 of 2203** |
 | Requirement references unresolved | **0** |
 
-33 + 13 = 46, matching the 46 `OneFromEachSet` blocks in the raw file.
+The 46 `OneFromEachSet` blocks split 33 + 4 + 9: two-set duos, three-set duos, three-set
+legendaries. The tenth legendary and the nine Hex duos state their gates elsewhere.
+
+These are the numbers `npm run validate` prints and `data/baseline.json` holds it to.
 
 **Not yet done:** display names. `Content/Game/Text/en/TraitText.en.sjson` is sjson, not
 Lua, and needs its own loader. Nothing renders to a player until that exists.
 
-**Open question:** the extractor finds 33 duos. Wikis variously claim 29 and 37. Worth a
-validator check rather than a guess about who is right.
+**Closed question:** the wikis' 37 was right and the extractor's 33 was a definition, not a
+count. The four missing duos state three prerequisite sets rather than two: Heinous Affront,
+Natural Selection, Ripple Effect and Beach Ball. Every one inherits `SynergyTrait` and every
+one is offered by two gods, so the game calls them duos and so do we. Where 29 came from is
+still unknown, and it does not matter now that the marker is the source.
 
 ---
 

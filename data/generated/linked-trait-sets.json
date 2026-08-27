@@ -5,7 +5,8 @@
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
   "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
-  "luaTable": "LinkedTraitData"
+  "luaTable": "LinkedTraitData",
+  "sha256": "5845eadbc4138a18d929965d84dafc351b19d5ea31172a2a09c980a51288cdb1"
  },
  "data": {
   "AphroditeCoreTraits": [

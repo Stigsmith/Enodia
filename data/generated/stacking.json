@@ -10,7 +10,8 @@
   "defaults": {
    "decay": 0.5,
    "floor": 0.1
-  }
+  },
+  "sha256": "5135448674588815f0a68e95224136dcb84f5e3ffa77713e43379a7b3f186417"
  },
  "data": {
   "ApolloBlindBoon": {

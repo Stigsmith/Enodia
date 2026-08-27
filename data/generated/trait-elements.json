@@ -5,7 +5,8 @@
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
   "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
-  "luaTable": "TraitElementData"
+  "luaTable": "TraitElementData",
+  "sha256": "7735374cda28df71e6a44f6efbdb751b926c598b727fd31ed85c34df2a24a5b0"
  },
  "data": {
   "Aether": {

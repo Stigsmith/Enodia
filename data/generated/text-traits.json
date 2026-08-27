@@ -4,7 +4,8 @@
   "gameVersion": "138174",
   "source": "Game/Text/en/TraitText.en.sjson",
   "generatedBy": "scripts/extract.mjs",
-  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch."
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "sha256": "0f30df1982b6c1670e931f232bbfaeeb6d5e954cc5b97e533e2a327b0b45d8fd"
  },
  "data": {
   "TraitLevel_Current": {

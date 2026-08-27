@@ -5,9 +5,30 @@
   "type": "module",
   "description": "In-run build companion for Hades II",
   "scripts": {
-    "extract": "node scripts/extract.mjs"
+    "dev": "vite",
+    "prebuild": "node scripts/validate.ts",
+    "build": "vite build",
+    "preview": "vite preview",
+    "validate": "node scripts/validate.ts",
+    "extract": "node scripts/extract.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "wasmoon": "^1.16.0"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.0",
+    "jsdom": "^30.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   }
 }

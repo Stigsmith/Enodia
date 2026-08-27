@@ -4,7 +4,8 @@
   "gameVersion": "138174",
   "source": "Game/Text/en/ScreenText.en.sjson",
   "generatedBy": "scripts/extract.mjs",
-  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch."
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "sha256": "39ce69f2e044392dd566024868bf204155531b82f4f6b371f6e7bd460fe4a4ea"
  },
  "data": {
   "Menu_Exit": {
