@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -8,6 +8,155 @@
   "luaTable": "WeaponSets"
  },
  "data": {
+  "CastProjectileNames": [
+   "AphroditeCastProjectile",
+   "ApolloSingleCastStrike",
+   "ProjectileAresSwordCast",
+   "DemeterCastBlast",
+   "HephCastBlast",
+   "HeraCastDamageProjectile",
+   "PoseidonCastSplashSplinter",
+   "ZeusCastStrike"
+  ],
+  "EnemyMagicWeapons": [
+   "LightningAura"
+  ],
+  "ExpireProjectileExcludeProjectileNames": [
+   "ProjectileLob",
+   "ProjectileLobCharged",
+   "LavaTileWeapon",
+   "LavaTileTriangle01Weapon",
+   "LavaTileTriangle02Weapon",
+   "NPC_FurySister_01_Assist",
+   "NPC_Thanatos_01_Assist",
+   "ThanatosDeathCurseAoE",
+   "NPC_Sisyphus_01_Assist",
+   "TheseusSpearThrow",
+   "HadesCerberusAssist",
+   "GhostWall",
+   "SafeZoneDefense",
+   "SafeZonePulse",
+   "ChronosGrindWall",
+   "ChronosGrindVacuum",
+   "ScyllaCone",
+   "OilPuddleFire",
+   "OilPuddleFire02",
+   "OilPuddleFire03",
+   "OilPuddleFire04",
+   "OilPuddleFireFlying",
+   "OilPuddleFire02Flying",
+   "OilPuddleFire03Flying",
+   "OilPuddleFire04Flying",
+   "OilPuddleSlick",
+   "OilPuddleSlick02",
+   "OilPuddleSlick03",
+   "OilPuddleSlick04",
+   "SheepSickAura",
+   "EagleHoming",
+   "EagleSpiral",
+   "RadiatorMelee360",
+   "RadiatorMelee360Slow",
+   "TalosShieldThrowStraight",
+   "TalosShieldThrowLeft",
+   "TalosShieldThrowRight"
+  ],
+  "ExpireProjectileLastStandExcludeProjectileNames": [
+   "DemeterCastBlast",
+   "AresProjectile",
+   "ApolloCastRapid",
+   "ProjectileCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob",
+   "WeaponCastProjectileHades",
+   "ProjectileSpellMeteor",
+   "PrometheusFireCircle",
+   "PrometheusFireCircleSmall",
+   "PrometheusFireCircleLarge"
+  ],
+  "HeroAllWeapons": [
+   "WeaponStaffSwing",
+   "WeaponStaffBall",
+   "WeaponDagger",
+   "WeaponDaggerThrow",
+   "WeaponCast",
+   "WeaponAxe",
+   "WeaponAxeSpecial",
+   "WeaponTorch",
+   "WeaponTorchSpecial",
+   "WeaponLob",
+   "WeaponLobSpecial",
+   "WeaponSuit",
+   "WeaponSuitRanged",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob"
+  ],
+  "HeroAllWeaponsAndSprint": [
+   "WeaponStaffSwing",
+   "WeaponStaffBall",
+   "WeaponDagger",
+   "WeaponDaggerThrow",
+   "WeaponCast",
+   "WeaponAxe",
+   "WeaponAxeSpecial",
+   "WeaponTorch",
+   "WeaponTorchSpecial",
+   "WeaponLob",
+   "WeaponLobSpecial",
+   "WeaponSuit",
+   "WeaponSuitRanged",
+   "WeaponSprint",
+   "WeaponSprintEx",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob",
+   "WeaponCastProjectileHades",
+   "WeaponAnywhereCast",
+   "WeaponCastProjectile",
+   "WeaponCastLob"
+  ],
+  "HeroBlinkWeapons": [
+   "WeaponBlink"
+  ],
+  "HeroDashWeapons": [
+   "WeaponDaggerDash",
+   "WeaponStaffDash",
+   "WeaponAxeDash",
+   "WeaponSuitDash"
+  ],
+  "HeroMeleeRangeWeapons": [
+   "WeaponStaffSwing",
+   "WeaponStaffSwing2",
+   "WeaponStaffSwing3",
+   "WeaponStaffSwing5",
+   "WeaponStaffDash",
+   "WeaponAxe",
+   "WeaponAxe2",
+   "WeaponAxe3",
+   "WeaponAxe4",
+   "WeaponAxe5",
+   "WeaponAxeDash",
+   "WeaponAxeSpin",
+   "WeaponDagger",
+   "WeaponDaggerDash",
+   "WeaponSuit",
+   "WeaponSuit2",
+   "WeaponSuitDouble"
+  ],
   "HeroNonExWeapons": [
    "WeaponStaffSwing",
    "WeaponStaffSwing2",
@@ -33,32 +182,182 @@
    "WeaponSuitDouble",
    "WeaponSuitDash"
   ],
-  "CastProjectileNames": [
-   "AphroditeCastProjectile",
-   "ApolloSingleCastStrike",
-   "ProjectileAresSwordCast",
-   "DemeterCastBlast",
-   "HephCastBlast",
-   "HeraCastDamageProjectile",
-   "PoseidonCastSplashSplinter",
-   "ZeusCastStrike"
+  "HeroNonPhysicalWeapons": [
+   "WeaponCast"
   ],
-  "SpellProjectileNames": [
-   "ProjectileMoonBeam",
-   "ProjectileBloodMoonBeam",
-   "ProjectileSpellLaser",
-   "SpellLeapBlast",
-   "ProjectileTransformSwing",
-   "ProjectileTransformRing",
-   "ProjectileSpellMeteor",
-   "ProjectileSpellMiniMeteor",
-   "PolymorphNova",
-   "ProjectileSpellPolymorph",
-   "MorphDamageProjectile"
+  "HeroPrimarySecondaryWeapons": [
+   "WeaponStaffSwing",
+   "WeaponStaffBall",
+   "WeaponDagger",
+   "WeaponDaggerThrow",
+   "WeaponAxe",
+   "WeaponAxeSpecial",
+   "WeaponTorch",
+   "WeaponTorchSpecial",
+   "WeaponLob",
+   "WeaponLobSpecial",
+   "WeaponSuit",
+   "WeaponSuitRanged"
+  ],
+  "HeroPrimaryWeapons": [
+   "WeaponStaffSwing",
+   "WeaponAxe",
+   "WeaponDagger",
+   "WeaponTorch",
+   "WeaponLob",
+   "WeaponSuit"
+  ],
+  "HeroRangedWeapons": [
+   "WeaponCast",
+   "WeaponCastProjectileHades",
+   "WeaponCastProjectile",
+   "WeaponAnywhereCast",
+   "WeaponCastLob"
+  ],
+  "HeroRushWeapons": [
+   "WeaponBlink",
+   "WeaponSprint"
+  ],
+  "HeroSecondaryWeapons": [
+   "WeaponStaffBall",
+   "WeaponDaggerThrow",
+   "WeaponAxeSpecial",
+   "WeaponTorchSpecial",
+   "WeaponLobSpecial",
+   "WeaponSuitRanged"
+  ],
+  "HeroSpellWeapons": [
+   "WeaponSpellPolymorph",
+   "WeaponSpellLaser",
+   "WeaponSpellSummon",
+   "WeaponSpellMeteor",
+   "WeaponSpellTimeSlow",
+   "WeaponSpellPotion",
+   "WeaponSpellLeap"
+  ],
+  "HeroTransformForceCancelWeapons": [
+   "WeaponAxeSpecialSwing",
+   "WeaponStaffSwing5",
+   "WeaponSuitCharged"
   ],
   "HeroTransformWeapons": [
    "WeaponTransformAttack",
    "WeaponTransformSpecial"
+  ],
+  "HeroWeaponSets": {
+   "WeaponAxe": [
+    "WeaponAxe2",
+    "WeaponAxe3",
+    "WeaponAxeDash",
+    "WeaponAxeSpin",
+    "WeaponAxeSpecial",
+    "WeaponAxeSpecialSwing"
+   ],
+   "WeaponDagger": [
+    "WeaponDaggerThrow",
+    "WeaponDaggerBlink",
+    "WeaponDaggerDash",
+    "WeaponDagger2",
+    "WeaponDagger5",
+    "WeaponDaggerDouble",
+    "WeaponDaggerMultiStab"
+   ],
+   "WeaponLob": [
+    "WeaponLobSpecial",
+    "WeaponLobChargedPulse",
+    "WeaponSkullImpulse"
+   ],
+   "WeaponStaffSwing": [
+    "WeaponStaffSwing2",
+    "WeaponStaffSwing3",
+    "WeaponStaffSwing5",
+    "WeaponStaffBall",
+    "WeaponStaffDash"
+   ],
+   "WeaponSuit": [
+    "WeaponSuit2",
+    "WeaponSuitDouble",
+    "WeaponSuitCharged",
+    "WeaponSuitDash",
+    "WeaponSuitRanged"
+   ],
+   "WeaponTorch": [
+    "WeaponTorchSpecial"
+   ]
+  },
+  "LavaWeaponNames": [
+   "LavaTileWeapon",
+   "LavaTileTriangle01Weapon",
+   "LavaTileTriangle02Weapon",
+   "LavaSplash"
+  ],
+  "LinkedWeaponUpgrades": {
+   "WeaponAxe": [
+    "WeaponAxeDash",
+    "WeaponAxe2",
+    "WeaponAxe3",
+    "WeaponAxe4",
+    "WeaponAxe5",
+    "WeaponAxeSpin"
+   ],
+   "WeaponAxeSpecial": [
+    "WeaponAxeSpecialSwing"
+   ],
+   "WeaponBlink": [
+    "WeaponSprint"
+   ],
+   "WeaponCast": [
+    "WeaponCastArm"
+   ],
+   "WeaponDagger": [
+    "WeaponDagger2",
+    "WeaponDagger5",
+    "WeaponDaggerDash",
+    "WeaponDaggerDouble",
+    "WeaponDaggerMultiStab"
+   ],
+   "WeaponDaggerThrow": {},
+   "WeaponLob": [
+    "WeaponLobPulse",
+    "WeaponLobChargedPulse"
+   ],
+   "WeaponLobSpecial": [
+    "WeaponSkullImpulse"
+   ],
+   "WeaponStaffBall": {},
+   "WeaponStaffSwing": [
+    "WeaponStaffSwing2",
+    "WeaponStaffSwing3",
+    "WeaponStaffSwing5",
+    "WeaponStaffDash"
+   ],
+   "WeaponSuit": [
+    "WeaponSuit2",
+    "WeaponSuitDouble",
+    "WeaponSuitDash",
+    "WeaponSuitCharged"
+   ],
+   "WeaponTorch": {},
+   "WeaponTorchSpecial": {}
+  },
+  "MapTransitionExpireProjectileExcludeNames": [
+   "DemeterSuper",
+   "DemeterMaxSuper",
+   "DionysusLobProjectile",
+   "TheseusSpearThrow ",
+   "TheseusSpearThrowReturn",
+   "LavaTileWeapon",
+   "LavaTileTriangle01Weapon",
+   "LavaTileTriangle02Weapon",
+   "NPC_FurySister_01_Assist",
+   "NPC_Thanatos_01_Assist",
+   "NPC_Sisyphus_01_Assist",
+   "TheseusSpearThrow"
+  ],
+  "OlympianEffectNames": [
+   "DamageShareDeath",
+   "BurnEffect",
+   "DamageOverTime"
   ],
   "OlympianProjectileNames": [
    "AphroditeBurst",
@@ -125,177 +424,35 @@
    "PoseidonStatueWave",
    "DemeterStatueFrostStorm"
   ],
-  "HeroPrimaryWeapons": [
-   "WeaponStaffSwing",
-   "WeaponAxe",
-   "WeaponDagger",
-   "WeaponTorch",
-   "WeaponLob",
-   "WeaponSuit"
-  ],
-  "HeroSpellWeapons": [
-   "WeaponSpellPolymorph",
-   "WeaponSpellLaser",
-   "WeaponSpellSummon",
-   "WeaponSpellMeteor",
-   "WeaponSpellTimeSlow",
-   "WeaponSpellPotion",
-   "WeaponSpellLeap"
-  ],
-  "HeroMeleeRangeWeapons": [
-   "WeaponStaffSwing",
-   "WeaponStaffSwing2",
-   "WeaponStaffSwing3",
-   "WeaponStaffSwing5",
-   "WeaponStaffDash",
-   "WeaponAxe",
-   "WeaponAxe2",
-   "WeaponAxe3",
-   "WeaponAxe4",
-   "WeaponAxe5",
-   "WeaponAxeDash",
-   "WeaponAxeSpin",
-   "WeaponDagger",
-   "WeaponDaggerDash",
-   "WeaponSuit",
-   "WeaponSuit2",
-   "WeaponSuitDouble"
-  ],
-  "MapTransitionExpireProjectileExcludeNames": [
-   "DemeterSuper",
-   "DemeterMaxSuper",
-   "DionysusLobProjectile",
-   "TheseusSpearThrow ",
-   "TheseusSpearThrowReturn",
-   "LavaTileWeapon",
-   "LavaTileTriangle01Weapon",
-   "LavaTileTriangle02Weapon",
-   "NPC_FurySister_01_Assist",
-   "NPC_Thanatos_01_Assist",
-   "NPC_Sisyphus_01_Assist",
-   "TheseusSpearThrow"
-  ],
-  "HeroRushWeapons": [
-   "WeaponBlink",
-   "WeaponSprint"
-  ],
   "RubbleWeapons": [
    "RubbleFall",
    "RubbleFallLarge",
    "RubbleFallElysium"
   ],
-  "HeroNonPhysicalWeapons": [
-   "WeaponCast"
-  ],
-  "LavaWeaponNames": [
-   "LavaTileWeapon",
-   "LavaTileTriangle01Weapon",
-   "LavaTileTriangle02Weapon",
-   "LavaSplash"
-  ],
-  "HeroRangedWeapons": [
-   "WeaponCast",
-   "WeaponCastProjectileHades",
-   "WeaponCastProjectile",
-   "WeaponAnywhereCast",
-   "WeaponCastLob"
-  ],
-  "OlympianEffectNames": [
-   "DamageShareDeath",
-   "BurnEffect",
-   "DamageOverTime"
-  ],
-  "HeroAllWeaponsAndSprint": [
-   "WeaponStaffSwing",
-   "WeaponStaffBall",
-   "WeaponDagger",
-   "WeaponDaggerThrow",
-   "WeaponCast",
-   "WeaponAxe",
-   "WeaponAxeSpecial",
-   "WeaponTorch",
-   "WeaponTorchSpecial",
-   "WeaponLob",
-   "WeaponLobSpecial",
-   "WeaponSuit",
-   "WeaponSuitRanged",
-   "WeaponSprint",
-   "WeaponSprintEx",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob"
-  ],
-  "ExpireProjectileLastStandExcludeProjectileNames": [
-   "DemeterCastBlast",
-   "AresProjectile",
-   "ApolloCastRapid",
-   "ProjectileCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob",
-   "WeaponCastProjectileHades",
+  "SpellProjectileNames": [
+   "ProjectileMoonBeam",
+   "ProjectileBloodMoonBeam",
+   "ProjectileSpellLaser",
+   "SpellLeapBlast",
+   "ProjectileTransformSwing",
+   "ProjectileTransformRing",
    "ProjectileSpellMeteor",
-   "PrometheusFireCircle",
-   "PrometheusFireCircleSmall",
-   "PrometheusFireCircleLarge"
+   "ProjectileSpellMiniMeteor",
+   "PolymorphNova",
+   "ProjectileSpellPolymorph",
+   "MorphDamageProjectile"
   ],
-  "ExpireProjectileExcludeProjectileNames": [
-   "ProjectileLob",
-   "ProjectileLobCharged",
-   "LavaTileWeapon",
-   "LavaTileTriangle01Weapon",
-   "LavaTileTriangle02Weapon",
-   "NPC_FurySister_01_Assist",
-   "NPC_Thanatos_01_Assist",
-   "ThanatosDeathCurseAoE",
-   "NPC_Sisyphus_01_Assist",
-   "TheseusSpearThrow",
-   "HadesCerberusAssist",
-   "GhostWall",
-   "SafeZoneDefense",
-   "SafeZonePulse",
-   "ChronosGrindWall",
-   "ChronosGrindVacuum",
-   "ScyllaCone",
-   "OilPuddleFire",
-   "OilPuddleFire02",
-   "OilPuddleFire03",
-   "OilPuddleFire04",
-   "OilPuddleFireFlying",
-   "OilPuddleFire02Flying",
-   "OilPuddleFire03Flying",
-   "OilPuddleFire04Flying",
-   "OilPuddleSlick",
-   "OilPuddleSlick02",
-   "OilPuddleSlick03",
-   "OilPuddleSlick04",
-   "SheepSickAura",
-   "EagleHoming",
-   "EagleSpiral",
-   "RadiatorMelee360",
-   "RadiatorMelee360Slow",
-   "TalosShieldThrowStraight",
-   "TalosShieldThrowLeft",
-   "TalosShieldThrowRight"
-  ],
-  "HeroBlinkWeapons": [
-   "WeaponBlink"
+  "SprintProjectileNames": [
+   "AphroditeRushProjectile",
+   "ProjectileAresSwordWake",
+   "AthenaRushProjectile",
+   "DemeterSprintStorm",
+   "HephSprintBlast",
+   "HeraSprintProjectile",
+   "HestiaSprintPuddle",
+   "PoseidonSprintBlast",
+   "PoseidonSprintSecondaryBlast",
+   "ZeusSprintStrike"
   ],
   "TimeSlowExpireProjectileExcludeProjectileNames": [
    "ProjectileStaffBall",
@@ -334,169 +491,12 @@
    "ProjectileSuitGrenadeStraight",
    "ProjectileSuitBombStraight"
   ],
-  "HeroDashWeapons": [
-   "WeaponDaggerDash",
-   "WeaponStaffDash",
-   "WeaponAxeDash",
-   "WeaponSuitDash"
-  ],
-  "HeroAllWeapons": [
-   "WeaponStaffSwing",
-   "WeaponStaffBall",
-   "WeaponDagger",
-   "WeaponDaggerThrow",
-   "WeaponCast",
-   "WeaponAxe",
-   "WeaponAxeSpecial",
-   "WeaponTorch",
-   "WeaponTorchSpecial",
-   "WeaponLob",
-   "WeaponLobSpecial",
-   "WeaponSuit",
-   "WeaponSuitRanged",
-   "WeaponCastProjectileHades",
-   "WeaponAnywhereCast",
-   "WeaponCastProjectile",
-   "WeaponCastLob"
-  ],
-  "HeroTransformForceCancelWeapons": [
-   "WeaponAxeSpecialSwing",
-   "WeaponStaffSwing5",
-   "WeaponSuitCharged"
-  ],
-  "EnemyMagicWeapons": [
-   "LightningAura"
-  ],
-  "HeroPrimarySecondaryWeapons": [
-   "WeaponStaffSwing",
-   "WeaponStaffBall",
-   "WeaponDagger",
-   "WeaponDaggerThrow",
-   "WeaponAxe",
-   "WeaponAxeSpecial",
-   "WeaponTorch",
-   "WeaponTorchSpecial",
-   "WeaponLob",
-   "WeaponLobSpecial",
-   "WeaponSuit",
-   "WeaponSuitRanged"
-  ],
   "TrapWeapons": [
    "BlastCubeExplosion",
    "SpikeTrapWeapon",
    "SmokeTrapWeapon",
    "LavaSplash",
    "LavaPuddleLarge"
-  ],
-  "LinkedWeaponUpgrades": {
-   "WeaponStaffSwing": [
-    "WeaponStaffSwing2",
-    "WeaponStaffSwing3",
-    "WeaponStaffSwing5",
-    "WeaponStaffDash"
-   ],
-   "WeaponAxe": [
-    "WeaponAxeDash",
-    "WeaponAxe2",
-    "WeaponAxe3",
-    "WeaponAxe4",
-    "WeaponAxe5",
-    "WeaponAxeSpin"
-   ],
-   "WeaponDaggerThrow": {},
-   "WeaponTorchSpecial": {},
-   "WeaponLob": [
-    "WeaponLobPulse",
-    "WeaponLobChargedPulse"
-   ],
-   "WeaponStaffBall": {},
-   "WeaponSuit": [
-    "WeaponSuit2",
-    "WeaponSuitDouble",
-    "WeaponSuitDash",
-    "WeaponSuitCharged"
-   ],
-   "WeaponCast": [
-    "WeaponCastArm"
-   ],
-   "WeaponBlink": [
-    "WeaponSprint"
-   ],
-   "WeaponTorch": {},
-   "WeaponDagger": [
-    "WeaponDagger2",
-    "WeaponDagger5",
-    "WeaponDaggerDash",
-    "WeaponDaggerDouble",
-    "WeaponDaggerMultiStab"
-   ],
-   "WeaponAxeSpecial": [
-    "WeaponAxeSpecialSwing"
-   ],
-   "WeaponLobSpecial": [
-    "WeaponSkullImpulse"
-   ]
-  },
-  "HeroWeaponSets": {
-   "WeaponStaffSwing": [
-    "WeaponStaffSwing2",
-    "WeaponStaffSwing3",
-    "WeaponStaffSwing5",
-    "WeaponStaffBall",
-    "WeaponStaffDash"
-   ],
-   "WeaponAxe": [
-    "WeaponAxe2",
-    "WeaponAxe3",
-    "WeaponAxeDash",
-    "WeaponAxeSpin",
-    "WeaponAxeSpecial",
-    "WeaponAxeSpecialSwing"
-   ],
-   "WeaponSuit": [
-    "WeaponSuit2",
-    "WeaponSuitDouble",
-    "WeaponSuitCharged",
-    "WeaponSuitDash",
-    "WeaponSuitRanged"
-   ],
-   "WeaponDagger": [
-    "WeaponDaggerThrow",
-    "WeaponDaggerBlink",
-    "WeaponDaggerDash",
-    "WeaponDagger2",
-    "WeaponDagger5",
-    "WeaponDaggerDouble",
-    "WeaponDaggerMultiStab"
-   ],
-   "WeaponLob": [
-    "WeaponLobSpecial",
-    "WeaponLobChargedPulse",
-    "WeaponSkullImpulse"
-   ],
-   "WeaponTorch": [
-    "WeaponTorchSpecial"
-   ]
-  },
-  "SprintProjectileNames": [
-   "AphroditeRushProjectile",
-   "ProjectileAresSwordWake",
-   "AthenaRushProjectile",
-   "DemeterSprintStorm",
-   "HephSprintBlast",
-   "HeraSprintProjectile",
-   "HestiaSprintPuddle",
-   "PoseidonSprintBlast",
-   "PoseidonSprintSecondaryBlast",
-   "ZeusSprintStrike"
-  ],
-  "HeroSecondaryWeapons": [
-   "WeaponStaffBall",
-   "WeaponDaggerThrow",
-   "WeaponAxeSpecial",
-   "WeaponTorchSpecial",
-   "WeaponLobSpecial",
-   "WeaponSuitRanged"
   ]
  }
 }

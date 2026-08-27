@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -16,37 +16,6 @@
    "TraitLevel_AspectLvl5",
    "TraitLevel_AspectLvl6"
   ],
-  "RarityValues": {
-   "Duo": 5,
-   "Rare": 2,
-   "Perfect": 6,
-   "Common": 1,
-   "Heroic": 4,
-   "Epic": 3,
-   "Legendary": 5
-  },
-  "BoonRarityRollOrder": [
-   "Common",
-   "Rare",
-   "Epic",
-   "Duo",
-   "Legendary"
-  ],
-  "WeaponRarityUpgradeOrder": [
-   "Common",
-   "Rare",
-   "Epic",
-   "Heroic",
-   "Legendary",
-   "Perfect"
-  ],
-  "TalentRarity": [
-   "TraitLevel_TalentLvl1",
-   "TraitLevel_TalentLvl2",
-   "TraitLevel_TalentLvl3",
-   "TraitLevel_TalentLvl4",
-   "TraitLevel_TalentLvl5"
-  ],
   "BoonRarityReverseRollOrder": [
    "Legendary",
    "Duo",
@@ -54,31 +23,12 @@
    "Rare",
    "Common"
   ],
-  "TalentRarityUpgradeOrder": [
+  "BoonRarityRollOrder": [
    "Common",
    "Rare",
    "Epic",
-   "Heroic",
+   "Duo",
    "Legendary"
-  ],
-  "ShrineRarityText": [
-   "ShrineLevel0",
-   "ShrineLevel1",
-   "ShrineLevel2",
-   "ShrineLevel3",
-   "ShrineLevel4",
-   "ShrineLevel5"
-  ],
-  "LegacyGameStateRequirements": [
-   {}
-  ],
-  "HammerRarityText": [
-   "TraitLevel_AspectLvl1",
-   "TraitLevel_AspectLvl1",
-   "TraitLevel_AspectLvl1",
-   "TraitLevel_AspectLvl1",
-   "TraitLevel_AspectLvl2",
-   "TraitLevel_AspectLvl3"
   ],
   "ElementalGameStateRequirements": [
    {
@@ -97,11 +47,61 @@
     ]
    }
   ],
+  "HammerRarityText": [
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl1",
+   "TraitLevel_AspectLvl2",
+   "TraitLevel_AspectLvl3"
+  ],
+  "LegacyGameStateRequirements": [
+   {}
+  ],
   "RarityUpgradeOrder": [
    "Common",
    "Rare",
    "Epic",
    "Heroic"
+  ],
+  "RarityValues": {
+   "Common": 1,
+   "Duo": 5,
+   "Epic": 3,
+   "Heroic": 4,
+   "Legendary": 5,
+   "Perfect": 6,
+   "Rare": 2
+  },
+  "ShrineRarityText": [
+   "ShrineLevel0",
+   "ShrineLevel1",
+   "ShrineLevel2",
+   "ShrineLevel3",
+   "ShrineLevel4",
+   "ShrineLevel5"
+  ],
+  "TalentRarity": [
+   "TraitLevel_TalentLvl1",
+   "TraitLevel_TalentLvl2",
+   "TraitLevel_TalentLvl3",
+   "TraitLevel_TalentLvl4",
+   "TraitLevel_TalentLvl5"
+  ],
+  "TalentRarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic",
+   "Legendary"
+  ],
+  "WeaponRarityUpgradeOrder": [
+   "Common",
+   "Rare",
+   "Epic",
+   "Heroic",
+   "Legendary",
+   "Perfect"
   ]
  }
 }

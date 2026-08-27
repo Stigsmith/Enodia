@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -8,30 +8,30 @@
   "luaTable": "TraitElementData"
  },
  "data": {
-  "Earth": {
-   "Icon": "EarthTraitSmall",
-   "Keyword": "EarthBoonKeyword",
-   "BaseElement": true
+  "Aether": {
+   "BaseElement": false,
+   "Icon": "AetherTraitSmall",
+   "Keyword": "AetherBoonKeyword"
   },
   "Air": {
+   "BaseElement": true,
    "Icon": "AirTraitSmall",
-   "Keyword": "AirBoonKeyword",
-   "BaseElement": true
+   "Keyword": "AirBoonKeyword"
   },
-  "Water": {
-   "Icon": "WaterTraitSmall",
-   "Keyword": "WaterBoonKeyword",
-   "BaseElement": true
+  "Earth": {
+   "BaseElement": true,
+   "Icon": "EarthTraitSmall",
+   "Keyword": "EarthBoonKeyword"
   },
   "Fire": {
+   "BaseElement": true,
    "Icon": "FireTraitSmall",
-   "Keyword": "FireBoonKeyword",
-   "BaseElement": true
+   "Keyword": "FireBoonKeyword"
   },
-  "Aether": {
-   "Icon": "AetherTraitSmall",
-   "Keyword": "AetherBoonKeyword",
-   "BaseElement": false
+  "Water": {
+   "BaseElement": true,
+   "Icon": "WaterTraitSmall",
+   "Keyword": "WaterBoonKeyword"
   }
  }
 }

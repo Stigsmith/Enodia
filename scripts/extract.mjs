@@ -152,8 +152,11 @@ function toPlain(value, seen = new Set(), depth = 0) {
       .sort((a, b) => Number(a[0]) - Number(b[0]))
       .map(([, v]) => toPlain(v, seen, depth + 1))
   } else {
+    // Sort keys. Lua's pairs() is unordered, so without this every run
+    // reshuffles the output and produces a six-figure diff that buries any
+    // real change a game patch made. Arrays keep their index order above.
     out = {}
-    for (const [k, v] of entries) {
+    for (const [k, v] of entries.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))) {
       const p = toPlain(v, seen, depth + 1)
       if (p !== undefined) out[k] = p
     }

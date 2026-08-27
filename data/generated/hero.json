@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -8,49 +8,232 @@
   "luaTable": "HeroData"
  },
  "data": {
-  "SubtitleColor": [
-   254,
-   255,
+  "AnimOffsetZ": 0,
+  "AttachedAnimationName": "LaurelCindersSpawner",
+  "AttachedLightColor": [
+   232,
+   131,
+   0,
+   255
+  ],
+  "AttachedLightCount": 1,
+  "AttachedLightName": "LightCharacterEllipse01",
+  "AttachedLightScale": 1.2,
+  "AutoSprintBuffer": 0.42,
+  "BoonData": {
+   "ForceCommon": false,
+   "GameStateRequirements": [
+    {
+     "Comparison": ">=",
+     "Path": [
+      "GameState",
+      "CompletedRunsCache"
+     ],
+     "Value": 2
+    }
+   ],
+   "RarityChances": {
+    "Duo": 0.12,
+    "Epic": 0.05,
+    "Legendary": 0.1,
+    "Rare": 0.1
+   },
+   "ReplaceChance": 0.1
+  },
+  "BoonInteractAnimation": "MelinoeBoonInteract",
+  "CanBeFrozen": true,
+  "ChokingSound": "/VO/MelinoeEmotes/EmoteStunned",
+  "ComboThreshold": 12,
+  "DamagedAnimation": "MelinoeGetHit",
+  "DamagedFxStyles": {
+   "Default": "PlayerHitSpark"
+  },
+  "DamagedSound": "/VO/MelinoeEmotes/EmoteHurt",
+  "DashManeuverTimeThreshold": 0.22,
+  "DefaultWeapon": "WeaponStaffSwing",
+  "EasyModeDamageMultiplierBase": 0.8,
+  "EasyModeDamageMultiplierDeathCap": 30,
+  "EasyModeDamageMultiplierPerDeath": -0.02,
+  "EmoteOffsetX": 60,
+  "EmoteOffsetY": -220,
+  "EnemyMoneyDropBaseValue": 1,
+  "FreezeTimeReductionPerInput": 1.3,
+  "FrozenSound": "/VO/MelinoeEmotes/EmoteHurt",
+  "HermesData": {
+   "ForceCommon": false,
+   "RarityChances": {
+    "Epic": 0.03,
+    "Legendary": 0.01,
+    "Rare": 0.06
+   }
+  },
+  "HeroFinalHitRumbleParameters": [
+   {
+    "Duration": 0.6,
+    "RightFraction": 0.4,
+    "ScreenPreWait": 0.02
+   }
+  ],
+  "HeroHitRumbleParameters": [
+   {
+    "Duration": 0.2,
+    "LeftFraction": 0.2,
+    "ScreenPreWait": 0
+   }
+  ],
+  "HeroMajorHitRumbleParameters": [
+   {
+    "Duration": 0.35,
+    "RightFraction": 0.4,
+    "ScreenPreWait": 0
+   }
+  ],
+  "InteractAnimation": "MelinoeInteract",
+  "InvulnerableFrameCumulativeDamageDuration": 0.6,
+  "InvulnerableFrameDuration": 1.3,
+  "InvulnerableFrameMinDamage": 15,
+  "InvulnerableFrameThreshold": 0.25,
+  "InvulnerableHitFx": "PlayerArmorHitSpark",
+  "LastStandData": {
+   "Duration": 5,
+   "Heal": 0.4,
+   "Modifier": 0.3
+  },
+  "LastStands": {},
+  "LightBarColor": [
+   0,
+   0,
    255,
    255
   ],
-  "WeaponData": {
-   "ForceCommon": true
+  "LineHistoryName": "PlayerUnit",
+  "LowHealthVoiceLineThreshold": 0.35,
+  "LowHealthVoiceLines": {
+   "1": {
+    "Cue": "/VO/Melinoe_0319",
+    "Text": "You..."
+   },
+   "2": {
+    "Cue": "/VO/Melinoe_0320",
+    "Text": "{#Emph}Rngh."
+   },
+   "3": {
+    "Cue": "/VO/Melinoe_0321",
+    "Text": "{#Emph}Tsch."
+   },
+   "4": {
+    "Cue": "/VO/Melinoe_0322",
+    "Text": "{#Emph}Grr!"
+   },
+   "5": {
+    "Cue": "/VO/Melinoe_0323",
+    "Text": "{#Emph}Pah."
+   },
+   "6": {
+    "Cue": "/VO/Melinoe_0324",
+    "Text": "Really."
+   },
+   "7": {
+    "Cue": "/VO/Melinoe_0325",
+    "Text": "{#Emph}Nrgh."
+   },
+   "8": {
+    "Cue": "/VO/Melinoe_0326",
+    "Text": "Truly."
+   },
+   "9": {
+    "Cue": "/VO/Melinoe_0327",
+    "Text": "No...!"
+   },
+   "10": {
+    "Cue": "/VO/Melinoe_1956",
+    "Text": "Damn it!"
+   },
+   "11": {
+    "Cue": "/VO/Melinoe_0328",
+    "GameStateRequirements": [
+     {
+      "IsNone": [
+       "F_Boss01",
+       "F_Boss02"
+      ],
+      "Path": [
+       "CurrentRun",
+       "CurrentRoom",
+       "Name"
+      ]
+     }
+    ],
+    "Text": "Damn you...!"
+   },
+   "BreakIfPlayed": true,
+   "CooldownTime": 100,
+   "GameStateRequirements": [
+    {
+     "PathFalse": [
+      "CurrentRun",
+      "Hero",
+      "IsDead"
+     ]
+    }
+   ],
+   "PreLineWait": 0.35,
+   "RandomRemaining": true,
+   "SuccessiveChanceToPlay": 0.25,
+   "TriggerCooldowns": [
+    "MedeaSpokeRecently"
+   ]
   },
-  "ChokingSound": "/VO/MelinoeEmotes/EmoteStunned",
-  "DamagedSound": "/VO/MelinoeEmotes/EmoteHurt",
+  "ManaData": {
+   "ManaRegenCooldown": 1,
+   "MinManaTickRate": 0.05
+  },
+  "MaxGodsPerRun": 4,
+  "MaxHealth": 30,
+  "MaxHealthMultiplier": 1,
+  "MaxMana": 50,
+  "Name": "Default",
   "NarrativeFadeInColor": [
    0,
    128,
    128,
    255
   ],
-  "UniqueGodCount": 0,
-  "DamagedAnimation": "MelinoeGetHit",
-  "TurnInPlaceAngleMin": 30,
-  "TriggersOnDamageEffects": true,
-  "HeroMajorHitRumbleParameters": [
-   {
-    "RightFraction": 0.4,
-    "ScreenPreWait": 0,
-    "Duration": 0.35
-   }
-  ],
+  "OnDeathShakeScreenAngle": 90,
+  "OnDeathShakeScreenDistance": 5,
+  "OnDeathShakeScreenDuration": 0.25,
+  "OnDeathShakeScreenSpeed": 250,
+  "Outline": {
+   "B": 151,
+   "FadeInDuration": 0.6,
+   "G": 216,
+   "Opacity": 0.7,
+   "R": 63,
+   "Thickness": 3,
+   "Threshold": 0.6
+  },
+  "PerfectDashHitDisableDuration": 0.3,
+  "PlayerInjuredVoiceLineThreshold": 0.65,
+  "Portrait": "Portrait_Mel_Default_01",
+  "ReserveManaSources": {},
+  "RushWeaponMaxRange": 400,
+  "SecretDoorCostBase": 10,
+  "SecretDoorCostDepthScalar": 0.4,
   "SetupEvents": [
    {
-    "FunctionName": "OverwriteSelf",
     "Args": {
      "Speaker": "PlayerUnit_Intro",
      "SpeakerLabelOffsetY": 18
     },
+    "FunctionName": "OverwriteSelf",
     "GameStateRequirements": [
      {
+      "Comparison": "<=",
       "Path": [
        "GameState",
        "CompletedRunsCache"
       ],
-      "Value": 0,
-      "Comparison": "<="
+      "Value": 0
      },
      {
       "PathFalse": [
@@ -62,11 +245,11 @@
     ]
    },
    {
-    "FunctionName": "OverwriteSelf",
     "Args": {
      "Speaker": "PlayerUnit",
      "SpeakerLabelOffsetY": "nil"
     },
+    "FunctionName": "OverwriteSelf",
     "GameStateRequirements": [
      {
       "PathTrue": [
@@ -78,235 +261,52 @@
     ]
    }
   ],
-  "UnusedWeaponThreshold": 3,
-  "MaxHealth": 30,
-  "DefaultWeapon": "WeaponStaffSwing",
-  "LastStandData": {
-   "Heal": 0.4,
-   "Duration": 5,
-   "Modifier": 0.3
-  },
-  "LineHistoryName": "PlayerUnit",
-  "InvulnerableFrameThreshold": 0.25,
-  "LowHealthVoiceLineThreshold": 0.35,
-  "AttachedLightScale": 1.2,
-  "UnfreezeAnimation": "MelinoeIdle",
-  "TargetMetaRewardsAdjustSpeed": 10,
-  "TempArmorVfx": "HephaestusLaurels",
-  "MaxMana": 50,
-  "AttachedLightCount": 1,
-  "OnDeathShakeScreenDuration": 0.25,
-  "MaxHealthMultiplier": 1,
-  "ReserveManaSources": {},
-  "InvulnerableHitFx": "PlayerArmorHitSpark",
-  "VoiceLineBufferTime": 9,
-  "EasyModeDamageMultiplierPerDeath": -0.02,
-  "HeroFinalHitRumbleParameters": [
-   {
-    "RightFraction": 0.4,
-    "ScreenPreWait": 0.02,
-    "Duration": 0.6
-   }
-  ],
-  "LightBarColor": [
-   0,
-   0,
-   255,
-   255
-  ],
-  "InvulnerableFrameDuration": 1.3,
-  "OnDeathShakeScreenAngle": 90,
-  "OnDeathShakeScreenDistance": 5,
-  "CanBeFrozen": true,
-  "LowHealthVoiceLines": {
-   "1": {
-    "Text": "You...",
-    "Cue": "/VO/Melinoe_0319"
-   },
-   "2": {
-    "Text": "{#Emph}Rngh.",
-    "Cue": "/VO/Melinoe_0320"
-   },
-   "3": {
-    "Text": "{#Emph}Tsch.",
-    "Cue": "/VO/Melinoe_0321"
-   },
-   "4": {
-    "Text": "{#Emph}Grr!",
-    "Cue": "/VO/Melinoe_0322"
-   },
-   "5": {
-    "Text": "{#Emph}Pah.",
-    "Cue": "/VO/Melinoe_0323"
-   },
-   "6": {
-    "Text": "Really.",
-    "Cue": "/VO/Melinoe_0324"
-   },
-   "7": {
-    "Text": "{#Emph}Nrgh.",
-    "Cue": "/VO/Melinoe_0325"
-   },
-   "8": {
-    "Text": "Truly.",
-    "Cue": "/VO/Melinoe_0326"
-   },
-   "9": {
-    "Text": "No...!",
-    "Cue": "/VO/Melinoe_0327"
-   },
-   "10": {
-    "Text": "Damn it!",
-    "Cue": "/VO/Melinoe_1956"
-   },
-   "11": {
-    "GameStateRequirements": [
-     {
-      "Path": [
-       "CurrentRun",
-       "CurrentRoom",
-       "Name"
-      ],
-      "IsNone": [
-       "F_Boss01",
-       "F_Boss02"
-      ]
-     }
-    ],
-    "Text": "Damn you...!",
-    "Cue": "/VO/Melinoe_0328"
-   },
-   "SuccessiveChanceToPlay": 0.25,
-   "PreLineWait": 0.35,
-   "BreakIfPlayed": true,
-   "RandomRemaining": true,
-   "GameStateRequirements": [
-    {
-     "PathFalse": [
-      "CurrentRun",
-      "Hero",
-      "IsDead"
-     ]
-    }
-   ],
-   "CooldownTime": 100,
-   "TriggerCooldowns": [
-    "MedeaSpokeRecently"
-   ]
-  },
-  "TargetMetaRewardsRatio": 0.45,
-  "Portrait": "Portrait_Mel_Default_01",
-  "LastStands": {},
   "ShoutSlowParameters": [
    {
     "Fraction": 0.1,
-    "ScreenPreWait": 0.01,
-    "LerpTime": 0
+    "LerpTime": 0,
+    "ScreenPreWait": 0.01
    },
    {
     "Fraction": 1,
-    "ScreenPreWait": 1.2,
-    "LerpTime": 0.1
+    "LerpTime": 0.1,
+    "ScreenPreWait": 1.2
    }
   ],
   "Speaker": "PlayerUnit",
-  "AttachedLightColor": [
-   232,
-   131,
-   0,
-   255
-  ],
-  "MaxGodsPerRun": 4,
-  "TriggersOnHitEffects": true,
-  "EmoteOffsetX": 60,
-  "Traits": {},
-  "InvulnerableFrameCumulativeDamageDuration": 0.6,
-  "ManaData": {
-   "MinManaTickRate": 0.05,
-   "ManaRegenCooldown": 1
-  },
-  "OnDeathShakeScreenSpeed": 250,
-  "FrozenSound": "/VO/MelinoeEmotes/EmoteHurt",
-  "TraitDictionary": {},
-  "AttachedAnimationName": "LaurelCindersSpawner",
-  "SecretDoorCostDepthScalar": 0.4,
+  "SpeakingStatusAnimation": "StatusIconSpeaking_Hero",
+  "SpeechCooldownTime": 15,
+  "SpeedMultiplierCap": 2,
   "StackData": {
    "AllowRarityOverride": false,
    "ForceCommon": true
   },
-  "Weapons": {
-   "WeaponSprint": true,
-   "WeaponCast": true,
-   "WeaponBlink": true
-  },
-  "HermesData": {
-   "RarityChances": {
-    "Rare": 0.06,
-    "Epic": 0.03,
-    "Legendary": 0.01
-   },
-   "ForceCommon": false
-  },
-  "DamagedFxStyles": {
-   "Default": "PlayerHitSpark"
-  },
-  "BoonData": {
-   "ReplaceChance": 0.1,
-   "GameStateRequirements": [
-    {
-     "Path": [
-      "GameState",
-      "CompletedRunsCache"
-     ],
-     "Value": 2,
-     "Comparison": ">="
-    }
-   ],
-   "ForceCommon": false,
-   "RarityChances": {
-    "Rare": 0.1,
-    "Epic": 0.05,
-    "Duo": 0.12,
-    "Legendary": 0.1
-   }
-  },
-  "BoonInteractAnimation": "MelinoeBoonInteract",
-  "AttachedLightName": "LightCharacterEllipse01",
-  "AnimOffsetZ": 0,
-  "EnemyMoneyDropBaseValue": 1,
-  "HeroHitRumbleParameters": [
-   {
-    "LeftFraction": 0.2,
-    "ScreenPreWait": 0,
-    "Duration": 0.2
-   }
+  "SubtitleColor": [
+   254,
+   255,
+   255,
+   255
   ],
-  "InteractAnimation": "MelinoeInteract",
-  "PlayerInjuredVoiceLineThreshold": 0.65,
+  "TargetMetaRewardsAdjustSpeed": 10,
+  "TargetMetaRewardsRatio": 0.45,
+  "TempArmorVfx": "HephaestusLaurels",
+  "TraitDictionary": {},
+  "Traits": {},
+  "TriggersOnDamageEffects": true,
+  "TriggersOnHitEffects": true,
+  "TurnInPlaceAngleMin": 30,
   "UnFrozenSound": "/VO/MelinoeEmotes/EmoteGasping",
-  "RushWeaponMaxRange": 400,
-  "SecretDoorCostBase": 10,
-  "EasyModeDamageMultiplierDeathCap": 30,
-  "EasyModeDamageMultiplierBase": 0.8,
-  "Name": "Default",
-  "SpeakingStatusAnimation": "StatusIconSpeaking_Hero",
-  "SpeechCooldownTime": 15,
-  "AutoSprintBuffer": 0.42,
-  "DashManeuverTimeThreshold": 0.22,
-  "SpeedMultiplierCap": 2,
-  "Outline": {
-   "Opacity": 0.7,
-   "G": 216,
-   "Threshold": 0.6,
-   "FadeInDuration": 0.6,
-   "B": 151,
-   "Thickness": 3,
-   "R": 63
+  "UnfreezeAnimation": "MelinoeIdle",
+  "UniqueGodCount": 0,
+  "UnusedWeaponThreshold": 3,
+  "VoiceLineBufferTime": 9,
+  "WeaponData": {
+   "ForceCommon": true
   },
-  "InvulnerableFrameMinDamage": 15,
-  "PerfectDashHitDisableDuration": 0.3,
-  "EmoteOffsetY": -220,
-  "ComboThreshold": 12,
-  "FreezeTimeReductionPerInput": 1.3
+  "Weapons": {
+   "WeaponBlink": true,
+   "WeaponCast": true,
+   "WeaponSprint": true
+  }
  }
 }

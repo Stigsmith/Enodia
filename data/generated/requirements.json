@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-26",
+  "extractedOn": "2026-08-27",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
@@ -23,230 +23,22 @@
     ]
    ]
   },
-  "ChaosLastStandBlessing": {
-   "OneOf": [
-    "ChaosWeaponBlessing",
-    "ChaosSpecialBlessing",
-    "ChaosCastBlessing",
-    "ChaosHealthBlessing",
-    "ChaosRarityBlessing",
-    "ChaosMoneyBlessing",
-    "ChaosLastStandBlessing",
-    "ChaosManaBlessing",
-    "ChaosManaOverTimeBlessing",
-    "ChaosExSpeedBlessing",
-    "ChaosElementalBlessing",
-    "ChaosManaCostBlessing",
-    "ChaosSpeedBlessing",
-    "ChaosDoorHealBlessing",
-    "ChaosHarvestBlessing",
-    "ChaosOmegaDamageBlessing"
-   ]
-  },
-  "DamageSharePotencyBoon": {
-   "OneOf": [
-    "HeraWeaponBoon",
-    "HeraSpecialBoon",
-    "HeraCastBoon",
-    "HeraSprintBoon"
-   ]
-  },
-  "RandomStatusBoon": {
-   "OneFromEachSet": [
-    [
-     "AphroditeCastBoon",
-     "AphroditeSprintBoon",
-     "AphroditeManaBoon"
-    ],
-    [
-     "AphroditeWeaponBoon",
-     "AphroditeSpecialBoon"
-    ],
-    [
-     "WeakPotencyBoon",
-     "WeakVulnerabilityBoon",
-     "HighHealthOffenseBoon",
-     "FocusRawDamageBoon"
-    ]
-   ]
-  },
-  "CastAnywhereBoon": {
-   "OneOf": [
-    "AphroditeCastBoon",
-    "ApolloCastBoon",
-    "DemeterCastBoon",
-    "HephaestusCastBoon",
-    "HeraCastBoon",
-    "HestiaCastBoon",
-    "PoseidonCastBoon",
-    "ZeusCastBoon",
-    "AresCastBoon"
-   ]
-  },
-  "SlamManaBurstBoon": {
-   "OneFromEachSet": [
-    [
-     "AphroditeWeaponBoon",
-     "AphroditeSpecialBoon",
-     "AphroditeCastBoon",
-     "AphroditeSprintBoon",
-     "AphroditeManaBoon"
-    ],
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusSprintBoon"
-    ]
-   ]
-  },
-  "RootDurationBoon": {
-   "OneOf": [
-    "DemeterWeaponBoon",
-    "DemeterSpecialBoon",
-    "DemeterCastBoon"
-   ]
-  },
-  "MoneyDamageBoon": {
+  "AllElementalBoon": {
    "OneFromEachSet": [
     [
      "HeraWeaponBoon",
      "HeraSpecialBoon",
      "HeraCastBoon",
+     "HeraSprintBoon"
+    ],
+    [
+     "BoonDecayBoon",
+     "CommonGlobalDamageBoon",
      "OmegaHeraProjectileBoon"
     ],
     [
-     "PoseidonWeaponBoon",
-     "PoseidonSpecialBoon",
-     "PoseidonCastBoon",
-     "OmegaPoseidonProjectileBoon"
-    ],
-    [
-     "OmegaHeraProjectileBoon",
-     "OmegaPoseidonProjectileBoon"
-    ]
-   ]
-  },
-  "EchoExpirationBoon": {
-   "OneOf": [
-    "ZeusWeaponBoon",
-    "ZeusSpecialBoon"
-   ]
-  },
-  "SelfCastBoon": {
-   "OneFromEachSet": [
-    [
-     "AresCastBoon",
-     "AresExCastBoon",
-     "OmegaDelayedDamageBoon"
-    ],
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon",
-     "DemeterSprintBoon",
-     "DemeterManaBoon"
-    ]
-   ]
-  },
-  "SlowExAttackBoon": {
-   "OneOf": [
-    "AphroditeWeaponBoon",
-    "ApolloWeaponBoon",
-    "DemeterWeaponBoon",
-    "HephaestusWeaponBoon",
-    "HeraWeaponBoon",
-    "HestiaWeaponBoon",
-    "PoseidonWeaponBoon",
-    "ZeusWeaponBoon",
-    "AresWeaponBoon"
-   ]
-  },
-  "CastAttachBoon": {
-   "OneOf": [
-    "AphroditeCastBoon",
-    "ApolloCastBoon",
-    "DemeterCastBoon",
-    "HephaestusCastBoon",
-    "HeraCastBoon",
-    "HestiaCastBoon",
-    "PoseidonCastBoon",
-    "ZeusCastBoon",
-    "AresCastBoon"
-   ]
-  },
-  "CoverRegenerationBoon": {
-   "OneFromEachSet": [
-    [
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloRetaliateBoon",
-     "BlindChanceBoon"
-    ],
-    [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon",
-     "HestiaSprintBoon",
-     "HestiaManaBoon"
-    ]
-   ]
-  },
-  "LinkedDeathDamageBoon": {
-   "OneOf": [
-    "HeraWeaponBoon",
-    "HeraSpecialBoon",
-    "HeraCastBoon",
-    "HeraSprintBoon"
-   ]
-  },
-  "RaiseDeadBoon": {
-   "OneFromEachSet": [
-    [
-     "HeraCastBoon",
-     "HeraSprintBoon",
-     "HeraManaBoon"
-    ],
-    [
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloManaBoon"
-    ]
-   ]
-  },
-  "PoseidonStatusBoon": {
-   "OneOf": [
-    "PoseidonWeaponBoon",
-    "PoseidonSpecialBoon"
-   ],
-   "PriorityChance": 0.25
-  },
-  "DoubleSplashBoon": {
-   "OneFromEachSet": [
-    [
-     "AresWeaponBoon",
-     "AresSpecialBoon",
-     "AresCastBoon",
-     "AresSprintBoon",
-     "AresManaBoon"
-    ],
-    [
-     "PoseidonWeaponBoon",
-     "PoseidonSpecialBoon"
-    ]
-   ]
-  },
-  "FireballRendBoon": {
-   "OneFromEachSet": [
-    [
-     "AresWeaponBoon",
-     "AresSpecialBoon",
-     "AresCastBoon",
-     "AresSprintBoon",
-     "AresManaBoon"
-    ],
-    [
-     "FireballManaSpecialBoon",
-     "CastProjectileBoon"
+     "DamageSharePotencyBoon",
+     "SpawnCastDamageBoon"
     ]
    ]
   },
@@ -269,6 +61,27 @@
     ]
    ]
   },
+  "ApolloBlindBoon": {
+   "OneOf": [
+    "ApolloCastBoon",
+    "ApolloSprintBoon",
+    "ApolloRetaliateBoon",
+    "BlindChanceBoon"
+   ]
+  },
+  "ApolloExCastBoon": {
+   "OneOf": [
+    "AphroditeCastBoon",
+    "ApolloCastBoon",
+    "DemeterCastBoon",
+    "HephaestusCastBoon",
+    "HeraCastBoon",
+    "HestiaCastBoon",
+    "PoseidonCastBoon",
+    "ZeusCastBoon",
+    "AresCastBoon"
+   ]
+  },
   "ApolloSecondStageCastBoon": {
    "OneFromEachSet": [
     [
@@ -280,6 +93,492 @@
      "ZeusCastBoon",
      "ZeusSprintBoon"
     ]
+   ]
+  },
+  "AresExCastBoon": {
+   "OneOf": [
+    "AphroditeCastBoon",
+    "ApolloCastBoon",
+    "DemeterCastBoon",
+    "HephaestusCastBoon",
+    "HeraCastBoon",
+    "HestiaCastBoon",
+    "PoseidonCastBoon",
+    "ZeusCastBoon",
+    "AresCastBoon"
+   ]
+  },
+  "AresStatusDoubleDamageBoon": {
+   "OneOf": [
+    "AresWeaponBoon",
+    "AresSpecialBoon"
+   ]
+  },
+  "AutoRevengeBoon": {
+   "OneFromEachSet": [
+    [
+     "AresWeaponBoon",
+     "AresSpecialBoon"
+    ],
+    [
+     "ZeusWeaponBoon",
+     "ZeusSpecialBoon",
+     "ZeusCastBoon",
+     "ZeusSprintBoon",
+     "ZeusManaBoon"
+    ],
+    [
+     "BloodDropRevengeBoon",
+     "ApolloRetaliateBoon",
+     "BoltRetaliateBoon"
+    ]
+   ]
+  },
+  "BlindChanceBoon": {
+   "OneOf": [
+    "ApolloWeaponBoon"
+   ],
+   "PriorityChance": 0.25
+  },
+  "BlindClearBoon": {
+   "OneFromEachSet": [
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusSprintBoon"
+    ],
+    [
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloRetaliateBoon",
+     "BlindChanceBoon"
+    ]
+   ]
+  },
+  "BloodManaBurstBoon": {
+   "OneFromEachSet": [
+    [
+     "AresManaBoon",
+     "BloodDropRevengeBoon"
+    ],
+    [
+     "AphroditeWeaponBoon",
+     "AphroditeSpecialBoon",
+     "AphroditeCastBoon",
+     "AphroditeSprintBoon",
+     "AphroditeManaBoon"
+    ]
+   ]
+  },
+  "BloodRetentionBoon": {
+   "OneFromEachSet": [
+    [
+     "AresManaBoon",
+     "BloodDropRevengeBoon"
+    ],
+    [
+     "HeraWeaponBoon",
+     "HeraSpecialBoon",
+     "HeraCastBoon",
+     "HeraSprintBoon",
+     "HeraManaBoon"
+    ]
+   ]
+  },
+  "BurnArmorBoon": {
+   "OneOf": [
+    "HestiaWeaponBoon",
+    "HestiaSpecialBoon",
+    "HestiaCastBoon"
+   ]
+  },
+  "BurnConsumeBoon": {
+   "OneFromEachSet": [
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon"
+    ],
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon"
+    ]
+   ]
+  },
+  "BurnRefreshBoon": {
+   "OneFromEachSet": [
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon"
+    ],
+    [
+     "AphroditeCastBoon",
+     "AphroditeSprintBoon",
+     "AphroditeManaBoon"
+    ]
+   ]
+  },
+  "BurnSprintBoon": {
+   "OneFromEachSet": [
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon"
+    ],
+    [
+     "BurnExplodeBoon",
+     "BurnArmorBoon",
+     "BurnStackBoon",
+     "OmegaZeroBurnBoon"
+    ],
+    [
+     "CastProjectileBoon",
+     "FireballManaSpecialBoon"
+    ]
+   ]
+  },
+  "BurnStackBoon": {
+   "OneOf": [
+    "HestiaWeaponBoon",
+    "HestiaSpecialBoon",
+    "HestiaCastBoon"
+   ]
+  },
+  "CastAnywhereBoon": {
+   "OneOf": [
+    "AphroditeCastBoon",
+    "ApolloCastBoon",
+    "DemeterCastBoon",
+    "HephaestusCastBoon",
+    "HeraCastBoon",
+    "HestiaCastBoon",
+    "PoseidonCastBoon",
+    "ZeusCastBoon",
+    "AresCastBoon"
+   ]
+  },
+  "CastAttachBoon": {
+   "OneOf": [
+    "AphroditeCastBoon",
+    "ApolloCastBoon",
+    "DemeterCastBoon",
+    "HephaestusCastBoon",
+    "HeraCastBoon",
+    "HestiaCastBoon",
+    "PoseidonCastBoon",
+    "ZeusCastBoon",
+    "AresCastBoon"
+   ]
+  },
+  "ChaosLastStandBlessing": {
+   "OneOf": [
+    "ChaosWeaponBlessing",
+    "ChaosSpecialBlessing",
+    "ChaosCastBlessing",
+    "ChaosHealthBlessing",
+    "ChaosRarityBlessing",
+    "ChaosMoneyBlessing",
+    "ChaosLastStandBlessing",
+    "ChaosManaBlessing",
+    "ChaosManaOverTimeBlessing",
+    "ChaosExSpeedBlessing",
+    "ChaosElementalBlessing",
+    "ChaosManaCostBlessing",
+    "ChaosSpeedBlessing",
+    "ChaosDoorHealBlessing",
+    "ChaosHarvestBlessing",
+    "ChaosOmegaDamageBlessing"
+   ]
+  },
+  "ChaosMetaUpgradeCurse": {
+   "OneOf": [
+    "ChaosWeaponBlessing",
+    "ChaosSpecialBlessing",
+    "ChaosCastBlessing",
+    "ChaosHealthBlessing",
+    "ChaosRarityBlessing",
+    "ChaosMoneyBlessing",
+    "ChaosLastStandBlessing",
+    "ChaosManaBlessing",
+    "ChaosManaOverTimeBlessing",
+    "ChaosExSpeedBlessing",
+    "ChaosElementalBlessing",
+    "ChaosManaCostBlessing",
+    "ChaosSpeedBlessing",
+    "ChaosDoorHealBlessing",
+    "ChaosHarvestBlessing",
+    "ChaosOmegaDamageBlessing"
+   ]
+  },
+  "CharmCrowdBoon": {
+   "OneFromEachSet": [
+    [
+     "HeraWeaponBoon",
+     "HeraSpecialBoon",
+     "HeraCastBoon",
+     "HeraSprintBoon"
+    ],
+    [
+     "AphroditeCastBoon",
+     "AphroditeSprintBoon",
+     "AphroditeManaBoon"
+    ]
+   ]
+  },
+  "ClearRootBoon": {
+   "OneFromEachSet": [
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusSprintBoon"
+    ],
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon"
+    ]
+   ]
+  },
+  "CoverRegenerationBoon": {
+   "OneFromEachSet": [
+    [
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloRetaliateBoon",
+     "BlindChanceBoon"
+    ],
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon",
+     "HestiaSprintBoon",
+     "HestiaManaBoon"
+    ]
+   ]
+  },
+  "DamageSharePotencyBoon": {
+   "OneOf": [
+    "HeraWeaponBoon",
+    "HeraSpecialBoon",
+    "HeraCastBoon",
+    "HeraSprintBoon"
+   ]
+  },
+  "DoorHealToFullBoon": {
+   "OneOf": [
+    "HighHealthOffenseBoon"
+   ]
+  },
+  "DoubleBloodDropBoon": {
+   "OneFromEachSet": [
+    [
+     "AresWeaponBoon",
+     "AresSpecialBoon"
+    ],
+    [
+     "AresManaBoon",
+     "BloodDropRevengeBoon"
+    ],
+    [
+     "AresExCastBoon",
+     "AresStatusDoubleDamageBoon",
+     "MissingHealthCritBoon",
+     "LowHealthLifestealBoon",
+     "OmegaDelayedDamageBoon"
+    ]
+   ]
+  },
+  "DoubleBoltBoon": {
+   "OneOf": [
+    "ZeusWeaponBoon",
+    "ZeusSpecialBoon",
+    "ZeusCastBoon",
+    "ZeusSprintBoon",
+    "ZeusManaBoltBoon",
+    "BoltRetaliateBoon",
+    "CastAnywhereBoon"
+   ]
+  },
+  "DoubleExManaBoon": {
+   "OneFromEachSet": [
+    [
+     "ApolloWeaponBoon",
+     "ApolloSpecialBoon"
+    ],
+    [
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloManaBoon"
+    ],
+    [
+     "DoubleStrikeChanceBoon",
+     "ApolloCastAreaBoon",
+     "ApolloBlindBoon",
+     "ApolloExCastBoon"
+    ]
+   ]
+  },
+  "DoubleMassiveAttackBoon": {
+   "OneFromEachSet": [
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusSprintBoon"
+    ],
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon",
+     "HestiaSprintBoon",
+     "HestiaManaBoon"
+    ]
+   ]
+  },
+  "DoubleSplashBoon": {
+   "OneFromEachSet": [
+    [
+     "AresWeaponBoon",
+     "AresSpecialBoon",
+     "AresCastBoon",
+     "AresSprintBoon",
+     "AresManaBoon"
+    ],
+    [
+     "PoseidonWeaponBoon",
+     "PoseidonSpecialBoon"
+    ]
+   ]
+  },
+  "DoubleStrikeChanceBoon": {
+   "OneOf": [
+    "AphroditeWeaponBoon",
+    "ApolloWeaponBoon",
+    "DemeterWeaponBoon",
+    "HephaestusWeaponBoon",
+    "HeraWeaponBoon",
+    "HestiaWeaponBoon",
+    "PoseidonWeaponBoon",
+    "ZeusWeaponBoon",
+    "AresWeaponBoon"
+   ]
+  },
+  "DoubleSwordBoon": {
+   "OneFromEachSet": [
+    [
+     "AresCastBoon",
+     "AresSprintBoon",
+     "OmegaDelayedDamageBoon",
+     "RendBloodDropBoon"
+    ],
+    [
+     "ApolloWeaponBoon",
+     "ApolloSpecialBoon",
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloManaBoon"
+    ]
+   ]
+  },
+  "EchoBurnBoon": {
+   "OneFromEachSet": [
+    [
+     "ZeusWeaponBoon",
+     "ZeusSpecialBoon"
+    ],
+    [
+     "HestiaWeaponBoon",
+     "HestiaSpecialBoon",
+     "HestiaCastBoon"
+    ]
+   ]
+  },
+  "EchoExpirationBoon": {
+   "OneOf": [
+    "ZeusWeaponBoon",
+    "ZeusSpecialBoon"
+   ]
+  },
+  "FireballRendBoon": {
+   "OneFromEachSet": [
+    [
+     "AresWeaponBoon",
+     "AresSpecialBoon",
+     "AresCastBoon",
+     "AresSprintBoon",
+     "AresManaBoon"
+    ],
+    [
+     "FireballManaSpecialBoon",
+     "CastProjectileBoon"
+    ]
+   ]
+  },
+  "GoodStuffBoon": {
+   "OneFromEachSet": [
+    [
+     "PoseidonWeaponBoon",
+     "PoseidonSpecialBoon",
+     "PoseidonCastBoon",
+     "PoseidonSprintBoon",
+     "PoseidonManaBoon"
+    ],
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon",
+     "DemeterSprintBoon",
+     "DemeterManaBoon"
+    ],
+    [
+     "RoomRewardBonusBoon",
+     "DoubleRewardBoon",
+     "BoonGrowthBoon",
+     "PlantHealthBoon"
+    ]
+   ]
+  },
+  "InstantRootKill": {
+   "OneFromEachSet": [
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon"
+    ],
+    [
+     "PlantHealthBoon",
+     "ReserveManaHitShieldBoon",
+     "BoonGrowthBoon"
+    ],
+    [
+     "SlowExAttackBoon",
+     "RootDurationBoon",
+     "CastAttachBoon"
+    ]
+   ]
+  },
+  "KeepsakeLevelBoon": {
+   "OneFromEachSet": [
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon",
+     "DemeterSprintBoon",
+     "DemeterManaBoon"
+    ],
+    [
+     "HeraWeaponBoon",
+     "HeraSpecialBoon",
+     "HeraCastBoon",
+     "HeraSprintBoon",
+     "HeraManaBoon"
+    ]
+   ]
+  },
+  "LightningDebuffGeneratorBoon": {
+   "OneOf": [
+    "FocusLightningBoon"
    ]
   },
   "LightningVulnerabilityBoon": {
@@ -298,47 +597,168 @@
     ]
    ]
   },
-  "RapidSwordBoon": {
+  "LinkedDeathDamageBoon": {
+   "OneOf": [
+    "HeraWeaponBoon",
+    "HeraSpecialBoon",
+    "HeraCastBoon",
+    "HeraSprintBoon"
+   ]
+  },
+  "LuckyBoon": {
+   "OneOf": [
+    "DoubleRewardBoon",
+    "PoseidonCastBoon",
+    "PoseidonStatusBoon",
+    "BoltRetaliateBoon",
+    "DoubleBoltBoon",
+    "SpawnKillBoon",
+    "BlindChanceBoon",
+    "DoubleStrikeChanceBoon",
+    "CritBonusBoon",
+    "HighHealthCritBoon",
+    "InsideCastCritBoon",
+    "TimedCritVulnerabilityBoon",
+    "FocusCritBoon",
+    "DashOmegaBuffBoon",
+    "SorceryCritBoon",
+    "AresManaBoon",
+    "BloodDropRevengeBoon",
+    "MissingHealthCritBoon",
+    "AresStatusDoubleDamageBoon",
+    "DoubleSplashBoon",
+    "BloodManaBurstBoon",
+    "MoneyDamageBoon"
+   ]
+  },
+  "ManaBurstCountBoon": {
    "OneFromEachSet": [
     [
-     "AresCastBoon",
-     "AresSprintBoon",
-     "OmegaDelayedDamageBoon",
-     "RendBloodDropBoon"
+     "ManaBurstBoon"
     ],
     [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusCastBoon",
-     "HephaestusSprintBoon",
-     "HephaestusManaBoon"
+     "ApolloWeaponBoon",
+     "ApolloSpecialBoon",
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloManaBoon"
     ]
    ]
   },
-  "BurnStackBoon": {
-   "OneOf": [
-    "HestiaWeaponBoon",
-    "HestiaSpecialBoon",
-    "HestiaCastBoon"
-   ]
-  },
-  "SteamBoon": {
+  "ManaRestoreDamageBoon": {
    "OneFromEachSet": [
     [
-     "PoseidonCastBoon",
-     "PoseidonStatusBoon"
+     "HeraWeaponBoon",
+     "HeraSpecialBoon",
+     "HeraCastBoon",
+     "HeraSprintBoon"
     ],
     [
      "HestiaWeaponBoon",
      "HestiaSpecialBoon",
      "HestiaCastBoon",
      "HestiaSprintBoon",
-     "FireballManaSpecialBoon",
-     "CastProjectileBoon"
+     "HestiaManaBoon"
     ]
    ]
   },
-  "ApolloExCastBoon": {
+  "ManaShieldBoon": {
+   "OneFromEachSet": [
+    [
+     "DamageShareRetaliateBoon",
+     "LinkedDeathDamageBoon",
+     "DamageSharePotencyBoon",
+     "SpawnCastDamageBoon",
+     "OmegaHeraProjectileBoon"
+    ],
+    [
+     "MassiveDamageBoon",
+     "AntiArmorBoon",
+     "HeavyArmorBoon",
+     "ArmorBoon",
+     "EncounterStartDefenseBuffBoon",
+     "ManaToHealthBoon",
+     "MassiveKnockupBoon"
+    ]
+   ]
+  },
+  "MassiveCastBoon": {
+   "OneFromEachSet": [
+    [
+     "PoseidonWeaponBoon",
+     "PoseidonSpecialBoon",
+     "PoseidonCastBoon",
+     "PoseidonSprintBoon",
+     "PoseidonManaBoon"
+    ],
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusSprintBoon"
+    ]
+   ]
+  },
+  "MassiveDamageBoon": {
+   "OneOf": [
+    "HephaestusWeaponBoon",
+    "HephaestusSpecialBoon",
+    "HephaestusSprintBoon"
+   ]
+  },
+  "MassiveKnockupBoon": {
+   "OneOf": [
+    "HephaestusWeaponBoon",
+    "HephaestusSpecialBoon",
+    "HephaestusSprintBoon"
+   ],
+   "PriorityChance": 0.25
+  },
+  "MaxHealthDamageBoon": {
+   "OneFromEachSet": [
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterManaBoon",
+     "DemeterSprintBoon",
+     "PlantHealthBoon"
+    ],
+    [
+     "AphroditeWeaponBoon",
+     "AphroditeSpecialBoon",
+     "AphroditeManaBoon",
+     "AphroditeSprintBoon",
+     "DoorHealToFullBoon"
+    ]
+   ]
+  },
+  "MoneyDamageBoon": {
+   "OneFromEachSet": [
+    [
+     "HeraWeaponBoon",
+     "HeraSpecialBoon",
+     "HeraCastBoon",
+     "OmegaHeraProjectileBoon"
+    ],
+    [
+     "PoseidonWeaponBoon",
+     "PoseidonSpecialBoon",
+     "PoseidonCastBoon",
+     "OmegaPoseidonProjectileBoon"
+    ],
+    [
+     "OmegaHeraProjectileBoon",
+     "OmegaPoseidonProjectileBoon"
+    ]
+   ]
+  },
+  "OmegaZeroBurnBoon": {
+   "OneOf": [
+    "HestiaWeaponBoon",
+    "HestiaSpecialBoon",
+    "HestiaCastBoon"
+   ]
+  },
+  "PoseidonExCastBoon": {
    "OneOf": [
     "AphroditeCastBoon",
     "ApolloCastBoon",
@@ -373,129 +793,154 @@
     ]
    ]
   },
-  "MassiveKnockupBoon": {
+  "PoseidonStatusBoon": {
    "OneOf": [
-    "HephaestusWeaponBoon",
-    "HephaestusSpecialBoon",
-    "HephaestusSprintBoon"
+    "PoseidonWeaponBoon",
+    "PoseidonSpecialBoon"
    ],
    "PriorityChance": 0.25
   },
-  "LuckyBoon": {
-   "OneOf": [
-    "DoubleRewardBoon",
-    "PoseidonCastBoon",
-    "PoseidonStatusBoon",
-    "BoltRetaliateBoon",
-    "DoubleBoltBoon",
-    "SpawnKillBoon",
-    "BlindChanceBoon",
-    "DoubleStrikeChanceBoon",
-    "CritBonusBoon",
-    "HighHealthCritBoon",
-    "InsideCastCritBoon",
-    "TimedCritVulnerabilityBoon",
-    "FocusCritBoon",
-    "DashOmegaBuffBoon",
-    "SorceryCritBoon",
-    "AresManaBoon",
-    "BloodDropRevengeBoon",
-    "MissingHealthCritBoon",
-    "AresStatusDoubleDamageBoon",
-    "DoubleSplashBoon",
-    "BloodManaBurstBoon",
-    "MoneyDamageBoon"
-   ]
-  },
-  "DoorHealToFullBoon": {
-   "OneOf": [
-    "HighHealthOffenseBoon"
-   ]
-  },
-  "AresStatusDoubleDamageBoon": {
-   "OneOf": [
-    "AresWeaponBoon",
-    "AresSpecialBoon"
-   ]
-  },
-  "DoubleExManaBoon": {
+  "RaiseDeadBoon": {
    "OneFromEachSet": [
     [
-     "ApolloWeaponBoon",
-     "ApolloSpecialBoon"
+     "HeraCastBoon",
+     "HeraSprintBoon",
+     "HeraManaBoon"
     ],
     [
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloManaBoon"
-    ],
-    [
-     "DoubleStrikeChanceBoon",
-     "ApolloCastAreaBoon",
-     "ApolloBlindBoon",
-     "ApolloExCastBoon"
-    ]
-   ]
-  },
-  "ManaBurstCountBoon": {
-   "OneFromEachSet": [
-    [
-     "ManaBurstBoon"
-    ],
-    [
-     "ApolloWeaponBoon",
-     "ApolloSpecialBoon",
      "ApolloCastBoon",
      "ApolloSprintBoon",
      "ApolloManaBoon"
     ]
    ]
   },
-  "MaxHealthDamageBoon": {
+  "RandomStatusBoon": {
    "OneFromEachSet": [
     [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterManaBoon",
-     "DemeterSprintBoon",
-     "PlantHealthBoon"
+     "AphroditeCastBoon",
+     "AphroditeSprintBoon",
+     "AphroditeManaBoon"
     ],
     [
      "AphroditeWeaponBoon",
-     "AphroditeSpecialBoon",
-     "AphroditeManaBoon",
-     "AphroditeSprintBoon",
-     "DoorHealToFullBoon"
+     "AphroditeSpecialBoon"
+    ],
+    [
+     "WeakPotencyBoon",
+     "WeakVulnerabilityBoon",
+     "HighHealthOffenseBoon",
+     "FocusRawDamageBoon"
     ]
    ]
   },
-  "WeakPotencyBoon": {
-   "OneOf": [
-    "AphroditeCastBoon",
-    "AphroditeSprintBoon",
-    "AphroditeManaBoon"
-   ]
-  },
-  "BurnSprintBoon": {
+  "RapidSwordBoon": {
    "OneFromEachSet": [
     [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon"
+     "AresCastBoon",
+     "AresSprintBoon",
+     "OmegaDelayedDamageBoon",
+     "RendBloodDropBoon"
     ],
     [
-     "BurnExplodeBoon",
-     "BurnArmorBoon",
-     "BurnStackBoon",
-     "OmegaZeroBurnBoon"
-    ],
-    [
-     "CastProjectileBoon",
-     "FireballManaSpecialBoon"
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusCastBoon",
+     "HephaestusSprintBoon",
+     "HephaestusManaBoon"
     ]
    ]
   },
-  "PoseidonExCastBoon": {
+  "ReboundingSparkBoon": {
+   "OneFromEachSet": [
+    [
+     "FocusLightningBoon"
+    ],
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusCastBoon",
+     "HephaestusSprintBoon",
+     "HephaestusManaBoon"
+    ]
+   ]
+  },
+  "RendBloodDropBoon": {
+   "OneOf": [
+    "AresWeaponBoon",
+    "AresSpecialBoon",
+    "AresManaBoon",
+    "BloodDropRevengeBoon"
+   ]
+  },
+  "RootDurationBoon": {
+   "OneOf": [
+    "DemeterWeaponBoon",
+    "DemeterSpecialBoon",
+    "DemeterCastBoon"
+   ]
+  },
+  "RootStrikeBoon": {
+   "OneFromEachSet": [
+    [
+     "ZeusWeaponBoon",
+     "ZeusSpecialBoon",
+     "ZeusCastBoon",
+     "ZeusSprintBoon",
+     "ZeusManaBoon"
+    ],
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon"
+    ]
+   ]
+  },
+  "SelfCastBoon": {
+   "OneFromEachSet": [
+    [
+     "AresCastBoon",
+     "AresExCastBoon",
+     "OmegaDelayedDamageBoon"
+    ],
+    [
+     "DemeterWeaponBoon",
+     "DemeterSpecialBoon",
+     "DemeterCastBoon",
+     "DemeterSprintBoon",
+     "DemeterManaBoon"
+    ]
+   ]
+  },
+  "SlamManaBurstBoon": {
+   "OneFromEachSet": [
+    [
+     "AphroditeWeaponBoon",
+     "AphroditeSpecialBoon",
+     "AphroditeCastBoon",
+     "AphroditeSprintBoon",
+     "AphroditeManaBoon"
+    ],
+    [
+     "HephaestusWeaponBoon",
+     "HephaestusSpecialBoon",
+     "HephaestusSprintBoon"
+    ]
+   ]
+  },
+  "SlowExAttackBoon": {
+   "OneOf": [
+    "AphroditeWeaponBoon",
+    "ApolloWeaponBoon",
+    "DemeterWeaponBoon",
+    "HephaestusWeaponBoon",
+    "HeraWeaponBoon",
+    "HestiaWeaponBoon",
+    "PoseidonWeaponBoon",
+    "ZeusWeaponBoon",
+    "AresWeaponBoon"
+   ]
+  },
+  "SpawnCastDamageBoon": {
    "OneOf": [
     "AphroditeCastBoon",
     "ApolloCastBoon",
@@ -508,123 +953,38 @@
     "AresCastBoon"
    ]
   },
-  "MassiveDamageBoon": {
+  "SpawnKillBoon": {
+   "OneFromEachSet": [
+    [
+     "ZeusWeaponBoon",
+     "ZeusSpecialBoon",
+     "ZeusCastBoon",
+     "ZeusSprintBoon",
+     "ZeusManaBoon"
+    ],
+    [
+     "FocusLightningBoon",
+     "ZeusManaBoltBoon",
+     "CastAnywhereBoon",
+     "BoltRetaliateBoon"
+    ],
+    [
+     "EchoExpirationBoon",
+     "DoubleBoltBoon",
+     "LightningDebuffGeneratorBoon"
+    ]
+   ]
+  },
+  "SpellMoonBeamTrait": {
    "OneOf": [
-    "HephaestusWeaponBoon",
-    "HephaestusSpecialBoon",
-    "HephaestusSprintBoon"
+    "SuitHexAspect"
    ]
   },
-  "ManaShieldBoon": {
+  "SprintEchoBoon": {
    "OneFromEachSet": [
     [
-     "DamageShareRetaliateBoon",
-     "LinkedDeathDamageBoon",
-     "DamageSharePotencyBoon",
-     "SpawnCastDamageBoon",
-     "OmegaHeraProjectileBoon"
-    ],
-    [
-     "MassiveDamageBoon",
-     "AntiArmorBoon",
-     "HeavyArmorBoon",
-     "ArmorBoon",
-     "EncounterStartDefenseBuffBoon",
-     "ManaToHealthBoon",
-     "MassiveKnockupBoon"
-    ]
-   ]
-  },
-  "GoodStuffBoon": {
-   "OneFromEachSet": [
-    [
-     "PoseidonWeaponBoon",
-     "PoseidonSpecialBoon",
-     "PoseidonCastBoon",
-     "PoseidonSprintBoon",
-     "PoseidonManaBoon"
-    ],
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon",
-     "DemeterSprintBoon",
-     "DemeterManaBoon"
-    ],
-    [
-     "RoomRewardBonusBoon",
-     "DoubleRewardBoon",
-     "BoonGrowthBoon",
-     "PlantHealthBoon"
-    ]
-   ]
-  },
-  "ChaosMetaUpgradeCurse": {
-   "OneOf": [
-    "ChaosWeaponBlessing",
-    "ChaosSpecialBlessing",
-    "ChaosCastBlessing",
-    "ChaosHealthBlessing",
-    "ChaosRarityBlessing",
-    "ChaosMoneyBlessing",
-    "ChaosLastStandBlessing",
-    "ChaosManaBlessing",
-    "ChaosManaOverTimeBlessing",
-    "ChaosExSpeedBlessing",
-    "ChaosElementalBlessing",
-    "ChaosManaCostBlessing",
-    "ChaosSpeedBlessing",
-    "ChaosDoorHealBlessing",
-    "ChaosHarvestBlessing",
-    "ChaosOmegaDamageBlessing"
-   ]
-  },
-  "AllElementalBoon": {
-   "OneFromEachSet": [
-    [
-     "HeraWeaponBoon",
-     "HeraSpecialBoon",
-     "HeraCastBoon",
-     "HeraSprintBoon"
-    ],
-    [
-     "BoonDecayBoon",
-     "CommonGlobalDamageBoon",
-     "OmegaHeraProjectileBoon"
-    ],
-    [
-     "DamageSharePotencyBoon",
-     "SpawnCastDamageBoon"
-    ]
-   ]
-  },
-  "DoubleSwordBoon": {
-   "OneFromEachSet": [
-    [
-     "AresCastBoon",
-     "AresSprintBoon",
-     "OmegaDelayedDamageBoon",
-     "RendBloodDropBoon"
-    ],
-    [
-     "ApolloWeaponBoon",
-     "ApolloSpecialBoon",
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloManaBoon"
-    ]
-   ]
-  },
-  "LightningDebuffGeneratorBoon": {
-   "OneOf": [
-    "FocusLightningBoon"
-   ]
-  },
-  "BloodManaBurstBoon": {
-   "OneFromEachSet": [
-    [
-     "AresManaBoon",
-     "BloodDropRevengeBoon"
+     "ZeusWeaponBoon",
+     "ZeusSpecialBoon"
     ],
     [
      "AphroditeWeaponBoon",
@@ -635,51 +995,34 @@
     ]
    ]
   },
-  "BloodRetentionBoon": {
+  "SteamBoon": {
    "OneFromEachSet": [
     [
-     "AresManaBoon",
-     "BloodDropRevengeBoon"
-    ],
-    [
-     "HeraWeaponBoon",
-     "HeraSpecialBoon",
-     "HeraCastBoon",
-     "HeraSprintBoon",
-     "HeraManaBoon"
-    ]
-   ]
-  },
-  "AutoRevengeBoon": {
-   "OneFromEachSet": [
-    [
-     "AresWeaponBoon",
-     "AresSpecialBoon"
-    ],
-    [
-     "ZeusWeaponBoon",
-     "ZeusSpecialBoon",
-     "ZeusCastBoon",
-     "ZeusSprintBoon",
-     "ZeusManaBoon"
-    ],
-    [
-     "BloodDropRevengeBoon",
-     "ApolloRetaliateBoon",
-     "BoltRetaliateBoon"
-    ]
-   ]
-  },
-  "EchoBurnBoon": {
-   "OneFromEachSet": [
-    [
-     "ZeusWeaponBoon",
-     "ZeusSpecialBoon"
+     "PoseidonCastBoon",
+     "PoseidonStatusBoon"
     ],
     [
      "HestiaWeaponBoon",
      "HestiaSpecialBoon",
-     "HestiaCastBoon"
+     "HestiaCastBoon",
+     "HestiaSprintBoon",
+     "FireballManaSpecialBoon",
+     "CastProjectileBoon"
+    ]
+   ]
+  },
+  "StormSpawnBoon": {
+   "OneFromEachSet": [
+    [
+     "ApolloWeaponBoon",
+     "ApolloSpecialBoon",
+     "ApolloCastBoon",
+     "ApolloSprintBoon",
+     "ApolloManaBoon"
+    ],
+    [
+     "DemeterSprintBoon",
+     "CastNovaBoon"
     ]
    ]
   },
@@ -715,79 +1058,26 @@
     ]
    ]
   },
-  "ManaRestoreDamageBoon": {
-   "OneFromEachSet": [
-    [
-     "HeraWeaponBoon",
-     "HeraSpecialBoon",
-     "HeraCastBoon",
-     "HeraSprintBoon"
-    ],
-    [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon",
-     "HestiaSprintBoon",
-     "HestiaManaBoon"
-    ]
-   ]
-  },
-  "ApolloBlindBoon": {
+  "TimeStopLastStandBoon": {
    "OneOf": [
-    "ApolloCastBoon",
-    "ApolloSprintBoon",
-    "ApolloRetaliateBoon",
-    "BlindChanceBoon"
+    "HermesWeaponBoon",
+    "HermesSpecialBoon",
+    "HermesCastDiscountBoon",
+    "SprintShieldBoon",
+    "SorcerySpeedBoon",
+    "DodgeChanceBoon",
+    "SlowProjectileBoon",
+    "MoneyMultiplierBoon",
+    "TimedKillBuffBoon",
+    "RestockBoon",
+    "LuckyBoon"
    ]
   },
-  "DoubleMassiveAttackBoon": {
-   "OneFromEachSet": [
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusSprintBoon"
-    ],
-    [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon",
-     "HestiaSprintBoon",
-     "HestiaManaBoon"
-    ]
-   ]
-  },
-  "BlindChanceBoon": {
-   "OneOf": [
-    "ApolloWeaponBoon"
-   ],
-   "PriorityChance": 0.25
-  },
-  "AresExCastBoon": {
+  "WeakPotencyBoon": {
    "OneOf": [
     "AphroditeCastBoon",
-    "ApolloCastBoon",
-    "DemeterCastBoon",
-    "HephaestusCastBoon",
-    "HeraCastBoon",
-    "HestiaCastBoon",
-    "PoseidonCastBoon",
-    "ZeusCastBoon",
-    "AresCastBoon"
-   ]
-  },
-  "BlindClearBoon": {
-   "OneFromEachSet": [
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusSprintBoon"
-    ],
-    [
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloRetaliateBoon",
-     "BlindChanceBoon"
-    ]
+    "AphroditeSprintBoon",
+    "AphroditeManaBoon"
    ]
   },
   "WeakVulnerabilityBoon": {
@@ -795,78 +1085,6 @@
     "AphroditeCastBoon",
     "AphroditeSprintBoon",
     "AphroditeManaBoon"
-   ]
-  },
-  "MassiveCastBoon": {
-   "OneFromEachSet": [
-    [
-     "PoseidonWeaponBoon",
-     "PoseidonSpecialBoon",
-     "PoseidonCastBoon",
-     "PoseidonSprintBoon",
-     "PoseidonManaBoon"
-    ],
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusSprintBoon"
-    ]
-   ]
-  },
-  "ReboundingSparkBoon": {
-   "OneFromEachSet": [
-    [
-     "FocusLightningBoon"
-    ],
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusCastBoon",
-     "HephaestusSprintBoon",
-     "HephaestusManaBoon"
-    ]
-   ]
-  },
-  "BurnRefreshBoon": {
-   "OneFromEachSet": [
-    [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon"
-    ],
-    [
-     "AphroditeCastBoon",
-     "AphroditeSprintBoon",
-     "AphroditeManaBoon"
-    ]
-   ]
-  },
-  "BurnConsumeBoon": {
-   "OneFromEachSet": [
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon"
-    ],
-    [
-     "HestiaWeaponBoon",
-     "HestiaSpecialBoon",
-     "HestiaCastBoon"
-    ]
-   ]
-  },
-  "BurnArmorBoon": {
-   "OneOf": [
-    "HestiaWeaponBoon",
-    "HestiaSpecialBoon",
-    "HestiaCastBoon"
-   ]
-  },
-  "OmegaZeroBurnBoon": {
-   "OneOf": [
-    "HestiaWeaponBoon",
-    "HestiaSpecialBoon",
-    "HestiaCastBoon"
    ]
   },
   "WeaponUpgradeBoon": {
@@ -885,224 +1103,6 @@
      "MassiveDamageBoon",
      "AntiArmorBoon",
      "MassiveKnockupBoon"
-    ]
-   ]
-  },
-  "SpawnKillBoon": {
-   "OneFromEachSet": [
-    [
-     "ZeusWeaponBoon",
-     "ZeusSpecialBoon",
-     "ZeusCastBoon",
-     "ZeusSprintBoon",
-     "ZeusManaBoon"
-    ],
-    [
-     "FocusLightningBoon",
-     "ZeusManaBoltBoon",
-     "CastAnywhereBoon",
-     "BoltRetaliateBoon"
-    ],
-    [
-     "EchoExpirationBoon",
-     "DoubleBoltBoon",
-     "LightningDebuffGeneratorBoon"
-    ]
-   ]
-  },
-  "CharmCrowdBoon": {
-   "OneFromEachSet": [
-    [
-     "HeraWeaponBoon",
-     "HeraSpecialBoon",
-     "HeraCastBoon",
-     "HeraSprintBoon"
-    ],
-    [
-     "AphroditeCastBoon",
-     "AphroditeSprintBoon",
-     "AphroditeManaBoon"
-    ]
-   ]
-  },
-  "DoubleBloodDropBoon": {
-   "OneFromEachSet": [
-    [
-     "AresWeaponBoon",
-     "AresSpecialBoon"
-    ],
-    [
-     "AresManaBoon",
-     "BloodDropRevengeBoon"
-    ],
-    [
-     "AresExCastBoon",
-     "AresStatusDoubleDamageBoon",
-     "MissingHealthCritBoon",
-     "LowHealthLifestealBoon",
-     "OmegaDelayedDamageBoon"
-    ]
-   ]
-  },
-  "RootStrikeBoon": {
-   "OneFromEachSet": [
-    [
-     "ZeusWeaponBoon",
-     "ZeusSpecialBoon",
-     "ZeusCastBoon",
-     "ZeusSprintBoon",
-     "ZeusManaBoon"
-    ],
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon"
-    ]
-   ]
-  },
-  "SprintEchoBoon": {
-   "OneFromEachSet": [
-    [
-     "ZeusWeaponBoon",
-     "ZeusSpecialBoon"
-    ],
-    [
-     "AphroditeWeaponBoon",
-     "AphroditeSpecialBoon",
-     "AphroditeCastBoon",
-     "AphroditeSprintBoon",
-     "AphroditeManaBoon"
-    ]
-   ]
-  },
-  "StormSpawnBoon": {
-   "OneFromEachSet": [
-    [
-     "ApolloWeaponBoon",
-     "ApolloSpecialBoon",
-     "ApolloCastBoon",
-     "ApolloSprintBoon",
-     "ApolloManaBoon"
-    ],
-    [
-     "DemeterSprintBoon",
-     "CastNovaBoon"
-    ]
-   ]
-  },
-  "SpellMoonBeamTrait": {
-   "OneOf": [
-    "SuitHexAspect"
-   ]
-  },
-  "KeepsakeLevelBoon": {
-   "OneFromEachSet": [
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon",
-     "DemeterSprintBoon",
-     "DemeterManaBoon"
-    ],
-    [
-     "HeraWeaponBoon",
-     "HeraSpecialBoon",
-     "HeraCastBoon",
-     "HeraSprintBoon",
-     "HeraManaBoon"
-    ]
-   ]
-  },
-  "DoubleBoltBoon": {
-   "OneOf": [
-    "ZeusWeaponBoon",
-    "ZeusSpecialBoon",
-    "ZeusCastBoon",
-    "ZeusSprintBoon",
-    "ZeusManaBoltBoon",
-    "BoltRetaliateBoon",
-    "CastAnywhereBoon"
-   ]
-  },
-  "TimeStopLastStandBoon": {
-   "OneOf": [
-    "HermesWeaponBoon",
-    "HermesSpecialBoon",
-    "HermesCastDiscountBoon",
-    "SprintShieldBoon",
-    "SorcerySpeedBoon",
-    "DodgeChanceBoon",
-    "SlowProjectileBoon",
-    "MoneyMultiplierBoon",
-    "TimedKillBuffBoon",
-    "RestockBoon",
-    "LuckyBoon"
-   ]
-  },
-  "RendBloodDropBoon": {
-   "OneOf": [
-    "AresWeaponBoon",
-    "AresSpecialBoon",
-    "AresManaBoon",
-    "BloodDropRevengeBoon"
-   ]
-  },
-  "SpawnCastDamageBoon": {
-   "OneOf": [
-    "AphroditeCastBoon",
-    "ApolloCastBoon",
-    "DemeterCastBoon",
-    "HephaestusCastBoon",
-    "HeraCastBoon",
-    "HestiaCastBoon",
-    "PoseidonCastBoon",
-    "ZeusCastBoon",
-    "AresCastBoon"
-   ]
-  },
-  "DoubleStrikeChanceBoon": {
-   "OneOf": [
-    "AphroditeWeaponBoon",
-    "ApolloWeaponBoon",
-    "DemeterWeaponBoon",
-    "HephaestusWeaponBoon",
-    "HeraWeaponBoon",
-    "HestiaWeaponBoon",
-    "PoseidonWeaponBoon",
-    "ZeusWeaponBoon",
-    "AresWeaponBoon"
-   ]
-  },
-  "InstantRootKill": {
-   "OneFromEachSet": [
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon"
-    ],
-    [
-     "PlantHealthBoon",
-     "ReserveManaHitShieldBoon",
-     "BoonGrowthBoon"
-    ],
-    [
-     "SlowExAttackBoon",
-     "RootDurationBoon",
-     "CastAttachBoon"
-    ]
-   ]
-  },
-  "ClearRootBoon": {
-   "OneFromEachSet": [
-    [
-     "HephaestusWeaponBoon",
-     "HephaestusSpecialBoon",
-     "HephaestusSprintBoon"
-    ],
-    [
-     "DemeterWeaponBoon",
-     "DemeterSpecialBoon",
-     "DemeterCastBoon"
     ]
    ]
   }
