@@ -25,6 +25,7 @@ const trait = (id: string, name: string, slot: Slot | null, gods: string[] = [])
   slot,
   altSlot: null,
   gods,
+  requiredWeapon: null,
   requires: null,
 })
 

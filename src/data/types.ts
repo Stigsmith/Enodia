@@ -54,7 +54,44 @@ export type Trait = {
   altSlot: Slot | null
   /** the loot sets that offer it. A duo is offered by two */
   gods: GodId[]
+  /**
+   * The weapon this trait belongs to, which only the 24 aspects carry. No boon
+   * is weapon-gated at the eligibility level: the ValidWeapons lists inside the
+   * damage modifiers say where a bonus applies, not whether it can be offered.
+   */
+  requiredWeapon: WeaponId | null
   requires: Requirement | null
+}
+
+/** The game's internal weapon name, for example `WeaponStaffSwing`. */
+export type WeaponId = string
+
+/**
+ * The run, as the engines read it. DESIGN.md 3.3, with two changes the source
+ * forced.
+ *
+ * `held` carries a rarity per trait, because a slot held at Heroic can never be
+ * swapped and one held at Common can. `godsTaken` is separate from `godsSeen`
+ * because the cap counts pickups: `InteractLogic.HandleLootPickup` writes
+ * `LootTypeHistory` when the loot is taken, so seeing a god costs nothing.
+ */
+export type RunContext = {
+  weapon: WeaponId | null
+  aspect: TraitId | null
+  /** Exits remaining in the run. The engine's only clock. */
+  exitsLeft: number
+  held: Held
+  /** Olympians whose boon has been picked up. This is what the cap counts. */
+  godsTaken: GodId[]
+  /** Gods offered at an Exit, taken or not. Free, and useful for AT_RISK. */
+  godsSeen: GodId[]
+  /**
+   * `CurrentRun.MaxGodsPerRun or HeroData.MaxGodsPerRun`. Read from the run and
+   * never hardcoded: bounties override it to 1 or 2.
+   */
+  maxOlympians: number
+  /** The roster that counts toward the cap, derived from the loot data. */
+  olympians: readonly GodId[]
 }
 
 /** Traits by id. Built once, read everywhere, never mutated. */

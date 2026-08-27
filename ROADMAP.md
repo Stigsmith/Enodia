@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 4 of 11 complete, step 5 next |
+| **Build order step** | 5 of 11 complete, step 6 next |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -33,8 +33,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 2 | Validator wired into prebuild | **Done.** 8 checks, 38 unit tests. `npm run build` stops on a broken reference |
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
-| 5 | `engine/reachability.ts` | Next |
-| 6 | `engine/runsim.ts` | |
+| 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority. 114 tests, and it runs against the real 47 targets |
+| 6 | `engine/runsim.ts` | Next |
 | 7 | Setup screen, and the rail | |
 | 8 | **The timeline shell.** First shippable point | |
 | 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | |
@@ -95,11 +95,13 @@ These are real and none of them block step 2.
 
 **Engine**
 
-- A filled slot is not a proof of impossible. A swap can still arrive at `ReplaceChance`
-  0.1, so `engine/reachability.ts` must carry `swap` as a state between REACHABLE and DEAD
-  rather than collapsing it. `DESIGN.md` 4.2 has the corrected table
-- `src/data/load.ts` does not exist. `engine/slots.ts` takes its index as an argument, so
-  nothing has had to decide yet how the app gets its data into memory. Step 7 will
+- ~~A filled slot is not a proof of impossible~~. Handled: `obtainability` returns `swap`
+  as its own route, and only a set with nothing but swaps left in it is called a long shot
+- `src/data/load.ts` is a pure mapping and takes the parsed JSON as an argument, so nothing
+  has decided yet how the app gets its bytes into memory. `traits-resolved.json` is 1.3 MB
+  and this is a phone-first tool, so step 7 has a real decision to make
+- The verdicts are only as good as the targets. Every duo and legendary is a target today,
+  which is 47. Archetypes, once the owner writes them, are what turn that into a shortlist
 
 **Open questions**
 
