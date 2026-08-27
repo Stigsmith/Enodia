@@ -1,0 +1,388 @@
+/* The run surface and setup.
+ *
+ * No literal colour here: every value is a token from tokens.css, so a per-god
+ * theme swaps one ramp and this file does not change. VISUAL.md rule 2.
+ *
+ * Read on a phone, one hand, mid run. Targets are finger sized, the rail keeps
+ * fixed positions, and nothing moves when state changes. */
+
+.masthead {
+  margin-bottom: 2rem;
+}
+
+.tagline {
+  margin: 0.35rem 0 0;
+  color: var(--bone-dim);
+  font-size: 0.95rem;
+}
+
+.step-heading {
+  margin: 2rem 0 0.75rem;
+  font-family: var(--display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+.step-note {
+  margin: -0.4rem 0 0.9rem;
+  color: var(--bone-faint);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- setup -- */
+
+.weapon-grid,
+.aspect-row,
+.god-list,
+.boon-list,
+.rail {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.weapon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 0.6rem;
+}
+
+.weapon-card,
+.aspect-card,
+.god,
+.boon {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-response) var(--e-response), background var(--t-response) var(--e-response);
+}
+
+.weapon-card {
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.weapon-card img {
+  width: 100%;
+  max-width: 6rem;
+  height: auto;
+  border-radius: var(--r-hair);
+}
+
+.aspect-card img,
+.god img,
+.boon img {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-hair);
+  flex: none;
+}
+
+.weapon-card:hover,
+.aspect-card:hover,
+.god:hover,
+.boon:hover {
+  border-color: var(--div-5);
+  background: var(--ink-850);
+}
+
+.weapon-card.is-chosen,
+.aspect-card.is-chosen,
+.rarity.is-chosen {
+  border-color: var(--jade);
+  background: var(--ink-850);
+}
+
+.aspect-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+}
+
+.exits-field {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.exits-field button {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.exits-field output {
+  min-width: 2.5rem;
+  font-family: var(--mono);
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.begin {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 0.9rem;
+  border: 1px solid var(--jade-dim);
+  border-radius: var(--r-soft);
+  background: var(--ink-850);
+  color: var(--jade-hot);
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.begin:hover {
+  border-color: var(--jade);
+}
+
+/* ----------------------------------------------------------------- run -- */
+
+.run-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--div-2);
+}
+
+.run-what {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.run-aspect::before {
+  content: '\00b7';
+  margin: 0 0.5rem;
+  color: var(--bone-faint);
+}
+
+.run-aspect {
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.9rem;
+}
+
+.run-exits {
+  margin: 0 auto 0 0;
+  color: var(--bone-dim);
+  font-size: 0.9rem;
+}
+
+.run-exits strong {
+  font-family: var(--mono);
+  color: var(--bone);
+}
+
+.quiet {
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  padding: 0.35rem 0.8rem;
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.quiet:hover {
+  border-color: var(--div-3);
+  color: var(--bone-dim);
+}
+
+/* The rail. Fixed positions, never reordered, empty slots stay dark and stay
+ * in place. An empty Cast is the warning, and it is made of nothing. */
+
+.rail {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  margin: 1.25rem 0;
+}
+
+.rail-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.3rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-950);
+  text-align: center;
+}
+
+.rail-slot.is-filled {
+  border-color: var(--div-4);
+  background: var(--ink-900);
+}
+
+.rail-mark {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--div-3);
+  background: var(--ink-950);
+  overflow: hidden;
+}
+
+.rail-slot.is-filled .rail-mark {
+  border-color: var(--silver-sh);
+}
+
+.rail-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.rail-slot-name {
+  font-family: var(--display);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.rail-slot.is-filled .rail-slot-name {
+  color: var(--jade);
+}
+
+.rail-occupant {
+  font-size: 0.7rem;
+  line-height: 1.25;
+  color: var(--bone-faint);
+  overflow-wrap: anywhere;
+}
+
+.rail-slot.is-filled .rail-occupant {
+  color: var(--bone-dim);
+}
+
+/* ------------------------------------------------------------- logging -- */
+
+.god-list,
+.boon-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem;
+}
+
+.boon-slot {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--bone-faint);
+}
+
+.boon-blank {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-hair);
+  border: 1px dashed var(--div-4);
+  flex: none;
+}
+
+.rarity-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.rarity {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.pick-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+/* Unbuilt, and saying so. The only thing that may ever be this yellow. */
+.unbuilt {
+  margin: 2rem 0 0;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--div-3);
+  border-left: 2px solid var(--unbuilt);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.colophon {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-2);
+  color: var(--bone-faint);
+  font-size: 0.75rem;
+}
+
+.colophon p {
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

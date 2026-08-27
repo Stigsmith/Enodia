@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 
 import './ui/tokens.css'
 import './ui/base.css'
+import './ui/surface.css'
 import { App } from './App.tsx'
 
 const root = document.getElementById('root')
