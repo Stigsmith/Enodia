@@ -57,6 +57,90 @@ function ToLookup( t )
   return lookup
 end
 
+-- Inheritance. Bodies copied from the game: DeepCopyTable and
+-- ConcatTableValuesIPairs from UtilityLogic.lua, ProcessDataInheritance and
+-- DeepInheritData from RunData.lua around line 1363. Only 49 of 651 traits
+-- state a Slot; the rest inherit one, so nothing downstream can ask what slot
+-- a boon occupies until this has run.
+function DeepCopyTable( orig )
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for k,v in next, orig, nil do copy[k] = DeepCopyTable(v) end
+  else
+    copy = orig
+  end
+  return copy
+end
+
+function ConcatTableValuesIPairs( baseTable, tableToAdd )
+  if tableToAdd == nil then return baseTable end
+  for key, value in ipairs( tableToAdd ) do table.insert( baseTable, value ) end
+  return baseTable
+end
+
+-- RunData.lua:1323. One key, and it is why DebugOnly does not spread from a
+-- base template to every boon that inherits it.
+local inheritanceIgnores = { "DebugOnly" }
+
+function DeepInheritData( data, parentData )
+  for parentKey, parentValue in pairs( parentData ) do
+    local value = data[parentKey]
+    if data.NilValues ~= nil and data.NilValues[parentKey] then
+      data[parentKey] = nil
+    elseif value == "nil" then
+      data[parentKey] = nil
+      data.NilValues = data.NilValues or {}
+      data.NilValues[parentKey] = true
+    elseif value == nil then
+      if type(parentValue) == "table" then
+        data[parentKey] = DeepCopyTable( parentValue )
+      else
+        data[parentKey] = parentValue
+      end
+    elseif type(parentValue) == "table" and parentValue.DeepInheritance then
+      DeepInheritData( data[parentKey], parentValue )
+    elseif type(value) == "table" and ( value.Append or value.Prepend ) then
+      local parentTable = DeepCopyTable( parentValue )
+      if value.Append then
+        ConcatTableValuesIPairs( parentTable, value )
+        data[parentKey] = parentTable
+      else
+        ConcatTableValuesIPairs( value, parentTable )
+      end
+    end
+  end
+end
+
+function ProcessDataInheritance( data, dataStore )
+  if data.InheritFrom == nil then return end
+  local originalValues = {}
+  for k, ignoreKey in pairs( inheritanceIgnores ) do
+    originalValues[ignoreKey] = data[ignoreKey]
+  end
+  for k, inheritFromName in ipairs( data.InheritFrom ) do
+    local parentData = dataStore[inheritFromName]
+    if parentData ~= nil then
+      ProcessDataInheritance( parentData, dataStore )
+      DeepInheritData( data, parentData )
+    end
+  end
+  for k, ignoreKey in pairs( inheritanceIgnores ) do
+    data[ignoreKey] = originalValues[ignoreKey]
+  end
+end
+
+-- ProcessDataStore, minus ProcessSimpleExtractValues. That second pass turns
+-- ExtractValues into tooltip numbers, which is presentation and needs the live
+-- projectile and effect data. Nothing here reads it.
+function __resolveStore( store )
+  for name, data in pairs( store ) do
+    data.Name = name
+    ProcessDataInheritance( data, store )
+  end
+end
+
 -- Namespaces the trait data reads but that live outside these files.
 -- Auto-vivifying so a deep read like GameData.Foo.Bar yields a table, not a nil error.
 __autoreads = {}
@@ -198,6 +282,14 @@ for (const file of loadOrder()) {
 
 const grab = (name) => toPlain(lua.global.get(name))
 
+// Raw first, then resolved. traits.json stays the game's declaration, which is
+// what TraitRequirements and LinkedTraitData are written against, and
+// traits-resolved.json is what the game actually runs on once every InheritFrom
+// has been followed.
+const rawTraits = grab('TraitData')
+await lua.doString('__resolveStore(TraitData)')
+const resolvedTraits = grab('TraitData')
+
 const gameVersion = (() => {
   try {
     return readFileSync(join(GAME, 'packagever'), 'utf8').trim().slice(0, 60)
@@ -245,11 +337,22 @@ mkdirSync(OUT, { recursive: true })
 
 const summary = []
 for (const [fileName, luaName] of Object.entries(tables)) {
-  const data = grab(luaName)
+  const data = fileName === 'traits' ? rawTraits : grab(luaName)
   const count = data && typeof data === 'object' ? Object.keys(data).length : 0
   writeGenerated(fileName, { luaTable: luaName }, data)
   summary.push([fileName, luaName, count])
 }
+
+writeGenerated(
+  'traits-resolved',
+  {
+    luaTable: 'TraitData',
+    luaSource: 'ProcessDataInheritance and DeepInheritData, RunData.lua',
+    note:
+      'Every InheritFrom followed, the way the game does it at load. Use this to ask what a trait is. Use traits.json to see what the file actually declares.',
+  },
+  resolvedTraits
+)
 
 // ---------------------------------------------------------------------------
 // Display text. Lives in sjson, not Lua, so it gets its own pass.
@@ -408,6 +511,15 @@ if (failed.length) {
 }
 console.log('written to data/generated:')
 for (const [f, t, n] of summary) console.log(`  ${String(n).padStart(5)} keys  ${f}.json  (${t})`)
+
+{
+  const withSlot = (t) => Object.values(t).filter((v) => typeof v?.Slot === 'string').length
+  console.log(
+    `
+inheritance: ${withSlot(rawTraits)} of ${Object.keys(rawTraits).length} traits state a Slot, ` +
+      `${withSlot(resolvedTraits)} carry one once InheritFrom is followed`
+  )
+}
 
 console.log('\ndisplay text (sjson):')
 for (const [f, s, n] of textSummary) console.log(`  ${String(n).padStart(5)} entries  ${f}.json  (${s})`)

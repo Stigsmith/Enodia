@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import {
   checkAssets,
   checkCharset,
+  checkClassification,
   checkCounts,
   checkCurated,
   checkProvenance,
@@ -198,6 +199,19 @@ describe('classification', () => {
   it('leaves the base templates out, DebugOnly and all', () => {
     const found = classifyTraits(traits, requirements)
     expect([...found.duos, ...found.legendaries, ...found.hexDuos]).not.toContain('SynergyTrait')
+  })
+
+  it('fails a prerequisite form the engine cannot evaluate', () => {
+    const findings = checkClassification(
+      bundle({
+        generated: [
+          generated('traits', traits),
+          generated('requirements', { ...requirements, SomeNewBoon: { TwoOf: ['a', 'b', 'c'] } }),
+          generated('loot', {}),
+        ],
+      }),
+    )
+    expect(messages(findings, 'fail')).toContain('1 requirements use a form the engine does not evaluate')
   })
 
   it('reads OneOf as the gated form', () => {

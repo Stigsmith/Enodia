@@ -95,6 +95,10 @@ Do not restate these without the citation. Do not extend them without checking.
 | Rerolling is gated behind an Arcana card | `PanelRerollMetaUpgrade`, `CurrentRun.NumRerolls` |
 | Arcana card art maps by `Image = "CardArt_NN"`, and a source comment names each card | `MetaUpgradeData.lua` |
 | A god enters `LootTypeHistory` on **pickup**, not on offer. Declining an Exit costs nothing | `InteractLogic.HandleLootPickup` |
+| **A filled slot blocks the other gods' boon for that slot**, which is the lockout the project exists for | `GetPriorityTraits`: offers a core boon only when `not occupiedSlots[TraitData[name].Slot]` |
+| **It is not a proof of impossible.** A swap can still arrive at `ReplaceChance` **0.1**, after two completed runs, and only while the held boon can still be upgraded. `RarityUpgradeOrder` ends at Heroic, so **a Heroic boon locks its slot outright** | `GetReplacementTraits`, `HeroData.BoonData.ReplaceChance`, `TraitRarityData.RarityUpgradeOrder` |
+| Attack and Special are **guaranteed** a place in a priority offer that would otherwise contain neither | `guaranteedSlots = {"Melee", "Secondary"}` in `GetPriorityTraits` |
+| Only **45 boons occupy a core slot**, nine per slot, one per Olympian. Everything else a god offers occupies no slot at all | `Slot` over `traits-resolved.json` |
 | The Huntress fires below **99%** Magick, not "when low" | `LowManaThreshold = 0.99` in `TraitData_MetaUpgrade.lua` |
 
 ### What the files cannot tell you
@@ -198,6 +202,13 @@ The 46 `OneFromEachSet` blocks split 33 + 4 + 9: two-set duos, three-set duos, t
 legendaries. The tenth legendary and the nine Hex duos state their gates elsewhere.
 
 These are the numbers `npm run validate` prints and `data/baseline.json` holds it to.
+
+**Inheritance is resolved.** `traits-resolved.json` runs the game's own
+`ProcessDataInheritance` and `DeepInheritData` from `RunData.lua`, with
+`inheritanceIgnores = { "DebugOnly" }`. It matters more than it sounds: **only 49 of 651
+traits state a `Slot` and 122 carry one afterwards**, so anything asking what slot a boon
+occupies is blind without it. `traits.json` stays the raw declaration, because
+`TraitRequirements` and `LinkedTraitData` are written against that.
 
 **Not yet done:** display names. `Content/Game/Text/en/TraitText.en.sjson` is sjson, not
 Lua, and needs its own loader. Nothing renders to a player until that exists.

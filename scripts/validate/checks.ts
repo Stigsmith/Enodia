@@ -388,6 +388,26 @@ export function checkClassification(bundle: Bundle): Finding[] {
     ),
   )
 
+  // The game's HasTraitRequirements (RunLogic.lua:57) reads three forms: OneOf,
+  // TwoOf and OneFromEachSet. No trait in build 138174 uses TwoOf, and the
+  // engine does not evaluate it, so a patch introducing one would be read as
+  // satisfied and every verdict resting on it would be wrong.
+  const HANDLED_FORMS = ['OneOf', 'OneFromEachSet', 'PriorityChance']
+  const unknownForms: string[] = []
+  for (const [traitId, requirement] of Object.entries(requirements)) {
+    for (const form of Object.keys(dictOf(requirement))) {
+      if (!HANDLED_FORMS.includes(form)) unknownForms.push(`${traitId}.${form}`)
+    }
+  }
+  if (unknownForms.length) {
+    out.push(
+      fail('classification', `${unknownForms.length} requirements use a form the engine does not evaluate`, [
+        ...cap(unknownForms),
+        `Handled: ${HANDLED_FORMS.join(', ')}. Teach engine/reachability.ts the new one before shipping.`,
+      ]),
+    )
+  }
+
   // Every duo and legendary should state its prerequisites in TraitRequirements.
   // The Hex duos deliberately do not: theirs are GameStateRequirements.
   const missing = [...found.duos, ...found.legendaries].filter((id) => !requirements[id])
