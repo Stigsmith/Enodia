@@ -13,13 +13,15 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 6 of 11 complete, step 7 next |
+| **Build order step** | 7 of 11 complete, step 8 next, which is the first shippable point |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
-Nothing is implemented beyond the data layer and its validator. The app renders a shell that
-says so. The hand-authored page moved to `placeholder/index.html`, still live on Netlify,
-and `dist/` is Vite's now.
+The app runs. Setup produces a real run, the rail shows what you hold, and logging a Cast
+boon removes every other god's Cast boon from the picker, which is the lockout working in
+the product rather than in a test. The timeline is next and is the first shippable point.
+
+The hand-authored page is still `placeholder/index.html` and still what Netlify serves.
 
 ---
 
@@ -35,8 +37,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
 | 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority. 114 tests, and it runs against the real 47 targets |
 | 6 | `engine/runsim.ts` | **Done.** Seeded, legal runs. The dead-stays-dead property holds over 25 of them |
-| 7 | Setup screen, and the rail | Next |
-| 8 | **The timeline shell.** First shippable point | |
+| 7 | Setup screen, and the rail | **Done.** Weapon, aspect and Exits in, a real RunContext out, and the rail fills as you log |
+| 8 | **The timeline shell.** First shippable point | Next |
 | 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | |
 | 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | |
 | 11 | The offer block inside the present entry | |
@@ -97,9 +99,13 @@ These are real and none of them block step 2.
 
 - ~~A filled slot is not a proof of impossible~~. Handled: `obtainability` returns `swap`
   as its own route, and only a set with nothing but swaps left in it is called a long shot
-- `src/data/load.ts` is a pure mapping and takes the parsed JSON as an argument, so nothing
-  has decided yet how the app gets its bytes into memory. `traits-resolved.json` is 1.3 MB
-  and this is a phone-first tool, so step 7 has a real decision to make
+- ~~How the app gets its data~~. `npm run data` projects `data/generated` through
+  `src/data/load.ts` into `data/app/app-data.json`, 78 KB and 15 gzipped, imported rather
+  than fetched. One mapping, shared by the app, the tests and the validator
+- **`publicDir` is `assets/`,** so a manifest path is also a URL. 35 MB ships, 23 of which
+  is Arcana card art Phase 1 never renders. Downscale it before a real deploy
+- The Exit count in Setup defaults to 12 and is a placeholder. The real number wants region
+  data, which is not extracted
 - The verdicts are only as good as the targets. Every duo and legendary is a target today,
   which is 47. Archetypes, once the owner writes them, are what turn that into a shortlist
 

@@ -23,9 +23,9 @@ body {
 }
 
 .shell {
-  max-width: 34rem;
+  max-width: 46rem;
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: 2.5rem 1.25rem 4rem;
 }
 
 .wordmark {
@@ -42,6 +42,7 @@ body {
   color: var(--bone-dim);
 }
 
+/* Kept for the pre-setup shell. The run surface styles live in surface.css. */
 .state {
   margin: 0;
   padding: 1rem 1.25rem;
