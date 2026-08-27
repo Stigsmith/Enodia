@@ -81,11 +81,13 @@ src/
   data/
     load.ts          joins generated + curated on id, once, at module init
     types.ts
+    icons.ts         the asset join. slug from display name, one implementation
   ui/
   state/             the run context, localStorage adapter
 scripts/
   extract.ts         lua -> data/generated
   validate.ts        wired into prebuild
+  assets.ts          writes assets/manifest.json, fills gaps from the extraction
   health.ts          rule population measurement
 ```
 

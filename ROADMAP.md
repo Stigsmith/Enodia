@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 2 of 11 complete, step 3 next |
+| **Build order step** | 3 of 11 complete, step 4 next |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -31,8 +31,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 |---:|---|---|
 | 1 | Extractor, Lua to `data/generated` | **Done.** 57 files, zero failures. Text and stacking curves included |
 | 2 | Validator wired into prebuild | **Done.** 8 checks, 38 unit tests. `npm run build` stops on a broken reference |
-| 3 | Asset join, every trait has an icon or a recorded gap | Next |
-| 4 | `engine/slots.ts` and the type layer | |
+| 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 306 of 310 offerable traits have art, 4 gaps recorded |
+| 4 | `engine/slots.ts` and the type layer | Next |
 | 5 | `engine/reachability.ts` | |
 | 6 | `engine/runsim.ts` | |
 | 7 | Setup screen, and the rail | |
@@ -77,10 +77,14 @@ These are real and none of them block step 2.
 
 **Assets**
 
-- 144 of 579 trait icons unmatched, mostly `Hammer_` and `Shop_`. The wiki already
-  covers the hammers
+- ~~144 of 579 trait icons unmatched~~. **Closed for the set that matters:** 306 of the
+  310 traits a run can offer have art. The remaining 4 are Daedalus Hammer upgrades that
+  are in neither the game package nor the wiki scrape, and they are recorded in
+  `data/curated/icons.json` so the build stays honest about them
 - Aspect numbering in `assets/aspects/` unverified. The extractor can now resolve it
-- Missing: familiars, status effect icons, Tartarus region art
+- Missing: familiars, status effect icons, Tartarus region art, and 4 hammer icons
+- 17 wiki images lost their manifest row when someone moved them between categories.
+  `npm run assets` names them
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,
   and the app now imports it directly
 

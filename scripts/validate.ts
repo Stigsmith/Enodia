@@ -17,12 +17,14 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
 import { countsOf, coverageOf, runAllChecks } from './validate/checks.ts'
+import type { Manifest } from '../src/data/icons.ts'
 import type { Baseline, Bundle, CuratedFile, Finding, GeneratedFile, SourceFile, SourceKind } from './validate/types.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const GENERATED = join(ROOT, 'data/generated')
 const CURATED = join(ROOT, 'data/curated')
 const BASELINE = join(ROOT, 'data/baseline.json')
+const ASSETS = join(ROOT, 'assets')
 
 const argv = process.argv.slice(2)
 const verbose = argv.includes('--verbose')
@@ -105,6 +107,29 @@ function loadSources(): SourceFile[] {
   return files
 }
 
+const IMAGE = /\.(webp|png|jpg|jpeg)$/i
+
+/** assets/manifest.json. PowerShell wrote it once with a BOM, so strip one. */
+function loadManifest(): Manifest | null {
+  const path = join(ASSETS, 'manifest.json')
+  if (!existsSync(path)) return null
+  const raw = JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, '')) as Manifest
+  return Array.isArray(raw.assets) ? raw : { ...raw, assets: [] }
+}
+
+/** Every image on disk, as a path under assets/. */
+function loadAssetFiles(): string[] {
+  if (!existsSync(ASSETS)) return []
+  const out: string[] = []
+  for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue
+    for (const file of readdirSync(join(ASSETS, dir.name))) {
+      if (IMAGE.test(file)) out.push(`${dir.name}/${file}`)
+    }
+  }
+  return out.sort()
+}
+
 function loadBaseline(): Baseline | null {
   if (!existsSync(BASELINE)) return null
   const raw = JSON.parse(readFileSync(BASELINE, 'utf8')) as Partial<Baseline>
@@ -147,6 +172,8 @@ const bundle: Bundle = {
   curated: loadCurated(),
   sources: loadSources(),
   baseline: loadBaseline(),
+  manifest: loadManifest(),
+  assetFiles: loadAssetFiles(),
 }
 
 if (!bundle.generated.length) {
@@ -176,7 +203,7 @@ const warnings = findings.filter((f) => f.severity === 'warn')
 
 console.log(
   `\n${failures.length} failures, ${warnings.length} warnings, across ${bundle.generated.length} generated files, ` +
-    `${bundle.curated.length} curated files and ${bundle.sources.length} source files`,
+    `${bundle.curated.length} curated files, ${bundle.sources.length} source files and ${bundle.assetFiles.length} images`,
 )
 
 if (failures.length) {

@@ -8,6 +8,8 @@
  * A `fail` finding fails the build. A `warn` is printed and does not.
  */
 
+import { buildIconIndex, resolveIcon } from '../../src/data/icons.ts'
+import type { IconOverrides } from '../../src/data/icons.ts'
 import type { Bundle, Finding, SourceFile } from './types.ts'
 
 type Dict = Record<string, unknown>
@@ -310,6 +312,34 @@ export function classifyTraits(traits: Dict, requirements: Dict): Classification
   }
 }
 
+/**
+ * Every trait a run can actually put in front of a player.
+ *
+ * The loot pools, plus the three kinds that are never listed in a pool because
+ * they arrive by prerequisite: duos, legendaries and Selene's Hex duos. This is
+ * the set that needs art, and the set the run surface renders.
+ */
+export function offerableTraits(traits: Dict, loot: Dict): string[] {
+  const out = new Set<string>()
+
+  const POOL_FIELDS = ['Traits', 'PermanentTraits', 'TemporaryTraits', 'WeaponUpgrades']
+  for (const set of Object.values(loot)) {
+    for (const record of Object.values(dictOf(set))) {
+      const rec = dictOf(record)
+      for (const field of POOL_FIELDS) {
+        for (const id of stringsOf(rec[field])) out.add(id)
+      }
+    }
+  }
+
+  const found = classifyTraits(traits, {})
+  for (const id of [...found.duos, ...found.legendaries, ...found.hexDuos]) out.add(id)
+
+  // A pool can name a trait the trait data does not define. That is the
+  // references check's problem, not this one.
+  return [...out].filter((id) => traits[id] !== undefined).sort()
+}
+
 /** Which loot sets offer a given trait. Used to check a duo spans two gods. */
 export function offeredBy(loot: Dict): Map<string, string[]> {
   const out = new Map<string, string[]>()
@@ -516,31 +546,43 @@ export function extractUiStrings(file: SourceFile): UiString[] {
     }
 
     if (file.kind === 'html') {
+      let rest = line
+
+      // A script or style block, or a comment, carries across lines. Pick up
+      // again after the closing tag, since text after it is copy again.
       if (inScriptOrStyle) {
-        if (/<\/(script|style)>/i.test(line)) inScriptOrStyle = false
-        return
-      }
-      // A whole block on one line, then a block that opens and runs on.
-      const withoutBlocks = line.replace(/<(script|style)[^>]*>.*?<\/>/gi, ' ')
-      if (/<(script|style)[\s>]/i.test(withoutBlocks)) {
-        inScriptOrStyle = true
-        return
+        const close = rest.match(/<\/(script|style)>/i)
+        if (!close) return
+        inScriptOrStyle = false
+        rest = rest.slice((close.index ?? 0) + close[0].length)
       }
       if (inBlockComment) {
-        if (line.includes('-->')) inBlockComment = false
-        return
+        const close = rest.indexOf('-->')
+        if (close === -1) return
+        inBlockComment = false
+        rest = rest.slice(close + 3)
       }
-      if (line.includes('<!--') && !line.includes('-->')) {
+
+      // Blocks that open and close on this line drop out whole.
+      rest = rest.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ').replace(/<!--[\s\S]*?-->/g, ' ')
+
+      // Anything still open runs on to a later line.
+      const opening = rest.match(/<(script|style)\b[^>]*>/i)
+      if (opening) {
+        inScriptOrStyle = true
+        rest = rest.slice(0, opening.index ?? 0)
+      }
+      const commentAt = rest.indexOf('<!--')
+      if (commentAt !== -1) {
         inBlockComment = true
-        return
+        rest = rest.slice(0, commentAt)
       }
-      let stripped = withoutBlocks.replace(/<!--.*?-->/g, '')
-      // Attributes a reader sees, then whatever sits between tags.
-      for (const m of stripped.matchAll(/\b(?:title|alt|aria-label|placeholder|content)\s*=\s*"([^"]*)"/gi)) {
+
+      // Attributes a reader sees, then every text node between the tags.
+      for (const m of rest.matchAll(/\b(?:title|alt|aria-label|placeholder|content)\s*=\s*"([^"]*)"/gi)) {
         add(m[1] ?? '')
       }
-      stripped = stripped.replace(/<[^>]*>/g, ' ')
-      for (const chunk of stripped.split(' ')) add(chunk)
+      for (const chunk of rest.replace(/<[^>]*>/g, '\u0000').split('\u0000')) add(chunk)
       return
     }
 
@@ -850,6 +892,113 @@ export function checkCharset(bundle: Bundle): Finding[] {
 }
 
 // ---------------------------------------------------------------------------
+// 9. Assets. Build order step 3: every trait has an icon or is listed in
+//    knownGaps, and the gap count is reported against assets/manifest.json.
+// ---------------------------------------------------------------------------
+
+/** knownGaps and overrides, read out of data/curated/icons.json if it exists. */
+export function iconCuration(bundle: Bundle): { gaps: Set<string>; overrides: IconOverrides } {
+  const gaps = new Set<string>()
+  const overrides: IconOverrides = new Map()
+
+  for (const file of bundle.curated) {
+    if (!file.path.endsWith('icons.json')) continue
+    const doc = dictOf(file.json)
+    for (const gap of Array.isArray(doc.knownGaps) ? doc.knownGaps : []) {
+      // A gap is a trait id, or a record naming one and saying why.
+      if (typeof gap === 'string') gaps.add(gap)
+      else if (isDict(gap) && typeof gap.id === 'string') gaps.add(gap.id)
+    }
+    for (const record of Array.isArray(doc.records) ? doc.records : []) {
+      const rec = dictOf(record)
+      if (typeof rec.id === 'string' && typeof rec.asset === 'string') overrides.set(rec.id, rec.asset)
+    }
+  }
+  return { gaps, overrides }
+}
+
+export function checkAssets(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  const traits = generatedData(bundle, 'traits')
+  if (!Object.keys(traits).length) return out
+
+  if (!bundle.manifest) {
+    return [fail('assets', 'no assets/manifest.json', ['Write one with npm run assets'])]
+  }
+
+  // 1. The manifest has to describe the directory. It went stale once already,
+  //    when the wiki Arcana were replaced with game art and nothing rewrote it.
+  const onDisk = new Set(bundle.assetFiles)
+  const inManifest = new Set((bundle.manifest.assets ?? []).map((entry) => entry.file))
+  const vanished = [...inManifest].filter((file) => !onDisk.has(file))
+  const unlisted = [...onDisk].filter((file) => !inManifest.has(file))
+
+  if (vanished.length) {
+    out.push(
+      fail('assets', `${vanished.length} manifest entries name a file that is not on disk`, [
+        ...cap(vanished),
+        'Rebuild it with npm run assets.',
+      ]),
+    )
+  }
+  if (unlisted.length) {
+    out.push(
+      fail('assets', `${unlisted.length} images on disk are not in the manifest`, [
+        ...cap(unlisted),
+        'Rebuild it with npm run assets.',
+      ]),
+    )
+  }
+
+  // 2. Every trait a run can offer has art, or a recorded reason it does not.
+  const names = generatedData(bundle, 'text-traits')
+  const { gaps, overrides } = iconCuration(bundle)
+  const index = buildIconIndex(bundle.manifest)
+
+  const offerable = offerableTraits(traits, generatedData(bundle, 'loot'))
+  const missing: string[] = []
+  const recorded: string[] = []
+  let matched = 0
+
+  for (const id of offerable) {
+    const displayName = dictOf(names[id]).name
+    const found = resolveIcon(id, typeof displayName === 'string' ? displayName : null, index, overrides)
+    if (found.found) matched += 1
+    else if (gaps.has(id)) recorded.push(id)
+    else missing.push(`${id}  "${typeof displayName === 'string' ? displayName : '(no display name)'}"  ${found.why}`)
+  }
+
+  out.push(
+    info(
+      'assets',
+      `${matched} of ${offerable.length} offerable traits have art, ${recorded.length} gaps recorded, ${bundle.assetFiles.length} images in the library`,
+    ),
+  )
+
+  if (missing.length) {
+    out.push(
+      fail('assets', `${missing.length} offerable traits have neither art nor a recorded gap`, [
+        ...cap(missing),
+        'Fill them with npm run assets -- --fill, or record them in data/curated/icons.json knownGaps.',
+      ]),
+    )
+  }
+
+  // An id in knownGaps that now resolves is a gap someone quietly closed.
+  const stale = [...gaps].filter((id) => {
+    const displayName = dictOf(names[id]).name
+    return resolveIcon(id, typeof displayName === 'string' ? displayName : null, index, overrides).found
+  })
+  if (stale.length) {
+    out.push(
+      warn('assets', `${stale.length} recorded gaps now have art`, [...cap(stale), 'Remove them from data/curated/icons.json.']),
+    )
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
 
 export function runAllChecks(bundle: Bundle): Finding[] {
   return [
@@ -860,6 +1009,7 @@ export function runAllChecks(bundle: Bundle): Finding[] {
     ...checkVocabulary(bundle),
     ...checkRoster(bundle),
     ...checkCurated(bundle),
+    ...checkAssets(bundle),
     ...checkCharset(bundle),
   ]
 }
