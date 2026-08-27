@@ -55,6 +55,10 @@ named game art and can be deleted on the next wiki rebuild.
 Every file is listed in `manifest.json` with its category, byte size, SHA-256, the original
 wiki filename, and the wiki page it was scraped from.
 
+Provenance follows the bytes, not the path: `npm run assets` carries a wiki source page
+forward by checksum when a file has been renamed. Renaming the 25 aspect renders dropped
+their source pages the first time, which is how that got noticed.
+
 ## Categories
 
 | Category | Files | Source | Contents | Status |
@@ -63,20 +67,21 @@ wiki filename, and the wiki page it was scraped from.
 | `hammers/` | 111 | wiki | Daedalus Hammer upgrade icons, scraped per weapon page | 101 need verification |
 | `duos/` | 48 | mixed, 46 wiki and 2 game | Duo boon icons | complete, 37 of 37 |
 | `keepsakes/` | 33 | wiki | Keepsake icons | complete |
-| `aspects/` | 53 | mixed, 29 wiki and 24 game | Weapon aspect icons from the game, plus the wiki's large renders | complete, 24 icons and 24 renders |
+| `aspects/` | 56 | mixed, 30 wiki and 26 game | Aspect icons from the game, the wiki's large renders, and the Black Coat candidates | complete, 24 icons and 24 renders |
 | `characters/` | 27 | wiki | Non-boon-granting character portraits | good |
 | `gods/` | 16 | wiki | Boon-granting god portraits | complete |
 | `infusions/` | 11 | wiki | Elemental infusion boons | unverified count |
 | `artifacts/` | 11 | wiki | Consumables and run items | partial |
-| `biomes/` | 8 | wiki | Region art | missing Tartarus |
+| `biomes/` | 9 | mixed, 8 wiki and 1 game | Region art | complete, Tartarus came out of the run history icons |
 | `elements/` | 6 | wiki | Aether, Air, Earth, Fire, Water, Elemental Essence | complete |
-| `ui/` | 19 | wiki | Wiki section icons | low value, replace |
+| `ui/` | 19 | wiki | Wiki section icons | low value, chrome/ replaces it |
 | `slots/` | 5 | wiki | Attack, Special, Cast, Dash, Magick | complete |
 | `arcana/` | 25 | game | Arcana cards, named, from game files | complete |
 | `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic, from game files | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
-| `chrome/` | 14 | game | The game's own furniture: the Hammer screen medallion and feathers, location title plates, the victory banners, the item-consume burst | a starting set, see below |
+| `chrome/` | 14 | game | The game's own furniture: medallion, feathers, title plates, victory banners | a starting set |
+| `weapons/` | 12 | game | The six Nocturnal Arms, a Codex card and a shrine silhouette each | complete, 6 of 6 |
 
 ### Aspect naming, resolved 27 August 2026
 
@@ -144,7 +149,6 @@ Still open:
 | **Black Coat base render** | 1 | 0 | `aspects/coat-melinoe-render.webp` is the wiki's `Weapon_Coat01`, and it is unusable: the coat's parts are scattered at odd angles with a stray thumbnail in the corner, where the other three coat renders are properly composed. The 90x90 game icon is fine, so nothing is blocked | The wiki has no `Xinth - Aspect of Melinoë` image. Either the wiki's Weapons page has a better one, or it wants an in-game screenshot |
 | **Familiars** | 5 | 0 | Roster art | `GUI.pkg` has only cosmetic effigies. Try `CatFamiliar.pkg`, `FrogFamiliar.pkg`, `HoundFamiliar.pkg`, `PolecatFamiliar.pkg`, `RavenFamiliar.pkg` |
 | **Status effect icons** | ~15 | 0 | Needed for tag filtering | Not yet located |
-| **Biome: Tartarus** | 1 | 0 | Hole in the region strip | `BiomeMap.pkg` (24 MB) is the next thing to extract |
 | **Resource icons** | ~10 | 3 | Ash, Psyche, Bones, Moon Dust, Nectar, Grasp | Partly in `GUI/Icons`, worth a second pass |
 
 ### Correction, 27 August 2026: the boon icons were there all along
@@ -248,6 +252,29 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
+
+### The Black Coat base image, and why no source has a better one
+
+The wiki's `Weapon_Coat01.webp` is not a bad scrape. It is the game's own Codex card with
+the parchment cut away, and the game really does draw the Black Coat as a flat lay of
+gauntlets, boots and a folded pile. The coat is worn rather than held, so there is no
+assembled-weapon pose to find. Every source was checked: `GUI.pkg`, `WeaponSuit.pkg` and
+`Melinoe.pkg` hold Fx frames and portraits, and the weapon itself is a Granny model, which
+is 3D and not an image.
+
+So the choice is between framings, not between compositions. All of them are in
+`aspects/` for the owner to pick from:
+
+| File | What it is |
+|---|---|
+| `coat-melinoe.png` | The game's 90x90 aspect icon. Clean, framed, consistent with the other 23 |
+| `coat-melinoe-alt-codex-card.png` | The whole Codex card, 369x492, parchment and all |
+| `coat-melinoe-alt-shrine-mark.png` | The 90x50 silhouette from the Oath of the Unseen screen. Tiny and very legible |
+| `coat-melinoe-alt-wiki-icon.webp` | The wiki's 88x88 copy of the aspect icon |
+| `coat-melinoe-render.webp` | The wiki cutout, kept for comparison |
+
+Once one is chosen the others should go, and the choice belongs under `coat-melinoe` or
+`coat-melinoe-render` so the join keeps working without an override.
 
 ### The animated plates
 

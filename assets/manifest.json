@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 683,
+ "count": 699,
  "categories": [
   {
    "name": "arcana",
@@ -18,15 +18,17 @@
   },
   {
    "name": "aspects",
-   "count": 53,
+   "count": 56,
    "source": "mixed",
-   "wiki": 29,
-   "game": 24
+   "wiki": 30,
+   "game": 26
   },
   {
    "name": "biomes",
-   "count": 8,
-   "source": "wiki"
+   "count": 9,
+   "source": "mixed",
+   "wiki": 8,
+   "game": 1
   },
   {
    "name": "boons",
@@ -100,6 +102,11 @@
   {
    "name": "vows",
    "count": 19,
+   "source": "game"
+  },
+  {
+   "name": "weapons",
+   "count": 12,
    "source": "game"
   }
  ],
@@ -474,7 +481,9 @@
    "bytes": 21438,
    "sha256": "fdca6a713b42102021e1c2319c12f7b0882050c941ccd4d9a8e7aacef212a02e",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Axe02.webp",
+   "sourcePage": "Moonstone Axe",
+   "weapon": "axe"
   },
   {
    "id": "axe-charon",
@@ -491,7 +500,9 @@
    "bytes": 20186,
    "sha256": "d2f600107c1b089de6b83d4dfe6d17c9a1d8687b1fc18d40a524d737f65f2e34",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Axe01.webp",
+   "sourcePage": "Moonstone Axe",
+   "weapon": "axe"
   },
   {
    "id": "axe-melinoe",
@@ -508,7 +519,9 @@
    "bytes": 19272,
    "sha256": "5b82838080a7c4964409471c273babe184a2c06f49ba1cce9f33dc62e5dea937",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Axe04.webp",
+   "sourcePage": "Moonstone Axe",
+   "weapon": "axe"
   },
   {
    "id": "axe-nergal",
@@ -525,7 +538,9 @@
    "bytes": 13800,
    "sha256": "a6000045e9b4285d20c1d0e7caa45ae3ed5c55e29ba6cc8bf87faaf17ea014b8",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Axe03.webp",
+   "sourcePage": "Moonstone Axe",
+   "weapon": "axe"
   },
   {
    "id": "axe-thanatos",
@@ -542,7 +557,9 @@
    "bytes": 18592,
    "sha256": "6d7d8d7baf41d09551585a4805545e0cf234cdd41811a864b1fbf02200a42a9a",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Dagger02.webp",
+   "sourcePage": "Sister Blades",
+   "weapon": "blades"
   },
   {
    "id": "blades-artemis",
@@ -559,7 +576,9 @@
    "bytes": 9004,
    "sha256": "8e5630413831515bb122a153af5bc3e55b4a8342cb4c3aee93d260f1ee1e3215",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Dagger01.webp",
+   "sourcePage": "Sister Blades",
+   "weapon": "blades"
   },
   {
    "id": "blades-melinoe",
@@ -576,7 +595,9 @@
    "bytes": 14106,
    "sha256": "4c1bcad130ed61890c9e3599278d871c0022a03f2a35038d68e537ba2625f9b2",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Dagger04.webp",
+   "sourcePage": "Sister Blades",
+   "weapon": "blades"
   },
   {
    "id": "blades-pan",
@@ -593,7 +614,9 @@
    "bytes": 15352,
    "sha256": "3780d67de82cf486cad1d3a2f0039291f222742c05e55516fad7a6923cda2c19",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Dagger03.webp",
+   "sourcePage": "Sister Blades",
+   "weapon": "blades"
   },
   {
    "id": "blades-the-morrigan",
@@ -604,13 +627,43 @@
    "source": "game"
   },
   {
+   "id": "coat-melinoe-alt-codex-card",
+   "category": "aspects",
+   "file": "aspects/coat-melinoe-alt-codex-card.png",
+   "bytes": 120576,
+   "sha256": "0d6ad1d73d6862119eaf7c874039da178795030044d233d7dbf0b912947a00c6",
+   "source": "game"
+  },
+  {
+   "id": "coat-melinoe-alt-shrine-mark",
+   "category": "aspects",
+   "file": "aspects/coat-melinoe-alt-shrine-mark.png",
+   "bytes": 2057,
+   "sha256": "1f863466e9bae6246ed12f48168a5261fc661bb566bdb2a3773abc1d94031dd8",
+   "source": "game"
+  },
+  {
+   "id": "coat-melinoe-alt-wiki-icon",
+   "category": "aspects",
+   "file": "aspects/coat-melinoe-alt-wiki-icon.webp",
+   "bytes": 3852,
+   "sha256": "59a3cc2c19918cec3368a18fa20863305fac1d5619ff420f5b863151c5e180f6",
+   "source": "wiki",
+   "sourceFile": "Coat_Melino-3F.webp",
+   "sourcePage": "Black Coat",
+   "weapon": "coat",
+   "needsVerification": true
+  },
+  {
    "id": "coat-melinoe-render",
    "category": "aspects",
    "file": "aspects/coat-melinoe-render.webp",
    "bytes": 23734,
    "sha256": "3995d450630a7bc30698f1dff4d5f766a1f72c296a66d8d852b1e5ff6e74c33c",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Coat01.webp",
+   "sourcePage": "Black Coat",
+   "weapon": "coat"
   },
   {
    "id": "coat-melinoe",
@@ -627,7 +680,9 @@
    "bytes": 22300,
    "sha256": "4420b173a3f1222ad2936b7552048d1c194aa94b5d48e79c3138f3cf8ee60b0c",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Xinth_-_Aspect_of_Nyx.webp",
+   "sourcePage": "Black Coat",
+   "weapon": "coat"
   },
   {
    "id": "coat-nyx",
@@ -644,7 +699,9 @@
    "bytes": 30124,
    "sha256": "7e1db481bbb0fadddf390820069d33cf0a31bf8995ad1a4a959d40a94c180dcb",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Xinth_-_Aspect_of_Selene.webp",
+   "sourcePage": "Black Coat",
+   "weapon": "coat"
   },
   {
    "id": "coat-selene",
@@ -661,7 +718,9 @@
    "bytes": 27506,
    "sha256": "868d0b837fde980822f04f377cfbba376a030c4c09e431964bb9772cd19fddf6",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Xinth_-_Aspect_of_Shiva.webp",
+   "sourcePage": "Black Coat",
+   "weapon": "coat"
   },
   {
    "id": "coat-shiva",
@@ -678,7 +737,9 @@
    "bytes": 27378,
    "sha256": "58de11b7c9ff35dff05b37b58dca054af4d1453273fa3c193e5215bb07015712",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Torch03.webp",
+   "sourcePage": "Umbral Flames",
+   "weapon": "flames"
   },
   {
    "id": "flames-eos",
@@ -695,7 +756,9 @@
    "bytes": 16212,
    "sha256": "dcc1c42a104a4f69be6de2073141502e7dff69fdc73ee74ec81d8bc4f9802a0a",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Torch01.webp",
+   "sourcePage": "Umbral Flames",
+   "weapon": "flames"
   },
   {
    "id": "flames-melinoe",
@@ -712,7 +775,9 @@
    "bytes": 19844,
    "sha256": "a5db44b047257a4b30d1ce92d9facfbbcdcbff43e3d5cab2a333d009bdd18aeb",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Torch02.webp",
+   "sourcePage": "Umbral Flames",
+   "weapon": "flames"
   },
   {
    "id": "flames-moros",
@@ -729,7 +794,9 @@
    "bytes": 21920,
    "sha256": "5ae4b0d4d0cbb2d292c45df960b0c986f5f32d95860bd909868026192afde02c",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Torch04.webp",
+   "sourcePage": "Umbral Flames",
+   "weapon": "flames"
   },
   {
    "id": "flames-supay",
@@ -746,7 +813,9 @@
    "bytes": 26634,
    "sha256": "71bc90568468dad176098247653763c645862461eb3a0d35e78c0a4feab18001",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Skull04.webp",
+   "sourcePage": "Argent Skull",
+   "weapon": "skull"
   },
   {
    "id": "skull-hel",
@@ -763,7 +832,9 @@
    "bytes": 14706,
    "sha256": "2daf8e38fa7f4435b5c28af6448ef805ecac21b0fb2bbc89b752408878ed78f9",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Skull02.webp",
+   "sourcePage": "Argent Skull",
+   "weapon": "skull"
   },
   {
    "id": "skull-medea",
@@ -780,7 +851,9 @@
    "bytes": 17904,
    "sha256": "1e8c3ff3bf634115145f7ebdb258e93fb5bdb8715337e67c9e2c8a1b6f6f6fa8",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Skull01.webp",
+   "sourcePage": "Argent Skull",
+   "weapon": "skull"
   },
   {
    "id": "skull-melinoe",
@@ -797,7 +870,9 @@
    "bytes": 22592,
    "sha256": "16ae75a97d226eba48ffe8bf103328aabf12edf34fbacbf27b745db6fddc21aa",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Skull03.webp",
+   "sourcePage": "Argent Skull",
+   "weapon": "skull"
   },
   {
    "id": "skull-persephone",
@@ -814,7 +889,9 @@
    "bytes": 18584,
    "sha256": "4260cba3248a53733416d900632b068e7b11d45bdbdd8e560571f67bca9c47c3",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Staff04.webp",
+   "sourcePage": "Witch-s Staff",
+   "weapon": "staff"
   },
   {
    "id": "staff-anubis",
@@ -831,7 +908,9 @@
    "bytes": 18250,
    "sha256": "0795e93e4fb5993f1f26ea64c2b1d09482b7cd8edaa229d0cbf432a83ec015b9",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Staff02.webp",
+   "sourcePage": "Witch-s Staff",
+   "weapon": "staff"
   },
   {
    "id": "staff-circe",
@@ -848,7 +927,9 @@
    "bytes": 14696,
    "sha256": "13a647e3844f27b7b02406daf90937c23f43dd737c95cf15258387723e5f5bb7",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Staff01.webp",
+   "sourcePage": "Witch-s Staff",
+   "weapon": "staff"
   },
   {
    "id": "staff-melinoe",
@@ -865,7 +946,9 @@
    "bytes": 15544,
    "sha256": "88291b62f6a8577932f91c2458a3ce8150033454e8391f500691403783e1f552",
    "source": "wiki",
-   "needsProvenance": true
+   "sourceFile": "Weapon_Staff03.webp",
+   "sourcePage": "Witch-s Staff",
+   "weapon": "staff"
   },
   {
    "id": "staff-momus",
@@ -952,6 +1035,14 @@
    "source": "wiki",
    "sourceFile": "Biome_ships.webp",
    "sourcePage": "Boons-Hades II"
+  },
+  {
+   "id": "tartarus",
+   "category": "biomes",
+   "file": "biomes/tartarus.png",
+   "bytes": 9293,
+   "sha256": "194724d6db5ce3acdacc29b336613dec36a563afe8b9068c6bed2901f20e056f",
+   "source": "game"
   },
   {
    "id": "addled",
@@ -6759,6 +6850,102 @@
    "file": "vows/wandering.png",
    "bytes": 22163,
    "sha256": "78ec033ebfcc2710f1b9f4412a4937fab3d8fbc337849436f111de978ae9ef0f",
+   "source": "game"
+  },
+  {
+   "id": "axe-mark",
+   "category": "weapons",
+   "file": "weapons/axe-mark.png",
+   "bytes": 870,
+   "sha256": "64dbe7debec55e44cd2f1a0f76277c00556b8c30550b7f8a0defa2f6cbaec845",
+   "source": "game"
+  },
+  {
+   "id": "axe",
+   "category": "weapons",
+   "file": "weapons/axe.png",
+   "bytes": 154679,
+   "sha256": "75f44fe308c1987b85f05115b95ec2e79682ef631a4427e5f5e6367d4dfeb5ec",
+   "source": "game"
+  },
+  {
+   "id": "blades-mark",
+   "category": "weapons",
+   "file": "weapons/blades-mark.png",
+   "bytes": 1271,
+   "sha256": "8ee1093e919e0d52a18ec4ee7d0cf91e048a3217e7f9828a5c9b75f1fbd5fd3f",
+   "source": "game"
+  },
+  {
+   "id": "blades",
+   "category": "weapons",
+   "file": "weapons/blades.png",
+   "bytes": 138467,
+   "sha256": "4af5350a3af85f168fc41c4bdd9172992e9aefee57705defffd8c437b01523ca",
+   "source": "game"
+  },
+  {
+   "id": "coat-mark",
+   "category": "weapons",
+   "file": "weapons/coat-mark.png",
+   "bytes": 2057,
+   "sha256": "1f863466e9bae6246ed12f48168a5261fc661bb566bdb2a3773abc1d94031dd8",
+   "source": "game"
+  },
+  {
+   "id": "coat",
+   "category": "weapons",
+   "file": "weapons/coat.png",
+   "bytes": 120576,
+   "sha256": "0d6ad1d73d6862119eaf7c874039da178795030044d233d7dbf0b912947a00c6",
+   "source": "game"
+  },
+  {
+   "id": "flames-mark",
+   "category": "weapons",
+   "file": "weapons/flames-mark.png",
+   "bytes": 1761,
+   "sha256": "56c11777323f065f8ff0a2b76eee0d68fc55764c64d5fda2cffe12c2b8ec2ae7",
+   "source": "game"
+  },
+  {
+   "id": "flames",
+   "category": "weapons",
+   "file": "weapons/flames.png",
+   "bytes": 140205,
+   "sha256": "d3667b7aeef81df4adfdbbfca70faf3a4bcbcef1ed3e50830e97fcc08ff03427",
+   "source": "game"
+  },
+  {
+   "id": "skull-mark",
+   "category": "weapons",
+   "file": "weapons/skull-mark.png",
+   "bytes": 1788,
+   "sha256": "a754576e3cf9b96bd148825d756a1210bf38053b0114b1b06f718c02b53ac960",
+   "source": "game"
+  },
+  {
+   "id": "skull",
+   "category": "weapons",
+   "file": "weapons/skull.png",
+   "bytes": 144353,
+   "sha256": "ef465a5370de60522f4eb4f3352f09ce1583588815924eda78efdfb97798dc79",
+   "source": "game"
+  },
+  {
+   "id": "staff-mark",
+   "category": "weapons",
+   "file": "weapons/staff-mark.png",
+   "bytes": 1023,
+   "sha256": "078bdfff4e2f4f3c4199b6706165946212fb17bd5a90f4cad41ca483e4801be7",
+   "source": "game"
+  },
+  {
+   "id": "staff",
+   "category": "weapons",
+   "file": "weapons/staff.png",
+   "bytes": 129538,
+   "sha256": "79c1cd99ed7707d631733301e2126232bb2fe56b65f18f5fb28623d0000cb007",
    "source": "game"
   }
  ]
