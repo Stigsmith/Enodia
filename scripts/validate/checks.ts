@@ -8,7 +8,7 @@
  * A `fail` finding fails the build. A `warn` is printed and does not.
  */
 
-import { buildIconIndex, resolveIcon } from '../../src/data/icons.ts'
+import { aspectIconKeys, buildIconIndex, resolveIcon } from '../../src/data/icons.ts'
 import type { IconOverrides } from '../../src/data/icons.ts'
 import type { Bundle, Finding, SourceFile } from './types.ts'
 
@@ -338,6 +338,18 @@ export function offerableTraits(traits: Dict, loot: Dict): string[] {
   // A pool can name a trait the trait data does not define. That is the
   // references check's problem, not this one.
   return [...out].filter((id) => traits[id] !== undefined).sort()
+}
+
+/**
+ * The weapon aspects. Equipped before a run rather than offered inside one, so
+ * they are not in the offerable set, but the rail renders them and they need
+ * art all the same. RequiredWeapon is the marker, and every aspect carries it.
+ */
+export function aspectTraits(traits: Dict): string[] {
+  return Object.entries(traits)
+    .filter(([, trait]) => typeof dictOf(trait).RequiredWeapon === 'string' && dictOf(trait).DebugOnly !== true)
+    .map(([id]) => id)
+    .sort()
 }
 
 /** Which loot sets offer a given trait. Used to check a duo spans two gods. */
@@ -950,34 +962,80 @@ export function checkAssets(bundle: Bundle): Finding[] {
     )
   }
 
-  // 2. Every trait a run can offer has art, or a recorded reason it does not.
+  // 2. One slug, one image. Two categories holding the same slug means one
+  //    shadows the other and which one wins is decided by sort order, which is
+  //    no way to decide anything. It hid four Black Coat aspects behind wiki
+  //    copies filed under hammers/.
+  const bySlug = new Map<string, { file: string; sha256: string }[]>()
+  for (const entry of bundle.manifest.assets ?? []) {
+    if (typeof entry?.id !== 'string' || typeof entry.file !== 'string') continue
+    const copies = bySlug.get(entry.id) ?? []
+    copies.push({ file: entry.file, sha256: typeof entry.sha256 === 'string' ? entry.sha256 : '' })
+    bySlug.set(entry.id, copies)
+  }
+  const shadowed = [...bySlug.entries()].filter(([, copies]) => copies.length > 1)
+  // Two files under one slug, same bytes, is the same picture shelved twice.
+  // Two files under one slug with different bytes is a coin toss decided by
+  // sort order, which is what hid four Black Coat aspects behind wiki copies.
+  const sameBytes = shadowed.filter(([, copies]) => new Set(copies.map((c) => c.sha256)).size === 1)
+  const differentBytes = shadowed.filter(([, copies]) => new Set(copies.map((c) => c.sha256)).size > 1)
+
+  if (differentBytes.length) {
+    out.push(
+      warn('assets', `${differentBytes.length} slugs are claimed by two different images`, [
+        ...cap(differentBytes.map(([slug, copies]) => `${slug}: ${copies.map((c) => c.file).join(', ')}`)),
+        'The first by path wins, which is no way to decide. Rename or remove the loser.',
+      ]),
+    )
+  }
+  if (sameBytes.length) {
+    out.push(
+      info('assets', `${sameBytes.length} images are shelved in two categories, byte for byte the same`, [
+        ...cap(sameBytes.map(([slug, copies]) => `${slug}: ${copies.map((c) => c.file).join(', ')}`)),
+      ]),
+    )
+  }
+
+  // 3. Every trait a run can offer has art, or a recorded reason it does not.
   const names = generatedData(bundle, 'text-traits')
   const { gaps, overrides } = iconCuration(bundle)
   const index = buildIconIndex(bundle.manifest)
 
   const offerable = offerableTraits(traits, generatedData(bundle, 'loot'))
+  const aspects = aspectTraits(traits)
   const missing: string[] = []
   const recorded: string[] = []
-  let matched = 0
+  const matched = { offerable: 0, aspects: 0 }
 
-  for (const id of offerable) {
-    const displayName = dictOf(names[id]).name
-    const found = resolveIcon(id, typeof displayName === 'string' ? displayName : null, index, overrides)
-    if (found.found) matched += 1
-    else if (gaps.has(id)) recorded.push(id)
-    else missing.push(`${id}  "${typeof displayName === 'string' ? displayName : '(no display name)'}"  ${found.why}`)
+  const groups: [string, string[], 'offerable' | 'aspects'][] = [
+    ['offerable', offerable, 'offerable'],
+    ['aspect', aspects, 'aspects'],
+  ]
+
+  for (const [label, ids, counter] of groups) {
+    for (const id of ids) {
+      const displayName = dictOf(names[id]).name
+      const name = typeof displayName === 'string' ? displayName : null
+      const weapon = dictOf(traits[id]).RequiredWeapon
+      const keys = name && typeof weapon === 'string' ? aspectIconKeys(name, weapon) : []
+
+      const found = resolveIcon(id, name, index, { overrides, keys })
+      if (found.found) matched[counter] += 1
+      else if (gaps.has(id)) recorded.push(id)
+      else missing.push(`${label}  ${id}  "${name ?? '(no display name)'}"  ${found.why}`)
+    }
   }
 
   out.push(
     info(
       'assets',
-      `${matched} of ${offerable.length} offerable traits have art, ${recorded.length} gaps recorded, ${bundle.assetFiles.length} images in the library`,
+      `${matched.offerable} of ${offerable.length} offerable traits and ${matched.aspects} of ${aspects.length} weapon aspects have art, ${recorded.length} gaps recorded, ${bundle.assetFiles.length} images in the library`,
     ),
   )
 
   if (missing.length) {
     out.push(
-      fail('assets', `${missing.length} offerable traits have neither art nor a recorded gap`, [
+      fail('assets', `${missing.length} traits have neither art nor a recorded gap`, [
         ...cap(missing),
         'Fill them with npm run assets -- --fill, or record them in data/curated/icons.json knownGaps.',
       ]),
@@ -987,7 +1045,10 @@ export function checkAssets(bundle: Bundle): Finding[] {
   // An id in knownGaps that now resolves is a gap someone quietly closed.
   const stale = [...gaps].filter((id) => {
     const displayName = dictOf(names[id]).name
-    return resolveIcon(id, typeof displayName === 'string' ? displayName : null, index, overrides).found
+    const name = typeof displayName === 'string' ? displayName : null
+    const weapon = dictOf(traits[id]).RequiredWeapon
+    const keys = name && typeof weapon === 'string' ? aspectIconKeys(name, weapon) : []
+    return resolveIcon(id, name, index, { overrides, keys }).found
   })
   if (stale.length) {
     out.push(

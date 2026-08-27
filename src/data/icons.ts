@@ -75,24 +75,74 @@ export function buildIconIndex(manifest: Manifest): IconIndex {
  */
 export type IconOverrides = Map<string, string>
 
+/**
+ * Internal weapon name to the slug the image library uses.
+ *
+ * The library's names are the owner's, set in assets/build-lib.ps1, and they
+ * are the player-facing shapes rather than the internal ones: WeaponDagger is
+ * the Sister Blades, WeaponLob is the Argent Skull, WeaponSuit is the Black
+ * Coat. Step 4 may move this into the type layer. Until then it lives here,
+ * once, because the aspect join cannot work without it.
+ */
+export const WEAPON_SLUGS: Record<string, string> = {
+  WeaponStaffSwing: 'staff',
+  WeaponDagger: 'blades',
+  WeaponTorch: 'flames',
+  WeaponAxe: 'axe',
+  WeaponLob: 'skull',
+  WeaponSuit: 'coat',
+}
+
+/**
+ * Candidate slugs for a weapon aspect, best first.
+ *
+ * The display name alone is not enough: **six aspects are called "Aspect of
+ * Melinoe"**, one per weapon, so slugging the name collides five ways. The
+ * weapon qualifies it, which is also how the library already names the Black
+ * Coat's art (coat-nyx, coat-selene).
+ *
+ * `<weapon>-<aspect>` is the icon and the only key. There is deliberately no
+ * `aspect-<name>` fallback: those files are portraits of the namesake, not
+ * pictures of the weapon, and they collide across all six the same way.
+ */
+export function aspectIconKeys(displayName: string, requiredWeapon: string): string[] {
+  const weapon = WEAPON_SLUGS[requiredWeapon]
+  const bare = slugify(displayName.replace(/^Aspect of /i, ''))
+  if (!weapon || !bare) return []
+  return [`${weapon}-${bare}`]
+}
+
 export type IconResolution =
-  | { found: true; file: string; slug: string; via: 'slug' | 'override' }
+  | { found: true; file: string; slug: string; via: 'slug' | 'override' | 'key' }
   | { found: false; slug: string | null; why: 'no display name' | 'no asset' }
+
+export type ResolveOptions = {
+  overrides?: IconOverrides
+  /** Slugs to try before the display name, best first. See aspectIconKeys. */
+  keys?: string[]
+}
 
 export function resolveIcon(
   traitId: string,
   displayName: string | null | undefined,
   index: IconIndex,
-  overrides: IconOverrides = new Map(),
+  options: ResolveOptions = {},
 ): IconResolution {
-  const override = overrides.get(traitId)
-  if (override) return { found: true, file: override, slug: slugify(displayName ?? traitId), via: 'override' }
+  const override = options.overrides?.get(traitId)
+  if (override) {
+    return { found: true, file: override, slug: displayName ? slugify(displayName) : traitId, via: 'override' }
+  }
 
-  if (!displayName) return { found: false, slug: null, why: 'no display name' }
+  for (const key of options.keys ?? []) {
+    const entry = index.get(key)
+    if (entry) return { found: true, file: entry.file, slug: key, via: 'key' }
+  }
+
+  if (!displayName) return { found: false, slug: options.keys?.[0] ?? null, why: 'no display name' }
 
   const slug = slugify(displayName)
   const entry = index.get(slug)
   if (entry) return { found: true, file: entry.file, slug, via: 'slug' }
 
-  return { found: false, slug, why: 'no asset' }
+  return { found: false, slug: options.keys?.[0] ?? slug, why: 'no asset' }
 }

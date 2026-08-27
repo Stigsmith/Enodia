@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildIconIndex, resolveIcon, slugify } from './icons.ts'
+import { aspectIconKeys, buildIconIndex, resolveIcon, slugify } from './icons.ts'
 import type { Manifest } from './icons.ts'
 
 describe('slugify', () => {
@@ -60,9 +60,39 @@ describe('the icon index', () => {
     })
   })
 
+  it('qualifies an aspect by its weapon, since six share a display name', () => {
+    // Aspect of Melinoe is the base aspect of all six Nocturnal Arms, so the
+    // display name alone resolves five of them to the wrong picture.
+    expect(aspectIconKeys('Aspect of Melinoë', 'WeaponSuit')).toEqual(['coat-melinoe'])
+    expect(aspectIconKeys('Aspect of Melinoë', 'WeaponLob')).toEqual(['skull-melinoe'])
+    expect(aspectIconKeys('Aspect of Charon', 'WeaponAxe')).toEqual(['axe-charon'])
+  })
+
+  it('returns no keys for a weapon it does not know', () => {
+    expect(aspectIconKeys('Aspect of Melinoë', 'WeaponTrebuchet')).toEqual([])
+  })
+
+  it('prefers a supplied key over the display name', () => {
+    // aspect-melinoe is a portrait of Melinoe, not a picture of any weapon, so
+    // the weapon-qualified key has to win and the portrait must never be a
+    // fallback for it.
+    const index = buildIconIndex({
+      assets: [
+        { id: 'coat-melinoe', category: 'aspects', file: 'aspects/coat-melinoe.png' },
+        { id: 'aspect-melinoe', category: 'aspects', file: 'aspects/aspect-melinoe.webp' },
+      ],
+    })
+    const found = resolveIcon('BaseSuitAspect', 'Aspect of Melinoë', index, {
+      keys: aspectIconKeys('Aspect of Melinoë', 'WeaponSuit'),
+    })
+    expect(found).toEqual({ found: true, file: 'aspects/coat-melinoe.png', slug: 'coat-melinoe', via: 'key' })
+  })
+
   it('takes an override for a file the wiki named badly', () => {
     const overrides = new Map([['AxeMassiveThirdStrikeTrait', 'hammers/executioner-27s-chop.webp']])
-    const found = resolveIcon('AxeMassiveThirdStrikeTrait', 'Executioner’s Chop', buildIconIndex(manifest), overrides)
+    const found = resolveIcon('AxeMassiveThirdStrikeTrait', 'Executioner’s Chop', buildIconIndex(manifest), {
+      overrides,
+    })
     expect(found).toEqual({
       found: true,
       file: 'hammers/executioner-27s-chop.webp',

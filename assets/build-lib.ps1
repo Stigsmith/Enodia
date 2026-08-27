@@ -20,6 +20,10 @@ $gods = @('aphrodite','apollo','ares','artemis','athena','chaos','demeter','dion
           'hephaestus','hera','hermes','hestia','poseidon','zeus','selene','hades')
 # wiki site furniture, not game art
 $chrome = '^(button|content-border|codexupdate|site-|wiki-|favicon|calling-card|search|footer|header)'
+# The Black Coat page carries the game's own aspect icons as Coat_<name>.webp.
+# They used to land in hammers/, which is the wrong shelf, and they are now in
+# aspects/ at full resolution from GUI.pkg. Skip the wiki copies.
+$chrome = $chrome + '|^coat-(melinoe|nyx|selene|shiva)$'
 $wmap = @{ 'Staff'='staff'; 'Dagger'='blades'; 'Torch'='flames'; 'Axe'='axe'; 'Skull'='skull'; 'Coat'='coat' }
 $weaponPage = @{ 'Witch'='staff'; 'Sister Blades'='blades'; 'Umbral Flames'='flames';
                  'Moonstone Axe'='axe'; 'Argent Skull'='skull'; 'Black Coat'='coat' }

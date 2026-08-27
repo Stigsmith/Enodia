@@ -1,6 +1,6 @@
 # Enodia: Image Library
 
-643 images in 17 categories, categorised and slug-named.
+669 images in 17 categories, categorised and slug-named.
 
 Two sources, and the difference matters. **The file extension tells you which:**
 
@@ -59,11 +59,11 @@ wiki filename, and the wiki page it was scraped from.
 
 | Category | Files | Source | Contents | Status |
 |---|---:|---|---|---|
-| `boons/` | 259 | mixed, 188 wiki and 71 game | Olympian boon icons, wiki plus game | complete for every boon a run can offer |
-| `hammers/` | 114 | wiki | Daedalus Hammer upgrade icons, scraped per weapon page | 101 need verification, 4 missing |
+| `boons/` | 264 | mixed, 188 wiki and 76 game | Olympian boon icons, wiki plus game | complete for every boon a run can offer |
+| `hammers/` | 111 | wiki | Daedalus Hammer upgrade icons, scraped per weapon page | 101 need verification |
 | `duos/` | 48 | mixed, 46 wiki and 2 game | Duo boon icons | complete, 37 of 37 |
 | `keepsakes/` | 33 | wiki | Keepsake icons | complete |
-| `aspects/` | 29 | wiki | Weapon aspect icons plus aspect character portraits | numbering unverified |
+| `aspects/` | 53 | mixed, 29 wiki and 24 game | Weapon aspect icons from the game, plus the wiki's large renders | complete, 24 icons and 24 renders |
 | `characters/` | 27 | wiki | Non-boon-granting character portraits | good |
 | `gods/` | 16 | wiki | Boon-granting god portraits | complete |
 | `infusions/` | 11 | wiki | Elemental infusion boons | unverified count |
@@ -77,18 +77,34 @@ wiki filename, and the wiki page it was scraped from.
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic, from game files | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
 
-### Aspect naming
+### Aspect naming, resolved 27 August 2026
 
-Five weapons arrived numbered, the Black Coat arrived named:
+The numbering is gone. Every aspect is now named, and there are two images per aspect:
 
 ```
-axe-01..04   blades-01..04   flames-01..04   skull-01..04   staff-01..04
-coat-01  coat-nyx  coat-selene  coat-shiva
+aspects/<weapon>-<aspect>.png          the game's own 90x90 icon, all 24
+aspects/<weapon>-<aspect>-render.webp  the wiki's large transparent art, 23 of 24
 ```
 
-**Which number is which aspect is not verified.** The convention is usually 01 = Melinoë,
-04 = hidden, but do not write that into data until it is checked against the wiki. Rename
-to `<weapon>-<aspect-name>` once confirmed, matching the Black Coat pattern.
+`<weapon>` is staff, blades, flames, axe, skull, coat. `<aspect>` is the display name with
+"Aspect of " removed, so `coat-melinoe`, `axe-charon`, `blades-the-morrigan`.
+
+**The weapon has to qualify the name.** Six aspects are called "Aspect of Melinoë", one per
+weapon, so the display name alone resolves five of them to the wrong picture.
+`src/data/icons.ts` builds the key and the validator checks it.
+
+**How the numbering was resolved, since it had to be checked rather than assumed.** The
+wiki files arrived as `Weapon_Axe01..04` and the game names its aspects without numbering
+them, so the two had to be matched by picture. Method: a hue histogram over the saturated
+pixels of each image, then the assignment of renders to icons with the lowest total
+distance. It was validated first against the Black Coat, whose three renders the wiki had
+already named, and it got all three right. Applied to the five numbered weapons it produced
+a clean assignment every time, with the best total roughly half the cost of the next best.
+
+Four of the five weapons turned out to be in icon order. **Sister Blades is not:** the
+wiki's `blades-03` is the Morrigan and `blades-04` is Pan, which is the reverse of the icon
+numbering. Confirmed by eye as well as by the histogram, and it is exactly the assumption
+the old note would have baked in.
 
 ## Known gaps
 
@@ -101,6 +117,14 @@ Closed on 23 August 2026 by extracting `GUI.pkg`:
 | Arcana cards | **25 of 25**, named | 689x1071 PNG. Names resolved from `MetaUpgradeData.lua`, see below |
 | Rarity frames | **4 of 4** | `CardRarityIcon_Common/Rare/Epic/Heroic` |
 | Vow icons | **19** | Full Oath of the Unseen set, needed for the Fear model |
+
+Closed on 27 August 2026, second pass, after the owner asked about the Nocturnal Arms:
+
+| Was missing | Now | How |
+|---|---|---|
+| Weapon aspect icons | **24 of 24**, named | The packed name is `HammerSuit_01`, not `Suit_01`. The prefix rule only removed the underscore for `Hammer_`, and assuming it behaved like `Boon_` is what made every aspect icon look absent |
+| The four hammer upgrades listed below as missing | **filled** | Same fix. They were never absent |
+| A base image for the Black Coat that shows the weapon | **the game's icon** | The wiki's base render is broken. See the still-open table |
 
 Closed on 27 August 2026 by the asset join, build order step 3:
 
@@ -116,7 +140,7 @@ Still open:
 |---|---:|---:|---|---|
 | ~~**Boon icons**~~ | ~~300+~~ | ~~199~~ | **Solved, see below** | |
 | ~~**Selene Hexes**~~ | ~~9~~ | ~~0~~ | **Solved, see below** | |
-| **Hammer icons** | 4 | 0 | Four Daedalus Hammer upgrades a run can offer. Recorded in `data/curated/icons.json`, which is what keeps the build green | Not in `GUI.pkg`. Rapid Hack, Phantom Brand, Helheim Charge, Melting Break. The wiki pages have siblings of each, so this is a hole in the scrape |
+| **Black Coat base render** | 1 | 0 | `aspects/coat-melinoe-render.webp` is the wiki's `Weapon_Coat01`, and it is unusable: the coat's parts are scattered at odd angles with a stray thumbnail in the corner, where the other three coat renders are properly composed. The 90x90 game icon is fine, so nothing is blocked | The wiki has no `Xinth - Aspect of Melinoë` image. Either the wiki's Weapons page has a better one, or it wants an in-game screenshot |
 | **Familiars** | 5 | 0 | Roster art | `GUI.pkg` has only cosmetic effigies. Try `CatFamiliar.pkg`, `FrogFamiliar.pkg`, `HoundFamiliar.pkg`, `PolecatFamiliar.pkg`, `RavenFamiliar.pkg` |
 | **Status effect icons** | ~15 | 0 | Needed for tag filtering | Not yet located |
 | **Biome: Tartarus** | 1 | 0 | Hole in the region strip | `BiomeMap.pkg` (24 MB) is the next thing to extract |
@@ -180,6 +204,14 @@ The remaining twenty follow the same pattern and are listed in `manifest.json`.
 
 `ui/boonii.webp`, `ui/healthbar-1upmoros.webp`, `ui/healthbar-1upskelly.webp` are not game
 content. `ui/icon-*` are wiki furniture.
+
+`hammers/executioner-27s-chop.webp`, `boons/pauper-27s.webp`, `duos/king-27s-ransom.webp`
+and `duos/queen-27s-ransom.webp` kept a percent-encoded apostrophe in the slug. All four are
+now duplicated by correctly named game art, so they can go on the next wiki rebuild.
+
+Three wiki copies of the Black Coat aspect icons used to sit in `hammers/`, which is the
+wrong shelf, and they shadowed the game art under the same slug. Removed, and
+`build-lib.ps1` now skips them so a rebuild does not bring them back.
 
 `npm run assets` also reports **17 wiki images with no source page recorded**. They were
 moved between categories by hand after the manifest was written, so the file survived and

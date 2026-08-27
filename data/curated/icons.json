@@ -1,38 +1,5 @@
 {
-  "_note": "Hand authored. The asset join is derived from the display name by src/data/icons.ts, and this file holds only what that rule cannot reach: overrides for a file the wiki named badly, and the gaps nobody can close yet. scripts/validate.ts fails the build on an offerable trait that appears in neither.",
-  "knownGaps": [
-    {
-      "id": "AxeAttackRecoveryTrait",
-      "name": "Rapid Hack",
-      "icon": "Hammer_Axe_28",
-      "why": "Daedalus Hammer upgrade. Not in GUI.pkg, and the wiki scrape of the Moonstone Axe page missed it. Six other rapid-* hammers are present."
-    },
-    {
-      "id": "DaggerTripleBuffTrait",
-      "name": "Phantom Brand",
-      "icon": "Hammer_Daggers_43",
-      "why": "Daedalus Hammer upgrade. Not in GUI.pkg. The wiki has phantom-etchings from the same page but not this one."
-    },
-    {
-      "id": "LobGunAttackDoublerTrait",
-      "name": "Helheim Charge",
-      "icon": "Hammer_Lob_22",
-      "why": "Daedalus Hammer upgrade. Not in GUI.pkg, and absent from the wiki scrape."
-    },
-    {
-      "id": "LobRushArmorTrait",
-      "name": "Melting Break",
-      "icon": "Hammer_Lob_08",
-      "why": "Daedalus Hammer upgrade. Not in GUI.pkg. Six other melting-* hammers are present, so this is a hole in the scrape rather than in the page."
-    }
-  ],
-  "records": [
-    {
-      "id": "AxeMassiveThirdStrikeTrait",
-      "aliases": [],
-      "asset": "hammers/executioner-27s-chop.webp",
-      "source": "wiki",
-      "say": "The wiki filename kept the percent-encoded apostrophe, so the slug reads executioner-27s-chop and the display name cannot reach it. Four files in the library carry this artefact."
-    }
-  ]
+  "_note": "Hand authored. The asset join is derived from the display name by src/data/icons.ts, and this file holds only what that rule cannot reach: overrides onto a named file, and gaps nobody can close yet. scripts/validate.ts fails the build on a trait that appears in neither. Both lists are empty right now, which is the point: every trait a run offers, and every weapon aspect, has art.",
+  "knownGaps": [],
+  "records": []
 }
