@@ -1,0 +1,40 @@
+{
+  "_note": "Hand authored, and the owner's alone. A build is a combination: an aspect, a hammer upgrade, a duo, a legendary, and the gods to keep out. Nothing in the game files expresses that, so nothing here may be derived. src/engine/reachability.ts verdictForBuild reads these, and every field below is understood the moment one is written.",
+  "_shape": {
+    "id": "kebab-case, stable, never displayed",
+    "aliases": [
+      "older ids, so a rename keeps saved runs resolving. REQUIREMENTS.md 9"
+    ],
+    "name": "what you call it",
+    "say": "what it does and how it plays, one paragraph, in your words",
+    "source": "curator",
+    "requires": [
+      [
+        "TraitId",
+        "or this one"
+      ],
+      [
+        "and one from this set"
+      ]
+    ],
+    "aspect": "optional TraitId of the aspect it is built on",
+    "hammers": [
+      "optional TraitIds, each treated as its own set"
+    ],
+    "gods": {
+      "core": [
+        "Zeus"
+      ],
+      "compatible": [
+        "Poseidon"
+      ],
+      "avoid": [
+        "Hestia"
+      ]
+    }
+  },
+  "knownGaps": [
+    "No builds defined yet. Until one is, the tool tracks the 47 duos and legendaries, which the owner has correctly said is not the same thing."
+  ],
+  "records": []
+}

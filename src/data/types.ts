@@ -109,6 +109,39 @@ export type RunContext = {
   olympians: readonly GodId[]
 }
 
+/**
+ * A build: a combination, which is what a player is actually chasing.
+ *
+ * "A single duo or legendary is not a build", and the owner is right. Builds
+ * are centred on a combination of an aspect, a hammer upgrade, a duo and a
+ * legendary, and tracking one duo gives no more edge than the codex does.
+ *
+ * The engine needs no new machinery for this: a build is the same set-cover
+ * problem with more sets in it. What it needs is definitions, and those are
+ * judgement, so they live in `data/curated/builds.json` and they are the
+ * owner's to write. `CLAUDE.md`: evaluations come from the owner.
+ */
+export type Build = {
+  id: string
+  name: string
+  /** what it does and how it plays, in the owner's words */
+  say: string
+  /** every set must be satisfied, exactly like a duo's prerequisites */
+  requires: TraitId[][]
+  /** the aspect it is built on, when it needs one */
+  aspect?: TraitId
+  /** hammer upgrades it wants, each treated as its own set */
+  hammers?: TraitId[]
+  gods?: {
+    /** the build does not exist without these */
+    core?: GodId[]
+    /** fine, sometimes good, worth a spare slot */
+    compatible?: GodId[]
+    /** taking one costs a slot the build needs */
+    avoid?: GodId[]
+  }
+}
+
 /** Traits by id. Built once, read everywhere, never mutated. */
 export type TraitIndex = ReadonlyMap<TraitId, Trait>
 

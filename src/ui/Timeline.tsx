@@ -20,6 +20,7 @@ import { iconOf, traits } from '../data/app.ts'
 import type { RunEntry } from '../state/run.ts'
 
 export function Timeline({ entries, exitsLeft }: { entries: RunEntry[]; exitsLeft: number }) {
+  const newest = entries.at(-1)?.exit ?? 0
   return (
     <section className="timeline" aria-label="The run so far">
       {entries.length === 0 ? (
@@ -27,7 +28,7 @@ export function Timeline({ entries, exitsLeft }: { entries: RunEntry[]; exitsLef
       ) : (
         <ol className="timeline-list">
           {entries.map((entry) => (
-            <PastEntry key={entry.exit} entry={entry} />
+            <PastEntry key={entry.exit} entry={entry} isNewest={entry.exit === newest} />
           ))}
         </ol>
       )}
@@ -37,12 +38,15 @@ export function Timeline({ entries, exitsLeft }: { entries: RunEntry[]; exitsLef
   )
 }
 
-function PastEntry({ entry }: { entry: RunEntry }) {
+function PastEntry({ entry, isNewest }: { entry: RunEntry; isNewest: boolean }) {
   const taken = entry.taken ? traits.get(entry.taken) : null
   const icon = entry.taken ? iconOf.get(entry.taken) : null
 
   return (
     <li className={`entry${entry.died.length ? ' has-deaths' : ''}`}>
+      {/* The game's own pickup burst, played once on the entry that just
+          arrived. 19 frames of ItemConsume as one strip, stepped in CSS. */}
+      {isNewest && taken ? <span className="fx-item-consume entry-fx" aria-hidden="true" /> : null}
       <span className="entry-exit">{entry.exit}</span>
 
       <div className="entry-body">

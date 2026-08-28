@@ -13,7 +13,7 @@
  * Pure. No react, no storage, no fetch.
  */
 
-import type { GodId, RunContext, Trait, TraitId, TraitIndex } from '../data/types.ts'
+import type { Build, GodId, RunContext, Trait, TraitId, TraitIndex } from '../data/types.ts'
 import { canBeOffered } from './slots.ts'
 
 export type ReachState = 'ON_TRACK' | 'REACHABLE' | 'AT_RISK' | 'DEAD'
@@ -413,6 +413,42 @@ export function reachable(ctx: RunContext, traits: TraitIndex, targets?: readonl
   return list
     .map((target) => verdictFor(target, ctx, traits, memo))
     .sort((a, b) => order[a.state] - order[b.state] || a.minPicks - b.minPicks || a.target.localeCompare(b.target))
+}
+
+// ---------------------------------------------------------------------------
+// Builds. A combination rather than one boon.
+// ---------------------------------------------------------------------------
+
+/**
+ * Is this build still live, and what does it still need.
+ *
+ * Exactly the same question as for a duo, with more sets: the aspect it is
+ * built on, every hammer upgrade it wants, and the boons. A build is dead the
+ * moment any one of those sets has nothing live in it, which is why an aspect
+ * chosen at setup can settle a build's fate before the first Exit.
+ */
+export function verdictForBuild(build: Build, ctx: RunContext, traits: TraitIndex): Verdict {
+  const sets = [...build.requires]
+  if (build.aspect) sets.push([build.aspect])
+  for (const hammer of build.hammers ?? []) sets.push([hammer])
+
+  // A build is judged through the same code as everything else, by handing the
+  // engine a trait shaped like one. No second implementation of set cover.
+  const asTrait: Trait = {
+    id: build.id,
+    name: build.name,
+    kind: 'other',
+    slot: null,
+    altSlot: null,
+    gods: build.gods?.core ?? [],
+    requiredWeapon: null,
+    requires: { oneFromEachSet: sets },
+    text: build.say,
+  }
+
+  const index = new Map(traits)
+  index.set(build.id, asTrait)
+  return verdictFor(build.id, ctx, index)
 }
 
 // ---------------------------------------------------------------------------

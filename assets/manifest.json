@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 721,
+ "count": 741,
  "categories": [
   {
    "name": "arcana",
@@ -98,6 +98,16 @@
    "name": "slots",
    "count": 5,
    "source": "wiki"
+  },
+  {
+   "name": "sprites",
+   "count": 3,
+   "source": "game"
+  },
+  {
+   "name": "symbols",
+   "count": 17,
+   "source": "game"
   },
   {
    "name": "ui",
@@ -6698,6 +6708,166 @@
    "source": "wiki",
    "sourceFile": "SlotIcon_Special.webp",
    "sourcePage": "Boons-Hades II"
+  },
+  {
+   "id": "boon-duo",
+   "category": "sprites",
+   "file": "sprites/boon-duo.png",
+   "bytes": 245896,
+   "sha256": "cbd2f923f1d6862f6dcd0f9e458d7049bb0c16b79127bf1daf302242c83f113a",
+   "source": "game"
+  },
+  {
+   "id": "boon-legendary",
+   "category": "sprites",
+   "file": "sprites/boon-legendary.png",
+   "bytes": 230697,
+   "sha256": "7141fff584f9f5bba514ce5077cf0317b3f359b21407697061ad956ce639ecf0",
+   "source": "game"
+  },
+  {
+   "id": "item-consume",
+   "category": "sprites",
+   "file": "sprites/item-consume.png",
+   "bytes": 57674,
+   "sha256": "78f3ccb4754511e0e4f26e8b1a0641c982915f97cdecfc90f23dbff4dab18981",
+   "source": "game"
+  },
+  {
+   "id": "aphrodite",
+   "category": "symbols",
+   "file": "symbols/aphrodite.png",
+   "bytes": 72777,
+   "sha256": "39d945b7709d0d108418b5c94756553964952d73c7e2771332733b25de7b2d1f",
+   "source": "game"
+  },
+  {
+   "id": "apollo",
+   "category": "symbols",
+   "file": "symbols/apollo.png",
+   "bytes": 76676,
+   "sha256": "84dee11adfcdaeea29e13a7095b6e35e2feb731cfe371e742de5850a7fc4e75f",
+   "source": "game"
+  },
+  {
+   "id": "ares",
+   "category": "symbols",
+   "file": "symbols/ares.png",
+   "bytes": 75072,
+   "sha256": "02ea4b09e69c82ed73d77475eaa1133041c4303cdd33ac8da6094ce9eae267b5",
+   "source": "game"
+  },
+  {
+   "id": "artemis",
+   "category": "symbols",
+   "file": "symbols/artemis.png",
+   "bytes": 77815,
+   "sha256": "bdb3dcb6396bdb14af68a5820444d6d2c3cbc9b7fd2832c67c46ed043b965868",
+   "source": "game"
+  },
+  {
+   "id": "athena",
+   "category": "symbols",
+   "file": "symbols/athena.png",
+   "bytes": 75194,
+   "sha256": "9ecdd13453a71ee8477aace1683d0237fd8a9fc8f2815a7a0034291f8dc780ba",
+   "source": "game"
+  },
+  {
+   "id": "chaos",
+   "category": "symbols",
+   "file": "symbols/chaos.png",
+   "bytes": 82221,
+   "sha256": "a044a554248124321b4790df5052e15d636e712a933ced5b6f3beccbb6f881eb",
+   "source": "game"
+  },
+  {
+   "id": "demeter",
+   "category": "symbols",
+   "file": "symbols/demeter.png",
+   "bytes": 82351,
+   "sha256": "6214e2ad483d6913abfad028b9b327f3d36c95170ae0e2d9b2f9d714dfcfb83c",
+   "source": "game"
+  },
+  {
+   "id": "dionysus",
+   "category": "symbols",
+   "file": "symbols/dionysus.png",
+   "bytes": 79191,
+   "sha256": "567391b99febf125acd79da129e3555275b60a63aef801f71ba6d8c767e014f1",
+   "source": "game"
+  },
+  {
+   "id": "hades",
+   "category": "symbols",
+   "file": "symbols/hades.png",
+   "bytes": 73341,
+   "sha256": "cb50bc5abb36331ae1c78f3bd2ffc5cdbff67b31215193f9d1099daec2f74c9e",
+   "source": "game"
+  },
+  {
+   "id": "hammer",
+   "category": "symbols",
+   "file": "symbols/hammer.png",
+   "bytes": 75638,
+   "sha256": "3e691fef63ed9059e8c7bf5f5215ed7ac6a8de3f8d9236d1a0f80ea43d7392ba",
+   "source": "game"
+  },
+  {
+   "id": "hephaestus",
+   "category": "symbols",
+   "file": "symbols/hephaestus.png",
+   "bytes": 76533,
+   "sha256": "a4e47a2b0b8b6cf9f2db8c204bb4e498ae5cc66fc2ce4d5c5b6941fac7eb5825",
+   "source": "game"
+  },
+  {
+   "id": "hera",
+   "category": "symbols",
+   "file": "symbols/hera.png",
+   "bytes": 78743,
+   "sha256": "be199cb99062606407bfacf1a3c1dfd9297457973201abbb5538eb092d390f2a",
+   "source": "game"
+  },
+  {
+   "id": "hermes",
+   "category": "symbols",
+   "file": "symbols/hermes.png",
+   "bytes": 71363,
+   "sha256": "7d3553e631e5f5e6168482b02f3b348a25919c0c6708ef03f5991cc43082bc1e",
+   "source": "game"
+  },
+  {
+   "id": "hestia",
+   "category": "symbols",
+   "file": "symbols/hestia.png",
+   "bytes": 73008,
+   "sha256": "3ae6b5bec6b09b216b809ad16d0ecaf85fb2339fdc9992d3b6d3284f5c09a702",
+   "source": "game"
+  },
+  {
+   "id": "pom",
+   "category": "symbols",
+   "file": "symbols/pom.png",
+   "bytes": 74897,
+   "sha256": "3562f6d8e68220db05557cd7bfae46fdb8c2ad59c272b40692b5d8fcf9c1679d",
+   "source": "game"
+  },
+  {
+   "id": "poseidon",
+   "category": "symbols",
+   "file": "symbols/poseidon.png",
+   "bytes": 69109,
+   "sha256": "17ace84254bf17abd3511dece4de2a05ba3cda8674e42d7d6f880340dee22fb7",
+   "source": "game"
+  },
+  {
+   "id": "zeus",
+   "category": "symbols",
+   "file": "symbols/zeus.png",
+   "bytes": 73913,
+   "sha256": "87b009d951090b1378334f579256aa56db46afc4c4c67efbd0078928ba39692c",
+   "source": "game"
   },
   {
    "id": "blooddrop",

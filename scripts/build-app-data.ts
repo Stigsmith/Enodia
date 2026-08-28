@@ -215,12 +215,26 @@ type Source = {
 const olympianList = olympiansFrom(loot)
 const sources: Source[] = []
 
+/**
+ * The game's own reward symbol, where there is one.
+ *
+ * `BoonSelectSymbols` has one per god plus a Hammer and a Pom: the glowing
+ * marks the game itself puts on an Exit. They beat the wiki portraits for this
+ * job because this is the job they were drawn for. Selene has none, since her
+ * Hexes do not arrive through the boon select screen.
+ */
+const symbolFor = (name: string): string | null => icons.get(name.toLowerCase())?.file ?? null
+const symbol = (name: string): string | null => {
+  const entry = manifest.assets.find((asset) => asset.file === `symbols/${name.toLowerCase()}.png`)
+  return entry?.file ?? null
+}
+
 for (const [god, pool] of godPoolsFrom(loot)) {
   sources.push({
     id: god,
     name: god,
     kind: olympianList.includes(god) ? 'olympian' : 'other',
-    icon: icons.get(god.toLowerCase())?.file ?? null,
+    icon: symbol(god) ?? symbolFor(god),
     traits: named([...new Set([...pool.priority, ...pool.pool])]),
   })
 }
@@ -232,7 +246,7 @@ if (chaos) {
     id: 'Chaos',
     name: 'Chaos',
     kind: 'other',
-    icon: icons.get('chaos')?.file ?? null,
+    icon: symbol('Chaos') ?? symbolFor('chaos'),
     traits: named([
       ...strings(dictOf(chaos).PermanentTraits),
       ...strings(dictOf(chaos).TemporaryTraits),
@@ -254,7 +268,7 @@ for (const [weapon, marker] of Object.entries(HAMMER_MARKERS)) {
     id: `Hammer_${weapon}`,
     name: 'Daedalus Hammer',
     kind: 'hammer',
-    icon: icons.get('daedalus-hammer')?.file ?? null,
+    icon: symbol('Hammer') ?? symbolFor('daedalus-hammer'),
     weapon,
     traits: named(Object.keys(resolved).filter((id) => ancestorsOf(id).has(marker))),
   })
@@ -287,7 +301,7 @@ for (const [setName, members] of Object.entries(unitSets)) {
       id: setName,
       name: who,
       kind: 'encounter',
-      icon: icons.get(who.toLowerCase())?.file ?? null,
+      icon: symbol(who) ?? symbolFor(who),
       ...(ENCOUNTER_PATHS[setName] ? { path: ENCOUNTER_PATHS[setName] } : {}),
       traits: pool,
     })

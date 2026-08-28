@@ -123,6 +123,11 @@ therefore the owner's, per `CLAUDE.md`. Proposed shape in `data/curated/builds.j
 The 47 duos and legendaries stay as the fallback for a run with no build chosen, since
 something has to be tracked before a build is picked.
 
+**The mechanism is built and empty.** `engine/reachability.ts verdictForBuild` judges a
+build through the same set-cover code as a duo, counting the aspect and each hammer as
+their own set, so an aspect chosen at setup can settle a build before the first Exit.
+`data/curated/builds.json` carries the shape and no records. Write one and it works.
+
 **From the owner, 28 August 2026**
 
 - ~~Setup asked how many Exits a run has~~. A player does not know, so it is an estimate
@@ -132,7 +137,8 @@ something has to be tracked before a build is picked.
 - **Wanted next:** a radial weapon picker using the large Codex art, the chosen weapon
   animating to the centre with its four aspects around it
 - ~~The rail as a permanent sidebar~~. Done, and the timeline is the only thing that
-  scrolls now. Unfolding it to every boon with tooltips is still to do
+  scrolls now. It unfolds to everything held, by slot, with the game's own sentence on each,
+  and every slot has a tooltip
 - ~~Which regions each Encounter god appears in~~. **Sourced:** Artemis only in `RoomDataF`
   which is Erebus, Hades only in `RoomDataI` which is Tartarus, Dionysus only in
   `RoomDataP` which is Ephyra. Athena appears in no room data, which fits her arriving

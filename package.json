@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "assets": "node scripts/assets.ts",
-    "data": "node scripts/build-app-data.ts"
+    "data": "node scripts/build-app-data.ts",
+    "sprites": "node scripts/sprites.ts"
   },
   "dependencies": {
     "react": "^19.2.8",

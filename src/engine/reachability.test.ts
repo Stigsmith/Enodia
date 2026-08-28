@@ -2,7 +2,15 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { bandFor, godPriority, minimumPicks, obtainability, reachable, verdictFor } from './reachability.ts'
+import {
+  bandFor,
+  godPriority,
+  minimumPicks,
+  obtainability,
+  reachable,
+  verdictFor,
+  verdictForBuild,
+} from './reachability.ts'
 import { buildTraitIndex, olympiansFrom } from '../data/load.ts'
 import type { Held, RunContext, Trait, TraitId, TraitIndex } from '../data/types.ts'
 
@@ -268,6 +276,46 @@ describe('god priority', () => {
   it('says the pool is settled once the cap is reached', () => {
     const ctx = context({ godsTaken: ['Aphrodite', 'Apollo', 'Ares', 'Demeter'] })
     expect(godPriority(ctx, index)).toEqual([])
+  })
+})
+
+describe('a build, which is a combination and not one boon', () => {
+  const build = {
+    id: 'zeus-poseidon-cast',
+    name: 'Killer Current, on the Cast',
+    say: 'A worked example, not a recommendation.',
+    requires: [['ZeusCast'], ['PoseidonCast']],
+    gods: { core: ['Zeus', 'Poseidon'] },
+  }
+
+  it('needs every part, not the easiest one', () => {
+    const verdict = verdictForBuild(build, context(), index)
+    expect(verdict.minPicks).toBe(2)
+    expect(verdict.state).toBe('REACHABLE')
+  })
+
+  it('dies when one part dies, even with the rest in hand', () => {
+    // Hera at Heroic shuts the Cast, and both halves of this build are Casts.
+    const ctx = context({ held: [{ id: 'HeraCast', rarity: 'Heroic' }], godsTaken: ['Hera'] })
+    expect(verdictForBuild(build, ctx, index).state).toBe('DEAD')
+  })
+
+  it('counts an aspect as a set, so setup can settle it', () => {
+    const withAspect = { ...build, aspect: 'CoatAspect' }
+    const traitsWithAspect: TraitIndex = new Map(index).set('CoatAspect', {
+      id: 'CoatAspect',
+      name: 'Aspect of Melinoe',
+      kind: 'aspect' as const,
+      slot: null,
+      altSlot: null,
+      gods: [],
+      requiredWeapon: 'WeaponSuit',
+      requires: null,
+      text: null,
+    })
+    // The run is on an axe, so an aspect of the coat can never arrive.
+    const ctx = context({ weapon: 'WeaponAxe' })
+    expect(verdictForBuild(withAspect, ctx, traitsWithAspect).state).toBe('DEAD')
   })
 })
 
