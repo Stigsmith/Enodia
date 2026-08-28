@@ -27,7 +27,16 @@ export type Weapon = {
   id: WeaponId
   /** the library's slug for it, which is also its art */
   slug: string
+  /** the game's own DisplayName, "Witch's Staff", used in its UI and patch notes */
   name: string
+  /**
+   * The arm's own name, "Descura".
+   *
+   * The Nocturnal Arms are characters, not equipment, and Melinoe's Codex names
+   * each of them. Both names are the game's; see the table in
+   * scripts/build-app-data.ts for the line each was transcribed from.
+   */
+  arm: string
   /** the base aspect's cutout: the weapon itself, transparent */
   icon: string | null
   /** the Codex card, parchment and all, for when a card is what is wanted */
