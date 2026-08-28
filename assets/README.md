@@ -257,6 +257,19 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
 
+### Boon icons are 90x90 and there is no larger copy
+
+All **537** files in `Screens/BoonIcons/` are 90x90, every one of them, and nothing else in
+the extraction shares a name with any of them at any size. The wiki's copies are the same
+icons rescaled. So 90 pixels is the ceiling, not a starting point.
+
+That sets a hard limit on how big a boon can be drawn. The timeline entry was 8.5rem, a 1.5x
+upscale, and it looked like one; it is 5rem now, which downsamples. Anything that wants a
+boon larger than about 80 pixels needs a different image, and there is not one.
+
+The same is not true of the gods: `gods/` is 214 wide and `gifts/` is 240, so a portrait can
+be drawn much larger than a boon before it softens.
+
 ### Chrome is picked by hand, and `scripts/chrome.ts` is the record
 
 `npm run assets -- --fill` finds boon art by matching the trait data's `Icon` fields against
