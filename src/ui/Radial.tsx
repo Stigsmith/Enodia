@@ -32,9 +32,8 @@ export function Radial({
   /** the one that has already been picked sits in the middle */
   centre,
   /**
-   * "cards" zooms the art inside each bubble. The Codex weapon cards are
-   * portrait parchment with the weapon in the middle, so a circular crop of one
-   * at natural size is mostly card.
+   * "renders" shows transparent cutouts whole rather than cropping them to the
+   * circle, which is what the weapon and aspect art wants.
    */
   variant = 'default',
 }: {
@@ -43,7 +42,7 @@ export function Radial({
   onChoose: (id: string) => void
   label: string
   centre?: RadialItem | null
-  variant?: 'default' | 'cards' | 'renders'
+  variant?: 'default' | 'renders'
 }) {
   const [hovered, setHovered] = useState<string | null>(null)
 

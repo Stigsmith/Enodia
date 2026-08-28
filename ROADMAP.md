@@ -137,8 +137,13 @@ something has to be tracked before a build is picked.
   which is Erebus, Hades only in `RoomDataI` which is Tartarus, Dionysus only in
   `RoomDataP` which is Ephyra. Athena appears in no room data, which fits her arriving
   through her keepsake. The picker filters on it
-- **Wanted next:** a look that is more Crossroads and less web app. The game's own boon
-  plates and rarity frames are in `assets/frames/` now and are a start, not an answer
+- **In progress:** a look that is more Crossroads and less web app. The game's own boon
+  plates and rarity frames are in `assets/frames/`, and `assets/chrome/` now carries
+  `TraitTrayBacking` (the tone-on-tone ornament `VISUAL.md` 1 asks for by name), the tray
+  header ribbon, the tooltip nine-slice, the hairline dividers and the filigree circle
+- **The menu exists as a shell.** One button top left, covering rather than pushing, with
+  build manager, build exchange, account, friends, leaderboards, settings, help and about
+  listed and marked unbuilt. Starting a run is always its first entry
 - **Open:** which regions each Encounter god appears in. `RoomData` places Artemis in F,
   Dionysus in P and Hades in I, and says nothing about Athena, so the letter to region
   mapping has to be established before the path can filter anything

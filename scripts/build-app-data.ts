@@ -306,7 +306,11 @@ const bundle = {
     id: weapon.id,
     slug: weapon.slug,
     name: weaponName(weapon.textId),
-    icon: icons.get(weapon.slug)?.file ?? null,
+    // The base aspect's cutout: the weapon itself, transparent, in Melinoe's
+    // own colours. The Codex card is the same weapon on parchment, which is a
+    // picture of a card rather than a picture of a weapon.
+    icon: icons.get(`${weapon.slug}-melinoe-render`)?.file ?? icons.get(weapon.slug)?.file ?? null,
+    card: icons.get(weapon.slug)?.file ?? null,
   })),
   pools,
   sources,

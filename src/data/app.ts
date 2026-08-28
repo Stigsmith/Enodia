@@ -28,7 +28,10 @@ export type Weapon = {
   /** the library's slug for it, which is also its art */
   slug: string
   name: string
+  /** the base aspect's cutout: the weapon itself, transparent */
   icon: string | null
+  /** the Codex card, parchment and all, for when a card is what is wanted */
+  card: string | null
 }
 
 /** Where a trait's art lives, by trait id. Absent when there is none. */

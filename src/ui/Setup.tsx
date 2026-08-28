@@ -54,7 +54,7 @@ export function Setup({
   return (
     <section className="setup">
       <Radial
-        variant={chosenWeapon ? 'renders' : 'cards'}
+        variant="renders"
         label={chosenWeapon ? 'Which aspect' : 'Which arm'}
         items={items}
         chosen={chosenWeapon ? aspect : weapon}
