@@ -1,89 +1,95 @@
 /**
  * The app shell.
  *
- * Setup is its own screen and happens once. Everything after it is one surface
- * in three parts: the rail for what you hold, the timeline for the run, and the
- * present entry for the decision in front of you. There is no navigation
- * between them, which is the point.
+ * **The timeline is the only thing that scrolls.** Everything else is pinned:
+ * the run and the tally along the top, the rail down the side, and the pick
+ * waiting in a tray at the bottom. A tool read in four seconds mid run cannot
+ * ask anyone to scroll to find what they came for, and the first version did
+ * exactly that.
+ *
+ * Setup is its own screen and happens once.
  */
 
+import { useState } from 'react'
+
 import { gameVersion, traits, weapons } from './data/app.ts'
+import { reachable } from './engine/reachability.ts'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
-import { Present } from './ui/Present.tsx'
+import { Tray } from './ui/Tray.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { useRun } from './state/run.ts'
 
 export function App() {
   const { run, entries, start, end, take, skip, setExitsLeft } = useRun()
+  const [trayOpen, setTrayOpen] = useState(true)
 
   if (!run) {
     return (
       <main className="shell">
-        <Header />
+        <header className="masthead">
+          <h1 className="wordmark">Enodia</h1>
+          <p className="tagline">A build companion for Hades II, read at an Exit.</p>
+        </header>
         <Setup onStart={start} />
-        <Footer />
+        <Colophon />
       </main>
     )
   }
 
   const weapon = weapons.find((entry) => entry.id === run.weapon)
   const aspect = run.aspect ? traits.get(run.aspect) : null
+  const verdicts = reachable(run, traits)
+  const open = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK').length
+  const closed = verdicts.filter((v) => v.state === 'DEAD').length
 
   return (
-    <main className="shell run-surface">
-      <Header />
-
-      <div className="run-head">
-        <p className="run-what">
-          {weapon?.name ?? 'Unknown arm'}
-          {aspect ? <span className="run-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
-          {run.path ? <span className="run-aspect">{run.path === 'surface' ? 'Surface' : 'Underworld'}</span> : null}
+    <div className={`surface${trayOpen ? ' tray-open' : ''}`}>
+      <header className="topbar">
+        <p className="topbar-run">
+          <span className="topbar-weapon">{weapon?.name ?? 'Unknown arm'}</span>
+          {aspect ? <span className="topbar-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
+          {run.path ? (
+            <span className="topbar-aspect">{run.path === 'surface' ? 'Surface' : 'Underworld'}</span>
+          ) : null}
         </p>
-        {/* An estimate, and the player's to correct. Nobody knows their Exit
-            count at the start of a run, so this is never a question, only a
-            number that can be nudged once the run makes it obvious. */}
-        <p className="run-exits">
+
+        <p className="topbar-exits">
           <button type="button" onClick={() => setExitsLeft(run.exitsLeft - 1)} aria-label="One fewer Exit left">
             &minus;
           </button>
-          <strong>{run.exitsLeft}</strong> {run.exitsLeft === 1 ? 'Exit' : 'Exits'} left
+          <strong>{run.exitsLeft}</strong>
+          <span>Exits left</span>
           <button type="button" onClick={() => setExitsLeft(run.exitsLeft + 1)} aria-label="One more Exit left">
             +
           </button>
-          <span className="estimate">estimate</span>
         </p>
+
+        <p className="topbar-tally">
+          <strong>{open}</strong> open
+          {closed ? <span className="topbar-closed">{closed} closed</span> : null}
+        </p>
+
         <button type="button" className="quiet" onClick={end}>
           End run
         </button>
-      </div>
+      </header>
 
-      <Rail held={run.held} />
+      <aside className="railbar" aria-label="Your slots">
+        <Rail held={run.held} />
+      </aside>
 
-      <Timeline entries={entries} exitsLeft={run.exitsLeft} />
+      <main className="scroller">
+        <Timeline entries={entries} exitsLeft={run.exitsLeft} />
+        <Colophon />
+      </main>
 
-      <Present run={run} onTake={take} onSkip={skip} />
-
-      <p className="unbuilt">
-        Step 11 puts the three boons actually on offer here, ranked, with the case for rejecting all three.
-        That needs the rating engine, which is step 10.
-      </p>
-
-      <Footer />
-    </main>
+      <Tray run={run} open={trayOpen} onToggle={() => setTrayOpen((was) => !was)} onTake={take} onSkip={skip} />
+    </div>
   )
 }
 
-function Header() {
-  return (
-    <header className="masthead">
-      <h1 className="wordmark">Enodia</h1>
-      <p className="tagline">A build companion for Hades II, read at an Exit.</p>
-    </header>
-  )
-}
-
-function Footer() {
+function Colophon() {
   return (
     <footer className="colophon">
       <p>

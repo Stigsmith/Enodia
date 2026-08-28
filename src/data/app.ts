@@ -78,6 +78,8 @@ export type RewardSource = {
   icon: string | null
   /** hammers only: which weapon these upgrades belong to */
   weapon?: string
+  /** where this one turns up, when the room data says. Athena says nothing */
+  path?: 'underworld' | 'surface'
   traits: TraitId[]
 }
 

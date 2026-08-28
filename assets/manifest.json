@@ -1,10 +1,10 @@
 {
- "generated": "2026-08-27",
+ "generated": "2026-08-28",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 696,
+ "count": 713,
  "categories": [
   {
    "name": "arcana",
@@ -58,6 +58,11 @@
    "name": "elements",
    "count": 6,
    "source": "wiki"
+  },
+  {
+   "name": "frames",
+   "count": 17,
+   "source": "game"
   },
   {
    "name": "gods",
@@ -4421,6 +4426,142 @@
    "source": "wiki",
    "sourceFile": "Element_Water.webp",
    "sourcePage": "Boons-Hades II"
+  },
+  {
+   "id": "circle",
+   "category": "frames",
+   "file": "frames/circle.png",
+   "bytes": 2374795,
+   "sha256": "2e90a8ad28641461c2448dd7acbcd5bd3b285a47ef01a7c6950b89db1e8851c9",
+   "source": "game"
+  },
+  {
+   "id": "divider",
+   "category": "frames",
+   "file": "frames/divider.png",
+   "bytes": 11013,
+   "sha256": "d75566f20c7d7540f441220e99197349289ee1b7ae29a4bc2f54c7344a95608c",
+   "source": "game"
+  },
+  {
+   "id": "frame-common",
+   "category": "frames",
+   "file": "frames/frame-common.png",
+   "bytes": 10346,
+   "sha256": "ac6229731ee50b8215107d1910c45072ef224f72bfccfe1875b63ab87a08b5a0",
+   "source": "game"
+  },
+  {
+   "id": "frame-duo",
+   "category": "frames",
+   "file": "frames/frame-duo.png",
+   "bytes": 11014,
+   "sha256": "9f1dc5163d7a857b739647331712534fe193d7d95c14a6eb4976a14e1cf0fce2",
+   "source": "game"
+  },
+  {
+   "id": "frame-epic",
+   "category": "frames",
+   "file": "frames/frame-epic.png",
+   "bytes": 10754,
+   "sha256": "36676faeaf0e4f34ba43c4bb5b6b97fc2a25614528910e7ebaf45d190cc50ce9",
+   "source": "game"
+  },
+  {
+   "id": "frame-heroic",
+   "category": "frames",
+   "file": "frames/frame-heroic.png",
+   "bytes": 10486,
+   "sha256": "a7bfcf24dec36f9fe030a0afdcc87133c13b9e5103b45e57807438107d42c04b",
+   "source": "game"
+  },
+  {
+   "id": "frame-legendary",
+   "category": "frames",
+   "file": "frames/frame-legendary.png",
+   "bytes": 11044,
+   "sha256": "596ea250031274972ce6c37915e87e8a7a2a0c4b08741438eba8fe6ccd077cb0",
+   "source": "game"
+  },
+  {
+   "id": "frame-primary",
+   "category": "frames",
+   "file": "frames/frame-primary.png",
+   "bytes": 7578,
+   "sha256": "6d46158ea26d801ffd4c0b2aca89c2b745206386def5ab537ca2dfae7827e441",
+   "source": "game"
+  },
+  {
+   "id": "frame-rare",
+   "category": "frames",
+   "file": "frames/frame-rare.png",
+   "bytes": 10641,
+   "sha256": "8bb63b01644c22dc3819ee7a6096b12561e88f99476783e363eb966d18f6ab69",
+   "source": "game"
+  },
+  {
+   "id": "plate-common",
+   "category": "frames",
+   "file": "frames/plate-common.png",
+   "bytes": 58613,
+   "sha256": "2c735ef740d85166f672ea507fabeccd351228692b3a50f1d6dde7b16c9ecbe6",
+   "source": "game"
+  },
+  {
+   "id": "plate-duo",
+   "category": "frames",
+   "file": "frames/plate-duo.png",
+   "bytes": 72605,
+   "sha256": "f67c2c7f486a2f77afe8bca2bca39bae69a076971cb3fac5ec69e3019d2b4f0e",
+   "source": "game"
+  },
+  {
+   "id": "plate-epic",
+   "category": "frames",
+   "file": "frames/plate-epic.png",
+   "bytes": 76097,
+   "sha256": "e33548cfeda1116486d3c496b82d3d6482deeb5e607a0a25860d71ddb966bc44",
+   "source": "game"
+  },
+  {
+   "id": "plate-heroic",
+   "category": "frames",
+   "file": "frames/plate-heroic.png",
+   "bytes": 75596,
+   "sha256": "3506d1fc6f6d233a7bab1dec858ab9294c25bc16f197d9a19d320e0ba0564048",
+   "source": "game"
+  },
+  {
+   "id": "plate-legendary",
+   "category": "frames",
+   "file": "frames/plate-legendary.png",
+   "bytes": 76726,
+   "sha256": "b9a9f74abe4c9f9b7ab3e9b1b6911781b3cc380b70880e3dece3daa0ed616d38",
+   "source": "game"
+  },
+  {
+   "id": "plate-rare",
+   "category": "frames",
+   "file": "frames/plate-rare.png",
+   "bytes": 80209,
+   "sha256": "19cd68260ec512daf7caf771096023922f9c9efd3611bad6ddfb60c76e737eff",
+   "source": "game"
+  },
+  {
+   "id": "plate-unity",
+   "category": "frames",
+   "file": "frames/plate-unity.png",
+   "bytes": 86461,
+   "sha256": "1edac71e1ce9a15b1b9447b9eefdcc9dfa44e92ae638af8bfa4442bdd35cfcd1",
+   "source": "game"
+  },
+  {
+   "id": "slot-shadow",
+   "category": "frames",
+   "file": "frames/slot-shadow.png",
+   "bytes": 766,
+   "sha256": "c7c1bf571d5a66860e40229ec3757abe35b604d1786f2f78d5a672bb81360870",
+   "source": "game"
   },
   {
    "id": "aphrodite",

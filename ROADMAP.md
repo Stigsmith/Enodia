@@ -97,6 +97,32 @@ These are real and none of them block step 2.
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,
   and the app now imports it directly
 
+**The open product question, 28 August 2026**
+
+> "A single duo or legendary is not a build. Builds are more intricate, and are often
+> centered around a combination of a Daedalus Hammer, a duo, a legendary and a specific
+> aspect. Tracking a single duo gives no more of an edge than tracking it in game."
+
+That is right and it changes what the tool tracks. The engine does not need changing: a
+build is the same set-cover problem with more sets in it, and `reachable` already takes
+targets as an argument. What is missing is the **definitions**, which are judgement and
+therefore the owner's, per `CLAUDE.md`. Proposed shape in `data/curated/builds.json`:
+
+```json
+{
+  "id": "zeus-apollo-double-legendary",
+  "name": "Glorious Disaster, both legendaries",
+  "say": "what this build does and how it plays, one paragraph",
+  "requires": [["ApolloCastBoon"], ["ZeusCastBoon"], ["SpawnKillBoon"]],
+  "aspect": "StaffCirceAspect",
+  "hammers": ["StaffPowershotTrait"],
+  "gods": { "core": ["Zeus", "Apollo"], "compatible": ["Poseidon"], "avoid": ["Hestia"] }
+}
+```
+
+The 47 duos and legendaries stay as the fallback for a run with no build chosen, since
+something has to be tracked before a build is picked.
+
 **From the owner, 28 August 2026**
 
 - ~~Setup asked how many Exits a run has~~. A player does not know, so it is an estimate
@@ -105,7 +131,14 @@ These are real and none of them block step 2.
   Encounter gods besides
 - **Wanted next:** a radial weapon picker using the large Codex art, the chosen weapon
   animating to the centre with its four aspects around it
-- **Wanted next:** the rail as a permanent sidebar, unfoldable to every boon with tooltips
+- ~~The rail as a permanent sidebar~~. Done, and the timeline is the only thing that
+  scrolls now. Unfolding it to every boon with tooltips is still to do
+- ~~Which regions each Encounter god appears in~~. **Sourced:** Artemis only in `RoomDataF`
+  which is Erebus, Hades only in `RoomDataI` which is Tartarus, Dionysus only in
+  `RoomDataP` which is Ephyra. Athena appears in no room data, which fits her arriving
+  through her keepsake. The picker filters on it
+- **Wanted next:** a look that is more Crossroads and less web app. The game's own boon
+  plates and rarity frames are in `assets/frames/` now and are a start, not an answer
 - **Open:** which regions each Encounter god appears in. `RoomData` places Artemis in F,
   Dionysus in P and Hades in I, and says nothing about Athena, so the letter to region
   mapping has to be established before the path can filter anything
