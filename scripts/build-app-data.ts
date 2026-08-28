@@ -61,13 +61,39 @@ const icons = buildIconIndex(manifest)
  * the only place the game writes them down in a form we can read. The leading
  * "The" is dropped so they sit in a list.
  */
+/**
+ * The six arms, and both of their names.
+ *
+ * `name` is the game's `DisplayName` out of HelpText, which is what the game
+ * itself uses in its UI and in every patch note: "Witch's Staff (Circe)".
+ *
+ * **`arm` is the weapon's own name**, and the Nocturnal Arms have them because
+ * they are characters rather than equipment. Melinoe's Codex says so of each in
+ * turn, and the owner calls the staff Descura because that is what the game
+ * calls her. Both names are the game's and neither replaces the other, so the
+ * surface shows the arm and keeps the type as the qualifier.
+ *
+ * Transcribed by hand from `Content/Game/Text/en/CodexText.en.sjson`, with the
+ * record each came from, because the name sits inside a prose blob rather than
+ * in a field of its own and a regex over that prose would be a guess dressed as
+ * an extraction. Quoted so the transcription can be audited:
+ *
+ * | Arm | The line it is taken from |
+ * |---|---|
+ * | Descura | "Amongst the Nocturnal Arms, Descura was first to wake" |
+ * | Lim and Oros | "The sister blades Lim and Oros were created for you" |
+ * | Ygnium | "You are ready for the Umbral Flames of Ygnium" |
+ * | Zorephet | "do not use Zorephet the Moonstone Axe" |
+ * | Revaal | "The Argent Skull once belonged to the Adjudicator Revaal" |
+ * | Xinth | "Xinth is simply that idea made manifest" |
+ */
 const WEAPONS = [
-  { id: 'WeaponStaffSwing', slug: 'staff', textId: 'HiddenAspectRevealed_Staff' },
-  { id: 'WeaponDagger', slug: 'blades', textId: 'HiddenAspectRevealed_Dagger' },
-  { id: 'WeaponTorch', slug: 'flames', textId: 'HiddenAspectRevealed_Torch' },
-  { id: 'WeaponAxe', slug: 'axe', textId: 'HiddenAspectRevealed_Axe' },
-  { id: 'WeaponLob', slug: 'skull', textId: 'HiddenAspectRevealed_Lob' },
-  { id: 'WeaponSuit', slug: 'coat', textId: 'HiddenAspectRevealed_Suit' },
+  { id: 'WeaponStaffSwing', slug: 'staff', textId: 'HiddenAspectRevealed_Staff', arm: 'Descura', codex: 'CodexData_WeaponStaff_01' },
+  { id: 'WeaponDagger', slug: 'blades', textId: 'HiddenAspectRevealed_Dagger', arm: 'Lim and Oros', codex: 'CodexData_WeaponDagger_01' },
+  { id: 'WeaponTorch', slug: 'flames', textId: 'HiddenAspectRevealed_Torch', arm: 'Ygnium', codex: 'CodexData_WeaponTorch_01' },
+  { id: 'WeaponAxe', slug: 'axe', textId: 'HiddenAspectRevealed_Axe', arm: 'Zorephet', codex: 'CodexData_WeaponAxe_01' },
+  { id: 'WeaponLob', slug: 'skull', textId: 'HiddenAspectRevealed_Lob', arm: 'Revaal', codex: 'CodexData_WeaponLob_01' },
+  { id: 'WeaponSuit', slug: 'coat', textId: 'HiddenAspectRevealed_Suit', arm: 'Xinth', codex: 'CodexData_WeaponSuit_01' },
 ]
 
 const weaponName = (textId: string): string => {
@@ -317,6 +343,7 @@ const bundle = {
     id: weapon.id,
     slug: weapon.slug,
     name: weaponName(weapon.textId),
+    arm: weapon.arm,
     // The base aspect's cutout: the weapon itself, transparent, in Melinoe's
     // own colours. The Codex card is the same weapon on parchment, which is a
     // picture of a card rather than a picture of a weapon.

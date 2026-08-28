@@ -767,13 +767,33 @@
 
 /* ---------------------------------------------------------------- radial -- */
 
-/* Scales with the page: the ring is a share of the viewport, clamped so it
- * stays thumb-sized on a phone and does not become a billboard on a desktop. */
+/* Scales with the column it is in, not with the page.
+ *
+ * It was `clamp(17rem, 62vmin, 30rem)`, and the 17rem floor is what broke it:
+ * on a 334 pixel viewport the station's own column is 252 and the floor forced
+ * the ring to 272, which overflowed the scroller and drew a horizontal
+ * scrollbar under the whole run. A viewport unit cannot see the rail or the
+ * station gutter, so it was measuring the wrong box.
+ *
+ * `cqi` measures the right one. 92 percent of the column, held under 70vmin so
+ * a wide column on a short screen still fits vertically, and floored low
+ * enough that the floor can never be the thing that overflows.
+ *
+ * `--size` has to stay a length. The ring positions its bubbles with
+ * `translate(0, calc(var(--size) / -2 ...))` and a percentage in a translate
+ * resolves against the element rather than the container, which would put
+ * every bubble in the wrong place. */
+.station-body,
+.setup {
+  container-type: inline-size;
+}
+
 .radial {
-  --size: clamp(17rem, 62vmin, 30rem);
+  --size: clamp(11rem, min(92cqi, 70vmin), 30rem);
   --bubble: calc(var(--size) * var(--bubble-scale, 0.24));
   margin: 1rem auto 0;
   width: var(--size);
+  max-width: 100%;
 }
 
 .radial-ring-area {
@@ -1092,24 +1112,51 @@
 
 .topbar-run {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.55rem;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
-.topbar-weapon {
+/* The aspect's own square icon. Rounded to the game's own corner rather than
+ * to a circle: these are rounded squares and a circular crop cuts them. */
+.topbar-mark {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: var(--r-soft);
+  object-fit: contain;
+  flex: none;
+}
+
+/* The arm leads. "Descura", not "Witch's Staff". */
+.topbar-arm {
   font-family: var(--display);
   font-size: 0.95rem;
   letter-spacing: 0.04em;
   color: var(--bone);
 }
 
-.topbar-aspect {
+/* The type is the quietest thing in the strip. It is there so a reader who
+ * does not know the arms by name can still tell what is being wielded, and it
+ * is the first thing to go when the bar runs out of room. */
+.topbar-aspect,
+.topbar-weapon {
   font-size: 0.75rem;
   color: var(--bone-faint);
 }
 
-.topbar-aspect::before {
+.topbar-weapon {
+  opacity: 0.72;
+}
+
+@media (max-width: 40rem) {
+  .topbar-weapon {
+    display: none;
+  }
+}
+
+.topbar-aspect::before,
+.topbar-weapon::before {
   content: '\00b7';
   margin-right: 0.55rem;
 }

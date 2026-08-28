@@ -12,7 +12,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { gameVersion, traits, weapons } from './data/app.ts'
+import { gameVersion, iconOf, traits, weapons } from './data/app.ts'
 import { brief, isWorthShowing } from './engine/briefing.ts'
 import type { Briefing as Card } from './engine/briefing.ts'
 import { reachable } from './engine/reachability.ts'
@@ -95,6 +95,8 @@ export function App() {
 
   const weapon = weapons.find((entry) => entry.id === run.weapon)
   const aspect = run.aspect ? traits.get(run.aspect) : null
+  // The aspect's icon, falling back to the arm's cutout before an aspect is set.
+  const aspectIcon = (run.aspect ? iconOf.get(run.aspect) : null) ?? weapon?.icon ?? null
   const verdicts = reachable(run, traits)
   const open = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK').length
   const closed = verdicts.filter((v) => v.state === 'DEAD').length
@@ -104,9 +106,22 @@ export function App() {
       <header className="topbar">
         <Menu onStartRun={end} hasRun onEndRun={end} onShowBriefing={openBriefing} />
 
+        {/* The arm, by its own name.
+         *
+         * "Descura" and "Witch's Staff" are both the game's: the second is the
+         * DisplayName its UI and patch notes use, the first is what Melinoe's
+         * Codex calls her, because the Nocturnal Arms are characters rather
+         * than equipment. The arm leads and the type qualifies it, which is
+         * how the owner talks about the run.
+         *
+         * The mark is the aspect's own square icon, not the weapon's cutout:
+         * the aspect is the thing that was chosen and the thing that changes
+         * how the run plays. */}
         <p className="topbar-run">
-          <span className="topbar-weapon">{weapon?.name ?? 'Unknown arm'}</span>
+          {aspectIcon ? <img className="topbar-mark" src={`/${aspectIcon}`} alt="" /> : null}
+          <span className="topbar-arm">{weapon?.arm ?? 'Unknown arm'}</span>
           {aspect ? <span className="topbar-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
+          {weapon ? <span className="topbar-weapon">{weapon.name}</span> : null}
           {run.path ? (
             <span className="topbar-aspect">{run.path === 'surface' ? 'Surface' : 'Underworld'}</span>
           ) : null}
