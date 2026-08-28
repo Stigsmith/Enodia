@@ -133,7 +133,7 @@ export const FRAMES: FrameOption[] = [
     note: 'The same marker with the disc taken off, so only the wings read',
     file: 'frames/reward-wings.png',
     width: 1.5,
-    aspect: '666 / 301',
+    aspect: '666 / 316',
     opacity: 0.95,
   },
 
