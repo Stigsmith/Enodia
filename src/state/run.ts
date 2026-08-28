@@ -32,8 +32,26 @@ const VERSION = 1
  * screen would put the death somewhere the player has to go looking.
  */
 export type RunEntry = {
-  /** 1-based, in the order they happened */
+  /**
+   * Which Exit this happened at, 1-based.
+   *
+   * An Encounter shares the number of the Exit that led to the Location it
+   * happened in, because that is where it happened.
+   */
   exit: number
+  /**
+   * **An Encounter is not an Exit.**
+   *
+   * `RoomLogic.BeginAthenaEncounter` reads `CurrentRun.CurrentRoom.Encounters`,
+   * plural, so an Encounter runs inside a Location the player has already
+   * reached. The Location's own reward is separate and still theirs. Artemis,
+   * Athena, Dionysus and Hades have no `LootData` entry at all and appear in no
+   * reward store: `RewardStoreData.RunProgress` is 18 slots and none of them is
+   * an Encounter god.
+   *
+   * So logging one costs no Exit, and it used to.
+   */
+  kind: 'exit' | 'encounter'
   god: GodId | null
   taken: TraitId | null
   rarity: HeldTrait['rarity'] | null
@@ -60,12 +78,18 @@ type Stored = {
 }
 
 /**
- * How many Exits a fresh run has left.
+ * How many Exits a run has.
  *
- * **An estimate, and never a question for the player.** Nobody knows their Exit
- * count when they start, and asking produced a number that was worse than a
- * default. It is corrected from the run surface, and it only moves what counts
- * as running out of time.
+ * **An estimate, and never a question for the player, in either direction.**
+ * Setup used to ask. That was wrong because nobody knows their Exit count when
+ * they start, so it became a default the player could correct from the run
+ * header with a plus and a minus. That was wrong for the same reason: a player
+ * cannot correct a number they have no way of knowing either. Both were asking
+ * the tool's question rather than answering the player's.
+ *
+ * So it is derived now, and the only input is the thing the player does know,
+ * which is how many Exits they have taken. It is labelled an estimate wherever
+ * it shows.
  *
  * The real number wants the region data, which is a map generator rather than a
  * table, so this stays an estimate until somebody measures real runs.
@@ -119,7 +143,11 @@ function migrate(stored: unknown): ActiveRun | null {
     // The roster and the cap come from the data, never from storage, so a patch
     // that changes either applies to a run already in progress.
     run: { ...record.run, olympians, maxOlympians: record.run.maxOlympians || offerRules.maxGodsPerRun },
-    entries: Array.isArray(record.entries) ? record.entries : [],
+    // Entries stored before `kind` existed were all logged as Exits, because
+    // that is the only thing the picker could record then.
+    entries: Array.isArray(record.entries)
+      ? record.entries.map((entry) => ({ ...entry, kind: entry?.kind === 'encounter' ? 'encounter' : 'exit' }))
+      : [],
     pinned: typeof record.pinned === 'string' ? record.pinned : null,
     // A run stored before step 9 has no clock. Its savedAt is close enough to
     // stand in, and the alternative is a briefing that never fires for it.
@@ -169,13 +197,12 @@ export type RunStore = {
   run: RunContext | null
   entries: RunEntry[]
   start: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => void
-  /** the Exit estimate is the player's to correct, and only theirs */
-  setExitsLeft: (exits: number) => void
+
   end: () => void
-  /** record a pick: the boon, its rarity, and the god who offered it */
-  take: (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null) => void
-  /** an Exit passed without taking a boon, which is a real move */
-  skip: (god: GodId | null) => void
+  /** record a pick: the boon, its rarity, the god who offered it, and where */
+  take: (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null, kind?: RunEntry['kind']) => void
+  /** a reward passed over without taking anything, which is a real move */
+  skip: (god: GodId | null, kind?: RunEntry['kind']) => void
   /** what the player says they are chasing. Null clears it */
   pinned: TraitId | null
   pin: (target: TraitId | null) => void
@@ -202,12 +229,6 @@ export function useRun(): RunStore {
     setActive((current) => (current ? { ...current, pinned: target } : current))
   }, [])
 
-  const setExitsLeft = useCallback((exits: number) => {
-    setActive((current) =>
-      current ? { ...current, run: { ...current.run, exitsLeft: Math.max(0, exits) } } : current,
-    )
-  }, [])
-
   const end = useCallback(() => setActive(null), [])
 
   /**
@@ -217,13 +238,14 @@ export function useRun(): RunStore {
    * after it, so the entry records what this pick closed rather than what was
    * already closed. That is the difference between a timeline and a list.
    */
-  const advance = useCallback((god: GodId | null, held?: HeldTrait) => {
+  const advance = useCallback((god: GodId | null, held: HeldTrait | undefined, kind: RunEntry['kind']) => {
     setActive((current) => {
       if (!current) return current
       const before = current.run
+      const costsAnExit = kind === 'exit'
       const after: RunContext = {
         ...before,
-        exitsLeft: Math.max(0, before.exitsLeft - 1),
+        exitsLeft: Math.max(0, before.exitsLeft - (costsAnExit ? 1 : 0)),
         godsSeen: god && !before.godsSeen.includes(god) ? [...before.godsSeen, god] : before.godsSeen,
         godsTaken:
           held && god && !before.godsTaken.includes(god) ? [...before.godsTaken, god] : before.godsTaken,
@@ -239,9 +261,13 @@ export function useRun(): RunStore {
         .filter((verdict) => verdict.state === 'DEAD' && !wasDead.has(verdict.target))
         .map((verdict) => verdict.target)
 
-      const exit = current.entries.length + 1
+      // Numbered by Exits taken, so an Encounter carries the number of the
+      // Exit that led to the Location it happened in rather than claiming one.
+      const exitsSoFar = current.entries.filter((entry) => entry.kind === 'exit').length
+      const exit = exitsSoFar + (costsAnExit ? 1 : 0)
       const entry: RunEntry = {
         exit,
+        kind,
         god,
         taken: held?.id ?? null,
         rarity: held?.rarity ?? null,
@@ -257,11 +283,15 @@ export function useRun(): RunStore {
   }, [])
 
   const take = useCallback(
-    (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null) => advance(god, { id: trait, rarity }),
+    (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null, kind: RunEntry['kind'] = 'exit') =>
+      advance(god, { id: trait, rarity }, kind),
     [advance],
   )
 
-  const skip = useCallback((god: GodId | null) => advance(god), [advance])
+  const skip = useCallback(
+    (god: GodId | null, kind: RunEntry['kind'] = 'exit') => advance(god, undefined, kind),
+    [advance],
+  )
 
   return {
     run: active?.run ?? null,
@@ -272,7 +302,6 @@ export function useRun(): RunStore {
     end,
     take,
     skip,
-    setExitsLeft,
     pin,
   }
 }

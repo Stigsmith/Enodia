@@ -22,6 +22,11 @@
  *
  * `square` turns the bubble into a rounded square, because the BoonIconFrames
  * are rounded squares and a circular portrait inside one looks like a mistake.
+ *
+ * **The default is thin.** The first drawn ring carried a lit metal band
+ * between its hairlines and read as a bezel around a screen rather than as an
+ * edge on a picture. It is still here as "Banded"; the default is two
+ * hairlines and the ground between them.
  */
 
 export type FrameOption = {
@@ -60,18 +65,17 @@ export const FRAMES: FrameOption[] = [
   {
     id: 'ring',
     name: 'Ring',
-    note: 'Two hairlines with a dark band between them. Drawn, and actually a circle',
+    note: 'A hairline, a breath of metal, and a second hairline. The default',
     file: null,
-    width: 1.22,
-    inner: 0.8,
+    width: 1.1,
+    inner: 0.9,
     opacity: 1,
     band: [
-      // the inner hairline, sitting on the bubble's own edge
-      'radial-gradient(closest-side, transparent 79.5%, var(--silver-sh) 80%, var(--silver) 82%, transparent 83%)',
-      // the outer one
-      'radial-gradient(closest-side, transparent 95%, var(--silver) 96%, var(--silver-sh) 99%, transparent 100%)',
-      // and the metal between, lit from the top left the way the game lights it
-      'linear-gradient(155deg, var(--silver-sh), var(--ink-850) 42%, var(--silver-deep) 64%, var(--silver-sh))',
+      // The inner edge, sitting on the bubble itself.
+      'radial-gradient(closest-side, transparent 90.5%, var(--silver) 91.5%, var(--silver-sh) 94%, transparent 96%)',
+      // The outer edge, dimmer, so the pair reads as one turned edge rather
+      // than as two lines.
+      'radial-gradient(closest-side, transparent 97%, var(--silver-sh) 98%, transparent 100%)',
     ].join(', '),
   },
   {
@@ -79,22 +83,36 @@ export const FRAMES: FrameOption[] = [
     name: 'Hairline',
     note: 'One thin silver circle and nothing else. The quietest it gets',
     file: null,
-    width: 1.1,
-    inner: 0.9,
+    width: 1.06,
+    inner: 0.93,
     opacity: 1,
-    band: 'radial-gradient(closest-side, transparent 89%, var(--silver) 91%, var(--silver-sh) 97%, transparent 100%)',
+    band: 'radial-gradient(closest-side, transparent 93%, var(--silver) 95%, transparent 98%)',
   },
   {
     id: 'double',
     name: 'Engraved',
     note: 'Two hairlines with the ground showing between them',
     file: null,
-    width: 1.28,
-    inner: 0.74,
+    width: 1.2,
+    inner: 0.82,
     opacity: 1,
     band: [
-      'radial-gradient(closest-side, transparent 77%, var(--silver-sh) 78%, var(--silver) 80%, transparent 81%)',
-      'radial-gradient(closest-side, transparent 92%, var(--silver) 93%, var(--silver-sh) 96%, transparent 97%)',
+      'radial-gradient(closest-side, transparent 82%, var(--silver-sh) 83%, var(--silver) 85%, transparent 86.5%)',
+      'radial-gradient(closest-side, transparent 96%, var(--silver-sh) 97%, transparent 99%)',
+    ].join(', '),
+  },
+  {
+    id: 'banded',
+    name: 'Banded',
+    note: 'The thicker one, with lit metal between the hairlines',
+    file: null,
+    width: 1.22,
+    inner: 0.8,
+    opacity: 1,
+    band: [
+      'radial-gradient(closest-side, transparent 79.5%, var(--silver-sh) 80%, var(--silver) 82%, transparent 83%)',
+      'radial-gradient(closest-side, transparent 95%, var(--silver) 96%, var(--silver-sh) 99%, transparent 100%)',
+      'linear-gradient(155deg, var(--silver-sh), var(--ink-850) 42%, var(--silver-deep) 64%, var(--silver-sh))',
     ].join(', '),
   },
 

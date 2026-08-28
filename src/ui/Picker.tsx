@@ -28,6 +28,7 @@ import { eligibleGods } from '../engine/runsim.ts'
 import { Radial } from './Radial.tsx'
 import type { ArtShape } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
+import type { RunEntry } from '../state/run.ts'
 
 type Kind = 'boon' | 'other' | 'hammer' | 'encounter' | 'artifact'
 
@@ -85,10 +86,13 @@ export function Picker({
   onSkip,
 }: {
   run: RunContext
-  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null) => void
-  onSkip: (god: string | null) => void
+  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
+  onSkip: (god: string | null, kind: RunEntry['kind']) => void
 }) {
   const [kind, setKind] = useState<Kind | null>(null)
+  // An Encounter happens inside a Location the player already reached, so it
+  // spends no Exit. Everything else here is an Exit reward.
+  const where = (which: Kind | null): RunEntry['kind'] => (which === 'encounter' ? 'encounter' : 'exit')
   const [source, setSource] = useState<RewardSource | null>(null)
   const [rarity, setRarity] = useState<HeldTrait['rarity']>('Common')
 
@@ -170,7 +174,7 @@ export function Picker({
           items={ARTIFACTS}
           chosen={null}
           onChoose={() => {
-            onSkip(null)
+            onSkip(null, 'exit')
             reset()
           }}
         />
@@ -239,7 +243,7 @@ export function Picker({
                 type="button"
                 className="boon"
                 onClick={() => {
-                  onTake(id, rarity, source.kind === 'olympian' ? source.id : null)
+                  onTake(id, rarity, source.kind === 'olympian' ? source.id : null, where(kind))
                   reset()
                 }}
               >
@@ -256,7 +260,7 @@ export function Picker({
         type="button"
         className="quiet"
         onClick={() => {
-          onSkip(source.kind === 'olympian' ? source.id : null)
+          onSkip(source.kind === 'olympian' ? source.id : null, where(kind))
           reset()
         }}
       >

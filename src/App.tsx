@@ -29,7 +29,7 @@ import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
 
 export function App() {
-  const { run, entries, pinned, lastPickAt, start, end, take, skip, setExitsLeft, pin } = useRun()
+  const { run, entries, pinned, lastPickAt, start, end, take, skip, pin } = useRun()
 
   // The saved frame, before anything draws a ring. The menu owns it after
   // that; this only makes a reload keep what was chosen.
@@ -80,6 +80,7 @@ export function App() {
   if (!run) {
     return (
       <main className="shell">
+        <Hecate />
         <header className="masthead">
           <Menu onStartRun={() => {}} hasRun={false} onEndRun={end} />
           <div>
@@ -103,6 +104,7 @@ export function App() {
 
   return (
     <div className="surface">
+      <Hecate />
       <header className="topbar">
         <Menu onStartRun={end} hasRun onEndRun={end} onShowBriefing={openBriefing} />
 
@@ -127,15 +129,16 @@ export function App() {
           ) : null}
         </p>
 
+        {/* An estimate, and it says so.
+         *
+         * There used to be a plus and a minus here. A player has no way of
+         * knowing how many Exits a run has left, so asking them to correct the
+         * number was asking the tool's question instead of answering theirs.
+         * It is derived from Exits taken now and reads as the guess it is. */}
         <p className="topbar-exits">
-          <button type="button" onClick={() => setExitsLeft(run.exitsLeft - 1)} aria-label="One fewer Exit left">
-            &minus;
-          </button>
+          <span className="topbar-about">about</span>
           <strong>{run.exitsLeft}</strong>
           <span>Exits left</span>
-          <button type="button" onClick={() => setExitsLeft(run.exitsLeft + 1)} aria-label="One more Exit left">
-            +
-          </button>
         </p>
 
         <p className="topbar-tally">
@@ -162,6 +165,26 @@ export function App() {
       </main>
 
       <Standing run={run} pinned={pinned} onPin={pin} />
+    </div>
+  )
+}
+
+/**
+ * The room the tool is standing in.
+ *
+ * `tokens.css` takes jade from Hecate's portrait and calls it the living
+ * light, so the page is lit by it and by nothing else. Three fixed layers
+ * behind everything: drifting blooms, two fields of rising dust, and a
+ * vignette. All of it is decoration, so it is aria-hidden and inert, and
+ * `prefers-reduced-motion` stops every animation in it.
+ */
+function Hecate() {
+  return (
+    <div className="hecate" aria-hidden="true">
+      <div className="hecate-glow" />
+      <div className="hecate-motes is-far" />
+      <div className="hecate-motes" />
+      <div className="hecate-vignette" />
     </div>
   )
 }
