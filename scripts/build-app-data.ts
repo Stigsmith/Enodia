@@ -216,25 +216,22 @@ const olympianList = olympiansFrom(loot)
 const sources: Source[] = []
 
 /**
- * The game's own reward symbol, where there is one.
+ * A god's portrait.
  *
- * `BoonSelectSymbols` has one per god plus a Hammer and a Pom: the glowing
- * marks the game itself puts on an Exit. They beat the wiki portraits for this
- * job because this is the job they were drawn for. Selene has none, since her
- * Hexes do not arrive through the boon select screen.
+ * The game's own `BoonSelectSymbols` glyphs were tried here and rejected: they
+ * are small glowing marks meant to sit on a door at a distance, and at the size
+ * a list shows them they are coloured dots. The portraits are faces, and a face
+ * is what a player recognises. `assets/symbols/` keeps the glyphs for wherever
+ * a small mark is genuinely the right thing.
  */
-const symbolFor = (name: string): string | null => icons.get(name.toLowerCase())?.file ?? null
-const symbol = (name: string): string | null => {
-  const entry = manifest.assets.find((asset) => asset.file === `symbols/${name.toLowerCase()}.png`)
-  return entry?.file ?? null
-}
+const portrait = (name: string): string | null => icons.get(name.toLowerCase())?.file ?? null
 
 for (const [god, pool] of godPoolsFrom(loot)) {
   sources.push({
     id: god,
     name: god,
     kind: olympianList.includes(god) ? 'olympian' : 'other',
-    icon: symbol(god) ?? symbolFor(god),
+    icon: portrait(god),
     traits: named([...new Set([...pool.priority, ...pool.pool])]),
   })
 }
@@ -246,7 +243,7 @@ if (chaos) {
     id: 'Chaos',
     name: 'Chaos',
     kind: 'other',
-    icon: symbol('Chaos') ?? symbolFor('chaos'),
+    icon: portrait('chaos'),
     traits: named([
       ...strings(dictOf(chaos).PermanentTraits),
       ...strings(dictOf(chaos).TemporaryTraits),
@@ -268,7 +265,7 @@ for (const [weapon, marker] of Object.entries(HAMMER_MARKERS)) {
     id: `Hammer_${weapon}`,
     name: 'Daedalus Hammer',
     kind: 'hammer',
-    icon: symbol('Hammer') ?? symbolFor('daedalus-hammer'),
+    icon: portrait('daedalus-hammer'),
     weapon,
     traits: named(Object.keys(resolved).filter((id) => ancestorsOf(id).has(marker))),
   })
@@ -301,7 +298,7 @@ for (const [setName, members] of Object.entries(unitSets)) {
       id: setName,
       name: who,
       kind: 'encounter',
-      icon: symbol(who) ?? symbolFor(who),
+      icon: portrait(who),
       ...(ENCOUNTER_PATHS[setName] ? { path: ENCOUNTER_PATHS[setName] } : {}),
       traits: pool,
     })

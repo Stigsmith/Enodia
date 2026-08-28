@@ -1,69 +1,105 @@
 /**
- * The timeline. The run itself, one entry per Exit.
+ * The run, as a path going down.
  *
- * `DESIGN.md` 8: lit entries behind you, one bright entry at the present, unlit
- * beads ahead for the Exits that remain.
+ * `DESIGN.md` 8 asks for lit entries behind, one bright entry at the present,
+ * and unlit beads ahead. This is that, laid out as a single vertical line: each
+ * Exit is a station on it, large and centred, so moving between them is a
+ * scroll rather than a scan. Going back in time is scrolling up, and it is
+ * deliberately a long way, because each pick deserves the screen it changed.
  *
- * Two rules from that section are load bearing here.
+ * **The picker is the end of the path, not a screen under it.** The present
+ * station is the ring, and finishing a pick advances the run and carries the
+ * page down to the next Exit, the same way the weapon ring hands you to the
+ * aspect ring.
  *
  * **A death is recorded where it happened.** Committing a slot can close a
- * dozen duos at once, and the entry for that pick is the only place the cause
+ * dozen duos at once, and the station for that pick is the only place the cause
  * and the consequence sit next to each other.
  *
- * **Future entries carry shape, never content.** `RewardLogic.ChooseLoot` draws
- * uniformly from the eligible set, so predicting which god sits behind an
- * unreached Exit would be an invented offer model. The beads state the pace of
- * the run, which is real.
+ * **Future stations carry shape, never content.** `RewardLogic.ChooseLoot`
+ * draws uniformly from the eligible set, so predicting which god sits behind an
+ * unreached Exit would be an invented offer model.
  */
 
+import { useEffect, useRef } from 'react'
+
 import { iconOf, traits } from '../data/app.ts'
+import { Picker } from './Picker.tsx'
 import type { RunEntry } from '../state/run.ts'
+import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
 
-export function Timeline({ entries, exitsLeft }: { entries: RunEntry[]; exitsLeft: number }) {
-  const newest = entries.at(-1)?.exit ?? 0
+export function Timeline({
+  entries,
+  run,
+  onTake,
+  onSkip,
+}: {
+  entries: RunEntry[]
+  run: RunContext
+  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null) => void
+  onSkip: (god: string | null) => void
+}) {
+  const present = useRef<HTMLLIElement>(null)
+
+  // Finishing a pick carries the page to the next Exit. The thing needed in a
+  // hurry sits at the far end of a history object, so position has to be
+  // fought deliberately.
+  useEffect(() => {
+    present.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }, [entries.length])
+
   return (
-    <section className="timeline" aria-label="The run so far">
-      {entries.length === 0 ? (
-        <p className="timeline-empty">Nothing behind you yet. The first Exit is below.</p>
-      ) : (
-        <ol className="timeline-list">
-          {entries.map((entry) => (
-            <PastEntry key={entry.exit} entry={entry} isNewest={entry.exit === newest} />
-          ))}
-        </ol>
-      )}
+    <ol className="path" aria-label="The run">
+      {entries.map((entry) => (
+        <Station key={entry.exit} entry={entry} />
+      ))}
 
-      <Beads count={exitsLeft} />
-    </section>
+      <li className="station is-present" ref={present}>
+        <span className="station-mark" aria-hidden="true" />
+        <div className="station-body">
+          <p className="station-exit">Exit {entries.length + 1}</p>
+          <Picker run={run} onTake={onTake} onSkip={onSkip} />
+        </div>
+      </li>
+
+      <li className="station is-ahead">
+        <span className="station-mark" aria-hidden="true" />
+        <div className="station-body">
+          <Beads count={run.exitsLeft} />
+        </div>
+      </li>
+    </ol>
   )
 }
 
-function PastEntry({ entry, isNewest }: { entry: RunEntry; isNewest: boolean }) {
+function Station({ entry }: { entry: RunEntry }) {
   const taken = entry.taken ? traits.get(entry.taken) : null
   const icon = entry.taken ? iconOf.get(entry.taken) : null
 
   return (
-    <li className={`entry${entry.died.length ? ' has-deaths' : ''}`}>
-      {/* The game's own pickup burst, played once on the entry that just
-          arrived. 19 frames of ItemConsume as one strip, stepped in CSS. */}
-      {isNewest && taken ? <span className="fx-item-consume entry-fx" aria-hidden="true" /> : null}
-      <span className="entry-exit">{entry.exit}</span>
+    <li className={`station${entry.died.length ? ' has-deaths' : ''}`}>
+      <span className="station-mark" aria-hidden="true" />
 
-      <div className="entry-body">
-        <p className="entry-what">
-          {taken ? (
-            <>
-              {icon ? <img src={`/${icon}`} alt="" loading="lazy" /> : null}
-              <span className="entry-boon">{taken.name}</span>
-              {entry.rarity ? <span className="entry-rarity">{entry.rarity}</span> : null}
-              {entry.god ? <span className="entry-god">from {entry.god}</span> : null}
-            </>
-          ) : (
-            <span className="entry-boon entry-declined">
-              {entry.god ? `Took nothing from ${entry.god}` : 'No god at this Exit'}
-            </span>
-          )}
+      <div className="station-body">
+        <p className="station-exit">
+          Exit {entry.exit}
+          {entry.god ? <span className="station-god">{entry.god}</span> : null}
         </p>
+
+        {taken ? (
+          <>
+            {icon ? <img className="station-art" src={`/${icon}`} alt="" loading="lazy" /> : null}
+            <p className="station-name">
+              {taken.name}
+              {entry.rarity ? <span className="station-rarity">{entry.rarity}</span> : null}
+            </p>
+            {taken.text ? <p className="station-text">{taken.text}</p> : null}
+          </>
+        ) : (
+          <p className="station-name station-declined">
+            {entry.god ? `Took nothing from ${entry.god}` : 'Nothing that changes what is reachable'}
+          </p>
+        )}
 
         {entry.died.length ? <Deaths died={entry.died} /> : null}
       </div>
@@ -75,8 +111,8 @@ function PastEntry({ entry, isNewest }: { entry: RunEntry; isNewest: boolean }) 
  * What this pick closed.
  *
  * The count carries the news and comes first. Settling the fourth Olympian can
- * close thirty five builds at once, and thirty five names is a wall rather than
- * a sentence, so the list opens on request.
+ * close thirty five duos at once, and thirty five names is a wall rather than a
+ * sentence, so the list opens on request.
  */
 function Deaths({ died }: { died: string[] }) {
   const named = died.map((id) => traits.get(id)?.name ?? id)
@@ -84,7 +120,7 @@ function Deaths({ died }: { died: string[] }) {
   const rest = named.length - shown.length
 
   return (
-    <details className="entry-deaths">
+    <details className="station-deaths">
       <summary>
         <span className="entry-deaths-count">
           {died.length === 1 ? '1 closed here' : `${died.length} closed here`}
@@ -99,12 +135,6 @@ function Deaths({ died }: { died: string[] }) {
   )
 }
 
-/**
- * The Exits ahead. A count, and nothing else.
- *
- * Deliberately unlabelled: any content here would be a prediction, and the
- * offer model that would license one has not been measured.
- */
 function Beads({ count }: { count: number }) {
   if (count <= 0) return <p className="beads-none">No Exits left.</p>
   return (

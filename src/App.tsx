@@ -10,20 +10,17 @@
  * Setup is its own screen and happens once.
  */
 
-import { useState } from 'react'
-
 import { gameVersion, traits, weapons } from './data/app.ts'
 import { reachable } from './engine/reachability.ts'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
-import { Tray } from './ui/Tray.tsx'
 import { Timeline } from './ui/Timeline.tsx'
+import { Standing } from './ui/Standing.tsx'
 import { useRun } from './state/run.ts'
 
 export function App() {
   const { run, entries, start, end, take, skip, setExitsLeft } = useRun()
-  const [trayOpen, setTrayOpen] = useState(true)
 
   if (!run) {
     return (
@@ -48,7 +45,7 @@ export function App() {
   const closed = verdicts.filter((v) => v.state === 'DEAD').length
 
   return (
-    <div className={`surface${trayOpen ? ' tray-open' : ''}`}>
+    <div className="surface">
       <header className="topbar">
         <Menu onStartRun={end} hasRun onEndRun={end} />
 
@@ -83,11 +80,11 @@ export function App() {
       </aside>
 
       <main className="scroller">
-        <Timeline entries={entries} exitsLeft={run.exitsLeft} />
+        <Timeline entries={entries} run={run} onTake={take} onSkip={skip} />
         <Colophon />
       </main>
 
-      <Tray run={run} open={trayOpen} onToggle={() => setTrayOpen((was) => !was)} onTake={take} onSkip={skip} />
+      <Standing run={run} />
     </div>
   )
 }

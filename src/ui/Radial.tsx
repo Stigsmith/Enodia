@@ -1,5 +1,5 @@
 /**
- * A radial picker. Bubbles on a circle, with the medallion behind them.
+ * A radial picker. Bubbles on a circle, each ringed by the game's own frame.
  *
  * Built for the reading posture rather than for looks: a ring of large round
  * targets is faster to hit with a thumb than a column of slabs, and it does not
@@ -12,9 +12,22 @@
  * There is no backdrop behind the ring. The rotating medallion that used to sit
  * there read as a spinning logo rather than as the Crossroads, and the owner
  * cut it. Whatever replaces it is still open.
+ *
+ * **Art is shaped, and the shape decides the treatment.** A portrait is a face
+ * and fills its circle. A boon mark, a slot glyph and a weapon render are
+ * rounded squares and cutouts, and a circular crop takes their corners off, so
+ * they sit inside the ring at a size that clears it instead.
  */
 
 import { useState } from 'react'
+
+/**
+ * How a piece of art wants to be drawn.
+ *
+ * `portrait` fills the circle, `icon` and `render` sit inside it uncropped.
+ * The variant supplies a default, so a ring of one kind never has to say it.
+ */
+export type ArtShape = 'portrait' | 'icon' | 'render'
 
 export type RadialItem = {
   id: string
@@ -22,6 +35,13 @@ export type RadialItem = {
   icon: string | null
   /** the second line in the tooltip, when there is something worth saying */
   note?: string | null
+  art?: ArtShape
+}
+
+const DEFAULT_ART: Record<'default' | 'renders' | 'portraits', ArtShape> = {
+  default: 'icon',
+  renders: 'render',
+  portraits: 'portrait',
 }
 
 export function Radial({
@@ -32,8 +52,8 @@ export function Radial({
   /** the one that has already been picked sits in the middle */
   centre,
   /**
-   * "renders" shows transparent cutouts whole rather than cropping them to the
-   * circle, which is what the weapon and aspect art wants.
+   * The default shape for items that do not name one: "renders" for weapon and
+   * aspect cutouts, "portraits" for faces.
    */
   variant = 'default',
 }: {
@@ -42,7 +62,7 @@ export function Radial({
   onChoose: (id: string) => void
   label: string
   centre?: RadialItem | null
-  variant?: 'default' | 'renders'
+  variant?: 'default' | 'renders' | 'portraits'
 }) {
   const [hovered, setHovered] = useState<string | null>(null)
 
@@ -67,10 +87,15 @@ export function Radial({
 
         <ul className="radial-ring" style={{ '--count': items.length } as React.CSSProperties}>
         {items.map((item, index) => (
-          <li key={item.id} style={{ '--index': index } as React.CSSProperties}>
+          <li
+            key={item.id}
+            className={`bubble-slot is-${item.art ?? DEFAULT_ART[variant]}`}
+            style={{ '--index': index } as React.CSSProperties}
+          >
             <button
               type="button"
               className={`bubble${chosen === item.id ? ' is-chosen' : ''}${hovered === item.id ? ' is-hovered' : ''}`}
+              aria-label={item.name}
               aria-pressed={chosen === item.id}
               onClick={() => onChoose(item.id)}
               onMouseEnter={() => setHovered(item.id)}
@@ -78,8 +103,9 @@ export function Radial({
               onFocus={() => setHovered(item.id)}
               onBlur={() => setHovered(null)}
             >
-              {item.icon ? <img src={`/${item.icon}`} alt="" loading="lazy" /> : <span className="bubble-blank" />}
-              <span className="visually-hidden">{item.name}</span>
+              {/* Not lazy. A ring holds at most a dozen and they are all on
+                  screen at once, so deferring them only buys a pop-in. */}
+              {item.icon ? <img src={`/${item.icon}`} alt="" /> : <span className="bubble-blank" />}
             </button>
           </li>
         ))}
