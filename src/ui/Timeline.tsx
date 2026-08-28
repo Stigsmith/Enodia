@@ -7,7 +7,7 @@
  * Two rules from that section are load bearing here.
  *
  * **A death is recorded where it happened.** Committing a slot can close a
- * dozen builds at once, and the entry for that pick is the only place the cause
+ * dozen duos at once, and the entry for that pick is the only place the cause
  * and the consequence sit next to each other.
  *
  * **Future entries carry shape, never content.** `RewardLogic.ChooseLoot` draws
@@ -83,7 +83,7 @@ function Deaths({ died }: { died: string[] }) {
     <details className="entry-deaths">
       <summary>
         <span className="entry-deaths-count">
-          {died.length === 1 ? '1 build closed here' : `${died.length} builds closed here`}
+          {died.length === 1 ? '1 closed here' : `${died.length} closed here`}
         </span>
         <span className="entry-deaths-list">
           {shown.join(', ')}

@@ -192,6 +192,8 @@ type Source = {
   kind: 'olympian' | 'other' | 'hammer' | 'hex' | 'encounter'
   icon: string | null
   weapon?: string
+  /** which way this one turns up, when the room data says */
+  path?: 'underworld' | 'surface'
   traits: string[]
 }
 
@@ -243,6 +245,21 @@ for (const [weapon, marker] of Object.entries(HAMMER_MARKERS)) {
   })
 }
 
+/**
+ * Where each Encounter god turns up, from the room data.
+ *
+ * `NPC_Artemis` appears only in `RoomDataF`, which is Erebus by its own
+ * `ErebusExitDoor`. `NPC_Dionysus` only in `RoomDataP`, which is Ephyra.
+ * `NPC_Hades` only in `RoomDataI`, which is Tartarus. Athena appears in no room
+ * data at all, which matches her arriving through her keepsake rather than
+ * through a Location, so she is left unfiltered.
+ */
+const ENCOUNTER_PATHS: Record<string, 'underworld' | 'surface'> = {
+  NPC_Artemis: 'underworld',
+  NPC_Hades: 'underworld',
+  NPC_Dionysus: 'surface',
+}
+
 const unitSets = read('unit-sets').data
 for (const [setName, members] of Object.entries(unitSets)) {
   for (const record of Object.values(dictOf(members))) {
@@ -256,6 +273,7 @@ for (const [setName, members] of Object.entries(unitSets)) {
       name: who,
       kind: 'encounter',
       icon: icons.get(who.toLowerCase())?.file ?? null,
+      ...(ENCOUNTER_PATHS[setName] ? { path: ENCOUNTER_PATHS[setName] } : {}),
       traits: pool,
     })
   }

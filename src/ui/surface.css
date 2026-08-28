@@ -997,3 +997,391 @@
 .rarity-step output.is-rare { color: var(--silver-hi); }
 .rarity-step output.is-epic { color: var(--rim-magenta); }
 .rarity-step output.is-heroic { color: var(--unbuilt); }
+
+/* ================================================================ surface ==
+ * The run surface. Three pinned regions and one that scrolls.
+ *
+ *   topbar   the run, the clock, the tally
+ *   railbar  five slots, never off screen
+ *   scroller the timeline, and the only thing with a scrollbar
+ *   tray     the pick, docked at the bottom
+ * ========================================================================= */
+
+.surface {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'top top'
+    'rail scroll'
+    'tray tray';
+  height: 100dvh;
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--div-2);
+  background: var(--ink-950);
+}
+
+.topbar p {
+  margin: 0;
+}
+
+.topbar-run {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.topbar-weapon {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+
+.topbar-aspect {
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+.topbar-aspect::before {
+  content: '\00b7';
+  margin-right: 0.55rem;
+}
+
+.topbar-exits {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+.topbar-exits strong {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.topbar-exits button {
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.topbar-tally {
+  margin-left: auto !important;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--bone-dim);
+}
+
+.topbar-tally strong {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  color: var(--jade-hot);
+}
+
+.topbar-closed {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--bone-faint);
+}
+
+/* The rail. A column now, and it never scrolls away. */
+.railbar {
+  grid-area: rail;
+  padding: 0.8rem 0.6rem;
+  border-right: 1px solid var(--div-2);
+  background: var(--ink-950);
+}
+
+.railbar .rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rail-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.rail-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+}
+
+.rail-art {
+  width: 78%;
+  height: 78%;
+  border-radius: var(--r-soft);
+  object-fit: cover;
+}
+
+/* The game's own rarity frame, sitting over the art the way it does in game. */
+.rail-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* An empty slot shows the game's glyph, dimmed. A hole reads as a bug. */
+.rail-glyph {
+  width: 58%;
+  height: 58%;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.rail-slot.is-filled .rail-slot-name {
+  color: var(--jade);
+}
+
+.scroller {
+  grid-area: scroll;
+  overflow-y: auto;
+  padding: 0.9rem 1rem 1.5rem;
+}
+
+/* ------------------------------------------------------------------ tray -- */
+
+.tray {
+  grid-area: tray;
+  border-top: 1px solid var(--div-4);
+  background: var(--ink-850);
+}
+
+.tray-handle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  border: 0;
+  background: none;
+  color: var(--jade);
+  font-family: var(--display);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tray-handle-hint {
+  font-family: var(--body);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bone-faint);
+}
+
+.tray-body {
+  max-height: 46dvh;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+}
+
+.tray-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+
+.tray-tabs button {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.tray-tabs button.is-active {
+  border-color: var(--jade-dim);
+  color: var(--jade-hot);
+}
+
+.god-priority-list,
+.target-list {
+  list-style: none;
+  margin: 0 0 0.8rem;
+  padding: 0;
+}
+
+.god-priority-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.2rem 0;
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+}
+
+/* On a phone the rail lies along the top instead of down the side, because
+ * 44 points of width is a lot when there are only 375 of them. */
+@media (max-width: 34rem) {
+  .surface {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'top'
+      'rail'
+      'scroll'
+      'tray';
+  }
+
+  .railbar {
+    border-right: 0;
+    border-bottom: 1px solid var(--div-2);
+    padding: 0.5rem;
+  }
+
+  .railbar .rail {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .tray-body {
+    max-height: 52dvh;
+  }
+}
+
+/* ---------------------------------------------------------------- plates -- */
+
+/* The game's own boon plate, used the way the game uses it: a wide dark strip
+ * with the icon in a frame at the left. It is why this reads as Hades II
+ * furniture rather than as a list of web buttons. */
+
+.source-group {
+  margin-bottom: 0.9rem;
+}
+
+.group-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.4rem;
+  font-family: var(--display);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+.group-heading span {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bone-faint);
+}
+
+.god-list,
+.boon-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.35rem;
+}
+
+.plate,
+.boon {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900) url('/frames/plate-common.png') left center / cover no-repeat;
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-response) var(--e-response), filter var(--t-response) var(--e-response);
+}
+
+.plate:hover,
+.boon:hover {
+  border-color: var(--jade-dim);
+  filter: brightness(1.25);
+}
+
+.plate.is-hammer,
+.plate.is-hex,
+.plate.is-other {
+  background-image: url('/frames/plate-unity.png');
+}
+
+.plate.is-encounter {
+  background-image: url('/frames/plate-duo.png');
+}
+
+.plate-mark,
+.boon img {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: none;
+}
+
+.plate-mark img:first-child {
+  width: 74%;
+  height: 74%;
+  border-radius: var(--r-soft);
+  object-fit: cover;
+}
+
+.plate-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
+
+.plate-name {
+  overflow-wrap: anywhere;
+}
+
+.boon {
+  padding-left: 0.4rem;
+}
+
+.boon img {
+  border-radius: var(--r-soft);
+  object-fit: cover;
+}

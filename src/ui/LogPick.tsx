@@ -18,8 +18,6 @@
 
 import { useState } from 'react'
 
-import { Radial } from './Radial.tsx'
-
 import { iconOf, sources, traits } from '../data/app.ts'
 import type { RewardSource } from '../data/app.ts'
 import { canBeOffered } from '../engine/slots.ts'
@@ -45,18 +43,27 @@ export function LogPick({
   const openGods = new Set(eligibleGods(run, traits, godPools))
   const held = new Set(run.held.map((h) => h.id))
 
-  // At an Exit. Olympians freeze to those held once the cap is reached, and the
-  // hammer is the one for the weapon in hand.
-  const atExit = sources.filter((entry) => {
-    if (entry.kind === 'olympian') return openGods.has(entry.id)
+  // Three groups, because they cost three different things.
+  //
+  // An Olympian spends one of your four slots the moment you take a boon. The
+  // hammer, Selene and Hermes cost nothing from that budget. The Encounter gods
+  // are not Exits at all, and the room data says where each turns up: Artemis
+  // and Hades in the Underworld, Dionysus on the Surface. Athena appears in no
+  // room data, which fits her arriving through her keepsake, so she is always
+  // listed.
+  const olympianSources = sources.filter((entry) => entry.kind === 'olympian' && openGods.has(entry.id))
+
+  const noSlotCost = sources.filter((entry) => {
     if (entry.kind === 'hammer') return entry.weapon === run.weapon
     if (entry.kind === 'hex') return true
     return entry.kind === 'other' && entry.id === 'Hermes'
   })
 
-  const elsewhere = sources.filter(
-    (entry) => entry.kind === 'encounter' || (entry.kind === 'other' && entry.id === 'Chaos'),
-  )
+  const elsewhere = sources.filter((entry) => {
+    if (entry.kind === 'other' && entry.id === 'Chaos') return true
+    if (entry.kind !== 'encounter') return false
+    return !entry.path || !run.path || entry.path === run.path
+  })
 
   const offerable = source
     ? source.traits
@@ -142,25 +149,26 @@ export function LogPick({
     )
   }
 
-  const byId = new Map([...atExit, ...elsewhere].map((entry) => [entry.id, entry]))
-
   return (
     <section className="log-pick">
-      <h2 className="step-heading">What did this Exit give</h2>
-      <Radial
-        label="Who was behind it"
-        items={atExit.map((entry) => ({
-          id: entry.id,
-          name: entry.name,
-          icon: entry.icon,
-          note: NOTES[entry.kind] ?? null,
-        }))}
-        chosen={null}
-        onChoose={(id) => setSource(byId.get(id) ?? null)}
+      <SourceGroup
+        title="An Olympian"
+        note="Spends one of your four slots"
+        entries={olympianSources}
+        onPick={setSource}
       />
-
-      <h2 className="step-heading">Or, from an Encounter</h2>
-      <SourceList entries={elsewhere} onPick={setSource} />
+      <SourceGroup
+        title="Costs no slot"
+        note="Never counts against the cap"
+        entries={noSlotCost}
+        onPick={setSource}
+      />
+      <SourceGroup
+        title="From an Encounter"
+        note={run.path ? `Who turns up on the ${run.path === 'surface' ? 'Surface' : 'Underworld'} path` : null}
+        entries={elsewhere}
+        onPick={setSource}
+      />
 
       <div className="pick-actions">
         <button type="button" className="quiet" onClick={() => onSkip(null)}>
@@ -171,13 +179,27 @@ export function LogPick({
   )
 }
 
-/** Why a source is in this ring at all, said once rather than per bubble. */
-const NOTES: Record<RewardSource['kind'], string> = {
-  olympian: 'Spends one of your four Olympian slots the moment you take a boon',
-  other: 'Never counts against the Olympian cap',
-  hammer: 'Two of the eighteen reward slots. Changes a weapon more than a boon does',
-  hex: 'Selene, and her Hexes never count against the Olympian cap',
-  encounter: 'Arrives through an Encounter rather than an Exit, and costs no slot',
+function SourceGroup({
+  title,
+  note,
+  entries,
+  onPick,
+}: {
+  title: string
+  note: string | null
+  entries: RewardSource[]
+  onPick: (entry: RewardSource) => void
+}) {
+  if (!entries.length) return null
+  return (
+    <div className="source-group">
+      <h3 className="group-heading">
+        {title}
+        {note ? <span>{note}</span> : null}
+      </h3>
+      <SourceList entries={entries} onPick={onPick} />
+    </div>
+  )
 }
 
 function SourceList({ entries, onPick }: { entries: RewardSource[]; onPick: (entry: RewardSource) => void }) {
@@ -185,9 +207,12 @@ function SourceList({ entries, onPick }: { entries: RewardSource[]; onPick: (ent
     <ul className="god-list">
       {entries.map((entry) => (
         <li key={entry.id}>
-          <button type="button" className={`god is-${entry.kind}`} onClick={() => onPick(entry)}>
-            {entry.icon ? <img src={`/${entry.icon}`} alt="" loading="lazy" /> : <span className="boon-blank" />}
-            <span>{entry.name}</span>
+          <button type="button" className={`plate is-${entry.kind}`} onClick={() => onPick(entry)}>
+            <span className="plate-mark">
+              {entry.icon ? <img src={`/${entry.icon}`} alt="" loading="lazy" /> : null}
+              <img className="plate-frame" src="/frames/frame-primary.png" alt="" aria-hidden="true" />
+            </span>
+            <span className="plate-name">{entry.name}</span>
           </button>
         </li>
       ))}

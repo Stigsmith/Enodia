@@ -23,7 +23,7 @@ const VERSION = 1
  * One Exit, after the fact.
  *
  * `died` is the point of the whole structure. Committing a slot can close a
- * dozen builds at once, and this entry is the only place in the product where
+ * dozen duos at once, and this entry is the only place in the product where
  * the cause and the consequence sit next to each other. A separate targets
  * screen would put the death somewhere the player has to go looking.
  */
