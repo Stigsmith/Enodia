@@ -156,11 +156,15 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - ~~The gods as the game's `BoonSelectSymbols` glyphs~~. Reverted on sight. They are small
   glowing marks meant to be read on a door at a distance and they render as coloured dots
   in a list. Portraits, larger than before. `assets/symbols/` keeps the glyphs
-- ~~The filigree circle around each bubble~~. **The frame is a setting now, not a
-  decision.** The stone ring went in and came straight back out: it was one answer and the
-  owner wanted to see the rest. `src/ui/frames.ts` holds ten options, the menu lists them
-  with a swatch each, and the choice persists. The default is the filigree again. Geometry
-  is one number per option, `hole`, so adding another is one entry and no CSS
+- ~~The filigree circle around each bubble~~. **The frame is a setting, and the default is
+  drawn rather than taken.** The stone ring went in and came back out, then the whole set
+  of game rings went out too, for one reason: **none of them is a circle.** The filigree is
+  a 482 by 269 disc with wings, the starburst is a four pointed star, the orbit is a band
+  across the middle, and BoonSelect's carved stone is the only round one in the package.
+  So `src/ui/frames.ts` now opens with three authored in CSS out of two radial gradients
+  and a mask, in the palette's own silver, and keeps five of the game's below them for
+  comparison. The menu lists all nine with a swatch each and the choice persists. Both
+  kinds run the same custom properties, so the swatch draws what the ring will
 - ~~A face fills the circle; nothing else does~~. A boon mark, a slot glyph and a hammer
   are rounded squares and a weapon is a diagonal cutout, and a circular crop takes the
   corners off all of them, so they sit inside the frame instead. `RadialItem.art` carries
