@@ -127,6 +127,20 @@ function iconFor(trait: Trait): string | null {
   return found.found ? found.file : null
 }
 
+/**
+ * The large art, for an aspect.
+ *
+ * `<weapon>-<aspect>-render` is the wiki's transparent cutout of the weapon in
+ * that aspect's colours, which is a picture of the thing rather than a 90 pixel
+ * icon of it. Only aspects have one.
+ */
+function renderFor(trait: Trait): string | null {
+  if (!trait.name || !trait.requiredWeapon) return null
+  const [key] = aspectIconKeys(trait.name, trait.requiredWeapon)
+  if (!key) return null
+  return icons.get(`${key}-render`)?.file ?? null
+}
+
 const records = [...traits.values()]
   // Templates with no display name are never rendered, and 84 of them would be
   // a third of the payload.
@@ -142,6 +156,7 @@ const records = [...traits.values()]
     ...(trait.requires ? { requires: trait.requires } : {}),
     ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
     ...(describe(trait.id) ? { text: describe(trait.id) } : {}),
+    ...(renderFor(trait) ? { render: renderFor(trait) } : {}),
   }))
 
 const pools = [...godPoolsFrom(loot).entries()].map(([god, pool]) => ({ god, ...pool }))

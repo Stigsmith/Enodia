@@ -767,20 +767,6 @@
   height: var(--size);
 }
 
-.radial-medallion {
-  position: absolute;
-  inset: 8%;
-  background: url('/chrome/medallion.png') center / contain no-repeat;
-  opacity: 0.22;
-  animation: radial-turn 120s linear infinite;
-}
-
-@keyframes radial-turn {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .radial-ring {
   position: absolute;
   inset: 0;
@@ -926,9 +912,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .radial-medallion {
-    animation: none;
-  }
   .radial-centre {
     animation-duration: 0.01ms;
   }
@@ -1384,4 +1367,65 @@
 .boon img {
   border-radius: var(--r-soft);
   object-fit: cover;
+}
+
+/* Aspect renders are transparent cutouts, so they want showing whole rather
+ * than cropped to a circle, and a little room around them. */
+.radial.is-renders .bubble {
+  background: radial-gradient(circle at 50% 45%, var(--ink-800), var(--ink-950) 70%);
+}
+
+.radial.is-renders .bubble img {
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+}
+
+/* The centre carries whatever the run is so far: the weapon until an aspect is
+ * chosen, then the aspect, large. The ring leaves a hole of about 0.52 of the
+ * width, so 0.44 fills it without touching the bubbles. */
+.radial-centre {
+  width: calc(var(--size) * 0.44);
+  gap: 0.5rem;
+}
+
+.radial-centre img {
+  max-height: calc(var(--size) * 0.42);
+  object-fit: contain;
+}
+
+.radial-centre span {
+  font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------- scrollbars -- */
+
+/* Thin, in the ground colours, and only visible where something scrolls. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--div-5) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--r-pill);
+  background-clip: content-box;
+  background-color: var(--div-5);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--jade-dim);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }

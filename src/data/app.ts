@@ -20,6 +20,7 @@ type RawTrait = {
   requires?: Requirement
   icon?: string
   text?: string
+  render?: string
 }
 
 export type Weapon = {
@@ -33,6 +34,11 @@ export type Weapon = {
 /** Where a trait's art lives, by trait id. Absent when there is none. */
 export const iconOf: ReadonlyMap<TraitId, string> = new Map(
   (bundle.traits as RawTrait[]).flatMap((trait) => (trait.icon ? [[trait.id, trait.icon] as const] : [])),
+)
+
+/** The large cutout, for the aspects that have one. */
+export const renderOf: ReadonlyMap<TraitId, string> = new Map(
+  (bundle.traits as RawTrait[]).flatMap((trait) => (trait.render ? [[trait.id, trait.render] as const] : [])),
 )
 
 export const traits: TraitIndex = new Map(

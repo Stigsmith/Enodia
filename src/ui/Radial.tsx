@@ -9,10 +9,9 @@
  * `VISUAL.md` doing the work a tooltip would otherwise have to. The tooltip is
  * there too, for the name and the sentence.
  *
- * The medallion behind it is `chrome/medallion.png`, the Daedalus Hammer
- * screen's own backdrop, counter-rotating in the game at RotationSpeed 0.5.
- * Here it turns once every two minutes, which is ambient tier: always running,
- * never asking for attention, and it stops dead under prefers-reduced-motion.
+ * There is no backdrop behind the ring. The rotating medallion that used to sit
+ * there read as a spinning logo rather than as the Crossroads, and the owner
+ * cut it. Whatever replaces it is still open.
  */
 
 import { useState } from 'react'
@@ -44,7 +43,7 @@ export function Radial({
   onChoose: (id: string) => void
   label: string
   centre?: RadialItem | null
-  variant?: 'default' | 'cards'
+  variant?: 'default' | 'cards' | 'renders'
 }) {
   const [hovered, setHovered] = useState<string | null>(null)
 
@@ -59,7 +58,6 @@ export function Radial({
       style={{ '--bubble-scale': bubble } as React.CSSProperties}
     >
       <div className="radial-ring-area">
-        <div className="radial-medallion" aria-hidden="true" />
 
         {centre ? (
           <div className="radial-centre">

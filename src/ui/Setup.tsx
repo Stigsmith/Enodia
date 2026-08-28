@@ -11,7 +11,7 @@
 
 import { useState } from 'react'
 
-import { aspectsOf, iconOf, weapons } from '../data/app.ts'
+import { aspectsOf, iconOf, renderOf, traits, weapons } from '../data/app.ts'
 import { Radial } from './Radial.tsx'
 import type { RadialItem } from './Radial.tsx'
 import type { RunPath, TraitId, WeaponId } from '../data/types.ts'
@@ -27,24 +27,38 @@ export function Setup({
 
   const chosenWeapon = weapons.find((entry) => entry.id === weapon) ?? null
 
-  // The weapon settles into the middle and its four aspects take the ring.
+  const chosenAspect = aspect ? traits.get(aspect) : null
+
+  // The weapon settles into the middle and its four aspects take the ring,
+  // shown as the large cutouts rather than the 90 pixel icons. Once an aspect
+  // is chosen it takes the middle, because that is what the run is now.
   const items: RadialItem[] = chosenWeapon
     ? aspectsOf(chosenWeapon.id).map((entry) => ({
         id: entry.id,
         name: entry.name?.replace(/^Aspect of /, '') ?? entry.id,
-        icon: iconOf.get(entry.id) ?? null,
+        icon: renderOf.get(entry.id) ?? iconOf.get(entry.id) ?? null,
         note: entry.text,
       }))
     : weapons.map((entry) => ({ id: entry.id, name: entry.name, icon: entry.icon }))
 
+  const centre: RadialItem | null = chosenAspect
+    ? {
+        id: chosenAspect.id,
+        name: chosenAspect.name?.replace(/^Aspect of /, '') ?? chosenAspect.id,
+        icon: renderOf.get(chosenAspect.id) ?? iconOf.get(chosenAspect.id) ?? null,
+      }
+    : chosenWeapon
+      ? { id: chosenWeapon.id, name: chosenWeapon.name, icon: chosenWeapon.icon }
+      : null
+
   return (
     <section className="setup">
       <Radial
-        variant={chosenWeapon ? 'default' : 'cards'}
+        variant={chosenWeapon ? 'renders' : 'cards'}
         label={chosenWeapon ? 'Which aspect' : 'Which arm'}
         items={items}
         chosen={chosenWeapon ? aspect : weapon}
-        centre={chosenWeapon ? { id: chosenWeapon.id, name: chosenWeapon.name, icon: chosenWeapon.icon } : null}
+        centre={centre}
         onChoose={(id) => {
           if (chosenWeapon) setAspect(id)
           else {
