@@ -116,6 +116,27 @@ export const FRAMES: FrameOption[] = [
     ].join(', '),
   },
 
+  // The game's own Exit reward marker, which is what it draws on an Exit when
+  // there is something behind it. `scripts/reward-frame.ts` has the chain it
+  // was traced through and why the disc had to be squared up first.
+  {
+    id: 'reward',
+    name: 'Exit reward',
+    note: 'What the game itself puts on an Exit: the disc and its two silver wings',
+    file: 'frames/reward-marker.png',
+    width: 1.34,
+    opacity: 0.95,
+  },
+  {
+    id: 'wings',
+    name: 'Wings',
+    note: 'The same marker with the disc taken off, so only the wings read',
+    file: 'frames/reward-wings.png',
+    width: 1.42,
+    aspect: '584 / 468',
+    opacity: 0.95,
+  },
+
   // The game's own, kept for comparison. None of them is a plain circle.
   {
     id: 'filigree',

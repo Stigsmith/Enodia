@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 875,
+ "count": 880,
  "categories": [
   {
    "name": "arcana",
@@ -44,7 +44,7 @@
   },
   {
    "name": "chrome",
-   "count": 52,
+   "count": 53,
    "source": "game"
   },
   {
@@ -66,7 +66,7 @@
   },
   {
    "name": "frames",
-   "count": 21,
+   "count": 25,
    "source": "game"
   },
   {
@@ -4092,6 +4092,14 @@
    "source": "game"
   },
   {
+   "id": "reward-glow",
+   "category": "chrome",
+   "file": "chrome/reward-glow.png",
+   "bytes": 22709,
+   "sha256": "365f815c08aa67e89056b72a52948e7174ce7d8e7d72af1197e0526454b7afe4",
+   "source": "game"
+  },
+  {
    "id": "sidebars",
    "category": "chrome",
    "file": "chrome/sidebars.png",
@@ -5305,6 +5313,38 @@
    "file": "frames/plate-unity.png",
    "bytes": 86461,
    "sha256": "1edac71e1ce9a15b1b9447b9eefdcc9dfa44e92ae638af8bfa4442bdd35cfcd1",
+   "source": "game"
+  },
+  {
+   "id": "reward-marker-meta",
+   "category": "frames",
+   "file": "frames/reward-marker-meta.png",
+   "bytes": 101387,
+   "sha256": "5f1a8bd1283d740a3dff690f33abd8cb238f6ad818dc00ae753155dfa6720b03",
+   "source": "game"
+  },
+  {
+   "id": "reward-marker",
+   "category": "frames",
+   "file": "frames/reward-marker.png",
+   "bytes": 106318,
+   "sha256": "6f78f97e4cd6ad9daed2aafb215dd5ee9ee27d14595b3f22205c30978587032e",
+   "source": "game"
+  },
+  {
+   "id": "reward-wings-meta",
+   "category": "frames",
+   "file": "frames/reward-wings-meta.png",
+   "bytes": 86771,
+   "sha256": "0775d7f8f422c085be086f7c67a0359c6030c4bb0003c2fae5fb6259be6e1f7a",
+   "source": "game"
+  },
+  {
+   "id": "reward-wings",
+   "category": "frames",
+   "file": "frames/reward-wings.png",
+   "bytes": 88749,
+   "sha256": "8d382d2b7cd1d0a22e4408d2f086eeb4c4475e61a2042f3a54642d1f6e3999e3",
    "source": "game"
   },
   {

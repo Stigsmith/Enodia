@@ -17,7 +17,8 @@
     "assets": "node scripts/assets.ts",
     "data": "node scripts/build-app-data.ts",
     "sprites": "node scripts/sprites.ts",
-    "chrome": "node scripts/chrome.ts"
+    "chrome": "node scripts/chrome.ts",
+    "reward-frame": "node scripts/reward-frame.ts"
   },
   "dependencies": {
     "react": "^19.2.8",

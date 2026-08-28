@@ -81,7 +81,7 @@ their source pages the first time, which is how that got noticed.
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic. These are `Icons/CardRarityIcon_*` | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
 | `chrome/` | 52 | game | The game's own furniture: boxes, buttons, backings, medallion, splash art | picked by hand, see `scripts/chrome.ts` |
-| `frames/` | 21 | game | Boon and rarity frames, plus every ring the radial can wear | see `src/ui/frames.ts` |
+| `frames/` | 25 | game | Boon and rarity frames, every ring the radial can wear, and the game's own Exit reward marker | see `src/ui/frames.ts` |
 | `icons/` | 7 | game | The game's own UI icons: boon, gold, reroll, inventory, warning, unknown | picked by hand |
 | `familiars/` | 50 | game | The five familiars, their six skins each and their stat icons | complete, unused so far |
 | `gifts/` | 33 | game | Keepsake max gift portraits, one per character. A possible alternate to `gods/` | unused so far |
@@ -256,6 +256,38 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
+
+### The Exit reward marker, and it is not in `GUI.pkg`
+
+The medallion the game puts on an Exit when there is something behind it, the one with two
+silver wings, is three layers and `RewardPresentation.CreateDoorRewardPreview` names them.
+It spawns a backing, sets one animation on it, and that animation chains:
+
+```
+RoomRewardAvailable_Back_Run       Fx/RoomRewardAvailable-Back/RoomRewardGlow
+  -> RoomRewardAvailable_Front_Run Fx/RoomRewardAvailable-Front/...0001..0060
+       -> RoomRewardFrame_Run      Fx/RoomRewardAvailable-Back/RoomRewardFrame-Run
+```
+
+A warm bloom behind, a shimmering disc of **60 frames at 30fps** over it, and the two wings
+on top. `_Meta` is the same for the MetaProgress store, with a green jewel on each wing.
+`Items_General_VFX.sjson` holds all of it.
+
+**They are in `ScriptsBase.pkg`, not `GUI.pkg`.** That is the whole reason nothing on this
+shelf had them: every extraction this project had run was of the GUI package, so the marker
+was never absent, it was never looked for. Same shape as the boon-icon and the aspect-name
+mistakes: a negative result proved something about the search.
+
+`deppth2`'s `-e` filter matched none of these entries under any name tried, including the
+exact one `deppth2 ls` prints, so the package comes out whole into
+`extracted/scriptsbase/`. It is 6,784 stills and takes several minutes.
+
+**The disc is an ellipse, 122 by 162,** because the game draws it in isometric: it is a
+circle seen at an angle. `npm run reward-frame` crops to the alpha bbox and resizes that
+crop to a square, which is what turns the ellipse back into a circle, punches the dark
+interior out so it can sit over a portrait, and composes the wings on top. Output is
+`frames/reward-marker.png`, `frames/reward-wings.png`, both `-meta` variants, and
+`chrome/reward-glow.png`.
 
 ### Boon icons are 90x90 and there is no larger copy
 
