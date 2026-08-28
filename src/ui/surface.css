@@ -2077,9 +2077,15 @@ body::before {
   display: grid;
   grid-template-columns: 2.5rem 1fr;
   align-items: start;
-  min-height: 62dvh;
-  padding: 2rem 0;
+  min-height: 48dvh;
+  padding: 1.5rem 0;
   scroll-margin: 12vh;
+}
+
+/* The present station is the picker, and a ring needs the room a logged entry
+ * does not. Shrinking both together would have cost the thing that was fine. */
+.station.is-present {
+  min-height: 62dvh;
 }
 
 /* The line itself, drawn behind the marks and stopping at the last one. */
@@ -2132,9 +2138,9 @@ body::before {
   align-items: baseline;
   justify-content: center;
   gap: 0.6rem;
-  margin: 0 0 1rem;
+  margin: 0 0 0.8rem;
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--bone-faint);
@@ -2148,10 +2154,19 @@ body::before {
   color: var(--bone-dim);
 }
 
-/* The boon, centred and large. This is the thing that pick was about. */
+/* The boon, centred. This is the thing that pick was about.
+ *
+ * **5rem, because that is what the art can carry.** The game draws its boon
+ * icons at 88 to 90 pixels and that is the only source there is: 435 of them
+ * come straight out of GUI.pkg at that size and the wiki's are the same icons
+ * rescaled. At 8.5rem this was a 1.5x upscale and it looked it. 80 pixels
+ * downsamples instead, which is always crisp.
+ *
+ * The station is still the biggest thing on the page. It just no longer claims
+ * more resolution than exists. */
 .station-art {
-  width: 8.5rem;
-  height: 8.5rem;
+  width: 5rem;
+  height: 5rem;
   object-fit: contain;
   border-radius: var(--r-card);
 }
@@ -2161,9 +2176,9 @@ body::before {
   align-items: baseline;
   justify-content: center;
   gap: 0.6rem;
-  margin: 0.7rem 0 0;
+  margin: 0.6rem 0 0;
   font-family: var(--display);
-  font-size: 1.15rem;
+  font-size: 1rem;
   letter-spacing: 0.03em;
   color: var(--bone);
 }
@@ -2182,9 +2197,9 @@ body::before {
 }
 
 .station-text {
-  max-width: 26rem;
-  margin: 0.5rem auto 0;
-  font-size: 0.85rem;
+  max-width: 24rem;
+  margin: 0.4rem auto 0;
+  font-size: 0.8rem;
   line-height: 1.5;
   color: var(--bone-dim);
 }
