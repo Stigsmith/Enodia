@@ -35,9 +35,8 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
   {
     id: 'boon',
     name: 'A boon',
-    // The wiki's generic boon mark. A Pom stood here first and said the wrong
-    // thing entirely: a Pom is not a boon.
-    icon: 'ui/boonii.webp',
+    // The game's own `Icons/Boon.png`, not the wiki's redraw of it.
+    icon: 'icons/boon.png',
     art: 'icon',
     note: 'From one of the nine Olympians. Spends a slot',
   },
@@ -214,7 +213,10 @@ export function Picker({
         >
           &minus;
         </button>
-        <output className={`rarity is-${rarity.toLowerCase()}`}>{rarity}</output>
+        <output className={`rarity is-${rarity.toLowerCase()}`}>
+          <img src={`/rarity/${rarity.toLowerCase()}.png`} alt="" />
+          {rarity}
+        </output>
         <button
           type="button"
           onClick={() =>

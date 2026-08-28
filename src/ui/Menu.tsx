@@ -16,6 +16,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { FRAMES, applyFrame, frameVars, readFrame, writeFrame } from './frames.ts'
+
 type Entry = {
   label: string
   note: string
@@ -25,7 +27,13 @@ type Entry = {
 
 export function Menu({ onStartRun, hasRun, onEndRun }: { onStartRun: () => void; hasRun: boolean; onEndRun: () => void }) {
   const [open, setOpen] = useState(false)
+  const [frame, setFrame] = useState(readFrame)
   const panel = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    applyFrame(frame)
+    writeFrame(frame)
+  }, [frame])
 
   useEffect(() => {
     if (!open) return
@@ -113,6 +121,39 @@ export function Menu({ onStartRun, hasRun, onEndRun }: { onStartRun: () => void;
               </ul>
             </section>
           ))}
+
+          {/* Which frame rings a bubble. It stays a setting until the owner
+              picks one, and the swatch is the whole point of it being here:
+              the answer is what it looks like, not what it is called. */}
+          <section>
+            <h2>Frame</h2>
+            <ul className="menu-frames">
+              {FRAMES.map((option) => (
+                <li key={option.id}>
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={frame === option.id}
+                    className={frame === option.id ? 'is-on' : ''}
+                    onClick={() => setFrame(option.id)}
+                  >
+                    {/* Its own geometry, not the applied one, or every swatch
+                        would draw the frame that is already on. */}
+                    <span
+                      className={`menu-frame-swatch${option.square ? ' is-square' : ''}`}
+                      style={frameVars(option) as React.CSSProperties}
+                      aria-hidden="true"
+                    >
+                      <img className="menu-frame-face" src="/gods/zeus.webp" alt="" />
+                      {option.file ? <img className="menu-frame-art" src={`/${option.file}`} alt="" /> : null}
+                    </span>
+                    <span className="menu-label">{option.name}</span>
+                    <span className="menu-note">{option.note}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       ) : null}
     </div>

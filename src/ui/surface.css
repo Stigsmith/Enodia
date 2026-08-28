@@ -197,20 +197,35 @@
   color: var(--bone);
 }
 
+/* The game's own button plate, nine sliced.
+ *
+ * `Shell/button.png` is 284x80 with rounded ends, so 38 pixels off each side
+ * keeps the cap intact and stretches only the flat middle. The hover state is
+ * a second file rather than a filter, because the game draws it as a rim glow
+ * and a brightness pass on the plain plate does not produce one. It is 302
+ * wide against the plain plate's 284: the glow bleeds outside the button, and
+ * `border-image` puts that bleed back inside, so the hover reads slightly
+ * tighter here than it does in game. */
 .quiet {
-  border: 1px solid transparent;
-  border-radius: var(--r-pill);
-  padding: 0.35rem 0.8rem;
+  border: 0 solid transparent;
+  border-width: 1.15rem 1.7rem;
+  border-image: url('/chrome/button.png') 38 fill / 1.15rem 1.7rem stretch;
+  border-radius: 0;
+  padding: 0 0.3rem;
+  min-height: 2.3rem;
   background: none;
-  color: var(--bone-faint);
+  color: var(--bone-dim);
   font-family: var(--body);
   font-size: 0.85rem;
   cursor: pointer;
+  transition: color var(--t-response) var(--e-response);
 }
 
-.quiet:hover {
-  border-color: var(--div-3);
-  color: var(--bone-dim);
+.quiet:hover,
+.quiet:focus-visible {
+  border-image-source: url('/chrome/button-highlight.png');
+  color: var(--bone);
+  outline: none;
 }
 
 /* The rail. Fixed positions, never reordered, empty slots stay dark and stay
@@ -795,7 +810,9 @@
   height: 100%;
   padding: 0;
   border: 1px solid var(--div-4);
-  border-radius: var(--r-pill);
+  /* A circle unless the frame is a rounded square, in which case a circular
+   * portrait inside it reads as a mistake. src/ui/frames.ts sets it. */
+  border-radius: var(--bubble-radius, 50%);
   background: var(--ink-900);
   overflow: hidden;
   cursor: pointer;
@@ -1006,9 +1023,16 @@
   cursor: default;
 }
 
+/* The word, with the game's own card rarity icon beside it. The colour was
+ * carrying the whole message and three of the four names are similar lengths,
+ * so the icon is what makes it readable at a glance. */
 .rarity-step output {
-  min-width: 5rem;
-  padding: 0.3rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 6.5rem;
+  padding: 0.3rem 0.7rem;
   border: 1px solid var(--div-3);
   border-radius: var(--r-pill);
   background: var(--ink-900);
@@ -1016,6 +1040,13 @@
   font-size: 0.75rem;
   text-align: center;
   color: var(--bone-dim);
+}
+
+.rarity-step output img {
+  width: 1rem;
+  height: 1.13rem;
+  object-fit: contain;
+  flex: none;
 }
 
 .rarity-step output.is-rare { color: var(--silver-hi); }
@@ -1563,6 +1594,54 @@
   color: var(--bone-faint);
 }
 
+/* The frame options. A swatch each, because the answer to "which frame" is
+ * what it looks like, and reading nine names decides nothing. Each swatch
+ * draws the same face under the same art at the same geometry the ring uses,
+ * so what is in the menu is what lands on the page. */
+.menu-frames button {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 0.6rem;
+  row-gap: 0;
+}
+
+.menu-frames .menu-frame-swatch {
+  grid-row: 1 / 3;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+}
+
+.menu-frame-face {
+  width: 62%;
+  height: 62%;
+  border-radius: var(--bubble-radius, 50%);
+  object-fit: cover;
+}
+
+/* 62 percent of the swatch is the bubble, so the frame is that times its own
+ * width, which is the same sum the ring does. */
+.menu-frame-art {
+  position: absolute;
+  width: calc(62% * var(--frame-width, 175%) / 100%);
+  object-fit: contain;
+  opacity: var(--frame-opacity, 0.42);
+  pointer-events: none;
+}
+
+.menu-frames button.is-on {
+  border-color: var(--jade-dim);
+  background: var(--ink-900);
+}
+
+.menu-frames button.is-on .menu-label {
+  color: var(--jade);
+}
+
 /* Unbuilt, and saying so in the one colour reserved for it. */
 .menu-panel button.is-unbuilt {
   cursor: default;
@@ -1641,35 +1720,40 @@ body::before {
   border-image: none;
 }
 
-/* Every bubble wears the game's own carved ring.
+/* Whatever is framing a bubble today.
  *
- * `frames/circle.png` is BoonSelect's ring, a closed circle with a hole rather
- * than the side flourishes the filigree had. Two flourishes on neighbouring
- * bubbles used to collide; a circle cannot.
+ * The frame is a setting, not a decision. `src/ui/frames.ts` writes
+ * `--frame-src`, `--frame-width` and `--frame-opacity` onto the root element
+ * and the menu lists the options, so trying one is a click rather than an edit.
+ * The default is the filigree, which is what was here before the stone ring.
  *
- * Its interior is 77 percent of the image, so 130 percent of the bubble puts
- * the hole at exactly one bubble across and a portrait sits flush inside it.
+ * A frame with a hole is sized so the hole lands on the bubble; one without is
+ * sized as a share of it. Either way this rule only reads the numbers.
  *
  * It sits on the li rather than the button, because the button clips its own
- * overflow to make the circle. */
+ * overflow to make the bubble. */
 .radial-ring li::after {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 130%;
-  aspect-ratio: 1 / 1;
+  width: var(--frame-width, 175%);
+  aspect-ratio: var(--frame-aspect, 482 / 269);
   transform: translate(-50%, -50%);
-  background: url('/frames/circle.png') center / contain no-repeat;
-  opacity: 0.92;
+  background: var(--frame-src, url('/chrome/circle-filigree.png')) center / contain no-repeat;
+  opacity: var(--frame-opacity, 0.42);
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response), transform var(--t-response) var(--e-response);
 }
 
-/* Stepping back, not going dark. The ring is what tells you where the targets
+:root[data-frame='none'] .radial-ring li::after {
+  display: none;
+}
+
+/* Stepping back, not going dark. The frame is what tells you where the targets
  * are, and it has to stay legible while a neighbour is under the finger. */
 .radial.is-hovering .radial-ring li::after {
-  opacity: 0.6;
+  opacity: calc(var(--frame-opacity, 0.42) * 0.65);
 }
 
 .radial-ring li:has(.is-hovered)::after,
@@ -2143,6 +2227,12 @@ body::before {
 
 .bubble-slot.is-portrait .bubble {
   overflow: hidden;
+  border-radius: var(--bubble-radius, 50%);
+}
+
+/* The frame options that are square want square art behind them. */
+.radial-ring li::after {
+  border-radius: var(--bubble-radius, 50%);
 }
 
 /* ------------------------------------------------------------- standing -- */

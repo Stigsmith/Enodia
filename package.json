@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "assets": "node scripts/assets.ts",
     "data": "node scripts/build-app-data.ts",
-    "sprites": "node scripts/sprites.ts"
+    "sprites": "node scripts/sprites.ts",
+    "chrome": "node scripts/chrome.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
