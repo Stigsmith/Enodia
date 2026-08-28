@@ -2,7 +2,9 @@
  * The active run, and where it lives between page loads.
  *
  * `DESIGN.md` 9: localStorage, one key per concern, versioned with a migration
- * function. This owns `enodia.run.active` and nothing else.
+ * function. This owns `enodia.run.active`. The verdict trail the briefing diffs
+ * against is its own key and its own file, `state/snapshot.ts`, but it is
+ * written here because a snapshot belongs to a pick and the pick happens here.
  *
  * Storage is treated as hostile: a private window can refuse it, a browser can
  * clear it, and a stored run can predate a rename. Every read is guarded and a
@@ -13,7 +15,9 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { olympians, offerRules, traits } from '../data/app.ts'
+import { snapshotOf } from '../engine/briefing.ts'
 import { reachable } from '../engine/reachability.ts'
+import { clearTrail, loadTrail, saveTrail, withSnapshot } from './snapshot.ts'
 import type { GodId, HeldTrait, RunContext, RunPath, TraitId, WeaponId } from '../data/types.ts'
 
 const KEY = 'enodia.run.active'
@@ -41,7 +45,17 @@ type Stored = {
   version: number
   run: RunContext
   entries: RunEntry[]
-  /** ISO, used by the re-entry briefing at step 9 to notice a gap */
+  /** the target the player says they are chasing. The briefing's headline */
+  pinned: TraitId | null
+  /**
+   * ISO, and the briefing's clock.
+   *
+   * Written on every pick rather than on every save, because `DESIGN.md` 6.3
+   * measures staleness from the last pick. Saving on mount would reset it and
+   * a run left overnight would look fresh every time it was reopened.
+   */
+  lastPickAt: string | null
+  /** ISO. When the run was last written at all */
   savedAt: string
 }
 
@@ -88,7 +102,12 @@ function isRunContext(value: unknown): value is RunContext {
   )
 }
 
-export type ActiveRun = { run: RunContext; entries: RunEntry[] }
+export type ActiveRun = {
+  run: RunContext
+  entries: RunEntry[]
+  pinned: TraitId | null
+  lastPickAt: string | null
+}
 
 /** Older shapes come through here. Return null to drop a run we cannot read. */
 function migrate(stored: unknown): ActiveRun | null {
@@ -101,6 +120,10 @@ function migrate(stored: unknown): ActiveRun | null {
     // that changes either applies to a run already in progress.
     run: { ...record.run, olympians, maxOlympians: record.run.maxOlympians || offerRules.maxGodsPerRun },
     entries: Array.isArray(record.entries) ? record.entries : [],
+    pinned: typeof record.pinned === 'string' ? record.pinned : null,
+    // A run stored before step 9 has no clock. Its savedAt is close enough to
+    // stand in, and the alternative is a briefing that never fires for it.
+    lastPickAt: record.lastPickAt ?? record.savedAt ?? null,
   }
 }
 
@@ -137,6 +160,9 @@ export function clearRun(): void {
   } catch {
     // Nothing to do, and nothing worth saying.
   }
+  // The trail belongs to the run. A new run diffed against the old one's
+  // verdicts would report every target in it as having changed.
+  clearTrail()
 }
 
 export type RunStore = {
@@ -150,6 +176,11 @@ export type RunStore = {
   take: (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null) => void
   /** an Exit passed without taking a boon, which is a real move */
   skip: (god: GodId | null) => void
+  /** what the player says they are chasing. Null clears it */
+  pinned: TraitId | null
+  pin: (target: TraitId | null) => void
+  /** ISO of the last pick, which is the briefing's clock */
+  lastPickAt: string | null
 }
 
 export function useRun(): RunStore {
@@ -163,7 +194,12 @@ export function useRun(): RunStore {
   }, [active])
 
   const start = useCallback((weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => {
-    setActive({ run: newRun(weapon, aspect, path), entries: [] })
+    clearTrail()
+    setActive({ run: newRun(weapon, aspect, path), entries: [], pinned: null, lastPickAt: null })
+  }, [])
+
+  const pin = useCallback((target: TraitId | null) => {
+    setActive((current) => (current ? { ...current, pinned: target } : current))
   }, [])
 
   const setExitsLeft = useCallback((exits: number) => {
@@ -194,17 +230,29 @@ export function useRun(): RunStore {
         held: held ? [...before.held, held] : before.held,
       }
 
+      // One pass over the targets, used twice. The death diff and the snapshot
+      // are the same verdicts asked two questions, and reachability is the
+      // expensive thing this app does.
+      const verdicts = reachable(after, traits)
       const wasDead = deadTargets(before)
-      const died = [...deadTargets(after)].filter((target) => !wasDead.has(target))
+      const died = verdicts
+        .filter((verdict) => verdict.state === 'DEAD' && !wasDead.has(verdict.target))
+        .map((verdict) => verdict.target)
 
+      const exit = current.entries.length + 1
       const entry: RunEntry = {
-        exit: current.entries.length + 1,
+        exit,
         god,
         taken: held?.id ?? null,
         rarity: held?.rarity ?? null,
         died,
       }
-      return { run: after, entries: [...current.entries, entry] }
+
+      // The trail, written here because a snapshot belongs to a pick.
+      const at = new Date().toISOString()
+      saveTrail(withSnapshot(loadTrail(), snapshotOf(exit, verdicts, at)))
+
+      return { ...current, run: after, entries: [...current.entries, entry], lastPickAt: at }
     })
   }, [])
 
@@ -215,5 +263,16 @@ export function useRun(): RunStore {
 
   const skip = useCallback((god: GodId | null) => advance(god), [advance])
 
-  return { run: active?.run ?? null, entries: active?.entries ?? [], start, end, take, skip, setExitsLeft }
+  return {
+    run: active?.run ?? null,
+    entries: active?.entries ?? [],
+    pinned: active?.pinned ?? null,
+    lastPickAt: active?.lastPickAt ?? null,
+    start,
+    end,
+    take,
+    skip,
+    setExitsLeft,
+    pin,
+  }
 }
