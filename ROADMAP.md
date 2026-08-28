@@ -13,15 +13,17 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 7 of 11 complete, step 8 next, which is the first shippable point |
+| **Build order step** | 8 of 11 complete, step 9 next. **Step 8 was the first shippable point and it is done** |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
-The app runs. Setup produces a real run, the rail shows what you hold, and logging a Cast
-boon removes every other god's Cast boon from the picker, which is the lockout working in
-the product rather than in a test. The timeline is next and is the first shippable point.
+**The tool works.** Set up a run, log what each Exit gave, and the timeline records what
+each pick closed at the pick that closed it. Settling the fourth Olympian reads "35 builds
+closed here" against that entry, and the present entry says what is still live and which god
+feeds it. That is the originating complaint answered, and it is the first shippable point.
 
-The hand-authored page is still `placeholder/index.html` and still what Netlify serves.
+Not shipped yet: the hand-authored page is still `placeholder/index.html` and still what
+Netlify serves. Deploying the app is a decision, not a task.
 
 ---
 
@@ -38,8 +40,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority. 114 tests, and it runs against the real 47 targets |
 | 6 | `engine/runsim.ts` | **Done.** Seeded, legal runs. The dead-stays-dead property holds over 25 of them |
 | 7 | Setup screen, and the rail | **Done.** Weapon, aspect and Exits in, a real RunContext out, and the rail fills as you log |
-| 8 | **The timeline shell.** First shippable point | Next |
-| 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | |
+| 8 | **The timeline shell.** First shippable point | **Done.** Deaths recorded at the pick that caused them, verdicts in the present entry |
+| 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | Next |
 | 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | |
 | 11 | The offer block inside the present entry | |
 

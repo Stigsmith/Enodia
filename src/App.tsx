@@ -1,20 +1,21 @@
 /**
  * The app shell.
  *
- * Setup is its own screen and happens once. Everything after it is the run
- * surface, which is one place: the rail down the side, the run above, and
- * nothing to navigate between. The timeline that fills the middle arrives at
- * build order step 8.
+ * Setup is its own screen and happens once. Everything after it is one surface
+ * in three parts: the rail for what you hold, the timeline for the run, and the
+ * present entry for the decision in front of you. There is no navigation
+ * between them, which is the point.
  */
 
 import { gameVersion, traits, weapons } from './data/app.ts'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
-import { LogPick } from './ui/LogPick.tsx'
+import { Present } from './ui/Present.tsx'
+import { Timeline } from './ui/Timeline.tsx'
 import { useRun } from './state/run.ts'
 
 export function App() {
-  const { run, start, end, take, skip } = useRun()
+  const { run, entries, start, end, take, skip } = useRun()
 
   if (!run) {
     return (
@@ -48,10 +49,13 @@ export function App() {
 
       <Rail held={run.held} />
 
-      <LogPick run={run} onTake={take} onSkip={skip} />
+      <Timeline entries={entries} exitsLeft={run.exitsLeft} />
+
+      <Present run={run} onTake={take} onSkip={skip} />
 
       <p className="unbuilt">
-        The timeline goes here at step 8: every Exit behind you, what it gave, and what died at that moment.
+        Step 11 puts the three boons actually on offer here, ranked, with the case for rejecting all three.
+        That needs the rating engine, which is step 10.
       </p>
 
       <Footer />
