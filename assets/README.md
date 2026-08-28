@@ -285,6 +285,14 @@ It is idempotent and it refuses two things:
 with gold flourishes rather than a ring with a hole. That is why art behind it shows through
 tinted, and why it is the only frame option with a non-square aspect.
 
+**Nothing in the package is a plain circle,** which is worth knowing before hunting for one
+again. Sweeping every GUI texture for a ring of alpha around a hole returns nineteen, and
+they are: the seven rounded-square BoonIconFrames, three Talent tree four-pointed stars,
+three cauldron bands that only cover the middle, `NativeAspectRatioFrame`, a Codex
+transition frame, and `BoonBG_Circle_01`. That last one is the only round frame Supergiant
+ships, and it is carved stone at 2475 square. The radial's default frame is drawn in CSS
+for that reason, in `src/ui/frames.ts`.
+
 ### The shelf ships whole, and it is 46 MB now
 
 `vite.config.ts` sets `publicDir: 'assets'`, so every file here is also a URL and page

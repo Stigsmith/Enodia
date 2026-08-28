@@ -1627,9 +1627,21 @@
  * width, which is the same sum the ring does. */
 .menu-frame-art {
   position: absolute;
-  width: calc(62% * var(--frame-width, 175%) / 100%);
+  width: calc(62% * var(--frame-width, 122%) / 100%);
   object-fit: contain;
-  opacity: var(--frame-opacity, 0.42);
+  opacity: var(--frame-opacity, 1);
+  pointer-events: none;
+}
+
+/* A drawn frame has no img to place, so the swatch grows its own. */
+.menu-frame-swatch::after {
+  content: '';
+  position: absolute;
+  width: calc(62% * var(--frame-width, 122%) / 100%);
+  aspect-ratio: 1 / 1;
+  background: var(--frame-band, none);
+  -webkit-mask: var(--frame-mask, none);
+  mask: var(--frame-mask, none);
   pointer-events: none;
 }
 
@@ -1722,13 +1734,21 @@ body::before {
 
 /* Whatever is framing a bubble today.
  *
- * The frame is a setting, not a decision. `src/ui/frames.ts` writes
- * `--frame-src`, `--frame-width` and `--frame-opacity` onto the root element
- * and the menu lists the options, so trying one is a click rather than an edit.
- * The default is the filigree, which is what was here before the stone ring.
+ * The frame is a setting, not a decision. `src/ui/frames.ts` writes the whole
+ * geometry onto the root element as custom properties and the menu lists the
+ * options, so trying one is a click rather than an edit.
  *
- * A frame with a hole is sized so the hole lands on the bubble; one without is
- * sized as a share of it. Either way this rule only reads the numbers.
+ * **The default is drawn here, not taken from the game.** Nothing in the
+ * package is a plain circle: the filigree is a 482 by 269 disc with wings, the
+ * starburst is a four pointed star, and BoonSelect's stone ring is the only
+ * round one. So the first three options are two radial gradients and a mask,
+ * in the palette's own silver.
+ *
+ * Both kinds go through this one rule. A taken frame sets `--frame-src` and is
+ * already a ring. A drawn one sets `--frame-band` and masks its own middle out,
+ * `--frame-mask` cutting the hole at the bubble's edge. Neither knows about the
+ * other, and the menu swatch runs the same properties, so what is in the menu
+ * is what lands on the page.
  *
  * It sits on the li rather than the button, because the button clips its own
  * overflow to make the bubble. */
@@ -1737,11 +1757,15 @@ body::before {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: var(--frame-width, 175%);
-  aspect-ratio: var(--frame-aspect, 482 / 269);
+  width: var(--frame-width, 122%);
+  aspect-ratio: var(--frame-aspect, 1 / 1);
   transform: translate(-50%, -50%);
-  background: var(--frame-src, url('/chrome/circle-filigree.png')) center / contain no-repeat;
-  opacity: var(--frame-opacity, 0.42);
+  background:
+    var(--frame-src, none) center / contain no-repeat,
+    var(--frame-band, none);
+  -webkit-mask: var(--frame-mask, none);
+  mask: var(--frame-mask, none);
+  opacity: var(--frame-opacity, 1);
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response), transform var(--t-response) var(--e-response);
 }

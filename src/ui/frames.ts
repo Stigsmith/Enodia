@@ -6,6 +6,14 @@
  * is a setting now. It writes `data-frame` on the root element, `surface.css`
  * keys off that, and the menu lists them.
  *
+ * **The defaults are drawn, not taken.** Every ring the package offers turned
+ * out not to be a circle: the filigree is a 482 by 269 disc with wings, the
+ * starburst is a four pointed star, the orbit is a band across the middle. Only
+ * BoonSelect's is round and it is carved stone at 2475 square. So the first
+ * three options are authored here out of two radial gradients and a mask, in
+ * the palette's own silver, and the game's own art is kept below them as a
+ * second group for comparison.
+ *
  * **`hole` is the whole geometry.** A frame with a hole is drawn so its hole
  * lands exactly on the bubble: at hole 0.77 the frame is 1/0.77 = 130 percent
  * of the bubble, and a portrait filling the bubble sits flush inside it. A
@@ -20,8 +28,18 @@ export type FrameOption = {
   id: string
   name: string
   note: string
-  /** path under assets/, or null for no frame at all */
+  /** path under assets/, or null for a drawn frame and for none at all */
   file: string | null
+  /**
+   * A drawn frame, in CSS rather than in art.
+   *
+   * `band` is what fills it and `hole` doubles as the mask radius, so a band
+   * of 0.8 leaves the outer fifth of the box as ring and the rest transparent.
+   * `width` still sizes the whole thing against the bubble.
+   */
+  band?: string
+  /** a drawn frame's inner edge, as a fraction of its own radius */
+  inner?: number
   /** the frame's interior as a fraction of its own width, when it has one */
   hole?: number
   /** frame width as a share of the bubble, when there is no hole to fit */
@@ -40,9 +58,51 @@ export type FrameOption = {
 
 export const FRAMES: FrameOption[] = [
   {
+    id: 'ring',
+    name: 'Ring',
+    note: 'Two hairlines with a dark band between them. Drawn, and actually a circle',
+    file: null,
+    width: 1.22,
+    inner: 0.8,
+    opacity: 1,
+    band: [
+      // the inner hairline, sitting on the bubble's own edge
+      'radial-gradient(closest-side, transparent 79.5%, var(--silver-sh) 80%, var(--silver) 82%, transparent 83%)',
+      // the outer one
+      'radial-gradient(closest-side, transparent 95%, var(--silver) 96%, var(--silver-sh) 99%, transparent 100%)',
+      // and the metal between, lit from the top left the way the game lights it
+      'linear-gradient(155deg, var(--silver-sh), var(--ink-850) 42%, var(--silver-deep) 64%, var(--silver-sh))',
+    ].join(', '),
+  },
+  {
+    id: 'hairline',
+    name: 'Hairline',
+    note: 'One thin silver circle and nothing else. The quietest it gets',
+    file: null,
+    width: 1.1,
+    inner: 0.9,
+    opacity: 1,
+    band: 'radial-gradient(closest-side, transparent 89%, var(--silver) 91%, var(--silver-sh) 97%, transparent 100%)',
+  },
+  {
+    id: 'double',
+    name: 'Engraved',
+    note: 'Two hairlines with the ground showing between them',
+    file: null,
+    width: 1.28,
+    inner: 0.74,
+    opacity: 1,
+    band: [
+      'radial-gradient(closest-side, transparent 77%, var(--silver-sh) 78%, var(--silver) 80%, transparent 81%)',
+      'radial-gradient(closest-side, transparent 92%, var(--silver) 93%, var(--silver-sh) 96%, transparent 97%)',
+    ].join(', '),
+  },
+
+  // The game's own, kept for comparison. None of them is a plain circle.
+  {
     id: 'filigree',
     name: 'Filigree',
-    note: 'UnlockTextCircleBacking. A filled disc with gold flourishes, so it tints the art it sits on',
+    note: 'UnlockTextCircleBacking. A filled disc with wings, so it tints what it sits on',
     file: 'chrome/circle-filigree.png',
     width: 1.75,
     opacity: 0.42,
@@ -51,7 +111,7 @@ export const FRAMES: FrameOption[] = [
   {
     id: 'stone',
     name: 'Stone ring',
-    note: "BoonSelect's carved ring. A closed circle, so neighbours never collide",
+    note: "BoonSelect's carved ring. The one round thing in the package",
     file: 'frames/circle.png',
     hole: 0.77,
     opacity: 0.92,
@@ -59,7 +119,7 @@ export const FRAMES: FrameOption[] = [
   {
     id: 'starburst-dark',
     name: 'Starburst, dark',
-    note: 'The Talent tree, locked. Silver points on a black ring',
+    note: 'The Talent tree, locked. A four pointed star, not a ring',
     file: 'frames/starburst-dark.png',
     hole: 0.62,
     opacity: 0.95,
@@ -73,43 +133,9 @@ export const FRAMES: FrameOption[] = [
     opacity: 0.85,
   },
   {
-    id: 'halo',
-    name: 'Halo',
-    note: 'The Talent tree highlight. A filled glow that sits behind rather than around',
-    file: 'frames/halo.png',
-    width: 1.5,
-    opacity: 0.5,
-  },
-  {
-    id: 'orbit',
-    name: 'Orbit',
-    note: 'A cauldron ring. A thin band across the middle, not a full circle',
-    file: 'frames/orbit.png',
-    width: 1.35,
-    opacity: 0.9,
-  },
-  {
-    id: 'boon-common',
-    name: 'Boon frame',
-    note: "The game's own Common boon frame. Square bubbles",
-    file: 'frames/frame-common.png',
-    width: 1.0,
-    square: true,
-    opacity: 1,
-  },
-  {
-    id: 'boon-legendary',
-    name: 'Boon frame, gold',
-    note: 'The Legendary frame. Square bubbles',
-    file: 'frames/frame-legendary.png',
-    width: 1.0,
-    square: true,
-    opacity: 1,
-  },
-  {
     id: 'boon-primary',
-    name: 'Boon frame, plain',
-    note: 'The unrarified frame, which is the quietest of the seven. Square bubbles',
+    name: 'Boon frame',
+    note: "The game's unrarified boon frame. Square bubbles",
     file: 'frames/frame-primary.png',
     width: 1.0,
     square: true,
@@ -118,7 +144,7 @@ export const FRAMES: FrameOption[] = [
   { id: 'none', name: 'None', note: 'Just the bubble', file: null },
 ]
 
-export const DEFAULT_FRAME = 'filigree'
+export const DEFAULT_FRAME = 'ring'
 
 const KEY = 'enodia.frame'
 
@@ -139,10 +165,21 @@ export function writeFrame(id: string) {
   }
 }
 
-/** The three numbers a frame is, as CSS custom properties. */
+/**
+ * A frame as CSS custom properties.
+ *
+ * One rule in `surface.css` reads these, so drawn and taken frames go through
+ * the same path and the menu swatch draws exactly what the ring will. A drawn
+ * frame masks its own middle out; a taken one is already a ring and does not.
+ */
 export function frameVars(frame: FrameOption): Record<string, string> {
+  const inner = frame.inner
   return {
     '--frame-src': frame.file ? `url('/${frame.file}')` : 'none',
+    '--frame-band': frame.band ?? 'none',
+    '--frame-mask': inner
+      ? `radial-gradient(closest-side, transparent ${(inner * 100).toFixed(1)}%, #000 ${(inner * 100 + 0.5).toFixed(1)}%)`
+      : 'none',
     '--frame-width': `${((frame.hole ? 1 / frame.hole : (frame.width ?? 1)) * 100).toFixed(1)}%`,
     '--frame-opacity': String(frame.opacity ?? 0.9),
     '--frame-aspect': frame.aspect ?? '1 / 1',
