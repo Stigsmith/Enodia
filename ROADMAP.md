@@ -134,8 +134,9 @@ their own set, so an aspect chosen at setup can settle a build before the first 
   now, corrected from the run header
 - ~~The Exit picker only offered gods~~. It offers what an Exit actually gives, and the
   Encounter gods besides
-- **Wanted next:** a radial weapon picker using the large Codex art, the chosen weapon
-  animating to the centre with its four aspects around it
+- ~~A radial weapon picker using the large Codex art, the chosen weapon animating to the
+  centre with its four aspects around it~~. Done, and the same ring is now the whole
+  picker
 - ~~The rail as a permanent sidebar~~. Done, and the timeline is the only thing that
   scrolls now. It unfolds to everything held, by slot, with the game's own sentence on each,
   and every slot has a tooltip
@@ -146,7 +147,22 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - **In progress:** a look that is more Crossroads and less web app. The game's own boon
   plates and rarity frames are in `assets/frames/`, and `assets/chrome/` now carries
   `TraitTrayBacking` (the tone-on-tone ornament `VISUAL.md` 1 asks for by name), the tray
-  header ribbon, the tooltip nine-slice, the hairline dividers and the filigree circle
+  header ribbon, the tooltip nine-slice and the hairline dividers
+- ~~The timeline as a separate screen with the picker tacked on underneath~~. **The run is
+  one path going down.** Each Exit is a station, centred and large, and the present station
+  is the picker itself: kind, then who, then which one, each a ring, skipping any step with
+  a single answer. Finishing a pick advances the run and carries the page to the next Exit.
+  Going back in time is scrolling up. `Tray.tsx` and `LogPick.tsx` are gone
+- ~~The gods as the game's `BoonSelectSymbols` glyphs~~. Reverted on sight. They are small
+  glowing marks meant to be read on a door at a distance and they render as coloured dots
+  in a list. Portraits, larger than before. `assets/symbols/` keeps the glyphs
+- ~~The filigree circle around each bubble~~. Replaced by `frames/circle.png`, which is
+  BoonSelect's carved ring. It is a closed circle, so neighbouring bubbles no longer put
+  their flourishes on top of each other, and its hole is 77 percent of the image, which
+  fixes the frame at 130 percent of a bubble. **A face fills the circle; nothing else
+  does.** A boon mark, a slot glyph and a hammer are rounded squares and a weapon is a
+  diagonal cutout, and a circular crop takes the corners off all of them, so they sit
+  inside the ring instead
 - **The menu exists as a shell.** One button top left, covering rather than pushing, with
   build manager, build exchange, account, friends, leaderboards, settings, help and about
   listed and marked unbuilt. Starting a run is always its first entry
@@ -164,8 +180,10 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - ~~How the app gets its data~~. `npm run data` projects `data/generated` through
   `src/data/load.ts` into `data/app/app-data.json`, 78 KB and 15 gzipped, imported rather
   than fetched. One mapping, shared by the app, the tests and the validator
-- **`publicDir` is `assets/`,** so a manifest path is also a URL. 35 MB ships, 23 of which
-  is Arcana card art Phase 1 never renders. Downscale it before a real deploy
+- **`publicDir` is `assets/`,** so a manifest path is also a URL. About 33 MB ships, 23 of
+  which is Arcana card art Phase 1 never renders. Downscale it before a real deploy.
+  `frames/circle.png` is the first one done: 2.37 MB at 2475 square, 249 KB at 512, for a
+  ring drawn at about 150 pixels across
 - The Exit count in Setup defaults to 12 and is a placeholder. The real number wants region
   data, which is not extracted
 - The verdicts are only as good as the targets. Every duo and legendary is a target today,

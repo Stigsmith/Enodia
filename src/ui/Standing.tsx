@@ -1,0 +1,107 @@
+/**
+ * Where the run stands. A drawer off the side, not a screen and not a tray.
+ *
+ * The picker lives on the path now, so this holds only the part that answers
+ * "what am I still chasing": the ranked gods, and what is closest with its
+ * measured odds. Closed by default, because silence is the normal state and a
+ * player who is mid pick does not need a list.
+ */
+
+import { useMemo, useState } from 'react'
+
+import { godPools, olympians, traits } from '../data/app.ts'
+import { completionOdds, formatOdds } from '../engine/odds.ts'
+import { godPriority, reachable } from '../engine/reachability.ts'
+import type { Verdict } from '../engine/reachability.ts'
+import type { RunContext } from '../data/types.ts'
+
+/** How many get a simulated percentage. The rest get their sentence only. */
+const RATED = 6
+
+export function Standing({ run }: { run: RunContext }) {
+  const [open, setOpen] = useState(false)
+
+  const verdicts = reachable(run, traits)
+  const live = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK')
+  const shortlist = live.slice(0, RATED).map((verdict) => verdict.target)
+  const shortlistKey = shortlist.join(',')
+
+  // Simulating costs real milliseconds, and none of them are worth spending
+  // while the drawer is shut.
+  const odds = useMemo(
+    () =>
+      open
+        ? new Map(
+            completionOdds(run, shortlist, traits, godPools, olympians, { runs: 300 }).map((entry) => [
+              entry.target,
+              entry.rate,
+            ]),
+          )
+        : new Map<string, number>(),
+    [run, shortlistKey, open],
+  )
+
+  const gods = godPriority(run, traits).filter((god) => god.keeps.length || god.kills.length)
+
+  return (
+    <aside className={`standing${open ? ' is-open' : ''}`}>
+      <button type="button" className="standing-handle" onClick={() => setOpen((was) => !was)} aria-expanded={open}>
+        {open ? 'Close' : `${live.length} still open`}
+      </button>
+
+      {open ? (
+        <div className="standing-body">
+          {gods.length ? (
+            <>
+              <h2>If you pick a god now</h2>
+              <ul className="god-priority-list">
+                {gods.slice(0, 4).map((god) => (
+                  <li key={god.god} className={god.kills.length ? 'is-costly' : ''}>
+                    <span className="god-name">{god.god}</span>
+                    <span className="god-why">{god.why}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+          <h2>Closest to done</h2>
+          {live.length ? (
+            <ul className="target-list">
+              {live.slice(0, 12).map((verdict) => (
+                <TargetLine key={verdict.target} verdict={verdict} rate={odds.get(verdict.target)} />
+              ))}
+            </ul>
+          ) : (
+            <p className="nothing-live">Nothing is still reachable. This run is what it is now.</p>
+          )}
+
+          <p className="odds-note">
+            Counted over 300 simulated runs from where you are, assuming you take what gets you there. Every
+            reward is treated as a god offer, so these read high.
+          </p>
+        </div>
+      ) : null}
+    </aside>
+  )
+}
+
+function TargetLine({ verdict, rate }: { verdict: Verdict; rate: number | undefined }) {
+  const trait = traits.get(verdict.target)
+  const kind = trait?.kind === 'legendary' ? 'Legendary' : trait?.kind === 'hex' ? 'Hex duo' : 'Duo'
+
+  return (
+    <li className={`target is-${verdict.state.toLowerCase()}`}>
+      <span className="target-head">
+        <span className="target-name">{trait?.name ?? verdict.target}</span>
+        <span className="target-kind">
+          {kind}
+          {trait?.gods.length ? ` · ${trait.gods.join(' and ')}` : ''}
+        </span>
+        {rate !== undefined ? <span className="odds">{formatOdds(rate)}</span> : null}
+      </span>
+      {trait?.text ? <span className="target-text">{trait.text}</span> : null}
+      <span className="target-why">{verdict.why}</span>
+    </li>
+  )
+}

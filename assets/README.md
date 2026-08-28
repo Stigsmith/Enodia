@@ -253,6 +253,21 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
 
+### `frames/circle.png` is downscaled, on purpose
+
+It is `Screens/BoonSelect/BoonBG_Circle_01.png`, the carved ring the game draws behind a
+boon offer, and every bubble in the radial picker now wears it. Shipped at its native
+2475x2468 it was **2.37 MB**, which is more than the whole rest of `frames/` put together,
+for a decoration drawn at about 150 pixels across.
+
+The copy in `assets/` is 512x512 and 249 KB. `vite.config.ts` sets `publicDir: 'assets'`,
+so anything on this shelf ships as-is and size here is page weight. The full-resolution
+original is still in `extracted/gui/textures/GUI/Screens/BoonSelect/`, so this is
+reversible; re-run `npm run assets` after touching it, because the manifest records bytes
+and sha256.
+
+The same argument applies to the 23 MB of Arcana card art, which is still full size.
+
 ### The Black Coat base image, and why no source has a better one
 
 The wiki's `Weapon_Coat01.webp` is not a bad scrape. It is the game's own Codex card with

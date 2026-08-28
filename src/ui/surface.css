@@ -819,9 +819,11 @@
 }
 
 /* Everything else steps back so the one under the finger is the only thing
- * being read. Emphasis tier, and it costs nothing when nothing is hovered. */
+ * being read. Emphasis tier, and it costs nothing when nothing is hovered.
+ * 0.35 was a blackout: the ring became a row of shapes you could no longer
+ * name, which is the opposite of a picker. */
 .radial.is-hovering .bubble {
-  opacity: 0.35;
+  opacity: 0.72;
 }
 
 .radial .bubble.is-hovered {
@@ -933,35 +935,52 @@
   margin-right: auto;
 }
 
-/* One circle, and it is the filigree.
+/* One circle, and it is the ring.
  *
- * The plain bubble underneath was a second circle inside the first, and the
- * weapon then overlapped both. So the button keeps the hit area and gives up
- * the border and the fill, the frame grows to be the thing you see, and the art
- * shrinks until it sits inside it. */
-.radial.is-renders .bubble {
+ * The plain bubble underneath was a second circle inside the first, and the art
+ * then overlapped both. So the button keeps the hit area and gives up the
+ * border and the fill, and the art shrinks until it sits inside the ring.
+ *
+ * This is every shape that is not a face. A boon mark, a slot glyph and a
+ * hammer are rounded squares; a weapon is a cutout with a long diagonal. A
+ * circular crop takes the corners off the first and most of the second. */
+.bubble-slot.is-icon .bubble,
+.bubble-slot.is-render .bubble {
   border-color: transparent;
   background: none;
   overflow: visible;
 }
 
-.radial.is-renders .bubble img {
-  /* The frame art is 482 by 269 with its circle filling the height, so the
-   * circle comes out at about half the frame's width. The frame is drawn at
-   * twice the bubble, which puts the circle at roughly one bubble across, and
-   * the art at 66 percent leaves it room to sit inside rather than across it. */
-  width: 58%;
-  height: 58%;
+.bubble-slot.is-icon .bubble img,
+.bubble-slot.is-render .bubble img {
   object-fit: contain;
   transform: none;
   transition: transform var(--t-response) var(--e-response);
 }
 
-.radial.is-renders .bubble.is-hovered img {
+/* The ring's hole is one bubble across, and the two shapes want different
+ * shares of it. A rounded square inscribed in a circle cannot exceed 71
+ * percent of the diameter, and a mark that stays under its neighbouring faces
+ * reads as a category rather than as a small portrait. A weapon is a diagonal
+ * cutout with empty corners, so it takes far more of the circle before it
+ * touches anything. */
+.bubble-slot.is-icon .bubble img {
+  width: 60%;
+  height: 60%;
+}
+
+.bubble-slot.is-render .bubble img {
+  width: 80%;
+  height: 80%;
+}
+
+.bubble-slot.is-icon .bubble.is-hovered img,
+.bubble-slot.is-render .bubble.is-hovered img {
   transform: scale(1.1);
 }
 
-.radial.is-renders .bubble.is-chosen img {
+.bubble-slot.is-icon .bubble.is-chosen img,
+.bubble-slot.is-render .bubble.is-chosen img {
   filter: drop-shadow(0 0 0.5rem var(--jade-dim));
 }
 
@@ -1134,12 +1153,19 @@
   background: none;
 }
 
+/* No circle here either. A boon icon is a rounded square and the rarity frame
+ * around it is the framing; the pill and the fill this rule used to inherit
+ * from the compact rail drew a second, wrong shape behind both. */
 .rail-mark {
   position: relative;
   display: grid;
   place-items: center;
   width: 3rem;
   height: 3rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
 }
 
 .rail-art {
@@ -1392,10 +1418,11 @@
 }
 
 /* The centre carries whatever the run is so far: the weapon until an aspect is
- * chosen, then the aspect, large. The ring leaves a hole of about 0.52 of the
- * width, so 0.44 fills it without touching the bubbles. */
+ * chosen, then the aspect, large. The stone rings are wider than the flourish
+ * they replaced, so 0.44 put a staff's tips into its neighbours. 0.38 clears
+ * them at four items, which is the tightest ring this screen builds. */
 .radial-centre {
-  width: calc(var(--size) * 0.44);
+  width: calc(var(--size) * 0.38);
   gap: 0.5rem;
 }
 
@@ -1614,37 +1641,40 @@ body::before {
   border-image: none;
 }
 
-/* And the centre of the ring sits in the game's filigree circle. */
-/* The filigree rings the bubbles, not the middle one.
+/* Every bubble wears the game's own carved ring.
  *
- * A bubble is a circle with its art contained inside it, so a circular frame
- * fits it exactly. The centre is a large cutout that deliberately overflows its
- * own box, and a staff laid diagonally across a small gold circle looks like a
- * mistake. It sits on the li rather than the button, because the button clips
- * its own overflow to make the circle. */
+ * `frames/circle.png` is BoonSelect's ring, a closed circle with a hole rather
+ * than the side flourishes the filigree had. Two flourishes on neighbouring
+ * bubbles used to collide; a circle cannot.
+ *
+ * Its interior is 77 percent of the image, so 130 percent of the bubble puts
+ * the hole at exactly one bubble across and a portrait sits flush inside it.
+ *
+ * It sits on the li rather than the button, because the button clips its own
+ * overflow to make the circle. */
 .radial-ring li::after {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  /* 200 percent put neighbouring flourishes on top of each other at six
-   * items. 175 keeps the circle wide enough for the art and the ring clear. */
-  width: 175%;
-  aspect-ratio: 482 / 269;
+  width: 130%;
+  aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
-  background: url('/chrome/circle-filigree.png') center / contain no-repeat;
-  opacity: 0.42;
+  background: url('/frames/circle.png') center / contain no-repeat;
+  opacity: 0.92;
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response), transform var(--t-response) var(--e-response);
 }
 
+/* Stepping back, not going dark. The ring is what tells you where the targets
+ * are, and it has to stay legible while a neighbour is under the finger. */
 .radial.is-hovering .radial-ring li::after {
-  opacity: 0.18;
+  opacity: 0.6;
 }
 
 .radial-ring li:has(.is-hovered)::after,
 .radial-ring li:has(.is-chosen)::after {
-  opacity: 0.9;
+  opacity: 1;
   transform: translate(-50%, -50%) scale(1.06);
 }
 
@@ -1919,4 +1949,243 @@ body::before {
   .entry-fx {
     display: none;
   }
+}
+
+/* ============================================================== the path ==
+ * The run as a line going down. One station per Exit, each large enough that
+ * moving between them is a scroll, which is what makes going back in time feel
+ * like going back rather than like reading a list.
+ * ========================================================================= */
+
+.path {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 34rem;
+}
+
+.station {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  align-items: start;
+  min-height: 62dvh;
+  padding: 2rem 0;
+  scroll-margin: 12vh;
+}
+
+/* The line itself, drawn behind the marks and stopping at the last one. */
+.station::before {
+  content: '';
+  position: absolute;
+  left: 1.2rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(var(--div-2), var(--div-4), var(--div-2));
+}
+
+.station:first-child::before {
+  top: 50%;
+}
+
+.station.is-ahead::before {
+  bottom: 50%;
+}
+
+.station-mark {
+  position: relative;
+  z-index: 1;
+  width: 0.85rem;
+  height: 0.85rem;
+  margin: 0.55rem 0 0 0.75rem;
+  border: 1px solid var(--div-5);
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+}
+
+.station.is-present .station-mark {
+  border-color: var(--jade);
+  background: var(--jade-dim);
+  box-shadow: 0 0 0.6rem var(--jade-dim);
+}
+
+.station.has-deaths .station-mark {
+  border-color: var(--rim-magenta);
+}
+
+.station-body {
+  min-width: 0;
+  text-align: center;
+}
+
+.station-exit {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.station-god {
+  font-family: var(--display);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: var(--bone-dim);
+}
+
+/* The boon, centred and large. This is the thing that pick was about. */
+.station-art {
+  width: 8.5rem;
+  height: 8.5rem;
+  object-fit: contain;
+  border-radius: var(--r-card);
+}
+
+.station-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0.7rem 0 0;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: var(--bone);
+}
+
+.station-rarity {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--bone-faint);
+}
+
+.station-declined {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--bone-faint);
+}
+
+.station-text {
+  max-width: 26rem;
+  margin: 0.5rem auto 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+
+.station-deaths {
+  margin: 1rem auto 0;
+  max-width: 26rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--div-2);
+  border-left: 2px solid var(--rim-magenta);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.station-deaths summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.station-deaths summary::-webkit-details-marker {
+  display: none;
+}
+
+/* -------------------------------------------------------------- picking -- */
+
+.picker-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.picker-label {
+  margin: 0 0 0.4rem;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: var(--jade-hot);
+}
+
+.picker-back {
+  margin-top: 0.6rem;
+}
+
+.picker-step .boon-list {
+  width: 100%;
+  margin-top: 0.9rem;
+}
+
+.picker-step .rarity-step {
+  margin-top: 0.9rem;
+}
+
+/* Portraits fill their circle, because a face wants to be a face. */
+.bubble-slot.is-portrait .bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bubble-slot.is-portrait .bubble {
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------- standing -- */
+
+.standing {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  max-width: min(26rem, 92vw);
+}
+
+.standing-handle {
+  display: block;
+  margin-left: auto;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--div-4);
+  border-bottom: 0;
+  border-radius: var(--r-soft) var(--r-soft) 0 0;
+  background: var(--ink-850);
+  color: var(--jade);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.standing-body {
+  max-height: 70dvh;
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--div-4);
+  background: var(--ink-850);
+}
+
+.standing-body h2 {
+  margin: 0.9rem 0 0.4rem;
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+.standing-body h2:first-child {
+  margin-top: 0;
 }
