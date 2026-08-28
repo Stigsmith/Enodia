@@ -386,3 +386,268 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* -------------------------------------------------------------- timeline -- */
+
+.timeline {
+  margin: 1.5rem 0 0;
+}
+
+.timeline-empty {
+  margin: 0;
+  color: var(--bone-faint);
+  font-size: 0.85rem;
+}
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.entry {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+/* A pick that closed something is the one the eye should find on the way back
+ * up the run. It is marked, and it is never a colour that means danger: the
+ * pick was legal and may well have been right. */
+.entry.has-deaths {
+  border-left: 2px solid var(--rim-magenta);
+}
+
+.entry-exit {
+  flex: none;
+  width: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+  text-align: right;
+}
+
+.entry-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.entry-what {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.entry-what img {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--r-hair);
+}
+
+.entry-boon {
+  color: var(--bone);
+}
+
+.entry-declined {
+  color: var(--bone-faint);
+  font-style: italic;
+}
+
+.entry-rarity,
+.entry-god {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--bone-faint);
+}
+
+.entry-deaths {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+}
+
+.entry-deaths summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.entry-deaths summary::-webkit-details-marker {
+  display: none;
+}
+
+.entry-deaths-all {
+  margin: 0.4rem 0 0;
+  color: var(--bone-faint);
+  line-height: 1.5;
+}
+
+.entry-deaths-count {
+  color: var(--rim-magenta);
+  font-family: var(--mono);
+}
+
+.entry-deaths-list {
+  color: var(--bone-faint);
+  line-height: 1.4;
+}
+
+.beads {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin: 0.9rem 0 0;
+  padding-left: 2.25rem;
+}
+
+.bead {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--div-4);
+}
+
+.beads-count,
+.beads-none {
+  margin-left: 0.5rem;
+  color: var(--bone-faint);
+  font-size: 0.75rem;
+}
+
+/* --------------------------------------------------------------- present -- */
+
+/* Not pinned. DESIGN.md 8 asks for the present entry never to be off screen,
+ * and a sticky panel this tall answers that by covering the run instead. It is
+ * scrolled into view after every pick, which keeps the rail and the timeline
+ * visible above it. */
+.present {
+  margin-top: 1.5rem;
+  scroll-margin-bottom: 1rem;
+  padding: 1rem 1.1rem 1.2rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-card);
+  background: var(--ink-850);
+}
+
+.tally {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--bone-dim);
+}
+
+.tally strong {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  color: var(--jade-hot);
+}
+
+.tally-dead,
+.tally-done {
+  font-size: 0.78rem;
+  font-family: var(--mono);
+  color: var(--bone-faint);
+}
+
+.block-heading {
+  margin: 1.1rem 0 0.5rem;
+  font-family: var(--display);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+.god-priority ul,
+.live-targets ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.god-priority li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: var(--bone-dim);
+}
+
+.god-name {
+  min-width: 5.5rem;
+  font-family: var(--display);
+  color: var(--bone);
+}
+
+.god-priority li.is-costly .god-why {
+  color: var(--rim-magenta);
+}
+
+.target {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: var(--bone-dim);
+}
+
+.target-name {
+  color: var(--bone);
+}
+
+.target.is-at_risk .target-name {
+  color: var(--unbuilt);
+}
+
+.target-why {
+  flex: 1 1 100%;
+  color: var(--bone-faint);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+/* Bands, not percentages. Weight and PriorityChance are in the files and
+ * unvalidated, so an invented number would be false precision. */
+.band {
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--bone-faint);
+}
+
+.band.is-likely {
+  border-color: var(--jade-dim);
+  color: var(--jade);
+}
+
+.nothing-live {
+  margin: 0.8rem 0 0;
+  color: var(--bone-dim);
+  font-size: 0.85rem;
+}
+
+.present .log-pick .step-heading {
+  margin-top: 1.3rem;
+}
