@@ -191,6 +191,20 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - **Open:** the owner reports the Fields offer three Encounters behind one Exit, and that
   the first surface Location is one open city with eight or nine ways out rather than two.
   Both are map generation rather than a table, and neither is modelled
+- ~~An Encounter spent an Exit~~. It does not. `RoomLogic.BeginAthenaEncounter` reads
+  `CurrentRun.CurrentRoom.Encounters`, plural, so an Encounter runs inside a Location
+  already reached, and none of the four Encounter gods appears in any reward store. An
+  Encounter entry now carries the number of the Exit that led to its Location and costs
+  nothing
+- ~~The Exit count was the player's to correct~~. It is derived. Setup used to ask, then the
+  run header offered a plus and a minus; both were the tool's question rather than the
+  player's, because nobody can correct a number they have no way of knowing. It reads
+  "about 7 Exits left" now and the beads say "about 5 more, if this run is a usual length"
+- **Open, and the owner is right that it is missing: Charon.** `ChosenRewardType == "Shop"`
+  is a real door reward, sourced at `RoomLogic.lua:4126`, which also says a Shop door alone
+  cannot be rerolled. So a shop **is** behind an Exit and costs one, unlike an Encounter.
+  What a Charon entry should record is a product decision and the owner's: he sells rather
+  than offers, his stock is in `StoreData.lua`, and a bought boon is still a boon in a slot
 
 **Step 9, and the one design decision in it**
 

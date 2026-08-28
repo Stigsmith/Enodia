@@ -1737,6 +1737,7 @@
  * is what the brief says to do.
  * ========================================================================= */
 
+/* The scrollwork, unchanged: the game's own panel motif at the corners. */
 body::before {
   content: '';
   position: fixed;
@@ -1748,6 +1749,190 @@ body::before {
   opacity: 0.09;
   pointer-events: none;
 }
+
+/* ==========================================================================
+ * HECATE'S LIGHT
+ *
+ * `tokens.css` says jade came out of Hecate's portrait and is "the living
+ * light", the one ramp a per-god theme swaps. So the room she is standing in
+ * is lit by it, and nothing else here is allowed to be.
+ *
+ * Three layers, all fixed, all behind the content, none of them interactive:
+ *
+ * 1. **The blooms.** Two large jade fields and one small magenta, drifting on
+ *    different periods so they never repeat a composition. Very low alpha:
+ *    they are the shape of a light source rather than a light source.
+ * 2. **The motes.** Dust in that light, rising. A field of tiny radial stops
+ *    tiled twice and translated, so it is two elements and no per-particle
+ *    DOM at all.
+ * 3. **The vignette**, which is what stops the whole thing reading as a
+ *    gradient and starts it reading as a room.
+ *
+ * Ambient tier, so `prefers-reduced-motion` stops all of it dead. VISUAL.md
+ * allows ambient motion to stop entirely because it carries no meaning.
+ * ======================================================================== */
+
+.hecate {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hecate-glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(40% 32% at 20% 16%, color-mix(in oklab, var(--jade) 62%, transparent), transparent 70%),
+    radial-gradient(48% 36% at 80% 74%, color-mix(in oklab, var(--jade-dim) 70%, transparent), transparent 72%),
+    radial-gradient(26% 20% at 64% 22%, color-mix(in oklab, var(--rim-magenta) 30%, transparent), transparent 70%),
+    radial-gradient(34% 40% at 48% 46%, color-mix(in oklab, var(--jade-dim) 34%, transparent), transparent 74%),
+    radial-gradient(30% 24% at 8% 84%, color-mix(in oklab, var(--rim-cyan) 16%, transparent), transparent 70%);
+  filter: blur(58px);
+  opacity: 0.85;
+  animation: hecate-drift 47s ease-in-out infinite alternate;
+}
+
+@keyframes hecate-drift {
+  0% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.5%, 2%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-1%, 1.5%, 0) scale(1.02);
+  }
+}
+
+/* Dust in the light.
+ *
+ * The stops are hand placed rather than random, because a random field
+ * regenerates on every reload and this one has to tile: the layer is 200
+ * percent tall and translated by exactly half its height, so the bottom half
+ * arrives where the top half left and the loop has no seam. */
+.hecate-motes {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 200%;
+  background-repeat: repeat;
+  background-size: 100% 50%;
+  background-image:
+    radial-gradient(2px 2px at 12% 7%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 31% 19%, var(--bone-dim), transparent 62%),
+    radial-gradient(2.5px 2.5px at 57% 11%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 74% 26%, var(--jade-hot), transparent 62%),
+    radial-gradient(3px 3px at 88% 15%, var(--jade), transparent 62%),
+    radial-gradient(1.5px 1.5px at 6% 34%, var(--bone-dim), transparent 62%),
+    radial-gradient(2.5px 2.5px at 44% 41%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 66% 37%, var(--jade-hot), transparent 62%),
+    radial-gradient(2px 2px at 21% 46%, var(--jade), transparent 62%),
+    radial-gradient(2.5px 2.5px at 93% 44%, var(--bone-dim), transparent 62%),
+    radial-gradient(1.5px 1.5px at 38% 3%, var(--jade-hot), transparent 62%),
+    radial-gradient(2px 2px at 82% 33%, var(--rim-cyan), transparent 62%),
+    radial-gradient(1.5px 1.5px at 50% 29%, var(--jade), transparent 62%),
+    radial-gradient(2px 2px at 15% 22%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 69% 48%, var(--bone-dim), transparent 62%);
+  opacity: 0.85;
+  animation: hecate-rise 38s linear infinite;
+}
+
+/* A second field, slower, larger and dimmer, so the dust has depth rather
+ * than moving as one sheet. */
+.hecate-motes.is-far {
+  background-size: 100% 50%;
+  filter: blur(1.2px);
+  opacity: 0.45;
+  animation-duration: 71s;
+  animation-delay: -18s;
+}
+
+@keyframes hecate-rise {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+/* What makes it a room. */
+.hecate-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(135% 105% at 50% 36%, transparent 62%, var(--ink-950) 100%);
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hecate-glow,
+  .hecate-motes {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- sheen -- */
+
+/* The turned edge on a panel.
+ *
+ * `tokens.css` has carried `--t-sheen` since the palette was written and
+ * nothing used it. This is what it was for: a light top edge and a jade cast
+ * under it, so a panel reads as catching Hecate's light rather than as a
+ * rectangle of a slightly different grey. One pseudo-element, no motion.
+ *
+ * The token still drives the one thing that does move, which is the present
+ * station's ring drawing the eye when a pick is waiting. */
+.briefing,
+.menu-panel,
+.standing-body,
+.rail-sheet {
+  position: relative;
+  isolation: isolate;
+}
+
+.briefing::after,
+.menu-panel::after,
+.standing-body::after,
+.rail-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--jade) 9%, transparent),
+    transparent 38%
+  );
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--jade-hot) 22%, transparent);
+  pointer-events: none;
+}
+
+/* The one thing waiting for the player, breathing. Ambient tier: it carries no
+ * information, so reduced motion stops it and nothing is lost. */
+.station.is-present .station-mark {
+  animation: station-pulse calc(var(--t-sheen) * 2) ease-in-out infinite;
+}
+
+@keyframes station-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0.6rem var(--jade-dim);
+  }
+  50% {
+    box-shadow: 0 0 1.15rem color-mix(in oklab, var(--jade-hot) 60%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station.is-present .station-mark {
+    animation: none;
+  }
+}
+
 
 .surface,
 .shell {

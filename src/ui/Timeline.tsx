@@ -44,8 +44,8 @@ export function Timeline({
 }: {
   entries: RunEntry[]
   run: RunContext
-  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null) => void
-  onSkip: (god: string | null) => void
+  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
+  onSkip: (god: string | null, kind: RunEntry['kind']) => void
   scrollToPresent?: boolean
 }) {
   const present = useRef<HTMLLIElement>(null)
@@ -67,7 +67,7 @@ export function Timeline({
       <li className="station is-present" ref={present}>
         <span className="station-mark" aria-hidden="true" />
         <div className="station-body">
-          <p className="station-exit">Exit {entries.length + 1}</p>
+          <p className="station-exit">Exit {entries.filter((entry) => entry.kind === 'exit').length + 1}</p>
           <Picker run={run} onTake={onTake} onSkip={onSkip} />
         </div>
       </li>
@@ -87,12 +87,15 @@ function Station({ entry }: { entry: RunEntry }) {
   const icon = entry.taken ? iconOf.get(entry.taken) : null
 
   return (
-    <li className={`station${entry.died.length ? ' has-deaths' : ''}`}>
+    <li className={`station is-${entry.kind}${entry.died.length ? ' has-deaths' : ''}`}>
       <span className="station-mark" aria-hidden="true" />
 
       <div className="station-body">
         <p className="station-exit">
-          Exit {entry.exit}
+          {/* An Encounter carries the number of the Exit that led to the
+              Location it happened in, and says what it was rather than
+              claiming an Exit of its own. */}
+          {entry.kind === 'encounter' ? `Encounter, at Exit ${entry.exit}` : `Exit ${entry.exit}`}
           {entry.god ? <span className="station-god">{entry.god}</span> : null}
         </p>
 
@@ -145,16 +148,23 @@ function Deaths({ died }: { died: string[] }) {
   )
 }
 
+/**
+ * The road ahead, as shape and not as a count.
+ *
+ * It used to read "7 Exits ahead", which states a fact nobody has. A run's Exit
+ * count is not knowable to a player and it is not in the files either: it wants
+ * the region data, which is a map generator rather than a table. So the beads
+ * carry that there is more run left and roughly how much, and the number is
+ * labelled as the guess it is.
+ */
 function Beads({ count }: { count: number }) {
-  if (count <= 0) return <p className="beads-none">No Exits left.</p>
+  if (count <= 0) return <p className="beads-none">Near the end of the run.</p>
   return (
-    <p className="beads" aria-label={`${count} ${count === 1 ? 'Exit' : 'Exits'} ahead`}>
+    <p className="beads" aria-label={`About ${count} more ${count === 1 ? 'Exit' : 'Exits'}`}>
       {Array.from({ length: Math.min(count, 20) }, (_, i) => (
         <span key={i} className="bead" aria-hidden="true" />
       ))}
-      <span className="beads-count">
-        {count} {count === 1 ? 'Exit' : 'Exits'} ahead
-      </span>
+      <span className="beads-count">about {count} more, if this run is a usual length</span>
     </p>
   )
 }
