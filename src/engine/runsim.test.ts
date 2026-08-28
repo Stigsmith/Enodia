@@ -27,6 +27,7 @@ const olympians = olympiansFrom(loot)
 const context = (over: Partial<RunContext> = {}): RunContext => ({
   weapon: null,
   aspect: null,
+  path: null,
   exitsLeft: 12,
   held: [],
   godsTaken: [],

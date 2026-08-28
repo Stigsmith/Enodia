@@ -225,6 +225,10 @@ function loadOrder() {
     'MetaUpgradeData.lua',
     // Assigns ScreenData.UpgradeChoice, which is where MaxChoices lives.
     'UpgradeChoiceData.lua',
+    // Artemis, Athena, Dionysus and Hades hand out boons but have no LootData
+    // entry, because they arrive through Encounters rather than Exits. Their
+    // pools live in UnitSetData, carrying TreatAsGodLootByShops.
+    ...pick(/^NPCData_(Artemis|Athena|Dionysus|Hades)\.lua$/),
   ]
 }
 
@@ -342,6 +346,10 @@ const tables = {
   'arcana-layout': 'MetaUpgradeDefaultCardLayout',
   'trait-rarity': 'TraitRarityData',
   'trait-elements': 'TraitElementData',
+  'unit-sets': 'UnitSetData',
+  // What can sit behind an Exit, per region. Not just gods: hammers, Selene,
+  // Hermes, health and Magick drops, and the Encounter gods all live here.
+  'reward-stores': 'RewardStoreData',
 }
 
 mkdirSync(OUT, { recursive: true })

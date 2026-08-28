@@ -15,7 +15,7 @@ import { Timeline } from './ui/Timeline.tsx'
 import { useRun } from './state/run.ts'
 
 export function App() {
-  const { run, entries, start, end, take, skip } = useRun()
+  const { run, entries, start, end, take, skip, setExitsLeft } = useRun()
 
   if (!run) {
     return (
@@ -38,9 +38,20 @@ export function App() {
         <p className="run-what">
           {weapon?.name ?? 'Unknown arm'}
           {aspect ? <span className="run-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
+          {run.path ? <span className="run-aspect">{run.path === 'surface' ? 'Surface' : 'Underworld'}</span> : null}
         </p>
+        {/* An estimate, and the player's to correct. Nobody knows their Exit
+            count at the start of a run, so this is never a question, only a
+            number that can be nudged once the run makes it obvious. */}
         <p className="run-exits">
+          <button type="button" onClick={() => setExitsLeft(run.exitsLeft - 1)} aria-label="One fewer Exit left">
+            &minus;
+          </button>
           <strong>{run.exitsLeft}</strong> {run.exitsLeft === 1 ? 'Exit' : 'Exits'} left
+          <button type="button" onClick={() => setExitsLeft(run.exitsLeft + 1)} aria-label="One more Exit left">
+            +
+          </button>
+          <span className="estimate">estimate</span>
         </p>
         <button type="button" className="quiet" onClick={end}>
           End run

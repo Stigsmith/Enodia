@@ -57,6 +57,7 @@ const OLYMPIANS = ['Aphrodite', 'Apollo', 'Ares', 'Demeter', 'Hephaestus', 'Hera
 const context = (over: Partial<RunContext> = {}): RunContext => ({
   weapon: null,
   aspect: null,
+  path: null,
   exitsLeft: 8,
   held: [],
   godsTaken: [],
@@ -288,6 +289,7 @@ describe('against data/generated', () => {
   const real = (over: Partial<RunContext> = {}): RunContext => ({
     weapon: null,
     aspect: null,
+    path: null,
     exitsLeft: 12,
     held: [],
     godsTaken: [],

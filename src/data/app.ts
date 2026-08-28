@@ -63,6 +63,24 @@ export const offerRules = bundle.offerRules as {
   rarityUpgradeOrder: string[]
 }
 
+/**
+ * Everything that can hand you a trait, and what it can hand you.
+ *
+ * Nine Olympians, Hermes and Chaos, Selene's Hexes, a Daedalus Hammer per
+ * weapon, and the four Encounter gods who have no LootData entry at all.
+ */
+export type RewardSource = {
+  id: string
+  name: string
+  kind: 'olympian' | 'other' | 'hammer' | 'hex' | 'encounter'
+  icon: string | null
+  /** hammers only: which weapon these upgrades belong to */
+  weapon?: string
+  traits: TraitId[]
+}
+
+export const sources: readonly RewardSource[] = bundle.sources as RewardSource[]
+
 /** Each god's offer pools, for the Exit picker and the simulator. */
 export const godPools: ReadonlyMap<GodId, { priority: TraitId[]; pool: TraitId[] }> = new Map(
   (bundle.pools as { god: string; priority: string[]; pool: string[] }[]).map((entry) => [

@@ -1,0 +1,1344 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-28",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "RewardStoreData",
+  "sha256": "fcbeb7293e4d2fde8a9759c77e3c6a6fac325ed853899f6708efc2ee3e834232"
+ },
+ "data": {
+  "FieldsCombatRewards": {},
+  "FieldsOptionalRewards": [
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "RoomMoneyTinyDrop"
+   },
+   {
+    "Name": "RoomMoneyTinyDrop"
+   },
+   {
+    "Name": "RoomMoneyTinyDrop"
+   },
+   {
+    "Name": "RoomRewardHealDrop"
+   },
+   {
+    "Name": "ArmorBoost"
+   },
+   {
+    "Name": "GiftDrop"
+   },
+   {
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   }
+  ],
+  "HubRewards": [
+   {
+    "Name": "MaxHealthDropBig"
+   },
+   {
+    "Name": "MaxManaDropBig"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HermesUpgradeRequirements"
+     ]
+    },
+    "Name": "HermesUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "SpellDropRequirements"
+     ]
+    },
+    "Name": "SpellDrop"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   }
+  ],
+  "InvalidOverrides": [
+   "Secrets"
+  ],
+  "MetaProgress": [
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "GiftDropLootRequirements"
+     ]
+    },
+    "Name": "GiftDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     "2": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     "2": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     },
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCurrencyBigDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 5
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     },
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCurrencyBigDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": "<=",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "OrRequirements": [
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCurrency"
+        ],
+        "Value": 500
+       }
+      ],
+      [
+       {
+        "Comparison": "<",
+        "Path": [
+         "GameState",
+         "LifetimeResourcesGained",
+         "MetaCardPointsCommon"
+        ],
+        "Value": 100
+       }
+      ]
+     ]
+    },
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     }
+    ],
+    "Name": "MetaCardPointsCommonBigDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     }
+    ],
+    "Name": "MetaCardPointsCommonBigDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     }
+    ],
+    "Name": "MetaCardPointsCommonBigDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCurrency"
+      ],
+      "Value": 500
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "LifetimeResourcesGained",
+       "MetaCardPointsCommon"
+      ],
+      "Value": 100
+     }
+    ],
+    "Name": "MetaCardPointsCommonBigDrop"
+   }
+  ],
+  "MinorRunProgress": [
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "EmptyMaxHealthSmallDrop"
+   },
+   {
+    "Name": "EmptyMaxHealthSmallDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StoreRewardRandomStack"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "PathTrue": [
+       "GameState",
+       "WorldUpgrades",
+       "WorldUpgradeElementalBoons"
+      ]
+     }
+    ],
+    "Name": "ElementalBoost"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "Path": [
+       "GameState",
+       "RoomCountCache",
+       "F_Story01"
+      ],
+      "Value": 3
+     }
+    ],
+    "Name": "ArmorBoost"
+   }
+  ],
+  "PreHubRewards": {},
+  "RunProgress": [
+   {
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade",
+       "AresUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "MaxManaDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade",
+       "AresUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "MaxManaDrop"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade",
+       "AresUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 1
+     }
+    ],
+    "Name": "RoomMoneyDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade",
+       "AresUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 1
+     },
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "LateHammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HermesUpgradeRequirements"
+     ]
+    },
+    "Name": "HermesUpgrade"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "PathTrue": [
+       "GameState",
+       "TextLinesRecord",
+       "PoseidonDevotionIntro01"
+      ]
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "CurrentRun",
+       "EncounterDepth"
+      ],
+      "Value": 7
+     },
+     {
+      "Comparison": ">=",
+      "Path": [
+       "CurrentRun",
+       "BiomeEncounterDepth"
+      ],
+      "Value": 2
+     },
+     {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 2
+     },
+     {
+      "FunctionArgs": {
+       "Count": 15,
+       "Event": "Devotion"
+      },
+      "FunctionName": "RequiredMinRoomsSinceEvent"
+     },
+     {
+      "FunctionArgs": {
+       "Count": 2
+      },
+      "FunctionName": "RequiredMinExits"
+     }
+    ],
+    "Name": "Devotion"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "SpellDropRequirements"
+     ]
+    },
+    "Name": "SpellDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "1": {
+      "Comparison": ">",
+      "Path": [
+       "CurrentRun",
+       "EnteredBiomes"
+      ],
+      "Value": 1
+     },
+     "2": {
+      "PathFalse": [
+       "CurrentRun",
+       "BiomeUseRecord",
+       "TalentDrop"
+      ]
+     },
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "TalentDrop"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   }
+  ],
+  "Secrets": [
+   {
+    "Name": "TrialUpgrade"
+   }
+  ],
+  "SubRoomRewards": [
+   {
+    "Name": "MaxManaDropSmall"
+   },
+   {
+    "Name": "MaxHealthDropSmall"
+   },
+   {
+    "Name": "EmptyMaxHealthSmallDrop"
+   },
+   {
+    "Name": "RoomMoneyTinyDrop"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "HasAll": [
+       "WorldUpgradeElementalBoons"
+      ],
+      "Path": [
+       "GameState",
+       "WorldUpgrades"
+      ]
+     }
+    ],
+    "Name": "AirBoost"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "HasAll": [
+       "WorldUpgradeElementalBoons"
+      ],
+      "Path": [
+       "GameState",
+       "WorldUpgrades"
+      ]
+     }
+    ],
+    "Name": "EarthBoost"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "HasAll": [
+       "WorldUpgradeElementalBoons"
+      ],
+      "Path": [
+       "GameState",
+       "WorldUpgrades"
+      ]
+     }
+    ],
+    "Name": "FireBoost"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "HasAll": [
+       "WorldUpgradeElementalBoons"
+      ],
+      "Path": [
+       "GameState",
+       "WorldUpgrades"
+      ]
+     }
+    ],
+    "Name": "WaterBoost"
+   },
+   {
+    "Name": "GiftDrop"
+   },
+   {
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "Name": "MetaCurrencyDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "Name": "MetaCardPointsCommonDrop"
+   },
+   {
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "Name": "MaxManaDrop"
+   },
+   {
+    "Name": "MaxManaDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyDrop"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "MinorTalentDrop"
+   }
+  ],
+  "SubRoomRewardsHard": [
+   {
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "Name": "MaxHealthDrop"
+   },
+   {
+    "Name": "MaxManaDrop"
+   },
+   {
+    "Name": "MaxManaDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgrade"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyDrop"
+   },
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyDrop"
+   }
+  ],
+  "TartarusRewards": [
+   {
+    "GameStateRequirements": {},
+    "Name": "RoomMoneyTripleDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgradeTriple"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "LateHammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": [
+     {
+      "PathTrue": [
+       "GameState",
+       "TextLinesRecord",
+       "PoseidonDevotionIntro01"
+      ]
+     },
+     {
+      "Comparison": ">=",
+      "CountOf": [
+       "AphroditeUpgrade",
+       "ApolloUpgrade",
+       "DemeterUpgrade",
+       "HephaestusUpgrade",
+       "HestiaUpgrade",
+       "HeraUpgrade",
+       "PoseidonUpgrade",
+       "ZeusUpgrade"
+      ],
+      "Path": [
+       "CurrentRun",
+       "LootTypeHistory"
+      ],
+      "Value": 2
+     },
+     {
+      "FunctionArgs": {
+       "Count": 15,
+       "Event": "Devotion"
+      },
+      "FunctionName": "RequiredMinRoomsSinceEvent"
+     },
+     {
+      "FunctionArgs": {
+       "Count": 2
+      },
+      "FunctionName": "RequiredMinExits"
+     }
+    ],
+    "Name": "Devotion"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "TalentBigDrop"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   }
+  ],
+  "TyphonBossRewards": [
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "AllowDuplicates": true,
+    "GameStateRequirements": {},
+    "Name": "Boon"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "TalentLegal"
+     ]
+    },
+    "Name": "TalentBigDrop"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "StackUpgradeLegal"
+     ]
+    },
+    "Name": "StackUpgradeTriple"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "HammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   },
+   {
+    "GameStateRequirements": {
+     "NamedRequirements": [
+      "LateHammerLootRequirements"
+     ]
+    },
+    "Name": "WeaponUpgrade"
+   }
+  ]
+ }
+}

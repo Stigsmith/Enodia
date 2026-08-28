@@ -25,7 +25,7 @@ export function Present({
   onSkip,
 }: {
   run: RunContext
-  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string) => void
+  onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null) => void
   onSkip: (god: string | null) => void
 }) {
   const [showAll, setShowAll] = useState(false)

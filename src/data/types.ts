@@ -75,9 +75,18 @@ export type WeaponId = string
  * because the cap counts pickups: `InteractLogic.HandleLootPickup` writes
  * `LootTypeHistory` when the loot is taken, so seeing a god costs nothing.
  */
+export type RunPath = 'underworld' | 'surface'
+
 export type RunContext = {
   weapon: WeaponId | null
   aspect: TraitId | null
+  /**
+   * Which way the run went. Recorded, and not yet used to filter anything: the
+   * region each Encounter god appears in is only half traceable in the room
+   * data, and a guess about who can still turn up would be exactly the kind of
+   * invented fact this project keeps out.
+   */
+  path: RunPath | null
   /** Exits remaining in the run. The engine's only clock. */
   exitsLeft: number
   held: Held
