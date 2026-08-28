@@ -282,12 +282,30 @@ mistakes: a negative result proved something about the search.
 exact one `deppth2 ls` prints, so the package comes out whole into
 `extracted/scriptsbase/`. It is 6,784 stills and takes several minutes.
 
-**The disc is an ellipse, 122 by 162,** because the game draws it in isometric: it is a
-circle seen at an angle. `npm run reward-frame` crops to the alpha bbox and resizes that
-crop to a square, which is what turns the ellipse back into a circle, punches the dark
-interior out so it can sit over a portrait, and composes the wings on top. Output is
-`frames/reward-marker.png`, `frames/reward-wings.png`, both `-meta` variants, and
-`chrome/reward-glow.png`.
+**There is no plain 2D copy of it, and there was never going to be.** These are world
+objects: the art ships already squashed for the plane it lies on, and the game draws it as
+it is. Nothing in any package holds an un-warped version.
+
+It is recoverable exactly, though, because **the disc is a circle in truth, so whatever
+ellipse it ships as is the transform.** Second moments of its own alpha put the major axis
+at 61.7 degrees with the minor at 0.631 of it. Undoing that, `R(t) diag(1, r) R(-t)`, takes
+the disc from 0.631 to **0.999**, which is a circle to three places and is the check that
+the transform is right rather than merely plausible.
+
+The wings take the same inverse because they lie on the same plane, and that is what fixes
+the shape of each crescent rather than just the angle between them. It leaves the pair on a
+12.7 degree axis, so one rotation lays them flat, and they come out as the mirrored pair a
+real Exit shows. Neither number is hardcoded: both are measured off the shipped alpha on
+every run, so a patch that redraws the marker gets followed rather than fought.
+
+`npm run reward-frame` writes `frames/reward-marker.png`, `frames/reward-wings.png`, both
+`-meta` variants, and `chrome/reward-glow.png`.
+
+**A front-facing cousin does exist**, and it was already on this shelf:
+`chrome/circle-filigree.png`, which is `UnlockTextCircleBacking.png` out of `GUI.pkg`. Its
+disc measures 260 by 251, so it really is round, because it is a UI element rather than a
+world one. Same motif, a plate with ornaments either side; different ornament, gold
+scrollwork rather than silver crescents.
 
 ### Boon icons are 90x90 and there is no larger copy
 
