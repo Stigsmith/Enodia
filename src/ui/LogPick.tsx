@@ -18,6 +18,8 @@
 
 import { useState } from 'react'
 
+import { Radial } from './Radial.tsx'
+
 import { iconOf, sources, traits } from '../data/app.ts'
 import type { RewardSource } from '../data/app.ts'
 import { canBeOffered } from '../engine/slots.ts'
@@ -72,18 +74,29 @@ export function LogPick({
       <section className="log-pick">
         <h2 className="step-heading">What {source.name} gave</h2>
 
-        <div className="rarity-row" role="group" aria-label="Rarity, optional">
-          {RARITIES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={`rarity${rarity === option ? ' is-chosen' : ''}`}
-              aria-pressed={rarity === option}
-              onClick={() => setRarity(option)}
-            >
-              {option}
-            </button>
-          ))}
+        {/* One stepper rather than four buttons. Rarity is optional at pickup
+            and the only thing it decides is whether that slot could still be
+            swapped, so it should cost one tap at most. */}
+        <div className="rarity-step" role="group" aria-label="Rarity, optional">
+          <button
+            type="button"
+            onClick={() => setRarity(RARITIES[Math.max(0, RARITIES.indexOf(rarity) - 1)] ?? 'Common')}
+            aria-label="Lower rarity"
+            disabled={rarity === RARITIES[0]}
+          >
+            &minus;
+          </button>
+          <output className={`rarity is-${rarity.toLowerCase()}`}>{rarity}</output>
+          <button
+            type="button"
+            onClick={() =>
+              setRarity(RARITIES[Math.min(RARITIES.length - 1, RARITIES.indexOf(rarity) + 1)] ?? 'Heroic')
+            }
+            aria-label="Higher rarity"
+            disabled={rarity === RARITIES[RARITIES.length - 1]}
+          >
+            +
+          </button>
         </div>
 
         <ul className="boon-list">
@@ -129,21 +142,42 @@ export function LogPick({
     )
   }
 
+  const byId = new Map([...atExit, ...elsewhere].map((entry) => [entry.id, entry]))
+
   return (
     <section className="log-pick">
       <h2 className="step-heading">What did this Exit give</h2>
-      <SourceList entries={atExit} onPick={setSource} />
+      <Radial
+        label="Who was behind it"
+        items={atExit.map((entry) => ({
+          id: entry.id,
+          name: entry.name,
+          icon: entry.icon,
+          note: NOTES[entry.kind] ?? null,
+        }))}
+        chosen={null}
+        onChoose={(id) => setSource(byId.get(id) ?? null)}
+      />
 
       <h2 className="step-heading">Or, from an Encounter</h2>
       <SourceList entries={elsewhere} onPick={setSource} />
 
       <div className="pick-actions">
         <button type="button" className="quiet" onClick={() => onSkip(null)}>
-          A Pom, gold, health, or nothing that changes the build
+          A Pom, gold, health, or nothing that changes what is reachable
         </button>
       </div>
     </section>
   )
+}
+
+/** Why a source is in this ring at all, said once rather than per bubble. */
+const NOTES: Record<RewardSource['kind'], string> = {
+  olympian: 'Spends one of your four Olympian slots the moment you take a boon',
+  other: 'Never counts against the Olympian cap',
+  hammer: 'Two of the eighteen reward slots. Changes a weapon more than a boon does',
+  hex: 'Selene, and her Hexes never count against the Olympian cap',
+  encounter: 'Arrives through an Encounter rather than an Exit, and costs no slot',
 }
 
 function SourceList({ entries, onPick }: { entries: RewardSource[]; onPick: (entry: RewardSource) => void }) {

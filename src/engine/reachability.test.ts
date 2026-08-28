@@ -20,6 +20,7 @@ const trait = (id: string, over: Partial<Trait> = {}): Trait => ({
   gods: [],
   requiredWeapon: null,
   requires: null,
+  text: null,
   ...over,
 })
 

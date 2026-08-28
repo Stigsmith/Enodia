@@ -178,6 +178,7 @@ export function buildTraitIndex(sources: Sources): TraitIndex {
       gods: gods.get(id) ?? [],
       requiredWeapon: str(trait.RequiredWeapon),
       requires: requirementOf(sources.requirements[id]),
+      text: null,
     })
   }
   return index

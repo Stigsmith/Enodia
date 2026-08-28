@@ -27,6 +27,7 @@ const trait = (id: string, name: string, slot: Slot | null, gods: string[] = [])
   gods,
   requiredWeapon: null,
   requires: null,
+  text: null,
 })
 
 const index: TraitIndex = new Map([
