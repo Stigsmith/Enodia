@@ -200,11 +200,13 @@ their own set, so an aspect chosen at setup can settle a build before the first 
   run header offered a plus and a minus; both were the tool's question rather than the
   player's, because nobody can correct a number they have no way of knowing. It reads
   "about 7 Exits left" now and the beads say "about 5 more, if this run is a usual length"
-- **Open, and the owner is right that it is missing: Charon.** `ChosenRewardType == "Shop"`
-  is a real door reward, sourced at `RoomLogic.lua:4126`, which also says a Shop door alone
-  cannot be rerolled. So a shop **is** behind an Exit and costs one, unlike an Encounter.
-  What a Charon entry should record is a product decision and the owner's: he sells rather
-  than offers, his stock is in `StoreData.lua`, and a bought boon is still a boon in a slot
+- ~~Charon was missing~~. He is a kind now, and he spends an Exit, because
+  `ChosenRewardType == "Shop"` is a real door reward: `RoomLogic.lua:4126` says a Shop door
+  is the one kind that cannot be rerolled. **A shop is not its own family of rewards, it is
+  another route to the ones that exist.** `StoreData.WorldShop` stocks `RandomLoot` and
+  `BoostedRandomLoot`, which are a boon from any god and therefore spend an Olympian slot,
+  plus `ShopHermesUpgrade`, `SpellDrop` and `WeaponUpgradeDrop`. So picking Charon asks the
+  same question the other kinds do, and his Poms and health go under "Something else"
 
 **Step 9, and the one design decision in it**
 

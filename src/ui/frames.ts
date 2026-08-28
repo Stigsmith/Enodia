@@ -132,8 +132,8 @@ export const FRAMES: FrameOption[] = [
     name: 'Wings',
     note: 'The same marker with the disc taken off, so only the wings read',
     file: 'frames/reward-wings.png',
-    width: 1.42,
-    aspect: '584 / 468',
+    width: 1.5,
+    aspect: '666 / 301',
     opacity: 0.95,
   },
 
@@ -183,7 +183,14 @@ export const FRAMES: FrameOption[] = [
   { id: 'none', name: 'None', note: 'Just the bubble', file: null },
 ]
 
-export const DEFAULT_FRAME = 'ring'
+/**
+ * The game's own Exit reward marker, on the ring where a player logs an Exit.
+ *
+ * The run picker is asking "what did this Exit give", and this is the thing the
+ * game draws on an Exit when it has something behind it. Nothing invented is
+ * going to beat that.
+ */
+export const DEFAULT_FRAME = 'reward'
 
 const KEY = 'enodia.frame'
 

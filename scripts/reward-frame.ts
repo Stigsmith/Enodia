@@ -22,11 +22,16 @@
  * package. `deppth2`'s `-e` filter does not match these entries by any name
  * tried, so the package is extracted whole into `extracted/scriptsbase/`.
  *
- * **The disc is an ellipse, 122 by 162.** The game draws it in isometric, so it
- * is a circle seen at an angle. Squaring it back up is what makes it usable
- * face on, and it is why this script exists rather than a line in
- * `scripts/chrome.ts`: the shelf takes files as they are, and this one has to
- * be undistorted, punched through and recomposed first.
+ * **Both pieces are drawn in isometric and both have to be undone.** The disc
+ * is an ellipse, 122 by 162, so it is a circle seen at an angle; squaring the
+ * crop makes it round. The wings sit on an axis 25.7 degrees below horizontal,
+ * measured from their own alpha rather than hardcoded, and on a real Exit they
+ * read as left and right of the disc. Laying them flat is what makes the
+ * composed marker look like the thing in the game.
+ *
+ * That is why this is its own script rather than a line in `scripts/chrome.ts`:
+ * the shelf takes files as they are, and this one has to be undistorted,
+ * punched through and recomposed first.
  */
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
@@ -71,8 +76,35 @@ def disc_ring(frame_path, punch=0.90):
     im.putalpha(Image.composite(im.getchannel("A"), Image.new("L", (SIZE, SIZE), 0), hole))
     return im
 
+def wing_axis(im):
+    """The angle the two crescents sit at, from their own alpha.
+
+    They are drawn diagonally because the game renders them on the same
+    isometric plane as the disc; on a door they read horizontal. Splitting the
+    sprite down the middle and taking each half's alpha-weighted centroid gives
+    the axis without hardcoding a number that a patch could move.
+    """
+    a = im.getchannel("A")
+    w, h = im.size
+    px = a.load()
+    def centroid(x0, x1):
+        sx = sy = n = 0
+        for y in range(h):
+            for x in range(x0, x1):
+                v = px[x, y]
+                if v > 30:
+                    sx += x*v; sy += y*v; n += v
+        return (sx/n, sy/n) if n else None
+    left, right = centroid(0, w//2), centroid(w//2, w)
+    if not left or not right:
+        return 0.0
+    import math
+    return math.degrees(math.atan2(right[1]-left[1], right[0]-left[0]))
+
 def wings(path, width):
     im = Image.open(path).convert("RGBA")
+    # Lay them flat first, then crop, or the crop keeps the diagonal's slack.
+    im = im.rotate(wing_axis(im), resample=Image.BICUBIC, expand=True)
     im = im.crop(im.getchannel("A").getbbox())
     return im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
 
@@ -91,10 +123,12 @@ for name, wing_src in [("run", "RoomRewardFrame-Run.png"), ("meta", "RoomRewardF
         report.append({"name": name, "error": "no " + wing_src})
         continue
 
-    canvas = round(SIZE * 1.2)
+    canvas = round(SIZE * 1.34)
     marker = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
     marker.alpha_composite(disc_ring(still), ((canvas - SIZE)//2, (canvas - SIZE)//2))
-    w = wings(wing_path, round(SIZE * 1.14))
+    # Wide enough that the crescents sit outside the disc, which is where the
+    # game puts them. At 1.14 they crossed the portrait inside it.
+    w = wings(wing_path, round(SIZE * 1.30))
     marker.alpha_composite(w, ((canvas - w.width)//2, (canvas - w.height)//2))
 
     suffix = "" if name == "run" else "-meta"

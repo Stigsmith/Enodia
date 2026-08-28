@@ -21,6 +21,8 @@
 
 import { useState } from 'react'
 
+import { FRAMES, frameVars } from './frames.ts'
+
 /**
  * How a piece of art wants to be drawn.
  *
@@ -56,6 +58,7 @@ export function Radial({
    * aspect cutouts, "portraits" for faces.
    */
   variant = 'default',
+  frame,
 }: {
   items: RadialItem[]
   chosen: string | null
@@ -63,8 +66,19 @@ export function Radial({
   label: string
   centre?: RadialItem | null
   variant?: 'default' | 'renders' | 'portraits'
+  /**
+   * Wear this frame instead of the one the menu chose.
+   *
+   * The weapon and aspect rings ask for the plain one: their art is large
+   * transparent cutouts and the game's own reward marker, which has wings
+   * reaching well past the circle, tangles with a staff laid diagonally
+   * across it. The run picker takes the setting, because that is the ring a
+   * player actually looks at.
+   */
+  frame?: string
 }) {
   const [hovered, setHovered] = useState<string | null>(null)
+  const override = frame ? FRAMES.find((entry) => entry.id === frame) : null
 
   // A ring of twelve needs smaller bubbles than a ring of four, or they overlap.
   const bubble = items.length <= 6 ? 0.24 : items.length <= 9 ? 0.19 : 0.16
@@ -74,7 +88,7 @@ export function Radial({
       className={`radial is-${variant}${hovered ? ' is-hovering' : ''}`}
       role="group"
       aria-label={label}
-      style={{ '--bubble-scale': bubble } as React.CSSProperties}
+      style={{ '--bubble-scale': bubble, ...(override ? frameVars(override) : {}) } as React.CSSProperties}
     >
       <div className="radial-ring-area">
 

@@ -54,6 +54,9 @@ export function Setup({
   return (
     <section className="setup">
       <Radial
+        // The plain ring, always: a weapon is a diagonal cutout and the game's
+        // reward marker has wings that reach past the circle and tangle with it.
+        frame="ring"
         variant="renders"
         label={chosenWeapon ? 'Which aspect' : 'Which arm'}
         items={items}
