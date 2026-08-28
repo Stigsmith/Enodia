@@ -1605,14 +1605,29 @@ body::before {
 }
 
 /* And the centre of the ring sits in the game's filigree circle. */
-.radial-centre::before {
+/* The filigree rings the bubbles, not the middle one.
+ *
+ * A bubble is a circle with its art contained inside it, so a circular frame
+ * fits it exactly. The centre is a large cutout that deliberately overflows its
+ * own box, and a staff laid diagonally across a small gold circle looks like a
+ * mistake. It sits on the li rather than the button, because the button clips
+ * its own overflow to make the circle. */
+.radial-ring li::after {
   content: '';
   position: absolute;
-  /* The art is wider than tall, a circle with flourishes off each shoulder, so
-   * it is fitted by height and kept clear of the ring. */
-  inset: -6% -2% auto;
-  aspect-ratio: 482 / 269;
-  background: url('/chrome/circle-filigree.png') center top / contain no-repeat;
-  opacity: 0.5;
+  inset: -16% -13%;
+  background: url('/chrome/circle-filigree.png') center / contain no-repeat;
+  opacity: 0.42;
   pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response), transform var(--t-response) var(--e-response);
+}
+
+.radial.is-hovering .radial-ring li::after {
+  opacity: 0.18;
+}
+
+.radial-ring li:has(.is-hovered)::after,
+.radial-ring li:has(.is-chosen)::after {
+  opacity: 0.85;
+  transform: scale(1.1);
 }
