@@ -5319,32 +5319,32 @@
    "id": "reward-marker-meta",
    "category": "frames",
    "file": "frames/reward-marker-meta.png",
-   "bytes": 101387,
-   "sha256": "5f1a8bd1283d740a3dff690f33abd8cb238f6ad818dc00ae753155dfa6720b03",
+   "bytes": 118485,
+   "sha256": "3dd7d1de6bdb95a4f320bf39fc9ecce51754adbf30b4f449184e32e3adaa9bcd",
    "source": "game"
   },
   {
    "id": "reward-marker",
    "category": "frames",
    "file": "frames/reward-marker.png",
-   "bytes": 106318,
-   "sha256": "6f78f97e4cd6ad9daed2aafb215dd5ee9ee27d14595b3f22205c30978587032e",
+   "bytes": 116967,
+   "sha256": "b84873743774c56cfe9d95cac7f03d39a1008b245bfa0db6320e08bba671d5eb",
    "source": "game"
   },
   {
    "id": "reward-wings-meta",
    "category": "frames",
    "file": "frames/reward-wings-meta.png",
-   "bytes": 86771,
-   "sha256": "0775d7f8f422c085be086f7c67a0359c6030c4bb0003c2fae5fb6259be6e1f7a",
+   "bytes": 90414,
+   "sha256": "6c9037a6f1ae1b6be11f8ab37cc53b32676bfc49dfafb404f81212f5c87f4c63",
    "source": "game"
   },
   {
    "id": "reward-wings",
    "category": "frames",
    "file": "frames/reward-wings.png",
-   "bytes": 88749,
-   "sha256": "8d382d2b7cd1d0a22e4408d2f086eeb4c4475e61a2042f3a54642d1f6e3999e3",
+   "bytes": 88559,
+   "sha256": "71e19fcd3a525d38149895bbaf17fe37321f54633db72f550a65730e52c13c41",
    "source": "game"
   },
   {

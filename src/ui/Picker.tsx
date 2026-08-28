@@ -30,7 +30,7 @@ import type { ArtShape } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
 import type { RunEntry } from '../state/run.ts'
 
-type Kind = 'boon' | 'other' | 'hammer' | 'encounter' | 'artifact'
+type Kind = 'boon' | 'other' | 'hammer' | 'shop' | 'encounter' | 'artifact'
 
 const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note: string }[] = [
   {
@@ -61,6 +61,13 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
     icon: 'gods/artemis.webp',
     art: 'portrait',
     note: 'Not an Exit at all, and costs no slot',
+  },
+  {
+    id: 'shop',
+    name: "Charon's shop",
+    icon: 'characters/charon.webp',
+    art: 'portrait',
+    note: 'An Exit like any other. What you bought is what counts',
   },
   {
     id: 'artifact',
@@ -109,6 +116,27 @@ export function Picker({
     if (which === 'boon') return sources.filter((s) => s.kind === 'olympian' && openGods.has(s.id))
     if (which === 'hammer') return sources.filter((s) => s.kind === 'hammer' && s.weapon === run.weapon)
     if (which === 'other') return sources.filter((s) => s.kind === 'hex' || (s.kind === 'other' && s.id === 'Hermes'))
+    /**
+     * What Charon stocks, from `StoreData.WorldShop`.
+     *
+     * `RandomLoot` and `BoostedRandomLoot` are a boon from any god, so buying
+     * one **does** spend an Olympian slot. `ShopHermesUpgrade` is Hermes,
+     * `SpellDrop` is Selene's Hex, `WeaponUpgradeDrop` is a Daedalus Hammer.
+     * The rest of his stock is Poms, health, Magick and Talents, which move no
+     * verdict and are logged under "Something else".
+     *
+     * So a shop is not its own family of rewards. It is another route to the
+     * families that already exist, and it asks the same question they do.
+     */
+    if (which === 'shop') {
+      return sources.filter(
+        (s) =>
+          (s.kind === 'olympian' && openGods.has(s.id)) ||
+          s.kind === 'hex' ||
+          (s.kind === 'other' && s.id === 'Hermes') ||
+          (s.kind === 'hammer' && s.weapon === run.weapon),
+      )
+    }
     if (which === 'encounter') {
       return sources.filter((s) => {
         if (s.kind === 'other' && s.id === 'Chaos') return true
