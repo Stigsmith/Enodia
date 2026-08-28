@@ -156,13 +156,23 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - ~~The gods as the game's `BoonSelectSymbols` glyphs~~. Reverted on sight. They are small
   glowing marks meant to be read on a door at a distance and they render as coloured dots
   in a list. Portraits, larger than before. `assets/symbols/` keeps the glyphs
-- ~~The filigree circle around each bubble~~. Replaced by `frames/circle.png`, which is
-  BoonSelect's carved ring. It is a closed circle, so neighbouring bubbles no longer put
-  their flourishes on top of each other, and its hole is 77 percent of the image, which
-  fixes the frame at 130 percent of a bubble. **A face fills the circle; nothing else
-  does.** A boon mark, a slot glyph and a hammer are rounded squares and a weapon is a
-  diagonal cutout, and a circular crop takes the corners off all of them, so they sit
-  inside the ring instead
+- ~~The filigree circle around each bubble~~. **The frame is a setting now, not a
+  decision.** The stone ring went in and came straight back out: it was one answer and the
+  owner wanted to see the rest. `src/ui/frames.ts` holds ten options, the menu lists them
+  with a swatch each, and the choice persists. The default is the filigree again. Geometry
+  is one number per option, `hole`, so adding another is one entry and no CSS
+- ~~A face fills the circle; nothing else does~~. A boon mark, a slot glyph and a hammer
+  are rounded squares and a weapon is a diagonal cutout, and a circular crop takes the
+  corners off all of them, so they sit inside the frame instead. `RadialItem.art` carries
+  the shape and the variant only supplies its default
+- **From the owner, 28 August 2026: 43 named textures and two folders out of the
+  extraction.** `npm run chrome` copies them and `scripts/chrome.ts` is the record of who
+  picked what and for what. New shelves: `icons/` (7 game UI icons), `familiars/` (50),
+  `gifts/` (33 Keepsake portraits). `chrome/` went 14 to 52 and `frames/` 17 to 21.
+  **Applied so far:** the boon mark is `Icons/Boon.png`, the rarity stepper carries
+  `CardRarityIcon_*`, and the quiet buttons wear `Shell/button.png` with its own highlight
+  plate on hover. **Held for where they belong:** the boxes, the choice box, the trash
+  button, the splash screens, the sidebars and the familiars
 - **The menu exists as a shell.** One button top left, covering rather than pushing, with
   build manager, build exchange, account, friends, leaderboards, settings, help and about
   listed and marked unbuilt. Starting a run is always its first entry
@@ -180,10 +190,11 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - ~~How the app gets its data~~. `npm run data` projects `data/generated` through
   `src/data/load.ts` into `data/app/app-data.json`, 78 KB and 15 gzipped, imported rather
   than fetched. One mapping, shared by the app, the tests and the validator
-- **`publicDir` is `assets/`,** so a manifest path is also a URL. About 33 MB ships, 23 of
-  which is Arcana card art Phase 1 never renders. Downscale it before a real deploy.
-  `frames/circle.png` is the first one done: 2.37 MB at 2475 square, 249 KB at 512, for a
-  ring drawn at about 150 pixels across
+- **`publicDir` is `assets/`,** so a manifest path is also a URL. **46 MB ships now**, 23 of
+  which is Arcana card art Phase 1 never renders and 9 of which arrived on 28 August and is
+  mostly held for later. `frames/circle.png` is the one downscale done so far: 2.37 MB at
+  2475 square, 249 KB at 512. The real fix is a build step that copies only what the app
+  references, and it is not written
 - The Exit count in Setup defaults to 12 and is a placeholder. The real number wants region
   data, which is not extracted
 - The verdicts are only as good as the targets. Every duo and legendary is a target today,

@@ -74,13 +74,17 @@ their source pages the first time, which is how that got noticed.
 | `artifacts/` | 11 | wiki | Consumables and run items | partial |
 | `biomes/` | 9 | mixed, 8 wiki and 1 game | Region art | complete, Tartarus came out of the run history icons |
 | `elements/` | 6 | wiki | Aether, Air, Earth, Fire, Water, Elemental Essence | complete |
-| `ui/` | 19 | wiki | Wiki section icons | low value, chrome/ replaces it |
+| `ui/` | 19 | wiki | Wiki section icons | low value, `icons/` and `chrome/` replace it |
 | `slots/` | 5 | wiki | Attack, Special, Cast, Dash, Magick | complete |
 | `arcana/` | 25 | game | Arcana cards, named, from game files | complete |
 | `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
-| `rarity/` | 4 | game | Common/Rare/Epic/Heroic, from game files | complete |
+| `rarity/` | 4 | game | Common/Rare/Epic/Heroic. These are `Icons/CardRarityIcon_*` | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
-| `chrome/` | 14 | game | The game's own furniture: medallion, feathers, title plates, victory banners | a starting set |
+| `chrome/` | 52 | game | The game's own furniture: boxes, buttons, backings, medallion, splash art | picked by hand, see `scripts/chrome.ts` |
+| `frames/` | 21 | game | Boon and rarity frames, plus every ring the radial can wear | see `src/ui/frames.ts` |
+| `icons/` | 7 | game | The game's own UI icons: boon, gold, reroll, inventory, warning, unknown | picked by hand |
+| `familiars/` | 50 | game | The five familiars, their six skins each and their stat icons | complete, unused so far |
+| `gifts/` | 33 | game | Keepsake max gift portraits, one per character. A possible alternate to `gods/` | unused so far |
 | `weapons/` | 12 | game | The six Nocturnal Arms, a Codex card and a shrine silhouette each | complete, 6 of 6 |
 
 ### Aspect naming, resolved 27 August 2026
@@ -252,6 +256,44 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
+
+### Chrome is picked by hand, and `scripts/chrome.ts` is the record
+
+`npm run assets -- --fill` finds boon art by matching the trait data's `Icon` fields against
+the extraction. **Chrome has no trait data behind it.** A pause box or a button plate is on
+the shelf because somebody looked at it and said that one, so the table in `scripts/chrome.ts`
+is both the copier and the record of who picked what and for what.
+
+```
+npm run chrome     copy the named GUI textures out of extracted/
+npm run assets     describe them in manifest.json
+```
+
+It is idempotent and it refuses two things:
+
+- **A slug that is already taken.** `buildIconIndex` keeps the first entry per slug and
+  directory order decides which, so a `gifts/zeus.png` would sort ahead of `gods/zeus.webp`
+  and silently change every god portrait in the app. The gift portraits carry a `-gift`
+  suffix for exactly this reason, and anything else that would collide is named and skipped
+- **Copying something already here.** Six of the 43 files picked on 28 August 2026 were on
+  the shelf already, byte for byte, under the names the app uses: the four rarity icons
+  (`Icons/CardRarityIcon_*`), `chrome/tooltip-backing.png` (`Tooltip_Backing_01.png`) and
+  `chrome/resource-backing.png` (`ResourceBacking.png`). They stay in the table so it is a
+  record of what was asked for rather than of what happened to be missing
+
+**`chrome/circle-filigree.png` is `UnlockTextCircleBacking.png`,** and it is a filled disc
+with gold flourishes rather than a ring with a hole. That is why art behind it shows through
+tinted, and why it is the only frame option with a non-square aspect.
+
+### The shelf ships whole, and it is 46 MB now
+
+`vite.config.ts` sets `publicDir: 'assets'`, so every file here is also a URL and page
+weight. The 28 August additions are about 9 MB of it, most of which nothing renders yet:
+the three 1920x1080 splash screens are 3.8 MB and the gift portraits another 1.8 MB.
+
+Nothing here is wrong, but a real deploy wants a build step that copies only what the app
+references rather than the whole library. Until then, downscale before adding, the way
+`frames/circle.png` was.
 
 ### `frames/circle.png` is downscaled, on purpose
 

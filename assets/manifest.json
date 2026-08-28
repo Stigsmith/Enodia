@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 741,
+ "count": 865,
  "categories": [
   {
    "name": "arcana",
@@ -44,7 +44,7 @@
   },
   {
    "name": "chrome",
-   "count": 22,
+   "count": 52,
    "source": "game"
   },
   {
@@ -60,8 +60,18 @@
    "source": "wiki"
   },
   {
+   "name": "familiars",
+   "count": 50,
+   "source": "game"
+  },
+  {
    "name": "frames",
-   "count": 17,
+   "count": 21,
+   "source": "game"
+  },
+  {
+   "name": "gifts",
+   "count": 33,
    "source": "game"
   },
   {
@@ -77,6 +87,11 @@
   {
    "name": "hexes",
    "count": 9,
+   "source": "game"
+  },
+  {
+   "name": "icons",
+   "count": 7,
    "source": "game"
   },
   {
@@ -3790,11 +3805,131 @@
    "sourcePage": "Characters-Hades II"
   },
   {
+   "id": "backdrop-mel",
+   "category": "chrome",
+   "file": "chrome/backdrop-mel.png",
+   "bytes": 318901,
+   "sha256": "030a3ab002ba091b166a441ac2380cee38e755813cd80406e7063b4a967e293b",
+   "source": "game"
+  },
+  {
+   "id": "box-confirm",
+   "category": "chrome",
+   "file": "chrome/box-confirm.png",
+   "bytes": 222457,
+   "sha256": "7ee8d9cdfc16b1215b599020b232d9ce9ce00d14f3831e1f7cd50c571c0cf507",
+   "source": "game"
+  },
+  {
+   "id": "box-halfscreen",
+   "category": "chrome",
+   "file": "chrome/box-halfscreen.png",
+   "bytes": 314895,
+   "sha256": "88c90b3d4afc8034e91e833dfff2d511e78b925c99703bcd66443ad174d13dcf",
+   "source": "game"
+  },
+  {
+   "id": "box-pause",
+   "category": "chrome",
+   "file": "chrome/box-pause.png",
+   "bytes": 246356,
+   "sha256": "aff45073e3d834cb80ff99e1cefb4ed22950295524994dcc6cb29e6d6ca77efe",
+   "source": "game"
+  },
+  {
+   "id": "button-cancel-highlight",
+   "category": "chrome",
+   "file": "chrome/button-cancel-highlight.png",
+   "bytes": 15345,
+   "sha256": "d5acec995169bc832372f5205816b7aff622dacbd46339fd88ce584ae8c2856e",
+   "source": "game"
+  },
+  {
+   "id": "button-cancel",
+   "category": "chrome",
+   "file": "chrome/button-cancel.png",
+   "bytes": 11417,
+   "sha256": "de760619b9e837f9df193f3eb79d95ba9c700d8a0298f4bcd8ee9fb645e5f4ae",
+   "source": "game"
+  },
+  {
+   "id": "button-confirm-highlight",
+   "category": "chrome",
+   "file": "chrome/button-confirm-highlight.png",
+   "bytes": 15445,
+   "sha256": "20299c523b9b9a53b93d310ea470873f540862322bfc4412cdf269130dad95da",
+   "source": "game"
+  },
+  {
+   "id": "button-confirm",
+   "category": "chrome",
+   "file": "chrome/button-confirm.png",
+   "bytes": 11167,
+   "sha256": "191262086e533392c09ebaa1a7a1d6be6fe2177f4b54ec66612530b4b69de3a6",
+   "source": "game"
+  },
+  {
+   "id": "button-highlight",
+   "category": "chrome",
+   "file": "chrome/button-highlight.png",
+   "bytes": 18115,
+   "sha256": "a9d5fa3f15cd80f98fe689fa10aa439ab88cc5956b451247ff88d282f3d8f1cd",
+   "source": "game"
+  },
+  {
+   "id": "button",
+   "category": "chrome",
+   "file": "chrome/button.png",
+   "bytes": 12239,
+   "sha256": "6778aff6238818dc7c5111e9fa731ebbc6eedd9fb086d3f2ba0493d72d076b46",
+   "source": "game"
+  },
+  {
+   "id": "choicebox-highlight",
+   "category": "chrome",
+   "file": "chrome/choicebox-highlight.png",
+   "bytes": 19237,
+   "sha256": "c418403a13d16b4052562c7e94e9e5a3d4efb335d1a2f0711871fbea50b0f5de",
+   "source": "game"
+  },
+  {
+   "id": "choicebox",
+   "category": "chrome",
+   "file": "chrome/choicebox.png",
+   "bytes": 11353,
+   "sha256": "ea88fa79a39db71c5b1a0617468d60bd9476849dab61dc4d4c912f68c05b285f",
+   "source": "game"
+  },
+  {
    "id": "circle-filigree",
    "category": "chrome",
    "file": "chrome/circle-filigree.png",
    "bytes": 57904,
    "sha256": "a72257cb911a958a467d57404b4b374899d1d684fa19e955d920ce932349239d",
+   "source": "game"
+  },
+  {
+   "id": "confirm-button-highlight",
+   "category": "chrome",
+   "file": "chrome/confirm-button-highlight.png",
+   "bytes": 15259,
+   "sha256": "9813f50fd104b7a00425965c5a0e1bc5318747f4ead26b7853ce1a6398d4c4e7",
+   "source": "game"
+  },
+  {
+   "id": "confirm-button",
+   "category": "chrome",
+   "file": "chrome/confirm-button.png",
+   "bytes": 15030,
+   "sha256": "4c5aff39408522039c469b3f248376531361d09bbe4824921b9e43b63c23b414",
+   "source": "game"
+  },
+  {
+   "id": "dialogue-olympian",
+   "category": "chrome",
+   "file": "chrome/dialogue-olympian.png",
+   "bytes": 207468,
+   "sha256": "4f1e1b452d6357cc464b59ec5b0aa964b6a965d94239c6bf2dc1a0ea51414b9b",
    "source": "game"
   },
   {
@@ -3814,6 +3949,22 @@
    "source": "game"
   },
   {
+   "id": "exit-button-highlight",
+   "category": "chrome",
+   "file": "chrome/exit-button-highlight.png",
+   "bytes": 29242,
+   "sha256": "5d80a716466fd3bc94ed827b018e0f6d6301e7659bca0e89809953bf3ee054e2",
+   "source": "game"
+  },
+  {
+   "id": "exit-button",
+   "category": "chrome",
+   "file": "chrome/exit-button.png",
+   "bytes": 29853,
+   "sha256": "e25da48c4b7ff66124283772ae700c3a8b54152ecbfea60186c5d01eb0c42d75",
+   "source": "game"
+  },
+  {
    "id": "hammer-feathers",
    "category": "chrome",
    "file": "chrome/hammer-feathers.png",
@@ -3827,6 +3978,22 @@
    "file": "chrome/icon-backing.png",
    "bytes": 19982,
    "sha256": "f1971e71d86a106c7981c373e3f44ed965f5a3f155bc5b595eaa2a6926acff8b",
+   "source": "game"
+  },
+  {
+   "id": "info-button-highlight",
+   "category": "chrome",
+   "file": "chrome/info-button-highlight.png",
+   "bytes": 37610,
+   "sha256": "52d405bb2db1d3430783a3910ae028ebcf30d85951dd393f9720141e89cd6923",
+   "source": "game"
+  },
+  {
+   "id": "info-button",
+   "category": "chrome",
+   "file": "chrome/info-button.png",
+   "bytes": 35337,
+   "sha256": "a4e7ec37d8556dac406d5561545921991018641de7c059ab2b5de296401dc16a",
    "source": "game"
   },
   {
@@ -3894,11 +4061,75 @@
    "source": "game"
   },
   {
+   "id": "resource-backing-harvest",
+   "category": "chrome",
+   "file": "chrome/resource-backing-harvest.png",
+   "bytes": 31236,
+   "sha256": "f746fdccc6c418c5544000126b51d93eb7a85051f889aff871dd9d912062f772",
+   "source": "game"
+  },
+  {
+   "id": "resource-backing-long",
+   "category": "chrome",
+   "file": "chrome/resource-backing-long.png",
+   "bytes": 17420,
+   "sha256": "4837cc61c2f0d7525d0f6027d2cfaece05423b28062d623b16bab4128cb05051",
+   "source": "game"
+  },
+  {
    "id": "resource-backing",
    "category": "chrome",
    "file": "chrome/resource-backing.png",
    "bytes": 14535,
    "sha256": "48ffe94471ce67b66977de834b8f04407009999c69b67ce793bc65c2d64b5db4",
+   "source": "game"
+  },
+  {
+   "id": "sidebars",
+   "category": "chrome",
+   "file": "chrome/sidebars.png",
+   "bytes": 49311,
+   "sha256": "75b6f072e73caea9c716387bbe106c89fc9ae2943ad56ef22a22fea8ada28b53",
+   "source": "game"
+  },
+  {
+   "id": "spell-slot-highlight",
+   "category": "chrome",
+   "file": "chrome/spell-slot-highlight.png",
+   "bytes": 18451,
+   "sha256": "470fac1a3c78f68e70f8d58c16c023c2d8a9300104b8d446fa47ca41553f5ec0",
+   "source": "game"
+  },
+  {
+   "id": "spell-slot",
+   "category": "chrome",
+   "file": "chrome/spell-slot.png",
+   "bytes": 314260,
+   "sha256": "08dbcffd99c6e67496c25776f233a828a2851454acd39b6c4d1bcec1909e39b8",
+   "source": "game"
+  },
+  {
+   "id": "splash-dreamrun",
+   "category": "chrome",
+   "file": "chrome/splash-dreamrun.png",
+   "bytes": 1624269,
+   "sha256": "7f037850de3650ea102d667ee1594fce9abd740e5cf9ec05fff8bdd405587013",
+   "source": "game"
+  },
+  {
+   "id": "splash-surface",
+   "category": "chrome",
+   "file": "chrome/splash-surface.png",
+   "bytes": 1094739,
+   "sha256": "bd30c71032e5d2a0505a95eec0873bec0c5a466b00adfaec499bc4841b65dded",
+   "source": "game"
+  },
+  {
+   "id": "splash-underworld",
+   "category": "chrome",
+   "file": "chrome/splash-underworld.png",
+   "bytes": 1214696,
+   "sha256": "1ba1597f04f414eac42447c8b730e1e0e92377a6c44a0701c41676543565d99e",
    "source": "game"
   },
   {
@@ -3918,11 +4149,35 @@
    "source": "game"
   },
   {
+   "id": "timer-backing",
+   "category": "chrome",
+   "file": "chrome/timer-backing.png",
+   "bytes": 19442,
+   "sha256": "b6882f532587faa2c55b955ee525119dc3331ca4683b6eddc6f23c20b57b2c10",
+   "source": "game"
+  },
+  {
    "id": "tooltip-backing",
    "category": "chrome",
    "file": "chrome/tooltip-backing.png",
    "bytes": 23530,
    "sha256": "aaeb2fd095d1eb3f8e10289f5e7dfe68541dbe16d956cb57d181a41756f6c7b0",
+   "source": "game"
+  },
+  {
+   "id": "trash-button-highlight",
+   "category": "chrome",
+   "file": "chrome/trash-button-highlight.png",
+   "bytes": 11413,
+   "sha256": "fdc547eecf4653021aa1198050bc6bbe5ff4626281a8a4860749d108fd61e51c",
+   "source": "game"
+  },
+  {
+   "id": "trash-button",
+   "category": "chrome",
+   "file": "chrome/trash-button.png",
+   "bytes": 8797,
+   "sha256": "8b62dcff7baf172b000ab2a3a979efa8b604d5cc47ffa994bc42551ffdd622c5",
    "source": "game"
   },
   {
@@ -4502,6 +4757,406 @@
    "sourcePage": "Boons-Hades II"
   },
   {
+   "id": "cat-attack",
+   "category": "familiars",
+   "file": "familiars/cat-attack.png",
+   "bytes": 29284,
+   "sha256": "2a8d682e9adcfe88f69ae93337115e4f377d1bb0e725999b6696e12e1e4e9afb",
+   "source": "game"
+  },
+  {
+   "id": "cat-laststandheal",
+   "category": "familiars",
+   "file": "familiars/cat-laststandheal.png",
+   "bytes": 30812,
+   "sha256": "fe585d05484ef20f1d3425e49a5607af4ac26e7b8452bed1bfc6b4df2bd2c1c4",
+   "source": "game"
+  },
+  {
+   "id": "cat-uses",
+   "category": "familiars",
+   "file": "familiars/cat-uses.png",
+   "bytes": 32420,
+   "sha256": "ca1bb676f3994d6fae32c5a5786640d4034c38d8db7a4abdecd44a416a90a0ba",
+   "source": "game"
+  },
+  {
+   "id": "familiars-cat-01",
+   "category": "familiars",
+   "file": "familiars/familiars-cat-01.png",
+   "bytes": 25965,
+   "sha256": "59fe92660d6a4bb24e96fee39e1d995d482affb27f33131b4bb8a185575d1a4d",
+   "source": "game"
+  },
+  {
+   "id": "familiars-frog-01",
+   "category": "familiars",
+   "file": "familiars/familiars-frog-01.png",
+   "bytes": 22477,
+   "sha256": "93c4761b712f303f872cbcadb4a8cdf6ad3a04949a803bde6ae0dead82212728",
+   "source": "game"
+  },
+  {
+   "id": "familiars-hound-01",
+   "category": "familiars",
+   "file": "familiars/familiars-hound-01.png",
+   "bytes": 24512,
+   "sha256": "b889db0781fdac13e3c0750dc7db5029de41c60dc86000eb821781b59e0f4349",
+   "source": "game"
+  },
+  {
+   "id": "familiars-polecat-01",
+   "category": "familiars",
+   "file": "familiars/familiars-polecat-01.png",
+   "bytes": 25426,
+   "sha256": "b968857a9c22b0a4458b393bca030fe365092011a857a712084c08a8ea7e79fc",
+   "source": "game"
+  },
+  {
+   "id": "familiars-raven-01",
+   "category": "familiars",
+   "file": "familiars/familiars-raven-01.png",
+   "bytes": 22124,
+   "sha256": "ed410d560fdd7f01d41a6f636684d6b11203998258bc99096fa977298b5987ad",
+   "source": "game"
+  },
+  {
+   "id": "frog-damage",
+   "category": "familiars",
+   "file": "familiars/frog-damage.png",
+   "bytes": 25708,
+   "sha256": "2494fca94e4dd4fdcc56b75e2fdf82dd2c546878ff5874a3eb8d6006ec81375f",
+   "source": "game"
+  },
+  {
+   "id": "frog-healthbonus",
+   "category": "familiars",
+   "file": "familiars/frog-healthbonus.png",
+   "bytes": 28574,
+   "sha256": "7bb8858e080ea5d53c04b1fe29e232ee09eae09c7f945b0809eb492ce44f5ad8",
+   "source": "game"
+  },
+  {
+   "id": "frog-uses",
+   "category": "familiars",
+   "file": "familiars/frog-uses.png",
+   "bytes": 25208,
+   "sha256": "0796fb45735a6f42ca998264e96e2d001b42633c22941a902ee2e8f85b5c2656",
+   "source": "game"
+  },
+  {
+   "id": "hound-attack",
+   "category": "familiars",
+   "file": "familiars/hound-attack.png",
+   "bytes": 27265,
+   "sha256": "0dace910e8168187610075ebb00e13a15fe7adcc4ea256a54e7eeaef87be154d",
+   "source": "game"
+  },
+  {
+   "id": "hound-manabonus",
+   "category": "familiars",
+   "file": "familiars/hound-manabonus.png",
+   "bytes": 28509,
+   "sha256": "b9dc3aa6703c3c2a7b3f6c00b3f019a57f2c588deb6c7b8132f41d3129b12169",
+   "source": "game"
+  },
+  {
+   "id": "hound-uses",
+   "category": "familiars",
+   "file": "familiars/hound-uses.png",
+   "bytes": 26824,
+   "sha256": "8f6235ccbeee316ff4afc8a3acfe1345477210ce9b48d03fe1010e9a8dfb66dc",
+   "source": "game"
+  },
+  {
+   "id": "polecat-damage",
+   "category": "familiars",
+   "file": "familiars/polecat-damage.png",
+   "bytes": 25806,
+   "sha256": "f2fbc61fd599f0617227532f461f3549203a7bd5bfd9c280ce1157325824fc49",
+   "source": "game"
+  },
+  {
+   "id": "polecat-dodgebonus",
+   "category": "familiars",
+   "file": "familiars/polecat-dodgebonus.png",
+   "bytes": 26175,
+   "sha256": "e7c3d77dd37ffc72575b27d81434f444428f21b9f31fa95f88cbd19cbf2208aa",
+   "source": "game"
+  },
+  {
+   "id": "polecat-uses",
+   "category": "familiars",
+   "file": "familiars/polecat-uses.png",
+   "bytes": 28178,
+   "sha256": "0f9bb197cc540ca87a8750299e24004db1f9a2eaadd633c39fc28c4a3abd8c29",
+   "source": "game"
+  },
+  {
+   "id": "raven-attack",
+   "category": "familiars",
+   "file": "familiars/raven-attack.png",
+   "bytes": 31100,
+   "sha256": "54e3f7aad744b4f995fa926886490fb322f43046cfce2bbeb488707ba3f0b981",
+   "source": "game"
+  },
+  {
+   "id": "raven-critchancebonus",
+   "category": "familiars",
+   "file": "familiars/raven-critchancebonus.png",
+   "bytes": 24869,
+   "sha256": "f3fdcdbe1ecaffbf3997069f7a40d6b60720abdd60e0ead8742abd417a744276",
+   "source": "game"
+  },
+  {
+   "id": "raven-uses",
+   "category": "familiars",
+   "file": "familiars/raven-uses.png",
+   "bytes": 27934,
+   "sha256": "ac2a22089ebfedae49cd5e70f72f7be7c4053e04964e14783a173c8e51b8d2b8",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat01",
+   "category": "familiars",
+   "file": "familiars/skin-cat01.png",
+   "bytes": 10153,
+   "sha256": "cc525a1f33dad94662713c3b8c4112d147a5649839dbee4eb82435f879ff14eb",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat02",
+   "category": "familiars",
+   "file": "familiars/skin-cat02.png",
+   "bytes": 10061,
+   "sha256": "4edd6ed76286d2e113244c090ff2f75e04fa5cc0898931f1f494d227594501d4",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat03",
+   "category": "familiars",
+   "file": "familiars/skin-cat03.png",
+   "bytes": 11082,
+   "sha256": "697e05f87730b69c6d78fa9f5be5672012685259c34a8821d71fd1bb6bbe7653",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat04",
+   "category": "familiars",
+   "file": "familiars/skin-cat04.png",
+   "bytes": 9738,
+   "sha256": "049726bcf1c286e047a18cbf51bfa5c8ad63e277867fe3b20c7b55d7bd67bbc5",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat05",
+   "category": "familiars",
+   "file": "familiars/skin-cat05.png",
+   "bytes": 7954,
+   "sha256": "013de2eee6458118d300c99d369d84c71fe864ab5dd129607caae2b01c2aa3f4",
+   "source": "game"
+  },
+  {
+   "id": "skin-cat06",
+   "category": "familiars",
+   "file": "familiars/skin-cat06.png",
+   "bytes": 10194,
+   "sha256": "c127ce730727c7862135afe506ad70381b153c46da93b6b914637da4bd6c9b37",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog01",
+   "category": "familiars",
+   "file": "familiars/skin-frog01.png",
+   "bytes": 13580,
+   "sha256": "0f83448d04129c909d120ca612077ea04dac6c2beed100d5a81326c52b2c1dca",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog02",
+   "category": "familiars",
+   "file": "familiars/skin-frog02.png",
+   "bytes": 14550,
+   "sha256": "b9ec062d655fb8cfbf8af7ae249e0bb2a8c3b23dbbe954091c13637382c6d41d",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog03",
+   "category": "familiars",
+   "file": "familiars/skin-frog03.png",
+   "bytes": 15062,
+   "sha256": "2d9f15be8e1d3866e1aaac10a9d510ffbe1a2b7cdca0b6571a4952b438d1eccf",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog04",
+   "category": "familiars",
+   "file": "familiars/skin-frog04.png",
+   "bytes": 17649,
+   "sha256": "7fbf6a63060a70e7cd0662e64d51750897ed90520611477551e9b09e6e4935bc",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog05",
+   "category": "familiars",
+   "file": "familiars/skin-frog05.png",
+   "bytes": 10846,
+   "sha256": "d2386c3141a263009bfe08c8da969a5b0ae4fafe9ba297c0289aebfeb59a065f",
+   "source": "game"
+  },
+  {
+   "id": "skin-frog06",
+   "category": "familiars",
+   "file": "familiars/skin-frog06.png",
+   "bytes": 12317,
+   "sha256": "90476eca3dcc949d8b8949219f075c32d730fac22c59633f9c3954770d54c012",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound01",
+   "category": "familiars",
+   "file": "familiars/skin-hound01.png",
+   "bytes": 8959,
+   "sha256": "51f40a07d26d93b53b9f228d06bc7cdc9e1c097dd7dfc213626a4a588385b581",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound02",
+   "category": "familiars",
+   "file": "familiars/skin-hound02.png",
+   "bytes": 7491,
+   "sha256": "f6911ea5b22df40dbe25a33daf2d9da86f3124f351e3707bdd9572c6576d7731",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound03",
+   "category": "familiars",
+   "file": "familiars/skin-hound03.png",
+   "bytes": 10678,
+   "sha256": "3aef8a615695d3cdbf4faf6027dbe8f0d745bc50904f793b475c8afa16979654",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound04",
+   "category": "familiars",
+   "file": "familiars/skin-hound04.png",
+   "bytes": 11379,
+   "sha256": "eea6c79ba94b95211b1ed4779e8a829ac4efcf19c1a4147bfa536a795a03982e",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound05",
+   "category": "familiars",
+   "file": "familiars/skin-hound05.png",
+   "bytes": 8402,
+   "sha256": "2d8c2f192ee520b1497b98b9b54862252c7831126726934dff44d5cf44b4b749",
+   "source": "game"
+  },
+  {
+   "id": "skin-hound06",
+   "category": "familiars",
+   "file": "familiars/skin-hound06.png",
+   "bytes": 9147,
+   "sha256": "2735a6f0dba365688122277ebebed539dd8344654f7ab6fc529a74c54e9009e5",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat01",
+   "category": "familiars",
+   "file": "familiars/skin-polecat01.png",
+   "bytes": 10270,
+   "sha256": "ab005f67a254349be548d74c8c0c345b9269f4a0b1288d54f2a0cd735ca2cc8e",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat02",
+   "category": "familiars",
+   "file": "familiars/skin-polecat02.png",
+   "bytes": 11678,
+   "sha256": "717b35ac6fcc6fa2a3601d6cd2d95f54902f63e65dc99ebabdb5e73f3701ee85",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat03",
+   "category": "familiars",
+   "file": "familiars/skin-polecat03.png",
+   "bytes": 11782,
+   "sha256": "0f9cea9385e9a1dc9d91b3c20db00ebc2eca7a6b5465ded948ed45ba8fad4427",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat04",
+   "category": "familiars",
+   "file": "familiars/skin-polecat04.png",
+   "bytes": 12394,
+   "sha256": "0e15ea996a3265fd552abb8e473baba7488d25287097a8036a1882ff0b68b3d9",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat05",
+   "category": "familiars",
+   "file": "familiars/skin-polecat05.png",
+   "bytes": 9318,
+   "sha256": "abcabd6a0bd4abbea716500d7751f0adc59d822d5129c37a551e488fd2b52127",
+   "source": "game"
+  },
+  {
+   "id": "skin-polecat06",
+   "category": "familiars",
+   "file": "familiars/skin-polecat06.png",
+   "bytes": 10545,
+   "sha256": "35945a73f80704fc78da652389062ce43782df8639a058b289041b25e002f7cb",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven01",
+   "category": "familiars",
+   "file": "familiars/skin-raven01.png",
+   "bytes": 8874,
+   "sha256": "39e1170160ce676e447c0e41fc4dd5ef93e543e6863f1046b6db99742ddf13cc",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven02",
+   "category": "familiars",
+   "file": "familiars/skin-raven02.png",
+   "bytes": 10451,
+   "sha256": "806c5794d5d537a518ee67d501251f63cb7d561f128cc0cc83f9a7c55b6a188c",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven03",
+   "category": "familiars",
+   "file": "familiars/skin-raven03.png",
+   "bytes": 10021,
+   "sha256": "7bde3e8b4706e45f52e08f83b61221cf101de18df70dd5910f2e6ff0b67154b0",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven04",
+   "category": "familiars",
+   "file": "familiars/skin-raven04.png",
+   "bytes": 10731,
+   "sha256": "7fb35e4ca5352d23e5b228fd6b0bf4c56011a8b8f147cd0c342679654a298dc3",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven05",
+   "category": "familiars",
+   "file": "familiars/skin-raven05.png",
+   "bytes": 7315,
+   "sha256": "e43aadb183c8aa8d3440fc0f7ada71ac3a098d912c01f936b2db5da50ad073b2",
+   "source": "game"
+  },
+  {
+   "id": "skin-raven06",
+   "category": "familiars",
+   "file": "familiars/skin-raven06.png",
+   "bytes": 10342,
+   "sha256": "6a4606960b76ceddcd1ef8b041678fe72e9b46ae2470f3297210fea9e993c2d1",
+   "source": "game"
+  },
+  {
    "id": "circle",
    "category": "frames",
    "file": "frames/circle.png",
@@ -4574,6 +5229,22 @@
    "source": "game"
   },
   {
+   "id": "halo",
+   "category": "frames",
+   "file": "frames/halo.png",
+   "bytes": 27139,
+   "sha256": "d5410bc21c61f64b72d7483ed515c985b2ad5625e9f59ba5157248906296336b",
+   "source": "game"
+  },
+  {
+   "id": "orbit",
+   "category": "frames",
+   "file": "frames/orbit.png",
+   "bytes": 7060,
+   "sha256": "f4c567dcbcb1c765cc5f72b3c29a4256e040804e35f7d5a1ea9ac9be217b8504",
+   "source": "game"
+  },
+  {
    "id": "plate-common",
    "category": "frames",
    "file": "frames/plate-common.png",
@@ -4635,6 +5306,286 @@
    "file": "frames/slot-shadow.png",
    "bytes": 766,
    "sha256": "c7c1bf571d5a66860e40229ec3757abe35b604d1786f2f78d5a672bb81360870",
+   "source": "game"
+  },
+  {
+   "id": "starburst-dark",
+   "category": "frames",
+   "file": "frames/starburst-dark.png",
+   "bytes": 13128,
+   "sha256": "9e060e5c948cf3f5e75d450f28c401208b83b34a96d3d374ed6b123d39db59fd",
+   "source": "game"
+  },
+  {
+   "id": "starburst",
+   "category": "frames",
+   "file": "frames/starburst.png",
+   "bytes": 19621,
+   "sha256": "8d72eaa4b738b576de5ba161e446e62f39f2bafd3cfbde2dedd754a4b82905c3",
+   "source": "game"
+  },
+  {
+   "id": "aphrodite-gift",
+   "category": "gifts",
+   "file": "gifts/aphrodite-gift.png",
+   "bytes": 73272,
+   "sha256": "fd4c3057f45c52fe7aca0a3427652ca5ee2548927245165cd1c0d942bd636fd1",
+   "source": "game"
+  },
+  {
+   "id": "apollo-gift",
+   "category": "gifts",
+   "file": "gifts/apollo-gift.png",
+   "bytes": 55927,
+   "sha256": "c7951bdcbc4bf2d4f82c377f13b46593ced7d72847cc12b70821dc59d973f295",
+   "source": "game"
+  },
+  {
+   "id": "arachne-gift",
+   "category": "gifts",
+   "file": "gifts/arachne-gift.png",
+   "bytes": 61122,
+   "sha256": "15de752b8d68aa031382441783afcd86d3af88e5cbaf2f99b907aee0a1197026",
+   "source": "game"
+  },
+  {
+   "id": "ares-gift",
+   "category": "gifts",
+   "file": "gifts/ares-gift.png",
+   "bytes": 63158,
+   "sha256": "33049dbbee505f949b0863fe9acffb39592a507eb7d6c585c9850ac0aeae0f6e",
+   "source": "game"
+  },
+  {
+   "id": "artemis-gift",
+   "category": "gifts",
+   "file": "gifts/artemis-gift.png",
+   "bytes": 54419,
+   "sha256": "4d2636701f0b1ae771efdc60d3144946afb6115040e1659ffb2e5d16bbb6a650",
+   "source": "game"
+  },
+  {
+   "id": "athena-gift",
+   "category": "gifts",
+   "file": "gifts/athena-gift.png",
+   "bytes": 58442,
+   "sha256": "e00cbe4eb4fe4ae46dc8bf0ac5ff0c1a0391d269a7f3d012b235f696f6c9abe8",
+   "source": "game"
+  },
+  {
+   "id": "chaos-gift",
+   "category": "gifts",
+   "file": "gifts/chaos-gift.png",
+   "bytes": 54159,
+   "sha256": "714fe9d2592972d61665373dea2db0ba334031fef878407213a507820756bd4c",
+   "source": "game"
+  },
+  {
+   "id": "charon-gift",
+   "category": "gifts",
+   "file": "gifts/charon-gift.png",
+   "bytes": 43557,
+   "sha256": "201c7a04000e5fca37ac3763e29b92080a3cffb0f0e3386a1a1cb12384248dc6",
+   "source": "game"
+  },
+  {
+   "id": "chronos-gift",
+   "category": "gifts",
+   "file": "gifts/chronos-gift.png",
+   "bytes": 39780,
+   "sha256": "015f3ce12662146b6852460946fba06d2e202eaa5e6794a40c6d32374f1a7bf5",
+   "source": "game"
+  },
+  {
+   "id": "circe-gift",
+   "category": "gifts",
+   "file": "gifts/circe-gift.png",
+   "bytes": 58978,
+   "sha256": "efdf4363c5fee885f8bd6203274fcb950881c66861feee033416e46484c497fd",
+   "source": "game"
+  },
+  {
+   "id": "demeter-gift",
+   "category": "gifts",
+   "file": "gifts/demeter-gift.png",
+   "bytes": 64537,
+   "sha256": "9ff76fcb6e64406171c2ef608530f6a7bc8b9effad51fe449488caab0d478e8b",
+   "source": "game"
+  },
+  {
+   "id": "dionysus-gift",
+   "category": "gifts",
+   "file": "gifts/dionysus-gift.png",
+   "bytes": 55190,
+   "sha256": "e9505a2dfc6f6b6b798e4c4d98f4e1761c3a5967bdae6edd425fbcc2199f8770",
+   "source": "game"
+  },
+  {
+   "id": "dora-gift",
+   "category": "gifts",
+   "file": "gifts/dora-gift.png",
+   "bytes": 46681,
+   "sha256": "388169a3e8f4cd1a48540a21dd74d1473e8579ddef27b5f89344f22e3b69023d",
+   "source": "game"
+  },
+  {
+   "id": "echo-gift",
+   "category": "gifts",
+   "file": "gifts/echo-gift.png",
+   "bytes": 54444,
+   "sha256": "30add1947928e217e789d33a21fc4b979736204c143b0e605e7d205ff468a3b2",
+   "source": "game"
+  },
+  {
+   "id": "eris-gift",
+   "category": "gifts",
+   "file": "gifts/eris-gift.png",
+   "bytes": 56916,
+   "sha256": "9c3a85debb84795d6767014f065a5ba3b8b937c0402c886186aa97977367867a",
+   "source": "game"
+  },
+  {
+   "id": "hadespersephone-gift",
+   "category": "gifts",
+   "file": "gifts/hadespersephone-gift.png",
+   "bytes": 56724,
+   "sha256": "d0e81ef28a86118158d4cd90312df6039f9ad06e5ca516f65ca155b055bce119",
+   "source": "game"
+  },
+  {
+   "id": "hecate-gift",
+   "category": "gifts",
+   "file": "gifts/hecate-gift.png",
+   "bytes": 35260,
+   "sha256": "5d23fb1497a964319c38fe8259e322777f81c7417a83dfdc1f8113730f573c93",
+   "source": "game"
+  },
+  {
+   "id": "hephaestus-gift",
+   "category": "gifts",
+   "file": "gifts/hephaestus-gift.png",
+   "bytes": 46579,
+   "sha256": "9f956b16647a4617c3992b6821f4f053e5bdc9e1f28c8b25c6a39ad0932b3d74",
+   "source": "game"
+  },
+  {
+   "id": "hera-gift",
+   "category": "gifts",
+   "file": "gifts/hera-gift.png",
+   "bytes": 64583,
+   "sha256": "e99bb3c90613d50bbff688155fbbfba5e01c34275e38fef6ac2d9b044b30f2e9",
+   "source": "game"
+  },
+  {
+   "id": "heracles-gift",
+   "category": "gifts",
+   "file": "gifts/heracles-gift.png",
+   "bytes": 56152,
+   "sha256": "4f91a229c8eb632c91759ffb46399fd18e041b9a0bd25d20bf700beb414f8656",
+   "source": "game"
+  },
+  {
+   "id": "hermes-gift",
+   "category": "gifts",
+   "file": "gifts/hermes-gift.png",
+   "bytes": 60963,
+   "sha256": "c3f7ce5603edd009cba727e606a15bc07e5d696203f647123aad30acbbc4ab51",
+   "source": "game"
+  },
+  {
+   "id": "hestia-gift",
+   "category": "gifts",
+   "file": "gifts/hestia-gift.png",
+   "bytes": 66572,
+   "sha256": "bc848c1edd22dbcd1791710479d219ca2ceb66385ad5503b152b05737ba38371",
+   "source": "game"
+  },
+  {
+   "id": "icarus-gift",
+   "category": "gifts",
+   "file": "gifts/icarus-gift.png",
+   "bytes": 59074,
+   "sha256": "778cde784fad5fd8a945aa4a28f5772cbcadcb35bc68dcff204049c5a2400de6",
+   "source": "game"
+  },
+  {
+   "id": "medea-gift",
+   "category": "gifts",
+   "file": "gifts/medea-gift.png",
+   "bytes": 53502,
+   "sha256": "82168c7fc1fc8af74cb6cd3087011d4eeb9231cc3c853d3acacaec3e17d3640f",
+   "source": "game"
+  },
+  {
+   "id": "moros-gift",
+   "category": "gifts",
+   "file": "gifts/moros-gift.png",
+   "bytes": 52040,
+   "sha256": "9d1d1fcb93b940e1a5ff0dcbf2e882b1afac0bacbd191c7949505d28e6dc501c",
+   "source": "game"
+  },
+  {
+   "id": "narcissus-gift",
+   "category": "gifts",
+   "file": "gifts/narcissus-gift.png",
+   "bytes": 58441,
+   "sha256": "6d1f660b31439a56af864c3e19fed7399e543388e455756d6ccfabe7d76c142d",
+   "source": "game"
+  },
+  {
+   "id": "nemesis-gift",
+   "category": "gifts",
+   "file": "gifts/nemesis-gift.png",
+   "bytes": 53982,
+   "sha256": "aeba05e8c72c8d5a71936acbdd22d7da8b04c96e05e76a24375a518f4cb3b629",
+   "source": "game"
+  },
+  {
+   "id": "odysseus-gift",
+   "category": "gifts",
+   "file": "gifts/odysseus-gift.png",
+   "bytes": 51199,
+   "sha256": "8fd7ee349f5051fe03cfec9445051520b015db229ed1178ce7dc9343f7d3d0af",
+   "source": "game"
+  },
+  {
+   "id": "poseidon-gift",
+   "category": "gifts",
+   "file": "gifts/poseidon-gift.png",
+   "bytes": 64838,
+   "sha256": "14d4d91a481d8f7ef21c63f80cdcc873c4f070178d9a4430ddf6b565d85bb532",
+   "source": "game"
+  },
+  {
+   "id": "selene-gift",
+   "category": "gifts",
+   "file": "gifts/selene-gift.png",
+   "bytes": 66416,
+   "sha256": "598316299b7c02b42d78ddef9faf8cb165511721d6289e2aa3a6dcd1b72e5b79",
+   "source": "game"
+  },
+  {
+   "id": "skelly-gift",
+   "category": "gifts",
+   "file": "gifts/skelly-gift.png",
+   "bytes": 38962,
+   "sha256": "68768ecb98245c9afa1e0276b7a1b186074de1e6c017e01660221339d5eef0c5",
+   "source": "game"
+  },
+  {
+   "id": "zagreus-gift",
+   "category": "gifts",
+   "file": "gifts/zagreus-gift.png",
+   "bytes": 44589,
+   "sha256": "01c9e40b1821c97b54468757a38bb3f4ab980aea7515ea48d8133078cdfacc14",
+   "source": "game"
+  },
+  {
+   "id": "zeus-gift",
+   "category": "gifts",
+   "file": "gifts/zeus-gift.png",
+   "bytes": 55591,
+   "sha256": "3d0f57ed9b171b4b0e325becc3889312dae8ca13096e8474c2977a5bf96cbac3",
    "source": "game"
   },
   {
@@ -6186,6 +7137,62 @@
    "file": "hexes/temper-of-zeus.png",
    "bytes": 13672,
    "sha256": "d93b2174f1ce6fde12e57232b0aaad119583fe5e77681f479e320a06e187c9c2",
+   "source": "game"
+  },
+  {
+   "id": "boon",
+   "category": "icons",
+   "file": "icons/boon.png",
+   "bytes": 7639,
+   "sha256": "df28f7862ea352bd840fbac173229a876bb69f939d3e4e44cd379bdc868d8c87",
+   "source": "game"
+  },
+  {
+   "id": "currency",
+   "category": "icons",
+   "file": "icons/currency.png",
+   "bytes": 59077,
+   "sha256": "6fcf609d2b2d7ef6f7210f0da93f14d6b498af8c7d80d378419b993d3727e93e",
+   "source": "game"
+  },
+  {
+   "id": "inventory",
+   "category": "icons",
+   "file": "icons/inventory.png",
+   "bytes": 6548,
+   "sha256": "96a76e08a092caa831489ef51acefc02832262b0623686c2d424250e97e1fce6",
+   "source": "game"
+  },
+  {
+   "id": "new-star",
+   "category": "icons",
+   "file": "icons/new-star.png",
+   "bytes": 2924,
+   "sha256": "b324711aaadf506567452716ddf568c5bae5603a08a780b3626287c094f5dd08",
+   "source": "game"
+  },
+  {
+   "id": "reroll",
+   "category": "icons",
+   "file": "icons/reroll.png",
+   "bytes": 7951,
+   "sha256": "91dd67ac4b1ac3332b2ff06c77ef7f1ee6f239286f64f663e5d6cc837c677f14",
+   "source": "game"
+  },
+  {
+   "id": "startled",
+   "category": "icons",
+   "file": "icons/startled.png",
+   "bytes": 7937,
+   "sha256": "118d49a63dfb0a0ddf65bc810406badc0664b7476bc2e92f60f82e0e70b01447",
+   "source": "game"
+  },
+  {
+   "id": "wants-to-talk",
+   "category": "icons",
+   "file": "icons/wants-to-talk.png",
+   "bytes": 12609,
+   "sha256": "0dc815e4512acaaea299627e11b32366191bb259a1c9067ddf38b30e801659d8",
    "source": "game"
   },
   {

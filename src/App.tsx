@@ -10,6 +10,8 @@
  * Setup is its own screen and happens once.
  */
 
+import { useEffect } from 'react'
+
 import { gameVersion, traits, weapons } from './data/app.ts'
 import { reachable } from './engine/reachability.ts'
 import { Menu } from './ui/Menu.tsx'
@@ -17,10 +19,15 @@ import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
+import { applyFrame, readFrame } from './ui/frames.ts'
 import { useRun } from './state/run.ts'
 
 export function App() {
   const { run, entries, start, end, take, skip, setExitsLeft } = useRun()
+
+  // The saved frame, before anything draws a ring. The menu owns it after
+  // that; this only makes a reload keep what was chosen.
+  useEffect(() => applyFrame(readFrame()), [])
 
   if (!run) {
     return (
