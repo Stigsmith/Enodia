@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 8 of 11 complete, step 9 next. **Step 8 was the first shippable point and it is done** |
+| **Build order step** | 9 of 11 complete, step 10 next. **Step 8 was the first shippable point and it is done** |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -21,6 +21,11 @@ Last updated 27 August 2026, game build `138174`.
 each pick closed at the pick that closed it. Settling the fourth Olympian reads "35 builds
 closed here" against that entry, and the present entry says what is still live and which god
 feeds it. That is the originating complaint answered, and it is the first shippable point.
+
+**And it remembers where you were.** Leave the run and come back, and the timeline opens
+under a card: what you were chasing and where it stands now, what moved since you last
+looked with the deaths first, what you hold by slot, and how many Exits are left. Pin a
+target from the standing drawer and that pin is what the card leads with.
 
 Not shipped yet: the hand-authored page is still `placeholder/index.html` and still what
 Netlify serves. Deploying the app is a decision, not a task.
@@ -41,8 +46,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 6 | `engine/runsim.ts` | **Done.** Seeded, legal runs. The dead-stays-dead property holds over 25 of them |
 | 7 | Setup screen, and the rail | **Done.** Weapon, aspect and Exits in, a real RunContext out, and the rail fills as you log |
 | 8 | **The timeline shell.** First shippable point | **Done.** Deaths recorded at the pick that caused them, verdicts in the present entry |
-| 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | Next |
-| 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | |
+| 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | **Done.** A trail per run, the diff, the pin, and the card. 16 tests |
+| 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | Next |
 | 11 | The offer block inside the present entry | |
 
 Later phases are scoped in `REQUIREMENTS.md` 7: **2** before the run, **3** memory,
@@ -186,6 +191,23 @@ their own set, so an aspect chosen at setup can settle a build before the first 
 - **Open:** the owner reports the Fields offer three Encounters behind one Exit, and that
   the first surface Location is one open city with eight or nine ways out rather than two.
   Both are map generation rather than a table, and neither is modelled
+
+**Step 9, and the one design decision in it**
+
+`DESIGN.md` 6.2 asks for a snapshot on every pick and a diff against it. Taken literally
+that diff is always empty: the most recent snapshot is the state the player is standing on.
+What makes the card work is the snapshot from *before the gap*, so `enodia.run.snapshot`
+holds a **trail**, one small record per pick, plus a `seen` mark for the Exit the player
+last read a card at. Still one array of small records per run, which is what 9 budgets.
+
+`Briefing.centre` and `Briefing.advice` are **null and stay null through Phase 1**, which is
+`DESIGN.md` 6.1. "Your weight is on Cast" is the sentence a player wants and it cannot be
+computed from the game files: `Slot` says which slot a boon occupies, and the boons that
+make a Cast build a Cast build mostly occupy none. That wants the curated `feeds` tag.
+
+`Briefing.position` reports `path` and `exitsLeft` and leaves `region` and `nextBoss` null,
+for the reason already in this file: `RoomData` places three Encounter gods in lettered room
+sets and says nothing about Athena, so the letter to region mapping is not established.
 
 **Engine**
 

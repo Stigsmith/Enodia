@@ -10,10 +10,15 @@
  * Setup is its own screen and happens once.
  */
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { gameVersion, traits, weapons } from './data/app.ts'
+import { brief, isWorthShowing } from './engine/briefing.ts'
+import type { Briefing as Card } from './engine/briefing.ts'
 import { reachable } from './engine/reachability.ts'
+import { loadPrefs } from './state/prefs.ts'
+import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
+import { Briefing } from './ui/Briefing.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
@@ -21,13 +26,56 @@ import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
 import { applyFrame, readFrame } from './ui/frames.ts'
 import { useRun } from './state/run.ts'
+import type { RunContext } from './data/types.ts'
 
 export function App() {
-  const { run, entries, start, end, take, skip, setExitsLeft } = useRun()
+  const { run, entries, pinned, lastPickAt, start, end, take, skip, setExitsLeft, pin } = useRun()
 
   // The saved frame, before anything draws a ring. The menu owns it after
   // that; this only makes a reload keep what was chosen.
   useEffect(() => applyFrame(readFrame()), [])
+
+  /**
+   * The re-entry card.
+   *
+   * **Built at two moments and never in between.** On arrival, which is the
+   * gap the feature exists for, and when the player asks for it from the menu,
+   * which `DESIGN.md` 6.3 also requires. Recomputing it as picks land would
+   * make it appear and vanish mid run, which is the opposite of a briefing.
+   *
+   * Held in state rather than derived, for the same reason.
+   */
+  const [card, setCard] = useState<Card | null>(null)
+  const [showBriefing, setShowBriefing] = useState(false)
+
+  const buildCard = useCallback(
+    (ctx: RunContext) => brief(ctx, lastSeen(loadTrail()), traits, { pinned, exit: entries.length }),
+    [pinned, entries.length],
+  )
+
+  // Arrival. Mount only, and it reads the run as it was when the page opened.
+  useEffect(() => {
+    if (!run) return
+    const arrival = buildCard(run)
+    setCard(arrival)
+    setShowBriefing(
+      isWorthShowing(arrival, { lastPickAt, now: Date.now(), staleAfterHours: loadPrefs().staleAfterHours }),
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const openBriefing = () => {
+    if (!run) return
+    // Rebuilt, because on demand means as things stand rather than as they
+    // stood when the tab opened.
+    setCard(buildCard(run))
+    setShowBriefing(true)
+  }
+
+  const dismissBriefing = () => {
+    setShowBriefing(false)
+    saveTrail(markSeen(loadTrail(), entries.length))
+  }
 
   if (!run) {
     return (
@@ -54,7 +102,7 @@ export function App() {
   return (
     <div className="surface">
       <header className="topbar">
-        <Menu onStartRun={end} hasRun onEndRun={end} />
+        <Menu onStartRun={end} hasRun onEndRun={end} onShowBriefing={openBriefing} />
 
         <p className="topbar-run">
           <span className="topbar-weapon">{weapon?.name ?? 'Unknown arm'}</span>
@@ -87,11 +135,18 @@ export function App() {
       </aside>
 
       <main className="scroller">
-        <Timeline entries={entries} run={run} onTake={take} onSkip={skip} />
+        {showBriefing && card ? <Briefing card={card} onDismiss={dismissBriefing} /> : null}
+        <Timeline
+          entries={entries}
+          run={run}
+          onTake={take}
+          onSkip={skip}
+          scrollToPresent={!showBriefing}
+        />
         <Colophon />
       </main>
 
-      <Standing run={run} />
+      <Standing run={run} pinned={pinned} onPin={pin} />
     </div>
   )
 }

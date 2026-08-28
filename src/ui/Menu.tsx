@@ -25,7 +25,18 @@ type Entry = {
   action?: () => void
 }
 
-export function Menu({ onStartRun, hasRun, onEndRun }: { onStartRun: () => void; hasRun: boolean; onEndRun: () => void }) {
+export function Menu({
+  onStartRun,
+  hasRun,
+  onEndRun,
+  onShowBriefing,
+}: {
+  onStartRun: () => void
+  hasRun: boolean
+  onEndRun: () => void
+  /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
+  onShowBriefing?: () => void
+}) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
   const panel = useRef<HTMLDivElement>(null)
@@ -58,6 +69,18 @@ export function Menu({ onStartRun, hasRun, onEndRun }: { onStartRun: () => void;
         hasRun
           ? { label: 'End this run', note: 'Clears it and returns to setup', action: () => { onEndRun(); setOpen(false) } }
           : { label: 'Start a run', note: 'Pick an arm, an aspect and a way', action: () => { onStartRun(); setOpen(false) } },
+        ...(hasRun && onShowBriefing
+          ? [
+              {
+                label: 'Where you left off',
+                note: 'What you hold, what you were chasing, and what moved',
+                action: () => {
+                  onShowBriefing()
+                  setOpen(false)
+                },
+              },
+            ]
+          : []),
       ],
     },
     {

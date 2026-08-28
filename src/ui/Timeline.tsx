@@ -33,11 +33,20 @@ export function Timeline({
   run,
   onTake,
   onSkip,
+  /**
+   * Whether to carry the page to the present on mount.
+   *
+   * False while the re-entry briefing is up: that card sits above the timeline
+   * and scrolling the present into view would push it off screen before it had
+   * been read, which is the whole of the feature.
+   */
+  scrollToPresent = true,
 }: {
   entries: RunEntry[]
   run: RunContext
   onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null) => void
   onSkip: (god: string | null) => void
+  scrollToPresent?: boolean
 }) {
   const present = useRef<HTMLLIElement>(null)
 
@@ -45,8 +54,9 @@ export function Timeline({
   // hurry sits at the far end of a history object, so position has to be
   // fought deliberately.
   useEffect(() => {
+    if (!scrollToPresent) return
     present.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }, [entries.length])
+  }, [entries.length, scrollToPresent])
 
   return (
     <ol className="path" aria-label="The run">

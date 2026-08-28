@@ -5,6 +5,11 @@
  * "what am I still chasing": the ranked gods, and what is closest with its
  * measured odds. Closed by default, because silence is the normal state and a
  * player who is mid pick does not need a list.
+ *
+ * It is also where a target gets pinned. The pin is what the briefing leads
+ * with when the player comes back, and this is the only place in the product
+ * where every live target is already listed, so asking them to say which one
+ * they are chasing costs one tap in a list they are already reading.
  */
 
 import { useMemo, useState } from 'react'
@@ -13,12 +18,20 @@ import { godPools, olympians, traits } from '../data/app.ts'
 import { completionOdds, formatOdds } from '../engine/odds.ts'
 import { godPriority, reachable } from '../engine/reachability.ts'
 import type { Verdict } from '../engine/reachability.ts'
-import type { RunContext } from '../data/types.ts'
+import type { RunContext, TraitId } from '../data/types.ts'
 
 /** How many get a simulated percentage. The rest get their sentence only. */
 const RATED = 6
 
-export function Standing({ run }: { run: RunContext }) {
+export function Standing({
+  run,
+  pinned,
+  onPin,
+}: {
+  run: RunContext
+  pinned: TraitId | null
+  onPin: (target: TraitId | null) => void
+}) {
   const [open, setOpen] = useState(false)
 
   const verdicts = reachable(run, traits)
@@ -69,7 +82,13 @@ export function Standing({ run }: { run: RunContext }) {
           {live.length ? (
             <ul className="target-list">
               {live.slice(0, 12).map((verdict) => (
-                <TargetLine key={verdict.target} verdict={verdict} rate={odds.get(verdict.target)} />
+                <TargetLine
+                  key={verdict.target}
+                  verdict={verdict}
+                  rate={odds.get(verdict.target)}
+                  pinned={pinned === verdict.target}
+                  onPin={() => onPin(pinned === verdict.target ? null : verdict.target)}
+                />
               ))}
             </ul>
           ) : (
@@ -86,19 +105,39 @@ export function Standing({ run }: { run: RunContext }) {
   )
 }
 
-function TargetLine({ verdict, rate }: { verdict: Verdict; rate: number | undefined }) {
+function TargetLine({
+  verdict,
+  rate,
+  pinned,
+  onPin,
+}: {
+  verdict: Verdict
+  rate: number | undefined
+  pinned: boolean
+  onPin: () => void
+}) {
   const trait = traits.get(verdict.target)
   const kind = trait?.kind === 'legendary' ? 'Legendary' : trait?.kind === 'hex' ? 'Hex duo' : 'Duo'
+  const name = trait?.name ?? verdict.target
 
   return (
-    <li className={`target is-${verdict.state.toLowerCase()}`}>
+    <li className={`target is-${verdict.state.toLowerCase()}${pinned ? ' is-pinned' : ''}`}>
       <span className="target-head">
-        <span className="target-name">{trait?.name ?? verdict.target}</span>
+        <span className="target-name">{name}</span>
         <span className="target-kind">
           {kind}
           {trait?.gods.length ? ` · ${trait.gods.join(' and ')}` : ''}
         </span>
         {rate !== undefined ? <span className="odds">{formatOdds(rate)}</span> : null}
+        <button
+          type="button"
+          className="target-pin"
+          aria-pressed={pinned}
+          onClick={onPin}
+          title={pinned ? `Stop chasing ${name}` : `Chase ${name}`}
+        >
+          <span className="visually-hidden">{pinned ? `Stop chasing ${name}` : `Chase ${name}`}</span>
+        </button>
       </span>
       {trait?.text ? <span className="target-text">{trait.text}</span> : null}
       <span className="target-why">{verdict.why}</span>
