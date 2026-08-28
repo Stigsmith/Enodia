@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 713,
+ "count": 721,
  "categories": [
   {
    "name": "arcana",
@@ -44,7 +44,7 @@
   },
   {
    "name": "chrome",
-   "count": 14,
+   "count": 22,
    "source": "game"
   },
   {
@@ -3780,6 +3780,30 @@
    "sourcePage": "Characters-Hades II"
   },
   {
+   "id": "circle-filigree",
+   "category": "chrome",
+   "file": "chrome/circle-filigree.png",
+   "bytes": 57904,
+   "sha256": "a72257cb911a958a467d57404b4b374899d1d684fa19e955d920ce932349239d",
+   "source": "game"
+  },
+  {
+   "id": "divider-long",
+   "category": "chrome",
+   "file": "chrome/divider-long.png",
+   "bytes": 1278,
+   "sha256": "6bb8029d90e5203d198cbb88254a3540ab20b4209ac16b7e456a46eb20039ec3",
+   "source": "game"
+  },
+  {
+   "id": "divider",
+   "category": "chrome",
+   "file": "chrome/divider.png",
+   "bytes": 818,
+   "sha256": "b5d8e471e02c86461ffbc3c9e40d9083878811b66e9ee5b872be854ac1541541",
+   "source": "game"
+  },
+  {
    "id": "hammer-feathers",
    "category": "chrome",
    "file": "chrome/hammer-feathers.png",
@@ -3860,6 +3884,14 @@
    "source": "game"
   },
   {
+   "id": "resource-backing",
+   "category": "chrome",
+   "file": "chrome/resource-backing.png",
+   "bytes": 14535,
+   "sha256": "48ffe94471ce67b66977de834b8f04407009999c69b67ce793bc65c2d64b5db4",
+   "source": "game"
+  },
+  {
    "id": "subtitle-backing",
    "category": "chrome",
    "file": "chrome/subtitle-backing.png",
@@ -3873,6 +3905,38 @@
    "file": "chrome/subtitle-generic.png",
    "bytes": 18534,
    "sha256": "bf3d402d8c6a6c10ded0d44ac92a15d2e83e97ed901a8ca76cac9266cb28584f",
+   "source": "game"
+  },
+  {
+   "id": "tooltip-backing",
+   "category": "chrome",
+   "file": "chrome/tooltip-backing.png",
+   "bytes": 23530,
+   "sha256": "aaeb2fd095d1eb3f8e10289f5e7dfe68541dbe16d956cb57d181a41756f6c7b0",
+   "source": "game"
+  },
+  {
+   "id": "tray-backing",
+   "category": "chrome",
+   "file": "chrome/tray-backing.png",
+   "bytes": 163527,
+   "sha256": "dcfe7b285acd75490c52b0cc8d5ced9968a7a597297616ad1de70b65044914a6",
+   "source": "game"
+  },
+  {
+   "id": "tray-header",
+   "category": "chrome",
+   "file": "chrome/tray-header.png",
+   "bytes": 28020,
+   "sha256": "227a645f7dd74361605afb3a4b23d302dd4699010821c1bba15df10b9fadf400",
+   "source": "game"
+  },
+  {
+   "id": "tray-tab",
+   "category": "chrome",
+   "file": "chrome/tray-tab.png",
+   "bytes": 8386,
+   "sha256": "272342810c3ddff9ab3d3d229796458b7bcc37ffc1ef19bb4fedba95fff11553",
    "source": "game"
   },
   {

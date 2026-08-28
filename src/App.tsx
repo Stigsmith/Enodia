@@ -14,6 +14,7 @@ import { useState } from 'react'
 
 import { gameVersion, traits, weapons } from './data/app.ts'
 import { reachable } from './engine/reachability.ts'
+import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Tray } from './ui/Tray.tsx'
@@ -28,8 +29,11 @@ export function App() {
     return (
       <main className="shell">
         <header className="masthead">
-          <h1 className="wordmark">Enodia</h1>
-          <p className="tagline">A build companion for Hades II, read at an Exit.</p>
+          <Menu onStartRun={() => {}} hasRun={false} onEndRun={end} />
+          <div>
+            <h1 className="wordmark">Enodia</h1>
+            <p className="tagline">A build companion for Hades II, read at an Exit.</p>
+          </div>
         </header>
         <Setup onStart={start} />
         <Colophon />
@@ -46,6 +50,8 @@ export function App() {
   return (
     <div className={`surface${trayOpen ? ' tray-open' : ''}`}>
       <header className="topbar">
+        <Menu onStartRun={end} hasRun onEndRun={end} />
+
         <p className="topbar-run">
           <span className="topbar-weapon">{weapon?.name ?? 'Unknown arm'}</span>
           {aspect ? <span className="topbar-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
@@ -70,9 +76,6 @@ export function App() {
           {closed ? <span className="topbar-closed">{closed} closed</span> : null}
         </p>
 
-        <button type="button" className="quiet" onClick={end}>
-          End run
-        </button>
       </header>
 
       <aside className="railbar" aria-label="Your slots">

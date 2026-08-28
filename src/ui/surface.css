@@ -933,14 +933,14 @@
   margin-right: auto;
 }
 
-/* The Codex cards are portrait parchment with the weapon in the middle, so a
- * circular crop at natural size is mostly card. Zoom past the border. */
-.radial.is-cards .bubble img {
-  transform: scale(1.5);
+/* Cutouts are drawn small inside their own canvas, so they want filling the
+ * bubble rather than sitting politely in the middle of it. */
+.radial.is-renders .bubble img {
+  transform: scale(1.18);
 }
 
-.radial.is-cards .bubble.is-hovered img {
-  transform: scale(1.55);
+.radial.is-renders .bubble.is-hovered img {
+  transform: scale(1.24);
 }
 
 .rarity-step {
@@ -1428,4 +1428,191 @@
 
 *::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* ------------------------------------------------------------------ menu -- */
+
+.menu {
+  position: relative;
+  flex: none;
+}
+
+.menu-button {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  cursor: pointer;
+}
+
+.menu-button:hover {
+  border-color: var(--jade-dim);
+}
+
+/* Three rules, which is the shape everyone already reads as a menu. */
+.menu-glyph {
+  width: 0.9rem;
+  height: 2px;
+  background: var(--bone-dim);
+  box-shadow: 0 -5px 0 var(--bone-dim), 0 5px 0 var(--bone-dim);
+}
+
+/* Covers rather than pushes, and returns you where you were. DESIGN.md 8. */
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 20;
+  width: min(21rem, 90vw);
+  max-height: 70dvh;
+  overflow-y: auto;
+  padding: 0.4rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-card);
+  background: var(--ink-850) url('/chrome/tray-backing.png') top left / 130% auto no-repeat;
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
+}
+
+.menu-panel section + section {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.menu-panel h2 {
+  margin: 0.2rem 0 0.25rem 0.55rem;
+  font-family: var(--display);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--jade);
+}
+
+.menu-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-panel button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-soft);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-panel button:hover:not(:disabled) {
+  border-color: var(--div-4);
+  background: var(--ink-900);
+}
+
+.menu-label {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: var(--bone);
+}
+
+.menu-note {
+  font-size: 0.72rem;
+  color: var(--bone-faint);
+}
+
+/* Unbuilt, and saying so in the one colour reserved for it. */
+.menu-panel button.is-unbuilt {
+  cursor: default;
+}
+
+.menu-panel button.is-unbuilt .menu-label {
+  color: var(--bone-faint);
+}
+
+.menu-panel button.is-unbuilt .menu-label::after {
+  content: 'not built';
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--unbuilt);
+  border-radius: var(--r-pill);
+  color: var(--unbuilt);
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  vertical-align: 0.1em;
+}
+
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* =============================================================== ornament ==
+ * VISUAL.md 1: the game's panels are not empty. They carry smoke and
+ * scrollwork at 8 to 12 percent above the ground, anchored to a corner and
+ * bleeding off the edge, and that is the entire reason a panel reads as made
+ * rather than drawn. The motif is TraitTrayBacking.png, taken directly, which
+ * is what the brief says to do.
+ * ========================================================================= */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    url('/chrome/tray-backing.png') left -12% top -8% / 46rem auto no-repeat,
+    url('/chrome/tray-backing.png') right -18% bottom -14% / 60rem auto no-repeat;
+  opacity: 0.09;
+  pointer-events: none;
+}
+
+.surface,
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* The game's own hairline, rather than a CSS border pretending to be one. */
+.group-heading,
+.block-heading {
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid transparent;
+  border-image: url('/chrome/divider-long.png') 0 0 7 0 / 0 0 3px 0 stretch;
+}
+
+/* The tray handle wears the tray's own header ribbon. */
+.tray-handle {
+  background: url('/chrome/tray-header.png') left center / auto 190% no-repeat;
+}
+
+/* The radial caption sits on the game's tooltip plate, which is a nine slice
+ * with corner ticks, so it stretches without smearing the corners. */
+.radial-caption {
+  padding: 0.7rem 1.4rem 0.9rem;
+  border-image: url('/chrome/tooltip-backing.png') 40 fill / 1.6rem stretch;
+}
+
+.radial-caption:empty {
+  border-image: none;
+}
+
+/* And the centre of the ring sits in the game's filigree circle. */
+.radial-centre::before {
+  content: '';
+  position: absolute;
+  /* The art is wider than tall, a circle with flourishes off each shoulder, so
+   * it is fitted by height and kept clear of the ring. */
+  inset: -6% -2% auto;
+  aspect-ratio: 482 / 269;
+  background: url('/chrome/circle-filigree.png') center top / contain no-repeat;
+  opacity: 0.5;
+  pointer-events: none;
 }
