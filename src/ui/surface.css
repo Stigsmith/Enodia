@@ -933,14 +933,36 @@
   margin-right: auto;
 }
 
-/* Cutouts are drawn small inside their own canvas, so they want filling the
- * bubble rather than sitting politely in the middle of it. */
+/* One circle, and it is the filigree.
+ *
+ * The plain bubble underneath was a second circle inside the first, and the
+ * weapon then overlapped both. So the button keeps the hit area and gives up
+ * the border and the fill, the frame grows to be the thing you see, and the art
+ * shrinks until it sits inside it. */
+.radial.is-renders .bubble {
+  border-color: transparent;
+  background: none;
+  overflow: visible;
+}
+
 .radial.is-renders .bubble img {
-  transform: scale(1.18);
+  /* The frame art is 482 by 269 with its circle filling the height, so the
+   * circle comes out at about half the frame's width. The frame is drawn at
+   * twice the bubble, which puts the circle at roughly one bubble across, and
+   * the art at 66 percent leaves it room to sit inside rather than across it. */
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  transform: none;
+  transition: transform var(--t-response) var(--e-response);
 }
 
 .radial.is-renders .bubble.is-hovered img {
-  transform: scale(1.24);
+  transform: scale(1.1);
+}
+
+.radial.is-renders .bubble.is-chosen img {
+  filter: drop-shadow(0 0 0.5rem var(--jade-dim));
 }
 
 .rarity-step {
@@ -1369,18 +1391,6 @@
   object-fit: cover;
 }
 
-/* Aspect renders are transparent cutouts, so they want showing whole rather
- * than cropped to a circle, and a little room around them. */
-.radial.is-renders .bubble {
-  background: radial-gradient(circle at 50% 45%, var(--ink-800), var(--ink-950) 70%);
-}
-
-.radial.is-renders .bubble img {
-  width: 84%;
-  height: 84%;
-  object-fit: contain;
-}
-
 /* The centre carries whatever the run is so far: the weapon until an aspect is
  * chosen, then the aspect, large. The ring leaves a hole of about 0.52 of the
  * width, so 0.44 fills it without touching the bubbles. */
@@ -1615,7 +1625,13 @@ body::before {
 .radial-ring li::after {
   content: '';
   position: absolute;
-  inset: -16% -13%;
+  left: 50%;
+  top: 50%;
+  /* 200 percent put neighbouring flourishes on top of each other at six
+   * items. 175 keeps the circle wide enough for the art and the ring clear. */
+  width: 175%;
+  aspect-ratio: 482 / 269;
+  transform: translate(-50%, -50%);
   background: url('/chrome/circle-filigree.png') center / contain no-repeat;
   opacity: 0.42;
   pointer-events: none;
@@ -1628,6 +1644,6 @@ body::before {
 
 .radial-ring li:has(.is-hovered)::after,
 .radial-ring li:has(.is-chosen)::after {
-  opacity: 0.85;
-  transform: scale(1.1);
+  opacity: 0.9;
+  transform: translate(-50%, -50%) scale(1.06);
 }
