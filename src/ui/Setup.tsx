@@ -1,22 +1,27 @@
 /**
- * Setup. Weapon, aspect, and how many Exits the run has.
+ * Setup. Weapon, aspect, and which way the run goes.
  *
  * `DESIGN.md` 8: setup happens once, before the run, and is its own screen.
- * Everything after it is one surface. Two taps to a run, and the Exit count is
- * a number the player can correct later rather than a question they have to
- * answer well.
+ *
+ * **It does not ask how many Exits the run has.** A player does not know that
+ * when they start, so the question produced a worse number than a default does.
+ * The estimate lives in the run header where it can be corrected once the run
+ * makes it obvious.
  */
 
 import { useState } from 'react'
 
 import { aspectsOf, iconOf, weapons } from '../data/app.ts'
-import { DEFAULT_EXITS } from '../state/run.ts'
-import type { TraitId, WeaponId } from '../data/types.ts'
+import type { RunPath, TraitId, WeaponId } from '../data/types.ts'
 
-export function Setup({ onStart }: { onStart: (weapon: WeaponId, aspect: TraitId | null, exits: number) => void }) {
+export function Setup({
+  onStart,
+}: {
+  onStart: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => void
+}) {
   const [weapon, setWeapon] = useState<WeaponId | null>(null)
   const [aspect, setAspect] = useState<TraitId | null>(null)
-  const [exits, setExits] = useState(DEFAULT_EXITS)
+  const [path, setPath] = useState<RunPath | null>(null)
 
   const aspects = weapon ? aspectsOf(weapon) : []
 
@@ -64,22 +69,29 @@ export function Setup({ onStart }: { onStart: (weapon: WeaponId, aspect: TraitId
             })}
           </ul>
 
-          <h2 className="step-heading">How many Exits</h2>
-          <p className="step-note">
-            Counted from here to the end of the run. Correct it later if the run is longer or shorter, it only
-            moves what counts as running out of time.
-          </p>
-          <div className="exits-field">
-            <button type="button" onClick={() => setExits((n) => Math.max(1, n - 1))} aria-label="One fewer Exit">
-              &minus;
-            </button>
-            <output>{exits}</output>
-            <button type="button" onClick={() => setExits((n) => Math.min(30, n + 1))} aria-label="One more Exit">
-              +
-            </button>
-          </div>
+          <h2 className="step-heading">Which way</h2>
+          <ul className="path-row">
+            {(
+              [
+                { id: 'underworld' as const, name: 'Underworld', icon: 'ui/underworldicon.webp' },
+                { id: 'surface' as const, name: 'Surface', icon: 'ui/surfaceicon.webp' },
+              ]
+            ).map((option) => (
+              <li key={option.id}>
+                <button
+                  type="button"
+                  className={`aspect-card${path === option.id ? ' is-chosen' : ''}`}
+                  aria-pressed={path === option.id}
+                  onClick={() => setPath(option.id)}
+                >
+                  <img src={`/${option.icon}`} alt="" loading="lazy" />
+                  <span>{option.name}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
 
-          <button type="button" className="begin" onClick={() => onStart(weapon, aspect, exits)}>
+          <button type="button" className="begin" onClick={() => onStart(weapon, aspect, path)}>
             Begin the run
           </button>
         </>

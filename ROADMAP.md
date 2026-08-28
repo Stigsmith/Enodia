@@ -97,6 +97,22 @@ These are real and none of them block step 2.
 - `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,
   and the app now imports it directly
 
+**From the owner, 28 August 2026**
+
+- ~~Setup asked how many Exits a run has~~. A player does not know, so it is an estimate
+  now, corrected from the run header
+- ~~The Exit picker only offered gods~~. It offers what an Exit actually gives, and the
+  Encounter gods besides
+- **Wanted next:** a radial weapon picker using the large Codex art, the chosen weapon
+  animating to the centre with its four aspects around it
+- **Wanted next:** the rail as a permanent sidebar, unfoldable to every boon with tooltips
+- **Open:** which regions each Encounter god appears in. `RoomData` places Artemis in F,
+  Dionysus in P and Hades in I, and says nothing about Athena, so the letter to region
+  mapping has to be established before the path can filter anything
+- **Open:** the owner reports the Fields offer three Encounters behind one Exit, and that
+  the first surface Location is one open city with eight or nine ways out rather than two.
+  Both are map generation rather than a table, and neither is modelled
+
 **Engine**
 
 - ~~A filled slot is not a proof of impossible~~. Handled: `obtainability` returns `swap`

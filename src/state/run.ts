@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { olympians, offerRules, traits } from '../data/app.ts'
 import { reachable } from '../engine/reachability.ts'
-import type { GodId, HeldTrait, RunContext, TraitId, WeaponId } from '../data/types.ts'
+import type { GodId, HeldTrait, RunContext, RunPath, TraitId, WeaponId } from '../data/types.ts'
 
 const KEY = 'enodia.run.active'
 const VERSION = 1
@@ -46,18 +46,28 @@ type Stored = {
 }
 
 /**
- * How many Exits a fresh run gets.
+ * How many Exits a fresh run has left.
  *
- * A placeholder, and knowingly so. The real number comes from the region data,
- * which is not extracted yet, and the run surface will let it be corrected. A
- * wrong count moves AT_RISK around and nothing else.
+ * **An estimate, and never a question for the player.** Nobody knows their Exit
+ * count when they start, and asking produced a number that was worse than a
+ * default. It is corrected from the run surface, and it only moves what counts
+ * as running out of time.
+ *
+ * The real number wants the region data, which is a map generator rather than a
+ * table, so this stays an estimate until somebody measures real runs.
  */
-export const DEFAULT_EXITS = 12
+export const ESTIMATED_EXITS = 12
 
-export function newRun(weapon: WeaponId, aspect: TraitId | null, exits = DEFAULT_EXITS): RunContext {
+export function newRun(
+  weapon: WeaponId,
+  aspect: TraitId | null,
+  path: RunPath | null = null,
+  exits = ESTIMATED_EXITS,
+): RunContext {
   return {
     weapon,
     aspect,
+    path,
     exitsLeft: exits,
     held: [],
     godsTaken: [],
@@ -132,7 +142,9 @@ export function clearRun(): void {
 export type RunStore = {
   run: RunContext | null
   entries: RunEntry[]
-  start: (weapon: WeaponId, aspect: TraitId | null, exits?: number) => void
+  start: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => void
+  /** the Exit estimate is the player's to correct, and only theirs */
+  setExitsLeft: (exits: number) => void
   end: () => void
   /** record a pick: the boon, its rarity, and the god who offered it */
   take: (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null) => void
@@ -150,8 +162,14 @@ export function useRun(): RunStore {
     else clearRun()
   }, [active])
 
-  const start = useCallback((weapon: WeaponId, aspect: TraitId | null, exits?: number) => {
-    setActive({ run: newRun(weapon, aspect, exits), entries: [] })
+  const start = useCallback((weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => {
+    setActive({ run: newRun(weapon, aspect, path), entries: [] })
+  }, [])
+
+  const setExitsLeft = useCallback((exits: number) => {
+    setActive((current) =>
+      current ? { ...current, run: { ...current.run, exitsLeft: Math.max(0, exits) } } : current,
+    )
   }, [])
 
   const end = useCallback(() => setActive(null), [])
@@ -197,5 +215,5 @@ export function useRun(): RunStore {
 
   const skip = useCallback((god: GodId | null) => advance(god), [advance])
 
-  return { run: active?.run ?? null, entries: active?.entries ?? [], start, end, take, skip }
+  return { run: active?.run ?? null, entries: active?.entries ?? [], start, end, take, skip, setExitsLeft }
 }

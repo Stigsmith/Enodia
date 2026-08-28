@@ -212,6 +212,7 @@ export function simulateRun(
   let ctx: RunContext = {
     weapon: options.weapon ?? null,
     aspect: null,
+    path: null,
     exitsLeft: exits,
     held: [],
     godsTaken: [],

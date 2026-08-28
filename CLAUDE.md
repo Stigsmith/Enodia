@@ -90,6 +90,9 @@ Do not restate these without the citation. Do not extend them without checking.
 | Hermes, Chaos, Selene and the Encounter gods do **not** count toward the cap | `GodLoot = false`, and no `LootData` entry at all for Artemis, Athena, Dionysus, Hades |
 | **`GodLoot` is inherited.** Poseidon and Zeus never state it and pick up `true` from `BaseLoot`. Selene's `SpellDrop` inherits from nothing, so it has no flag to pick up. Reading the field without following `InheritFrom` drops two Olympians | `LootData.BaseLoot`, read at `RunLogic.lua:1823` inside `GetInteractedGodsThisRun` |
 | Ordinary Exit rewards are **uniform random**. No weighting toward held gods | `RewardLogic.ChooseLoot` |
+| **A god is 4 of 18.** The default Exit store is `RunProgress`: 4 Boon slots, 2 Daedalus Hammer, 1 Selene, 1 Hermes, 1 Devotion, 1 Talent, and 8 slots of Poms, health, Magick and gold. A tool that only records gods cannot describe a real run | `RewardStoreData.RunProgress`, and `RewardLogic.lua:516` makes it the default |
+| **Artemis, Athena, Dionysus and Hades have no `LootData` entry.** They carry `TreatAsGodLootByShops` in `UnitSetData` with their own pools of 9, 8, 8 and 8, arrive through Encounters, and never spend an Olympian slot | `NPCData_*.lua`, read at `RunData.lua:556` |
+| A Daedalus Hammer upgrade belongs to a weapon through **`<Weapon>HammerTrait`** inheritance. 16, 15, 13, 14, 17 and 17 across the six, which is exactly the 92 in `Loot.WeaponUpgrade.Traits` | `TraitData_Hammer*`, checked against `LootSetData.Loot.WeaponUpgrade` |
 | Devotion Encounters draw **both** offers from gods already held | `SetupRoomReward`, `GetInteractedGodThisRun` |
 | Rarity scaling differs per boon. Heaven Strike 0.8 to 2.0, Storm Ring 1.0 to 1.6 | `RarityLevels` in `TraitData_Zeus.lua` |
 | Rerolling is gated behind an Arcana card | `PanelRerollMetaUpgrade`, `CurrentRun.NumRerolls` |

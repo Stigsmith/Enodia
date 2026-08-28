@@ -651,3 +651,51 @@
 .present .log-pick .step-heading {
   margin-top: 1.3rem;
 }
+
+.path-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-exits {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.run-exits button {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.run-exits button:hover {
+  border-color: var(--div-5);
+  color: var(--bone);
+}
+
+.estimate {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+  color: var(--bone-faint);
+}
+
+/* Reward sources that are not an Exit god read differently, because they are
+ * not competing for one of your four Olympian slots. */
+.god.is-hammer,
+.god.is-hex,
+.god.is-encounter,
+.god.is-other {
+  border-style: dashed;
+}
