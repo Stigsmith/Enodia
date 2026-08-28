@@ -61,6 +61,12 @@ export type Trait = {
    */
   requiredWeapon: WeaponId | null
   requires: Requirement | null
+  /**
+   * The game's own sentence about what this does, with the Keywords resolved
+   * and the formatting codes stripped. A player who has never seen a boon can
+   * find out what it is without leaving the tool.
+   */
+  text: string | null
 }
 
 /** The game's internal weapon name, for example `WeaponStaffSwing`. */

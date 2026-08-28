@@ -12,6 +12,8 @@
 import { useState } from 'react'
 
 import { aspectsOf, iconOf, weapons } from '../data/app.ts'
+import { Radial } from './Radial.tsx'
+import type { RadialItem } from './Radial.tsx'
 import type { RunPath, TraitId, WeaponId } from '../data/types.ts'
 
 export function Setup({
@@ -23,51 +25,40 @@ export function Setup({
   const [aspect, setAspect] = useState<TraitId | null>(null)
   const [path, setPath] = useState<RunPath | null>(null)
 
-  const aspects = weapon ? aspectsOf(weapon) : []
+  const chosenWeapon = weapons.find((entry) => entry.id === weapon) ?? null
+
+  // The weapon settles into the middle and its four aspects take the ring.
+  const items: RadialItem[] = chosenWeapon
+    ? aspectsOf(chosenWeapon.id).map((entry) => ({
+        id: entry.id,
+        name: entry.name?.replace(/^Aspect of /, '') ?? entry.id,
+        icon: iconOf.get(entry.id) ?? null,
+        note: entry.text,
+      }))
+    : weapons.map((entry) => ({ id: entry.id, name: entry.name, icon: entry.icon }))
 
   return (
     <section className="setup">
-      <h2 className="step-heading">Which arm</h2>
-      <ul className="weapon-grid">
-        {weapons.map((entry) => (
-          <li key={entry.id}>
-            <button
-              type="button"
-              className={`weapon-card${weapon === entry.id ? ' is-chosen' : ''}`}
-              aria-pressed={weapon === entry.id}
-              onClick={() => {
-                setWeapon(entry.id)
-                setAspect(null)
-              }}
-            >
-              {entry.icon ? <img src={`/${entry.icon}`} alt="" loading="lazy" /> : null}
-              <span>{entry.name}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <Radial
+        variant={chosenWeapon ? 'default' : 'cards'}
+        label={chosenWeapon ? 'Which aspect' : 'Which arm'}
+        items={items}
+        chosen={chosenWeapon ? aspect : weapon}
+        centre={chosenWeapon ? { id: chosenWeapon.id, name: chosenWeapon.name, icon: chosenWeapon.icon } : null}
+        onChoose={(id) => {
+          if (chosenWeapon) setAspect(id)
+          else {
+            setWeapon(id)
+            setAspect(null)
+          }
+        }}
+      />
 
-      {weapon ? (
-        <>
-          <h2 className="step-heading">Which aspect</h2>
-          <ul className="aspect-row">
-            {aspects.map((entry) => {
-              const icon = iconOf.get(entry.id)
-              return (
-                <li key={entry.id}>
-                  <button
-                    type="button"
-                    className={`aspect-card${aspect === entry.id ? ' is-chosen' : ''}`}
-                    aria-pressed={aspect === entry.id}
-                    onClick={() => setAspect(entry.id)}
-                  >
-                    {icon ? <img src={`/${icon}`} alt="" loading="lazy" /> : null}
-                    <span>{entry.name?.replace(/^Aspect of /, '')}</span>
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
+      {chosenWeapon ? (
+        <div className="setup-tail">
+          <button type="button" className="quiet" onClick={() => { setWeapon(null); setAspect(null) }}>
+            Pick a different arm
+          </button>
 
           <h2 className="step-heading">Which way</h2>
           <ul className="path-row">
@@ -91,10 +82,10 @@ export function Setup({
             ))}
           </ul>
 
-          <button type="button" className="begin" onClick={() => onStart(weapon, aspect, path)}>
+          <button type="button" className="begin" onClick={() => onStart(chosenWeapon.id, aspect, path)}>
             Begin the run
           </button>
-        </>
+        </div>
       ) : null}
     </section>
   )

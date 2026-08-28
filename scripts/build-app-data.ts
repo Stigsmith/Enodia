@@ -76,6 +76,51 @@ const weaponName = (textId: string): string => {
   return typeof name === 'string' ? name.replace(/^The /, '') : textId
 }
 
+/**
+ * The game's own description, made readable.
+ *
+ * `{$Keywords.CastSet}` resolves out of HelpText, which is where the published
+ * glossary lives, and the `{#BoldFormatGraft}` style codes are dropped. This is
+ * the game's sentence about its own boon, so a player who has never seen
+ * Ecstatic Obsession can find out what it does without leaving the tool.
+ */
+const ICON_WORDS: Record<string, string> = {
+  Mana: 'Magick',
+  ManaUp: 'Magick',
+  Health: 'health',
+  HealthUp: 'health',
+  HealthRestore: 'health',
+  EnemyHealth: 'health',
+  Currency: 'gold',
+  ArmorTotal: 'armour',
+  ArmorTotal_NoTooltip: 'armour',
+  RightArrow: 'to',
+}
+
+function describe(traitId: string): string | null {
+  const raw = dictOf(text[traitId]).description
+  if (typeof raw !== 'string') return null
+  return (
+    raw
+      // The published glossary, so the tool says the game's own words.
+      .replace(/\{\$Keywords\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => {
+        const entry = dictOf(help[key]).name
+        return typeof entry === 'string' ? entry : key
+      })
+      // Icon glyphs stand in for nouns. Dropping them leaves sentences like
+      // "you lose before you lose", so they become the word they depict.
+      .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => ICON_WORDS[key] ?? '')
+      // A number that depends on rarity. Computing it needs the game's
+      // ProcessSimpleExtractValues pass, which the extractor does not run, so
+      // the shape of the sentence is kept and the value is marked as a value.
+      .replace(/\{\$TooltipData\.[^}]*\}/g, '#')
+      .replace(/\{[^}]*\}/g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+([.,;:%])/g, '$1')
+      .trim()
+  )
+}
+
 function iconFor(trait: Trait): string | null {
   const keys = trait.name && trait.requiredWeapon ? aspectIconKeys(trait.name, trait.requiredWeapon) : []
   const found = resolveIcon(trait.id, trait.name, icons, { keys })
@@ -96,6 +141,7 @@ const records = [...traits.values()]
     ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
     ...(trait.requires ? { requires: trait.requires } : {}),
     ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
+    ...(describe(trait.id) ? { text: describe(trait.id) } : {}),
   }))
 
 const pools = [...godPoolsFrom(loot).entries()].map(([god, pool]) => ({ god, ...pool }))

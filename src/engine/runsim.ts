@@ -81,6 +81,14 @@ export type ChoosePolicy = (options: readonly TraitId[], ctx: RunContext, rng: R
 
 export type SimOptions = {
   seed?: number
+  /**
+   * Continue a run in progress rather than starting empty.
+   *
+   * Without this a simulation always answers "from the start of a run", which
+   * is the wrong question when a player is four Exits in and wants to know
+   * about the run they are actually in.
+   */
+  from?: RunContext
   /** how many Exits the run gets. A full Hades II run is roughly a dozen */
   exits?: number
   maxOlympians?: number
@@ -205,21 +213,23 @@ export function simulateRun(
   options: SimOptions = {},
 ): SimRun {
   const rng = seededRng(options.seed ?? 1)
-  const exits = options.exits ?? 12
+  const exits = options.exits ?? options.from?.exitsLeft ?? 12
   const maxChoices = options.maxChoices ?? 3
   const choose = options.choose ?? takeOne
 
-  let ctx: RunContext = {
-    weapon: options.weapon ?? null,
-    aspect: null,
-    path: null,
-    exitsLeft: exits,
-    held: [],
-    godsTaken: [],
-    godsSeen: [],
-    maxOlympians: options.maxOlympians ?? 4,
-    olympians,
-  }
+  let ctx: RunContext = options.from
+    ? { ...options.from, exitsLeft: exits, olympians }
+    : {
+        weapon: options.weapon ?? null,
+        aspect: null,
+        path: null,
+        exitsLeft: exits,
+        held: [],
+        godsTaken: [],
+        godsSeen: [],
+        maxOlympians: options.maxOlympians ?? 4,
+        olympians,
+      }
 
   const steps: SimStep[] = []
 

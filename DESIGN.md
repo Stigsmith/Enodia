@@ -478,14 +478,36 @@ A swap replaces rather than adds: `HandleUpgradeChoiceSelection` calls
 feeding. `engine/slots.ts` returns `offer`, `swap` or `locked` for exactly this reason, and
 reachability must not collapse the middle one into DEAD.
 
-### 4.3 Confidence bands
+### 4.3 Confidence, and the percentage question
 
-No percentages. On top of the four states, one of `Likely`, `Possible`, `Long shot`,
-derived only from countable facts: `exitsLeft`, `minPicks`, gods not yet seen, open slots.
+The original rule was: no percentages, only the bands `Likely`, `Possible`, `Long shot`. The
+reason was sound and is worth restating: **an invented percentage is false precision**, and
+the previous tool shipped one.
 
-The game data does carry `Weight` and `PriorityChance` fields, so a genuine offer model may
-be recoverable later. Until it is measured and validated it stays out of the UI. A band is
-honest. An invented percentage is not.
+**Revised 28 August 2026, after the owner said a percentage reads better than a band.** Both
+things can be true, because the rule was never about the character `%`. It was about where
+the number comes from.
+
+`engine/odds.ts` runs the game's own offer model forward from the run you are in, three
+hundred times, and counts how often the target lands. Everything it steps through is
+sourced: the uniform god draw from `ChooseLoot`, three choices from `MaxChoices`, the slot
+filter in `GetPriorityTraits`, the pool freezing at `MaxGodsPerRun`.
+
+Two things it assumes, and both are printed next to the number rather than buried here:
+
+1. **You take what gets you there.** The simulated player takes a prerequisite when one is
+   offered. Someone not chasing the target will do worse than the number says
+2. **Every reward is a god offer.** `RunProgress` gives a Boon in 4 of its 18 slots, so a
+   real run sees fewer god offers than this simulates. The number is a ceiling
+
+So it is a measured rate with its method attached, not a forecast. It is rendered in the
+mono register with the other derived things, never in the prose register where the game's
+own words live, and it is rounded to five because the simulation's own error at three
+hundred runs is about three points. It never renders 0%, because 0 would say impossible and
+impossible is a different verdict with a proof behind it.
+
+`Weight` and `PriorityChance` are still unmodelled, which is the largest known error in the
+number and the reason it is a ceiling rather than a forecast.
 
 One thing the bands must not do is blur the god cap. Whether a god can still appear is a
 fact, not a likelihood: eligible below the cap, impossible at it. Never render that as

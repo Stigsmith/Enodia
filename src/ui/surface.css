@@ -699,3 +699,301 @@
 .god.is-other {
   border-style: dashed;
 }
+
+/* A target line: the name, what it is, the measured odds, the game's own
+ * sentence, and then ours. Four registers and they must not look alike. */
+
+.target {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--div-1);
+}
+
+.target-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.target-kind {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.03em;
+  color: var(--bone-faint);
+}
+
+/* Measured, and therefore allowed to be a number. engine/odds.ts says what it
+ * rests on. It sits in the mono register with the other derived things, never
+ * in the prose register where the game's own words live. */
+.odds {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--jade-hot);
+}
+
+/* The game's sentence, in the game's voice. */
+.target-text {
+  color: var(--bone-dim);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.odds-note {
+  margin: 0.9rem 0 0;
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- radial -- */
+
+/* Scales with the page: the ring is a share of the viewport, clamped so it
+ * stays thumb-sized on a phone and does not become a billboard on a desktop. */
+.radial {
+  --size: clamp(17rem, 62vmin, 30rem);
+  --bubble: calc(var(--size) * var(--bubble-scale, 0.24));
+  margin: 1rem auto 0;
+  width: var(--size);
+}
+
+.radial-ring-area {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+
+.radial-medallion {
+  position: absolute;
+  inset: 8%;
+  background: url('/chrome/medallion.png') center / contain no-repeat;
+  opacity: 0.22;
+  animation: radial-turn 120s linear infinite;
+}
+
+@keyframes radial-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.radial-ring {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.radial-ring li {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--bubble);
+  height: var(--bubble);
+  margin: calc(var(--bubble) / -2);
+  /* Sit each bubble on the circle, starting at the top and going clockwise. */
+  transform: rotate(calc(var(--index) * (360deg / var(--count))))
+    translate(0, calc(var(--size) / -2 + var(--bubble) / 2 + 0.35rem))
+    rotate(calc(var(--index) * (-360deg / var(--count))));
+}
+
+.bubble {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform var(--t-response) var(--e-response),
+    opacity var(--t-response) var(--e-response),
+    border-color var(--t-response) var(--e-response);
+}
+
+.bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bubble-blank {
+  width: 40%;
+  height: 40%;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-pill);
+}
+
+/* Everything else steps back so the one under the finger is the only thing
+ * being read. Emphasis tier, and it costs nothing when nothing is hovered. */
+.radial.is-hovering .bubble {
+  opacity: 0.35;
+}
+
+.radial .bubble.is-hovered {
+  opacity: 1;
+  transform: scale(1.16);
+  border-color: var(--jade);
+}
+
+.bubble.is-chosen {
+  border-color: var(--jade-hot);
+  box-shadow: 0 0 0 1px var(--jade-dim);
+}
+
+.radial-centre {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--size) * 0.26);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  /* Arriving in the middle after being chosen, which is the one bit of motion
+   * that carries meaning here rather than decorating. */
+  animation: radial-settle 320ms var(--e-response) both;
+}
+
+@keyframes radial-settle {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.radial-centre img {
+  width: 100%;
+  max-height: calc(var(--size) * 0.34);
+  object-fit: contain;
+  border-radius: var(--r-soft);
+}
+
+.radial-centre span {
+  font-family: var(--display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+}
+
+/* Below the ring, not inside it. A caption that shares space with the bubbles
+ * collides with whichever one sits at the bottom of the circle. The height is
+ * reserved so hovering never moves the page. */
+.radial-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.2rem;
+  min-height: 3.4rem;
+  max-width: 26rem;
+  margin: 0.9rem auto 0;
+  text-align: center;
+}
+
+.radial-caption-name {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.radial-caption-note {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--bone-faint);
+}
+
+.radial-caption-idle {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radial-medallion {
+    animation: none;
+  }
+  .radial-centre {
+    animation-duration: 0.01ms;
+  }
+}
+
+.setup-tail {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.setup-tail .path-row {
+  max-width: 24rem;
+  margin: 0 auto;
+}
+
+.setup-tail .begin {
+  max-width: 24rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The Codex cards are portrait parchment with the weapon in the middle, so a
+ * circular crop at natural size is mostly card. Zoom past the border. */
+.radial.is-cards .bubble img {
+  transform: scale(1.5);
+}
+
+.radial.is-cards .bubble.is-hovered img {
+  transform: scale(1.55);
+}
+
+.rarity-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.rarity-step button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  cursor: pointer;
+}
+
+.rarity-step button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rarity-step output {
+  min-width: 5rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--bone-dim);
+}
+
+.rarity-step output.is-rare { color: var(--silver-hi); }
+.rarity-step output.is-epic { color: var(--rim-magenta); }
+.rarity-step output.is-heroic { color: var(--unbuilt); }

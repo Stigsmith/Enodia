@@ -489,11 +489,13 @@ export function godPriority(ctx: RunContext, traits: TraitIndex, targets?: reado
 }
 
 function godReason(god: GodId, keeps: TraitId[], kills: TraitId[], lastSlot: boolean): string {
-  const kept = keeps.length === 1 ? '1 live target' : `${keeps.length} live targets`
+  // "targets" was jargon and "builds" was worse: a duo is one boon with
+  // prerequisites, not a build. Say what they are.
+  const kept = keeps.length === 1 ? '1 duo or legendary still open' : `${keeps.length} duos and legendaries`
   if (lastSlot && kills.length) {
-    const killed = kills.length === 1 ? '1' : String(kills.length)
-    return `${god} feeds ${kept}, and takes your last Olympian slot, which kills ${killed}.`
+    const killed = kills.length === 1 ? '1 of them' : `${kills.length} others`
+    return `${god} feeds ${kept}, and spends your last Olympian slot, which closes ${killed}.`
   }
-  if (!keeps.length) return `${god} feeds nothing you are working toward.`
+  if (!keeps.length) return `${god} feeds nothing that is still open.`
   return `${god} feeds ${kept}.`
 }
