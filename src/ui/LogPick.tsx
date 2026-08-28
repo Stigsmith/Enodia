@@ -170,14 +170,35 @@ export function LogPick({
         onPick={setSource}
       />
 
-      <div className="pick-actions">
-        <button type="button" className="quiet" onClick={() => onSkip(null)}>
-          A Pom, gold, health, or nothing that changes what is reachable
-        </button>
+      {/* Nine of the eighteen reward slots are these, so they are a row rather
+          than a footnote. None of them changes what is reachable, so all four
+          record the same thing: an Exit passed, nothing added. */}
+      <div className="source-group">
+        <h3 className="group-heading">
+          Something else
+          <span>Half the reward slots, and none of them move a verdict</span>
+        </h3>
+        <ul className="consumables">
+          {CONSUMABLES.map((item) => (
+            <li key={item.label}>
+              <button type="button" className="consumable" onClick={() => onSkip(null)}>
+                {item.icon ? <img src={`/${item.icon}`} alt="" loading="lazy" /> : null}
+                <span>{item.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )
 }
+
+const CONSUMABLES: { label: string; icon: string | null }[] = [
+  { label: 'Pom of Power', icon: 'symbols/pom.png' },
+  { label: 'Centaur Heart', icon: 'artifacts/centaur-heart.webp' },
+  { label: 'Gold or resources', icon: 'artifacts/golden-crowns.webp' },
+  { label: 'Nothing', icon: null },
+]
 
 function SourceGroup({
   title,
