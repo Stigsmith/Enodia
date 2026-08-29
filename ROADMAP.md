@@ -59,7 +59,7 @@ Later phases are scoped in `REQUIREMENTS.md` 7: **2** before the run, **3** memo
 
 | What | On | Note |
 |---|---|---|
-| Netlify redeploy | The owner | The live page is several revisions behind, and its publish directory is now `placeholder/` rather than `dist/` |
+| Netlify redeploy | The owner | The live page is several revisions behind, and its publish directory is now `placeholder/` rather than `dist/`. **`dist/` is 10 MB and deployable now**, and `npm run preview` or the `dist` entry in `.claude/launch.json` serves it |
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
@@ -293,11 +293,16 @@ sets and says nothing about Athena, so the letter to region mapping is not estab
 - ~~How the app gets its data~~. `npm run data` projects `data/generated` through
   `src/data/load.ts` into `data/app/app-data.json`, 78 KB and 15 gzipped, imported rather
   than fetched. One mapping, shared by the app, the tests and the validator
-- **`publicDir` is `assets/`,** so a manifest path is also a URL. **46 MB ships now**, 23 of
-  which is Arcana card art Phase 1 never renders and 9 of which arrived on 28 August and is
-  mostly held for later. `frames/circle.png` is the one downscale done so far: 2.37 MB at
-  2475 square, 249 KB at 512. The real fix is a build step that copies only what the app
-  references, and it is not written
+- ~~`publicDir` is `assets/`, so the whole shelf ships~~. **Written.** `npm run prune` runs
+  after `vite build` and keeps only what the bundle names: **55 MB and 940 files down to 10
+  MB and 518**. It also drops `manifest.json`, which was shipping 933 records of build
+  metadata the app never reads.
+  The interesting part is the guard. Everything the app draws is a literal string by the
+  time Vite is done, except a path built from a template literal, and a scanner will
+  happily delete every file one of those resolves to. So it also looks for
+  `/<category>/${...}` in the built output and **fails the build on any it has not been
+  told about**. There is one today, `/rarity/${rarity}.png`, declared with its reason.
+  Verified by removing the declaration and watching it refuse
 - The Exit count in Setup defaults to 12 and is a placeholder. The real number wants region
   data, which is not extracted
 - The verdicts are only as good as the targets. Every duo and legendary is a target today,
