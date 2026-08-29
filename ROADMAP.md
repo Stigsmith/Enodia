@@ -286,6 +286,36 @@ make a Cast build a Cast build mostly occupy none. That wants the curated `feeds
 for the reason already in this file: `RoomData` places three Encounter gods in lettered room
 sets and says nothing about Athena, so the letter to region mapping is not established.
 
+**The boon text, and the one gap left in it**
+
+73 of the 567 descriptions the app renders were wrong, and they were wrong in ways a reader
+sees immediately: "you receive, health, and now", "While you have at least, you can never
+deal less damage", "spill, which can restore Magick". Three separate causes, all fixed by
+reading the game's own tables rather than by writing words:
+
+- **`{!Icons.X}` is a noun.** It renders as a glyph in game, so dropping it deletes the
+  noun. `HelpText` names them on the same id `{$Keywords.X}` already uses:
+  `MetaCurrencyIcon` is `"{!Icons.MetaCurrency} Bones"`, the glyph plus the word
+- **`{$TraitData.a.b.c}` is a literal path** into `traits-resolved.json`, one-based where
+  it indexes a list. 37 of the 38 in the trait text resolve, and the catch-all had been
+  deleting all of them
+- **`NoTooltip` and `Alt` are decorations on an id**, not different things, so
+  `GodBoonPluralNoTooltip` is `GodBoonPlural`. Eleven descriptions were printing the raw
+  identifier at the reader
+
+Two traps in it worth keeping. `HelpText`'s `DisplayName` is a **tooltip title** rather than
+an inline noun for a few: `Omega` is "Ω Moves", and reading it off the glossary turned "your
+{omega} Cast" into "your **Moves** Cast" where the game says **Ω Cast**. And `Total` is not
+a strippable decoration: `ArmorTotal` is not `Armor`, and stripping it turned "+1 armour"
+into "+1". The hand table wins and the glossary fills in behind it.
+
+**Still unread: `{$TooltipData.ExtractData.X}`, and it renders as `#`.** It names an entry
+in the trait's own `ExtractValues`, which names a `Key`, which is reported by one of the
+trait's function args. **Only 34 of 384 complete that chain** in the data as extracted: 236
+are `External` and point at another table entirely, and there are **37 distinct `Format`
+values** to apply once a number is found. Guessing any of it puts wrong numbers on a card,
+which is worse than an admitted gap.
+
 **Engine**
 
 - ~~A filled slot is not a proof of impossible~~. Handled: `obtainability` returns `swap`
