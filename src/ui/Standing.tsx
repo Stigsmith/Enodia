@@ -123,6 +123,12 @@ function TargetLine({
   return (
     <li className={`target is-${verdict.state.toLowerCase()}${pinned ? ' is-pinned' : ''}`}>
       <span className="target-head">
+        {/* The game's own checkmark, off the quest log. A target with every
+            prerequisite in hand is done, and done is a different thing from
+            a percentage. */}
+        {verdict.state === 'ON_TRACK' ? (
+          <img className="target-done" src="/icons/complete.png" alt="" aria-hidden="true" />
+        ) : null}
         <span className="target-name">{name}</span>
         <span className="target-kind">
           {kind}

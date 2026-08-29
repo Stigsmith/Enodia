@@ -1,10 +1,10 @@
 {
- "generated": "2026-08-28",
+ "generated": "2026-08-29",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 880,
+ "count": 933,
  "categories": [
   {
    "name": "arcana",
@@ -44,7 +44,7 @@
   },
   {
    "name": "chrome",
-   "count": 53,
+   "count": 59,
    "source": "game"
   },
   {
@@ -66,7 +66,7 @@
   },
   {
    "name": "frames",
-   "count": 25,
+   "count": 27,
    "source": "game"
   },
   {
@@ -91,7 +91,7 @@
   },
   {
    "name": "icons",
-   "count": 7,
+   "count": 15,
    "source": "game"
   },
   {
@@ -115,6 +115,11 @@
    "source": "mixed",
    "wiki": 1,
    "game": 9
+  },
+  {
+   "name": "shell",
+   "count": 37,
+   "source": "game"
   },
   {
    "name": "slots",
@@ -3820,6 +3825,14 @@
    "source": "game"
   },
   {
+   "id": "backing-palace-of-zeus",
+   "category": "chrome",
+   "file": "chrome/backing-palace-of-zeus.png",
+   "bytes": 273954,
+   "sha256": "b5c29003a9aaa0064f85853565562d8b38e211e7e7f79b7606341e068d96ce3d",
+   "source": "game"
+  },
+  {
    "id": "box-confirm",
    "category": "chrome",
    "file": "chrome/box-confirm.png",
@@ -3940,6 +3953,14 @@
    "source": "game"
   },
   {
+   "id": "dialogue-static",
+   "category": "chrome",
+   "file": "chrome/dialogue-static.png",
+   "bytes": 304844,
+   "sha256": "3dc81544bf6f6a4512c0278d4dcf9470eccd75394d2588ed0e4db1a7c4dbd328",
+   "source": "game"
+  },
+  {
    "id": "divider-long",
    "category": "chrome",
    "file": "chrome/divider-long.png",
@@ -4009,6 +4030,14 @@
    "file": "chrome/item-consume.png",
    "bytes": 33952,
    "sha256": "dc6f12dca5c2a9df3ad2eabf3c8446945f87cbc650213bad7a1110e3fd7c9e9c",
+   "source": "game"
+  },
+  {
+   "id": "lob-decal",
+   "category": "chrome",
+   "file": "chrome/lob-decal.png",
+   "bytes": 735750,
+   "sha256": "9c9fe6cb7352b192282a7ebb3806c7a9c8fdf36495911c43d42e28c36733516f",
    "source": "game"
   },
   {
@@ -4105,6 +4134,14 @@
    "file": "chrome/sidebars.png",
    "bytes": 49311,
    "sha256": "75b6f072e73caea9c716387bbe106c89fc9ae2943ad56ef22a22fea8ada28b53",
+   "source": "game"
+  },
+  {
+   "id": "sorcery-circle",
+   "category": "chrome",
+   "file": "chrome/sorcery-circle.png",
+   "bytes": 904600,
+   "sha256": "4c06148a2cc5f5f1909920e2f8dc96d7ad20acec65076066533951d3194b979d",
    "source": "game"
   },
   {
@@ -4209,6 +4246,22 @@
    "file": "chrome/tray-header.png",
    "bytes": 28020,
    "sha256": "227a645f7dd74361605afb3a4b23d302dd4699010821c1bba15df10b9fadf400",
+   "source": "game"
+  },
+  {
+   "id": "tray-panel",
+   "category": "chrome",
+   "file": "chrome/tray-panel.png",
+   "bytes": 162167,
+   "sha256": "1e8e099dc7fa91debf502fe25914c00ac0fa4e63c0c2411d641f57c91a3454a7",
+   "source": "game"
+  },
+  {
+   "id": "tray-tab-highlight",
+   "category": "chrome",
+   "file": "chrome/tray-tab-highlight.png",
+   "bytes": 14603,
+   "sha256": "0a03a6b6b8e472ba7b8afc8eba47a3bbb69c8bbf708bfdda777241023817fbec",
    "source": "game"
   },
   {
@@ -5169,6 +5222,22 @@
    "file": "familiars/skin-raven06.png",
    "bytes": 10342,
    "sha256": "6a4606960b76ceddcd1ef8b041678fe72e9b46ae2470f3297210fea9e993c2d1",
+   "source": "game"
+  },
+  {
+   "id": "circle-script-b",
+   "category": "frames",
+   "file": "frames/circle-script-b.png",
+   "bytes": 53507,
+   "sha256": "380998f8e15f6db02fa9868c1c3108c44c81e3e646122e9d13afd9fe67c09066",
+   "source": "game"
+  },
+  {
+   "id": "circle-script",
+   "category": "frames",
+   "file": "frames/circle-script.png",
+   "bytes": 65075,
+   "sha256": "261ebc3f954d1bfce1951e5add00c01b2423ccdf6fdfe2935f2e1ac3edc759ef",
    "source": "game"
   },
   {
@@ -7195,6 +7264,30 @@
    "source": "game"
   },
   {
+   "id": "chaos-gate",
+   "category": "icons",
+   "file": "icons/chaos-gate.png",
+   "bytes": 41743,
+   "sha256": "110141d88c8928ca88d65156cb267a43ae6488e685daa06d79e85b363079cfec",
+   "source": "game"
+  },
+  {
+   "id": "complete",
+   "category": "icons",
+   "file": "icons/complete.png",
+   "bytes": 13757,
+   "sha256": "1aba05d617521ca6df1bcc2e2320c1d7118037070aab6798c46779a257526df1",
+   "source": "game"
+  },
+  {
+   "id": "continue",
+   "category": "icons",
+   "file": "icons/continue.png",
+   "bytes": 24368,
+   "sha256": "b14a6f16851d68bc09873674026d37af232bc3d0bb43150013066df7b210d8e3",
+   "source": "game"
+  },
+  {
    "id": "currency",
    "category": "icons",
    "file": "icons/currency.png",
@@ -7208,6 +7301,30 @@
    "file": "icons/inventory.png",
    "bytes": 6548,
    "sha256": "96a76e08a092caa831489ef51acefc02832262b0623686c2d424250e97e1fce6",
+   "source": "game"
+  },
+  {
+   "id": "loading",
+   "category": "icons",
+   "file": "icons/loading.png",
+   "bytes": 27505,
+   "sha256": "4429c28f7c95671603c26e32f9675878b3d19ff92ffc11dd44c740c647e0ed38",
+   "source": "game"
+  },
+  {
+   "id": "max-upgrade",
+   "category": "icons",
+   "file": "icons/max-upgrade.png",
+   "bytes": 47343,
+   "sha256": "d3bbd6da34f4a5ad3d5910dc84ba60625641357be8aa2c99d35a4d7683bc52ca",
+   "source": "game"
+  },
+  {
+   "id": "mystery",
+   "category": "icons",
+   "file": "icons/mystery.png",
+   "bytes": 38554,
+   "sha256": "6b511ee176899cf8012b938f38ff9fdb9545ff4b7ac66a46dcb04af1386bcf93",
    "source": "game"
   },
   {
@@ -7227,11 +7344,27 @@
    "source": "game"
   },
   {
+   "id": "selected",
+   "category": "icons",
+   "file": "icons/selected.png",
+   "bytes": 15318,
+   "sha256": "46471b1a7e970c4513f620fd7e7bc6f721ad1feccd191797549e4e83e5fc0663",
+   "source": "game"
+  },
+  {
    "id": "startled",
    "category": "icons",
    "file": "icons/startled.png",
    "bytes": 7937,
    "sha256": "118d49a63dfb0a0ddf65bc810406badc0664b7476bc2e92f60f82e0e70b01447",
+   "source": "game"
+  },
+  {
+   "id": "story",
+   "category": "icons",
+   "file": "icons/story.png",
+   "bytes": 21132,
+   "sha256": "22ed569a84f6fba2b2f61f4a2fce45a11a718412470f843d1c802dd547e5e347",
    "source": "game"
   },
   {
@@ -7793,6 +7926,302 @@
    "sha256": "bf9bc028d897b8087c75e108e4166c09710aedc391388af2cdc5dbc9e5867e87",
    "source": "wiki",
    "needsProvenance": true
+  },
+  {
+   "id": "background-confirm",
+   "category": "shell",
+   "file": "shell/background-confirm.png",
+   "bytes": 222457,
+   "sha256": "7ee8d9cdfc16b1215b599020b232d9ce9ce00d14f3831e1f7cd50c571c0cf507",
+   "source": "game"
+  },
+  {
+   "id": "background-shade",
+   "category": "shell",
+   "file": "shell/background-shade.png",
+   "bytes": 49468,
+   "sha256": "9d217bb41e44e459b4a6e58120977df2acc5b60bb9dd72c6ee7d883a746c9d6a",
+   "source": "game"
+  },
+  {
+   "id": "box-settings",
+   "category": "shell",
+   "file": "shell/box-settings.png",
+   "bytes": 7090,
+   "sha256": "84075a3657385adf1d62033d669efa256a186628d7dcd37ffbc0b8ff79bcb4d9",
+   "source": "game"
+  },
+  {
+   "id": "button-press",
+   "category": "shell",
+   "file": "shell/button-press.png",
+   "bytes": 6669,
+   "sha256": "f58dae8949613ba355b0ca9d12fd1ebe8095cd2113344cf2509e7950b9e8b2f1",
+   "source": "game"
+  },
+  {
+   "id": "buttonpartial-highlight",
+   "category": "shell",
+   "file": "shell/buttonpartial-highlight.png",
+   "bytes": 40490,
+   "sha256": "80c0434789ee153dbd067226136ed2c15cf38dc2b36db8c48a336785147a45cc",
+   "source": "game"
+  },
+  {
+   "id": "buttonsecondary-highlight",
+   "category": "shell",
+   "file": "shell/buttonsecondary-highlight.png",
+   "bytes": 1338,
+   "sha256": "d529744456695c584c9c49acd35346af29d66a20025e43ffbb383fe0c2bb2fe0",
+   "source": "game"
+  },
+  {
+   "id": "buttonsecondary-press",
+   "category": "shell",
+   "file": "shell/buttonsecondary-press.png",
+   "bytes": 4592,
+   "sha256": "433bb3a7f9c4c23dcb2fb66e566c84d8757dbffacc92abca7a97b0d8a178ce80",
+   "source": "game"
+  },
+  {
+   "id": "buttonsecondary",
+   "category": "shell",
+   "file": "shell/buttonsecondary.png",
+   "bytes": 513,
+   "sha256": "6c8978f1e0a4bc679ffae18ff8eb25d402b671caed02780a496b7591e22281a8",
+   "source": "game"
+  },
+  {
+   "id": "buttonselected-highlight",
+   "category": "shell",
+   "file": "shell/buttonselected-highlight.png",
+   "bytes": 2709,
+   "sha256": "5d022f3c28b77e60448c86685bbbfd9eee368d6c926689f5517c3c50059dd1bd",
+   "source": "game"
+  },
+  {
+   "id": "cloudfail",
+   "category": "shell",
+   "file": "shell/cloudfail.png",
+   "bytes": 17940,
+   "sha256": "14bb16be12eb1517e9b4929626135f2b5e4213f6522f4e0e15ac2608281f4a8a",
+   "source": "game"
+  },
+  {
+   "id": "cloudsuccess",
+   "category": "shell",
+   "file": "shell/cloudsuccess.png",
+   "bytes": 18086,
+   "sha256": "1ec26fc81449e4c03f59d21f099a07806f372e12c4000650d3177ea2cd9bd6e1",
+   "source": "game"
+  },
+  {
+   "id": "cloudsyncconflict",
+   "category": "shell",
+   "file": "shell/cloudsyncconflict.png",
+   "bytes": 17742,
+   "sha256": "bcaa0e46b5885d3a61635d63011afcff8d69020674350efb05735c87a05b891b",
+   "source": "game"
+  },
+  {
+   "id": "downarrow-base",
+   "category": "shell",
+   "file": "shell/downarrow-base.png",
+   "bytes": 12947,
+   "sha256": "628ba3a3b186be935af6225f49df83552ee215afd0b6cdd6ead0218482bec7e4",
+   "source": "game"
+  },
+  {
+   "id": "downarrow-highlight",
+   "category": "shell",
+   "file": "shell/downarrow-highlight.png",
+   "bytes": 12861,
+   "sha256": "561a6395b2a8ce0302d8624eee4242629771f1bd41fe622d21896307c66d816c",
+   "source": "game"
+  },
+  {
+   "id": "easymode",
+   "category": "shell",
+   "file": "shell/easymode.png",
+   "bytes": 6050,
+   "sha256": "23380ffd0eb745c7261bfc1131e3aeaf5160de9a4675a27a53eb8ce05ad27ebf",
+   "source": "game"
+  },
+  {
+   "id": "optionselectoricon",
+   "category": "shell",
+   "file": "shell/optionselectoricon.png",
+   "bytes": 15318,
+   "sha256": "46471b1a7e970c4513f620fd7e7bc6f721ad1feccd191797549e4e83e5fc0663",
+   "source": "game"
+  },
+  {
+   "id": "screenedgeindicatoroptional",
+   "category": "shell",
+   "file": "shell/screenedgeindicatoroptional.png",
+   "bytes": 30903,
+   "sha256": "3f32dd1128e8583181ffc035a2af0e6d029ca32137b18a65df80dc5fd6c02161",
+   "source": "game"
+  },
+  {
+   "id": "selector-coin",
+   "category": "shell",
+   "file": "shell/selector-coin.png",
+   "bytes": 33541,
+   "sha256": "6f9a40b3586fec616a881beeaae20ceb23a629f060cde3637612abb90f7cb9d2",
+   "source": "game"
+  },
+  {
+   "id": "selector",
+   "category": "shell",
+   "file": "shell/selector.png",
+   "bytes": 5956,
+   "sha256": "f50ee557aa48311208a3d4732f33f58c2357549f96f707004027c1400295d4a0",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-down-highlight",
+   "category": "shell",
+   "file": "shell/settings-arrow-down-highlight.png",
+   "bytes": 3735,
+   "sha256": "4987ae19686b7a5a40be1667f5ca7798c9a2c40d539c4db4958979406d941402",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-down",
+   "category": "shell",
+   "file": "shell/settings-arrow-down.png",
+   "bytes": 3815,
+   "sha256": "cefa9038c91c53a911f919f4106e6840fd306d4d1e12209c82fc4e065b4c3700",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-left-highlight",
+   "category": "shell",
+   "file": "shell/settings-arrow-left-highlight.png",
+   "bytes": 3499,
+   "sha256": "c5c0c991a0393fe6659f000e143a42b704f7a481a1b0afe64182079c7624b638",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-left",
+   "category": "shell",
+   "file": "shell/settings-arrow-left.png",
+   "bytes": 3808,
+   "sha256": "13187fd1929b4aa7423c606dda5a7de8f0fc23940da688eee2daff5fcc8cdcff",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-right-highlight",
+   "category": "shell",
+   "file": "shell/settings-arrow-right-highlight.png",
+   "bytes": 3522,
+   "sha256": "038ef5ccc499722888541b0e089431b4aa63ac72d42947c4068aa4becb363618",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-right",
+   "category": "shell",
+   "file": "shell/settings-arrow-right.png",
+   "bytes": 3833,
+   "sha256": "74deb13b2b7d4ac050044e966c22331d566f27c4b0edcd8e172dd8390facce6e",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-up-highlight",
+   "category": "shell",
+   "file": "shell/settings-arrow-up-highlight.png",
+   "bytes": 3678,
+   "sha256": "94ea16a4eb26e32fee94e426c90ba53ef2aa7d07cb171048c3821a7c9d31f560",
+   "source": "game"
+  },
+  {
+   "id": "settings-arrow-up",
+   "category": "shell",
+   "file": "shell/settings-arrow-up.png",
+   "bytes": 3812,
+   "sha256": "1f5a9adcf9dce48db78fb2830cec6ddfd0d5bbdd33a96eb2ba1541f983991f9e",
+   "source": "game"
+  },
+  {
+   "id": "settings-bar-bg",
+   "category": "shell",
+   "file": "shell/settings-bar-bg.png",
+   "bytes": 839,
+   "sha256": "da4faf54613613ba9d459d2f650cc3d8dc7eb6d2c82d23c21f49194fa9dc8d21",
+   "source": "game"
+  },
+  {
+   "id": "settings-bar-fill",
+   "category": "shell",
+   "file": "shell/settings-bar-fill.png",
+   "bytes": 614,
+   "sha256": "f71962ea3dca1b68c59fbebbb8aedf3dc28000df9ff5e56fdb0d5e1b57629084",
+   "source": "game"
+  },
+  {
+   "id": "settings-bar-highlight",
+   "category": "shell",
+   "file": "shell/settings-bar-highlight.png",
+   "bytes": 625,
+   "sha256": "7ebc0f8af93f20874d490fdd0c126213784ae71f7d73eb794c7dbb9716c6b391",
+   "source": "game"
+  },
+  {
+   "id": "settings-bracket",
+   "category": "shell",
+   "file": "shell/settings-bracket.png",
+   "bytes": 2314,
+   "sha256": "0d33ac5a5374ae2319ec84ec84897a17abb85c4b93dc2d8fb6b2e0fdbea2d322",
+   "source": "game"
+  },
+  {
+   "id": "settings-toggle-off",
+   "category": "shell",
+   "file": "shell/settings-toggle-off.png",
+   "bytes": 2352,
+   "sha256": "12ab59bddada7e465a2e84ca1005fe7f379ed184ed24facf716f1d3c5f948b4b",
+   "source": "game"
+  },
+  {
+   "id": "settings-toggle-on",
+   "category": "shell",
+   "file": "shell/settings-toggle-on.png",
+   "bytes": 3066,
+   "sha256": "bf4544431e69750c4c99155ee52daf5425b649be5ee48b35f53abd49d133c819",
+   "source": "game"
+  },
+  {
+   "id": "setttings-option-off",
+   "category": "shell",
+   "file": "shell/setttings-option-off.png",
+   "bytes": 3376,
+   "sha256": "b68b661e163d84f2c7aff65aeb21760fe96da5de147d4cf9a0fa81b5cf24ae30",
+   "source": "game"
+  },
+  {
+   "id": "setttings-option-on",
+   "category": "shell",
+   "file": "shell/setttings-option-on.png",
+   "bytes": 2644,
+   "sha256": "1f167b5cf20400421af32edadaab223d4431b88ed786f307951acfb7c461a856",
+   "source": "game"
+  },
+  {
+   "id": "uparrow-base",
+   "category": "shell",
+   "file": "shell/uparrow-base.png",
+   "bytes": 13563,
+   "sha256": "18e43251e240a7017f3b177f71fcfdb2826cdf4fd40d2e4f499a167f75b03760",
+   "source": "game"
+  },
+  {
+   "id": "uparrow-highlight",
+   "category": "shell",
+   "file": "shell/uparrow-highlight.png",
+   "bytes": 13542,
+   "sha256": "bec66d81e59d905abf12b8940a12151eeeec937c5b7370e7c32b6013daf73c09",
+   "source": "game"
   },
   {
    "id": "attack",

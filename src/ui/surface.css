@@ -802,6 +802,48 @@
   height: var(--size);
 }
 
+/* Behind the ring: the game's own sorcery decal, breathing.
+ *
+ * `Fx/Sorcery/SorceryWolfHowlDecal`, a lit nonagram. The rotating medallion
+ * that used to sit here read as a spinning logo and the owner cut it, and the
+ * space has been open since. This does not rotate: it holds still and its
+ * light rises and falls, which is what a circle drawn on the ground does.
+ *
+ * Very quiet on purpose. It is the ambient tier and it is behind the thing a
+ * player is actually reading, so it stops entirely under reduced motion. */
+.radial-ring-area::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  background: url('/chrome/sorcery-circle.png') center / contain no-repeat;
+  opacity: 0.1;
+  pointer-events: none;
+  animation: sorcery-breathe 14s ease-in-out infinite;
+}
+
+@keyframes sorcery-breathe {
+  0%,
+  100% {
+    opacity: 0.075;
+    filter: brightness(0.9);
+  }
+  50% {
+    opacity: 0.16;
+    filter: brightness(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radial-ring-area::before {
+    animation: none;
+    opacity: 0.1;
+  }
+}
+
 .radial-ring {
   position: absolute;
   inset: 0;
@@ -1737,17 +1779,52 @@
  * is what the brief says to do.
  * ========================================================================= */
 
-/* The scrollwork, unchanged: the game's own panel motif at the corners. */
+/* The scrollwork behind everything.
+ *
+ * It was `TraitTrayBacking`, twice, at two different sizes and two different
+ * bleeds. That panel has a header baked into it, so the two copies could never
+ * line up with each other and the overlap read as an accident, which it was.
+ *
+ * `TraitTrayBacking_NoHeader` is the plain panel. Two of them, the right one
+ * mirrored, meeting in the middle: the smoke runs outward from the centre in
+ * both directions and the seam is where the two panels' own edges are, which
+ * is the quietest place for it.
+ *
+ * One panel on a narrow screen, because two would each be a sliver. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
-  background:
-    url('/chrome/tray-backing.png') left -12% top -8% / 46rem auto no-repeat,
-    url('/chrome/tray-backing.png') right -18% bottom -14% / 60rem auto no-repeat;
+  background: url('/chrome/tray-panel.png') center / cover no-repeat;
   opacity: 0.09;
   pointer-events: none;
+}
+
+@media (min-width: 60rem) {
+  body::before {
+    right: 50%;
+    /* `cover`, not a stretch. The panel is 1280 by 1793 and forcing it to a
+     * half-screen box would squash the smoke visibly even at nine percent. */
+    background: url('/chrome/tray-panel.png') right center / cover no-repeat;
+  }
+
+  /* The right half, mirrored. A second element rather than a transform on the
+   * first, because transforming `body::before` would take the left half with
+   * it and there is only one pseudo-element to give each half its own. */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: 0;
+    background: url('/chrome/tray-panel.png') left center / cover no-repeat;
+    transform: scaleX(-1);
+    opacity: 0.09;
+    pointer-events: none;
+  }
 }
 
 /* ==========================================================================
@@ -1953,15 +2030,23 @@ body::before {
   background: url('/chrome/tray-header.png') left center / auto 190% no-repeat;
 }
 
-/* The radial caption sits on the game's tooltip plate, which is a nine slice
- * with corner ticks, so it stretches without smearing the corners. */
+/* The caption sits on the game's own subtitle plate.
+ *
+ * It was the tooltip nine-slice, which has hard corners and four little tick
+ * marks, and stretching that to the width of the ring drew a box around a line
+ * of text that did not need one. `SubtitleBacking` has no frame at all: it is a
+ * soft dark fade that lets a line sit on the page. Which is what this is, and
+ * the game uses it for exactly this.
+ *
+ * Stretched rather than nine-sliced, because there is nothing in it that a
+ * stretch can smear. */
 .radial-caption {
   padding: 0.7rem 1.4rem 0.9rem;
-  border-image: url('/chrome/tooltip-backing.png') 40 fill / 1.6rem stretch;
+  background: url('/chrome/subtitle-backing.png') center / 100% 100% no-repeat;
 }
 
 .radial-caption:empty {
-  border-image: none;
+  background: none;
 }
 
 /* Whatever is framing a bubble today.
@@ -2836,4 +2921,60 @@ body::before {
 .target.is-pinned {
   border-left: 2px solid var(--jade);
   padding-left: 0.5rem;
+}
+
+/* ------------------------------------------------- the game's own marks -- */
+
+/* The checkmark off the quest log, on a target with every prerequisite held.
+ * Done is a different statement from a percentage and should not look like
+ * one. */
+.target-done {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-right: 0.35rem;
+  object-fit: contain;
+  vertical-align: -0.15rem;
+  flex: none;
+}
+
+/* What is chosen in the menu, in the game's own OptionSelectorIcon rather
+ * than a colour change nobody would read as a choice. */
+.menu-chosen {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-left: 0.45rem;
+  object-fit: contain;
+  vertical-align: -0.2rem;
+}
+
+.menu-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The disclosure marker on a station's deaths: the game's own downward
+ * pointer, which is what it puts under a line that has more behind it. */
+.station-deaths summary {
+  list-style: none;
+}
+
+.station-deaths summary::marker,
+.station-deaths summary::-webkit-details-marker {
+  display: none;
+  content: '';
+}
+
+.station-deaths summary::after {
+  content: '';
+  display: block;
+  width: 1rem;
+  height: 1.4rem;
+  margin: 0.3rem auto 0;
+  background: url('/icons/continue.png') center / contain no-repeat;
+  opacity: 0.5;
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.station-deaths[open] summary::after {
+  transform: rotate(180deg);
 }

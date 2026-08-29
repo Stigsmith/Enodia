@@ -170,7 +170,12 @@ export function Menu({
                       <img className="menu-frame-face" src="/gods/zeus.webp" alt="" />
                       {option.file ? <img className="menu-frame-art" src={`/${option.file}`} alt="" /> : null}
                     </span>
-                    <span className="menu-label">{option.name}</span>
+                    <span className="menu-label">
+                      {option.name}
+                      {frame === option.id ? (
+                        <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
+                      ) : null}
+                    </span>
                     <span className="menu-note">{option.note}</span>
                   </button>
                 </li>

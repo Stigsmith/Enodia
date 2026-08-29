@@ -80,9 +80,10 @@ their source pages the first time, which is how that got noticed.
 | `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic. These are `Icons/CardRarityIcon_*` | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
-| `chrome/` | 52 | game | The game's own furniture: boxes, buttons, backings, medallion, splash art | picked by hand, see `scripts/chrome.ts` |
-| `frames/` | 25 | game | Boon and rarity frames, every ring the radial can wear, and the game's own Exit reward marker | see `src/ui/frames.ts` |
-| `icons/` | 7 | game | The game's own UI icons: boon, gold, reroll, inventory, warning, unknown | picked by hand |
+| `chrome/` | 60 | game | The game's own furniture: boxes, backings, medallion, splash art | picked by hand, see `scripts/chrome.ts` |
+| `shell/` | 37 | game | `GUI/Shell` whole: buttons, arrows, toggles, sliders, selectors | swept |
+| `frames/` | 27 | game | Boon and rarity frames, every ring the radial can wear, the Exit reward marker, and Hecate's touchdown circles | see `src/ui/frames.ts` |
+| `icons/` | 15 | game | The game's own UI icons: boon, gold, reroll, story, Chaos gate, checkmark, mystery | picked by hand |
 | `familiars/` | 50 | game | The five familiars, their six skins each and their stat icons | complete, unused so far |
 | `gifts/` | 33 | game | Keepsake max gift portraits, one per character. A possible alternate to `gods/` | unused so far |
 | `weapons/` | 12 | game | The six Nocturnal Arms, a Codex card and a shrine silhouette each | complete, 6 of 6 |
@@ -256,6 +257,31 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
 ornament that brief says the page is missing. Both images are now in `chrome/`.
+
+### Three trees, not one
+
+`scripts/chrome.ts` knew only about `GUI.pkg`'s `GUI` folder until the reward marker turned
+up somewhere else. A pick now names its tree:
+
+| `tree` | Root |
+|---|---|
+| `gui` (default) | `extracted/gui/textures/GUI` |
+| `items` | `extracted/gui/textures/Items` |
+| `scriptsbase` | `extracted/scriptsbase/textures` |
+
+`Items/Loot/PreviewOnly/` is worth knowing about on its own: it holds the icons the game
+draws on an Exit to say what is behind it, one per reward type. `Story.png`, `ChaosGate.png`,
+`Shop.png`, `Bough.png`, `HadesLock.png`, `Mystery_Chaos.png` and the clockwork countdown.
+
+### `HeroTouchdownCircles` are circles, face on
+
+`Fx/HeroTouchdownCircles/HeroTouchdownCircleA` and `B` are what the game draws under Melinoe
+when she lands: a jade ring with witch script around the rim, and the same with a triangle
+inscribed. **They need no un-warping**, unlike everything else that looks like a ring in
+this game, because they are drawn face on rather than laid on a floor plane.
+
+They are frame options, `Witch circle` and `Witch circle, sealed`. The default is still the
+Exit reward marker: the owner compared them side by side and picked it.
 
 ### The Exit reward marker, and it is not in `GUI.pkg`
 
