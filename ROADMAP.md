@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 27 August 2026, game build `138174`.
+Last updated 29 August 2026, game build `138174`.
 
 ---
 
@@ -12,10 +12,12 @@ Last updated 27 August 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit" |
-| **Build order step** | **11 of 11. Phase 1 is complete.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
-| **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
+| **Phase** | 1, "The Exit". **Complete** |
+| **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
+| **Tests** | 220, across 11 files |
+| **Validator** | 8 checks, 0 failures, 3 warnings |
+| **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
+| **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
 **Phase 1 is complete.** Set up a run, log what each Exit gave, and the timeline records what
 each pick closed at the pick that closed it. Settling the fourth Olympian reads "35 builds
@@ -27,8 +29,13 @@ under a card: what you were chasing and where it stands now, what moved since yo
 looked with the deaths first, what you hold by slot, and how many Exits are left. Pin a
 target from the standing drawer and that pin is what the card leads with.
 
+**A mis-tap costs one tap.** Every logged station carries "This did not happen", and taking
+one back replays the run from empty so everything after it is recomputed, deaths included.
+
 Not shipped yet: the hand-authored page is still `placeholder/index.html` and still what
-Netlify serves. Deploying the app is a decision, not a task.
+Netlify serves. **The app is deployable now** rather than merely built: `npm run build`
+produces 10 MB, and `npm run preview` or the `dist` entry in `.claude/launch.json` serves it
+to check before pointing Netlify at it. Which is still a decision, not a task.
 
 ---
 
@@ -38,11 +45,11 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 
 | Step | What | State |
 |---:|---|---|
-| 1 | Extractor, Lua to `data/generated` | **Done.** 57 files, zero failures. Text and stacking curves included |
-| 2 | Validator wired into prebuild | **Done.** 8 checks, 38 unit tests. `npm run build` stops on a broken reference |
+| 1 | Extractor, Lua to `data/generated` | **Done.** 62 files, zero failures, deterministic: a re-run against the same build changes nothing but the date |
+| 2 | Validator wired into prebuild | **Done.** 8 checks. `npm run build` stops on a broken reference, and it has caught two of mine |
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
-| 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority. 114 tests, and it runs against the real 47 targets |
+| 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority, and it runs against the real 47 targets |
 | 6 | `engine/runsim.ts` | **Done.** Seeded, legal runs. The dead-stays-dead property holds over 25 of them |
 | 7 | Setup screen, and the rail | **Done.** Weapon, aspect and Exits in, a real RunContext out, and the rail fills as you log |
 | 8 | **The timeline shell.** First shippable point | **Done.** Deaths recorded at the pick that caused them, verdicts in the present entry |
@@ -52,6 +59,45 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 
 Later phases are scoped in `REQUIREMENTS.md` 7: **2** before the run, **3** memory,
 **4** automation and community.
+
+### What landed after step 11
+
+Phase 1 was the plan. These were not, and each answers something the plan assumed was
+already true.
+
+| | |
+|---|---|
+| `npm run prune` | Ships what the app references. **55 MB and 940 files down to 10 MB and 518** |
+| Boon text | 252 of 567 descriptions were wrong. `#` placeholders **422 down to 201** |
+| Corrections | "This did not happen" on every station, replaying the run |
+| Keyboard | An `h1`, a skip link, named landmarks |
+
+
+---
+
+## What I would pick up next
+
+Phase 1 is done and nothing below blocks anything else. In the order I would take them.
+
+**1. Point Netlify at `dist/`.** The owner's call, and the only thing between this and
+people using it. The build is 10 MB, it runs from a plain static server, and
+`.claude/launch.json` has a `dist` entry to check it first.
+
+**2. Extract `ProjectileData` and `WeaponData`.** The clearest measured gap: 21 of the
+remaining `#` are `External` values living in those tables and another 10 want
+`MultiplyByBase`, which needs the same. `EffectData` is already loaded by the extractor and
+simply never emitted, so that part is one line in the `tables` map. The rest means adding
+files to a 62-file load order that currently reports zero failures, so it wants care and a
+check that the count and the checksums hold.
+
+**3. The `feeds` tag.** The largest hand-authoring job in the project and the owner's, and
+three separate features are waiting on it: the briefing's centre of mass, any rule about
+what a boon actually does, and archetypes. Nothing else unlocks as much.
+
+**4. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
+walking `InheritFrom` itself.
+
+**5. Phase 2.** `REQUIREMENTS.md` 7.
 
 ---
 
