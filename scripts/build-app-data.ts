@@ -19,6 +19,7 @@ import { join, resolve } from 'node:path'
 
 import { buildTraitIndex, godPoolsFrom, olympiansFrom } from '../src/data/load.ts'
 import { aspectIconKeys, buildIconIndex, resolveIcon } from '../src/data/icons.ts'
+import { extractedValues } from './values.ts'
 import type { Manifest } from '../src/data/icons.ts'
 import type { Trait } from '../src/data/types.ts'
 
@@ -156,7 +157,9 @@ const ICON_WORDS: Record<string, string> = {
  */
 function glossary(key: string): string | null {
   const tried = [key]
-  for (const suffix of ['NoTooltip', '_NoTooltip', 'Alt', 'EX']) {
+  // `WithCount` is the same word with its count in front of it: the game
+  // renders "2 {AllElements}" and names the entry AllElementsWithCount.
+  for (const suffix of ['NoTooltip', '_NoTooltip', 'Alt', 'EX', 'WithCount']) {
     let candidate = key
     while (candidate.endsWith(suffix) && candidate.length > suffix.length) {
       candidate = candidate.slice(0, -suffix.length)
@@ -219,7 +222,7 @@ function iconWord(key: string): string {
    * Air Quality reads "While you have at least 5, you can never deal less
    * damage" and the reader has to guess five of what.
    */
-  const element = /^Curse([A-Z][a-z]+)$/.exec(key)
+  const element = /^(?:Curse)?(Air|Water|Fire|Earth|Aether)(?:NoTooltip|_NoTooltip|Alt)?$/.exec(key)
   if (element) candidates.push(`${element[1]}Boon`)
 
   for (const candidate of [key]) {
@@ -252,7 +255,10 @@ function traitDataAt(path: string): string | null {
   // generated.data, not the `resolved` alias further down: describe() runs
   // while the records are being built, which is before that line executes.
   let node: unknown = generated.data
-  for (const part of path.split('.')) {
+  // The text writes an index two ways, `.1.` and `.[2].`, and both are
+  // one-based. Reckless Abandon uses the bracketed form for the middle of its
+  // three damage values, and without it that sentence read "exactly 5,, or 555".
+  for (const part of path.split('.').map((piece) => piece.replace(/^\[(\d+)\]$/, '$1'))) {
     if (isDict(node) && part in node) node = node[part]
     else if (Array.isArray(node) && /^\d+$/.test(part)) node = node[Number(part) - 1]
     else return null
@@ -262,31 +268,65 @@ function traitDataAt(path: string): string | null {
   return null
 }
 
+/**
+ * The last pass over any piece of game text: markup out, spacing tidy.
+ *
+ * A display name goes through it as well as a description. Thirteen names were
+ * shipping raw markup, `{!Icons.CurseAir}` among them, because only
+ * descriptions were being cleaned.
+ */
+function tidy(raw: string): string {
+  return raw
+    .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => {
+      const word = iconWord(key)
+      return word ? ` ${word}` : ''
+    })
+    .replace(/\{[^}]*\}/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;:%])/g, '$1')
+    .trim()
+}
+
 function describe(traitId: string): string | null {
   const raw = dictOf(text[traitId]).description
   if (typeof raw !== 'string') return null
+  const values = extractedValues(dictOf(dictOf(generated.data)[traitId]))
   return (
     raw
       // The published glossary, so the tool says the game's own words.
       .replace(/\{\$Keywords\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => glossary(key) ?? key)
-      // Icon glyphs stand in for nouns. Dropping them leaves sentences like
-      // "you lose before you lose", so they become the word they depict.
-      .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => iconWord(key))
-      // A value the text names by path into the trait tables. Exact.
-      .replace(/\{\$TraitData\.([A-Za-z0-9_.]+)\}/g, (match, path: string) => traitDataAt(path) ?? match)
       /**
-       * A number that depends on rarity, and the one thing here still unread.
+       * Icon glyphs stand in for nouns. Dropping them leaves sentences like
+       * "you lose before you lose", so they become the word they depict.
        *
-       * `{$TooltipData.ExtractData.X}` names an entry in the trait's own
-       * `ExtractValues`, which names a `Key`, which is reported by one of the
-       * trait's function args. Only **34 of 384** complete that chain in the
-       * data as extracted: 236 are `External` and point at another table
-       * entirely, and there are 37 distinct `Format` values to apply once the
-       * number is found. Guessing any of it would put wrong numbers on a card,
-       * which is worse than an admitted gap. So the shape of the sentence is
-       * kept and the value is marked as a value.
+       * With a leading space, because a glyph sits tight against the number
+       * before it and a word cannot: "+{value}{!Icons.Mana}" is "+30 Magick",
+       * not "+30Magick". The whitespace collapse at the end tidies up the
+       * doubles this creates everywhere else.
        */
+      .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => {
+        const word = iconWord(key)
+        return word ? ` ${word}` : ''
+      })
+      // A value the text names by path into the trait tables. Exact.
+      // An unresolved path is a value we could not read. Leaving it to the
+      // catch-all deleted it, which is how "Your foes deal +% damage" got out.
+      .replace(/\{\$TraitData\.([^}]+)\}/g, (_match, path: string) => traitDataAt(path) ?? '#')
+      /**
+       * The trait's own numbers. `scripts/values.ts` is `ExtractValues` and
+       * `FormatExtractedValue` followed to the letter, for the part of them
+       * that is static.
+       *
+       * **These are base values**, before Luck and the other multipliers a run
+       * carries, every one of which is 1 on a fresh hero. Anything needing a
+       * table this project does not extract, or the state of a run in
+       * progress, stays a `#` rather than becoming a guess.
+       */
+      .replace(/\{\$TooltipData\.ExtractData\.([A-Za-z0-9_]+)\}/g, (_match, name: string) => values[name] ?? '#')
       .replace(/\{\$TooltipData\.[^}]*\}/g, '#')
+      // A value only the run in progress has. There is no static answer, and
+      // deleting it left "Your foes deal +% damage".
+      .replace(/\{\$CurrentRun\.[^}]*\}/g, '#')
       .replace(/\{[^}]*\}/g, '')
       .replace(/\s+/g, ' ')
       .replace(/\s+([.,;:%])/g, '$1')
@@ -320,7 +360,7 @@ const records = [...traits.values()]
   .filter((trait) => trait.name !== null)
   .map((trait) => ({
     id: trait.id,
-    name: trait.name,
+    name: trait.name ? tidy(trait.name) || trait.name : trait.name,
     kind: trait.kind,
     ...(trait.slot ? { slot: trait.slot } : {}),
     ...(trait.altSlot ? { altSlot: trait.altSlot } : {}),
