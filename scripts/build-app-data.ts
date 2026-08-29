@@ -110,6 +110,18 @@ const weaponName = (textId: string): string => {
  * the game's sentence about its own boon, so a player who has never seen
  * Ecstatic Obsession can find out what it does without leaving the tool.
  */
+/**
+ * What a glyph is, where the glossary would get it wrong.
+ *
+ * `HelpText` names most icons and naming them from there is right, but its
+ * `DisplayName` is a **tooltip title** rather than an inline noun, and for a
+ * few that is not the same thing. `Omega` is `"{!Icons.Omega} Moves"`, so
+ * reading it off the glossary turns "your {omega}{Cast}" into "your Moves
+ * Cast" where the game says **\u03a9 Cast**. `CLAUDE.md`'s vocabulary table has
+ * that one by name.
+ *
+ * So this table wins, and the glossary fills in behind it.
+ */
 const ICON_WORDS: Record<string, string> = {
   Mana: 'Magick',
   ManaUp: 'Magick',
@@ -120,7 +132,134 @@ const ICON_WORDS: Record<string, string> = {
   Currency: 'gold',
   ArmorTotal: 'armour',
   ArmorTotal_NoTooltip: 'armour',
+  // `Total` is not a decoration that can be stripped: ArmorTotal is not
+  // Armor. These two are named here rather than guessed at.
+  HealthUpTotal: 'health',
+  HealthDown: 'health',
+  // Marks rather than nouns: an arrow between two numbers, a slash between
+  // two costs. There is no word to look up because there is no word.
   RightArrow: 'to',
+  Slash: '/',
+  // \u03a9 Moves, per CLAUDE.md. The glossary calls this one "Moves", which
+  // reads as a different mechanic entirely once it is inline.
+  Omega: '\u03a9',
+}
+
+/**
+ * A name out of the published glossary, following the id's own decorations.
+ *
+ * `HelpText` keys the real entry on the plain id and the game refers to it
+ * with a suffix when it wants the same thing without a tooltip, or an
+ * alternate phrasing: `GodBoonPluralNoTooltip` is `GodBoonPlural`, `HoldAlt`
+ * is `Hold`. Without following that, eleven descriptions rendered the raw
+ * identifier at the reader, which is worse than rendering nothing.
+ */
+function glossary(key: string): string | null {
+  const tried = [key]
+  for (const suffix of ['NoTooltip', '_NoTooltip', 'Alt', 'EX']) {
+    let candidate = key
+    while (candidate.endsWith(suffix) && candidate.length > suffix.length) {
+      candidate = candidate.slice(0, -suffix.length)
+      tried.push(candidate)
+    }
+  }
+  // A doubly decorated id, GodBoonPluralNoTooltip -> GodBoonPlural -> GodBoon.
+  for (const candidate of [...tried]) {
+    for (const suffix of ['NoTooltip', 'Alt', 'Plural']) {
+      if (candidate.endsWith(suffix) && candidate.length > suffix.length) {
+        tried.push(candidate.slice(0, -suffix.length))
+      }
+    }
+  }
+
+  for (const candidate of tried) {
+    const name = dictOf(help[candidate]).name
+    if (typeof name !== 'string' || !name.trim()) continue
+    // Not trimmed. A glossary name is the glyph plus the word, so stripping
+    // the glyph leaves a leading space that is the space between them:
+    // "{!Icons.PomLevel} Lv." is " Lv." and "+#" + "Lv." reads "+#Lv.".
+    // describe() collapses runs of whitespace at the end, so a stray one
+    // costs nothing and a missing one is visible.
+    const cleaned = name.replace(/\{[^}]*\}/g, '')
+    if (cleaned.trim()) return cleaned
+  }
+  return null
+}
+
+/**
+ * The word an icon stands for.
+ *
+ * `{!Icons.X}` renders as a glyph in game and a glyph is a noun: "you receive
+ * [gold], [health], and [bones] now". Dropping it leaves "you receive, health,
+ * and now", which is what this app shipped until the sentences were read
+ * rather than the code.
+ *
+ * The table above first, then `HelpText` keyed by the icon's own id, which is
+ * the same table `{$Keywords.X}` already reads. `MetaCurrencyIcon` is
+ * `"{!Icons.MetaCurrency} Bones"`: the glyph plus the word, so stripping the
+ * glyph leaves the word. Nothing here is invented.
+ *
+ * 38 of the 74 keys used in trait text resolve straight off the glossary.
+ * `_NoTooltip` and `Alt` are decorations on an id rather than different
+ * things, so those are stripped and tried again. **`Icon` and `Total` are
+ * not stripped**: `ArmorTotal` is not `Armor` and the first attempt at this
+ * turned "+1 armour" into "+1".
+ */
+function iconWord(key: string): string {
+  const known = ICON_WORDS[key]
+  if (known !== undefined) return known
+
+  const candidates = [key]
+
+  /**
+   * The five elements are named on the boon, not on the curse.
+   *
+   * `HelpText` has no `CurseAir`, but `AirBoon` is `"{!Icons.CurseAir} Air"`:
+   * the same glyph, and the word. It holds for all five, checked. Without it
+   * Air Quality reads "While you have at least 5, you can never deal less
+   * damage" and the reader has to guess five of what.
+   */
+  const element = /^Curse([A-Z][a-z]+)$/.exec(key)
+  if (element) candidates.push(`${element[1]}Boon`)
+
+  for (const candidate of [key]) {
+    for (const suffix of ['_NoTooltip', 'NoTooltip', 'Alt']) {
+      if (candidate.endsWith(suffix) && candidate.length > suffix.length) {
+        const stripped = candidate.slice(0, -suffix.length)
+        candidates.push(stripped)
+        if (ICON_WORDS[stripped] !== undefined) return ICON_WORDS[stripped]
+      }
+    }
+  }
+
+  for (const candidate of candidates) {
+    const word = glossary(candidate)
+    if (word) return word
+  }
+  return ''
+}
+
+/**
+ * A value the text reaches for by path, out of the trait tables.
+ *
+ * `{$TraitData.ElementalDamageFloorBoon.ActivationRequirements.1.Value}` is a
+ * literal walk into `traits-resolved.json`, one-based where it indexes a list.
+ * **37 of the 38 in the trait text resolve**, and the ones that do not used to
+ * be deleted by the catch-all, which is how Air Quality came to read "While
+ * you have at least, you can never deal less damage than the limit."
+ */
+function traitDataAt(path: string): string | null {
+  // generated.data, not the `resolved` alias further down: describe() runs
+  // while the records are being built, which is before that line executes.
+  let node: unknown = generated.data
+  for (const part of path.split('.')) {
+    if (isDict(node) && part in node) node = node[part]
+    else if (Array.isArray(node) && /^\d+$/.test(part)) node = node[Number(part) - 1]
+    else return null
+  }
+  if (typeof node === 'number') return String(Math.round(node * 100) / 100)
+  if (typeof node === 'string') return node
+  return null
 }
 
 function describe(traitId: string): string | null {
@@ -129,16 +268,24 @@ function describe(traitId: string): string | null {
   return (
     raw
       // The published glossary, so the tool says the game's own words.
-      .replace(/\{\$Keywords\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => {
-        const entry = dictOf(help[key]).name
-        return typeof entry === 'string' ? entry : key
-      })
+      .replace(/\{\$Keywords\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => glossary(key) ?? key)
       // Icon glyphs stand in for nouns. Dropping them leaves sentences like
       // "you lose before you lose", so they become the word they depict.
-      .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => ICON_WORDS[key] ?? '')
-      // A number that depends on rarity. Computing it needs the game's
-      // ProcessSimpleExtractValues pass, which the extractor does not run, so
-      // the shape of the sentence is kept and the value is marked as a value.
+      .replace(/\{!Icons\.([A-Za-z0-9_]+)\}/g, (_match, key: string) => iconWord(key))
+      // A value the text names by path into the trait tables. Exact.
+      .replace(/\{\$TraitData\.([A-Za-z0-9_.]+)\}/g, (match, path: string) => traitDataAt(path) ?? match)
+      /**
+       * A number that depends on rarity, and the one thing here still unread.
+       *
+       * `{$TooltipData.ExtractData.X}` names an entry in the trait's own
+       * `ExtractValues`, which names a `Key`, which is reported by one of the
+       * trait's function args. Only **34 of 384** complete that chain in the
+       * data as extracted: 236 are `External` and point at another table
+       * entirely, and there are 37 distinct `Format` values to apply once the
+       * number is found. Guessing any of it would put wrong numbers on a card,
+       * which is worse than an admitted gap. So the shape of the sentence is
+       * kept and the value is marked as a value.
+       */
       .replace(/\{\$TooltipData\.[^}]*\}/g, '#')
       .replace(/\{[^}]*\}/g, '')
       .replace(/\s+/g, ' ')
