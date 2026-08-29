@@ -144,6 +144,14 @@ const round = (value: number, precision: number): number => {
 }
 
 /**
+ * `TraitRarityData.RarityUpgradeOrder`, one-based, which is what
+ * `GetRarityKey(index)` indexes. The game returns `"{$Keywords." .. key .. "}"`
+ * and the glossary turns that back into the same word, so the key is the
+ * answer.
+ */
+const RARITY_ORDER = ['Common', 'Rare', 'Epic', 'Heroic']
+
+/**
  * Every `ExtractData` value a trait can state without a run in progress.
  *
  * Keyed by `ExtractAs`, which is the name the description uses.
@@ -162,11 +170,23 @@ export function extractedValues(trait: Raw): Record<string, string> {
     if (typeof name !== 'string') continue
 
     // External values live in the projectile, weapon and effect tables, which
-    // this project does not extract. 21 of the 384.
+    // this project does not extract. 21 of the placeholders it is asked for.
     if (entry.External) continue
     if (RUN_DEPENDENT.some((field) => field in entry)) continue
 
     const format = typeof entry.Format === 'string' ? entry.Format : null
+
+    // `Rarity` names a rung on the ladder rather than a number, and the ladder
+    // is a constant. `FormatExtractedValue` returns a Keywords placeholder
+    // that resolves to the same word, so the word is the answer.
+    if (format === 'Rarity') {
+      const key = typeof entry.Key === 'string' ? entry.Key : 'ChangeValue'
+      const index = numberOf({ ...trait, ...reported }[key])
+      const rarity = index === null ? null : RARITY_ORDER[index - 1]
+      if (rarity && typeof name === 'string') out[name] = rarity
+      continue
+    }
+
     if (format && !(format in STATIC_FORMATS)) continue
 
     // `FormatExtractedValue` defaults a missing Key to ChangeValue.

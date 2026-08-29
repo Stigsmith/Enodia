@@ -98,7 +98,17 @@ describe('what it refuses', () => {
   it('refuses a format that needs the state of a run', () => {
     expect(refuses({ Format: 'SlottedBoon' })).toEqual({})
     expect(refuses({ Format: 'ResourceAmount' })).toEqual({})
-    expect(refuses({ Format: 'Rarity' })).toEqual({})
+    expect(refuses({ Format: 'FinalBoss' })).toEqual({})
+  })
+
+  it('reads Rarity as a rung on the ladder, one-based', () => {
+    // GetRarityKey indexes TraitRarityData.RarityUpgradeOrder, which is
+    // Common, Rare, Epic, Heroic.
+    const at = (n: number) =>
+      extractedValues({ V: n, ExtractValues: [{ ExtractAs: 'R', Key: 'V', Format: 'Rarity' }] }).R
+    expect(at(1)).toBe('Common')
+    expect(at(3)).toBe('Epic')
+    expect(at(9)).toBeUndefined()
   })
 
   it('refuses an External value, which lives in another table', () => {
