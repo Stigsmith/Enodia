@@ -140,7 +140,17 @@ export type Common = {
   says: string[]
 }
 
+/**
+ * What every list has in common.
+ *
+ * **Empty below two lists**, and that is not a detail. With one list there is
+ * nothing to have anything in common *with*, and returning that list instead
+ * meant a single-card offer had its only sentence lifted off it as "shared" and
+ * rendered as silence. `commonTo` guarded for it; `differentiate` recomputed
+ * and did not.
+ */
 function intersect<T>(lists: readonly (readonly T[])[]): T[] {
+  if (lists.length < 2) return []
   const [first, ...rest] = lists
   if (!first) return []
   let shared = new Set(first)
@@ -153,10 +163,8 @@ function intersect<T>(lists: readonly (readonly T[])[]): T[] {
 }
 
 export function commonTo(judged: readonly Judged[]): Common {
-  // Two cards is the fewest that can share anything. With one, everything it
-  // says is about it.
-  if (judged.length < 2) return { closes: [], says: [] }
-
+  // Two cards is the fewest that can share anything, which `intersect` now
+  // enforces for every caller rather than only this one.
   const shared = intersect(judged.map((entry) => entry.rated.says))
 
   // A rule lifted above the cards says it in the plural if it knows how.
