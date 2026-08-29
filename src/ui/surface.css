@@ -3247,3 +3247,45 @@ body::before {
   background: none;
   padding: 0.1rem 0 0.1rem 0.55rem;
 }
+
+/* Correcting a mistake, on the station where it was made.
+ *
+ * DESIGN.md 8 asks for an entry point for it, and this is where a player
+ * notices: they read back what got logged and one line is wrong. So the way
+ * to undo it sits under that line rather than on a settings screen.
+ *
+ * Quiet until wanted. It appears on hover or focus and is always reachable by
+ * keyboard, because a control that only exists on hover does not exist on a
+ * phone or to a screen reader. */
+.station-forget {
+  margin: 1rem auto 0;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: none;
+  font-family: var(--body);
+  font-size: 0.72rem;
+  color: transparent;
+  cursor: pointer;
+  transition: color var(--t-response) var(--e-response), border-color var(--t-response) var(--e-response);
+}
+
+.station:hover .station-forget,
+.station:focus-within .station-forget {
+  color: var(--bone-faint);
+}
+
+.station-forget:hover,
+.station-forget:focus-visible {
+  border-color: var(--rim-magenta);
+  color: var(--rim-magenta);
+  outline: none;
+}
+
+@media (hover: none) {
+  /* No hover to reveal it, so it is always there and always quiet. */
+  .station-forget {
+    color: var(--bone-faint);
+    opacity: 0.6;
+  }
+}

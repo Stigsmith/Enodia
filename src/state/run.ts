@@ -155,6 +155,59 @@ function migrate(stored: unknown): ActiveRun | null {
   }
 }
 
+/**
+ * Rebuild a run from its entries.
+ *
+ * **A mis-tap should cost one tap to fix, not a run.** `DESIGN.md` 8 asks for
+ * "the entry point for correcting a mistake" and there was not one: log the
+ * wrong boon at Exit 3 and every verdict after it is wrong, with nothing to do
+ * about it but start again.
+ *
+ * Removing an entry cannot just splice the list. What is held, which gods are
+ * spent, how many Exits are left and **what each pick closed** are all
+ * consequences of the whole history, and the deaths especially: a target that
+ * died at Exit 5 because of a pick at Exit 3 has to come back to life when
+ * that pick goes. So the run is replayed from empty and every one of them is
+ * recomputed.
+ *
+ * That costs one reachability pass per entry, a dozen for a full run, and it
+ * only runs when somebody corrects something. It also makes the stored `died`
+ * lists derived rather than authoritative, which is the right way round.
+ */
+export function replay(base: RunContext, entries: readonly RunEntry[], exits: number): ActiveRun {
+  let run: RunContext = { ...base, held: [], godsTaken: [], godsSeen: [], exitsLeft: exits }
+  const rebuilt: RunEntry[] = []
+  let taken = 0
+
+  for (const entry of entries) {
+    const before = run
+    const held = entry.taken ? { id: entry.taken, rarity: entry.rarity ?? 'Common' } : undefined
+    const costsAnExit = entry.kind === 'exit'
+    if (costsAnExit) taken += 1
+
+    run = {
+      ...before,
+      exitsLeft: Math.max(0, exits - taken),
+      godsSeen:
+        entry.god && !before.godsSeen.includes(entry.god) ? [...before.godsSeen, entry.god] : before.godsSeen,
+      godsTaken:
+        held && entry.god && !before.godsTaken.includes(entry.god)
+          ? [...before.godsTaken, entry.god]
+          : before.godsTaken,
+      held: held ? [...before.held, held] : before.held,
+    }
+
+    const wasDead = deadTargets(before)
+    const died = reachable(run, traits)
+      .filter((verdict) => verdict.state === 'DEAD' && !wasDead.has(verdict.target))
+      .map((verdict) => verdict.target)
+
+    rebuilt.push({ ...entry, exit: taken, died })
+  }
+
+  return { run, entries: rebuilt, pinned: null, lastPickAt: null }
+}
+
 export function loadRun(): ActiveRun | null {
   try {
     const raw = window.localStorage.getItem(KEY)
@@ -206,6 +259,16 @@ export type RunStore = {
   /** what the player says they are chasing. Null clears it */
   pinned: TraitId | null
   pin: (target: TraitId | null) => void
+  /**
+   * Take an entry back out, and rebuild everything after it.
+   *
+   * The whole history is replayed, so what is held, which gods are spent and
+   * what each remaining pick closed all come out right rather than merely
+   * consistent.
+   */
+  forget: (exit: number, kind: RunEntry['kind']) => void
+  /** the last thing logged, for the one-tap case */
+  undo: () => void
   /** ISO of the last pick, which is the briefing's clock */
   lastPickAt: string | null
 }
@@ -230,6 +293,51 @@ export function useRun(): RunStore {
   }, [])
 
   const end = useCallback(() => setActive(null), [])
+
+  /**
+   * Rebuild after a correction.
+   *
+   * **The trail is cleared rather than repaired.** Every snapshot in it was
+   * taken against a history that no longer happened, so diffing the corrected
+   * run against them would report moves nobody made. The next briefing shows
+   * what is held and what is pinned with no diff, which is the truth: there is
+   * nothing to compare against any more.
+   *
+   * The pin survives, because what the player is chasing did not change.
+   */
+  const rebuild = useCallback((keep: (entries: RunEntry[]) => RunEntry[]) => {
+    setActive((current) => {
+      if (!current) return current
+      const entries = keep(current.entries)
+      if (entries.length === current.entries.length) return current
+
+      const exits = current.run.exitsLeft + current.entries.filter((entry) => entry.kind === 'exit').length
+      clearTrail()
+
+      return {
+        ...replay(current.run, entries, exits),
+        pinned: current.pinned,
+        lastPickAt: current.lastPickAt,
+      }
+    })
+  }, [])
+
+  const forget = useCallback(
+    (exit: number, kind: RunEntry['kind']) =>
+      rebuild((entries) => {
+        // Exit numbers repeat across kinds: an Encounter carries the number of
+        // the Exit it happened at. Match on both, and drop only the first.
+        let dropped = false
+        return entries.filter((entry) => {
+          if (dropped || entry.exit !== exit || entry.kind !== kind) return true
+          dropped = true
+          return false
+        })
+      }),
+    [rebuild],
+  )
+
+  const undo = useCallback(() => rebuild((entries) => entries.slice(0, -1)), [rebuild])
 
   /**
    * One Exit passes.
@@ -303,5 +411,7 @@ export function useRun(): RunStore {
     take,
     skip,
     pin,
+    forget,
+    undo,
   }
 }

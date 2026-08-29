@@ -333,6 +333,22 @@ or the state of a run: `MultiplyByBase` wants a projectile's damage, `Rarity` wa
 key, `SlottedBoon` wants what is in a slot right now. **Extracting `ProjectileData` and
 `WeaponData` would close most of the remainder**, and is the obvious next move on this.
 
+**A mis-tap no longer costs a run**
+
+`DESIGN.md` 8 asks for "the entry point for correcting a mistake" and there was not one. Log
+the wrong boon at Exit 3 and every verdict after it is wrong, with nothing to do about it
+but start over. Every logged station carries "This did not happen" now.
+
+Removing an entry cannot splice the list. What is held, which gods are spent, how many
+Exits remain and **what each pick closed** are consequences of the whole history, so
+`replay` rebuilds the run from empty and recomputes all of it. Verified in the browser:
+taking back the second of four Olympians moved the tally from **11 open, 36 closed** to
+**47 open**. Every one of those 36 came back, which a splice would never have managed.
+
+The verdict trail is **cleared** rather than repaired, because every snapshot in it was
+taken against a history that no longer happened. The next briefing shows what is held and
+what is pinned with no diff, which is the truth.
+
 **Engine**
 
 - ~~A filled slot is not a proof of impossible~~. Handled: `obtainability` returns `swap`
