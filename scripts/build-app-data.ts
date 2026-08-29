@@ -38,6 +38,19 @@ const read = (name: string): { _provenance?: Raw; data: Raw } =>
   JSON.parse(readFileSync(join(ROOT, `data/generated/${name}.json`), 'utf8'))
 
 const generated = read('traits-resolved')
+
+/**
+ * The tables an `External` value in a description can name.
+ *
+ * Read once. `effects.json` and `weapons.json` were added to the extractor for
+ * this; `hero.json` was already there.
+ */
+const externalTables = {
+  effects: dictOf(read('effects').data),
+  weapons: dictOf(read('weapons').data),
+  hero: dictOf(read('hero').data),
+  traits: dictOf(read('traits-resolved').data),
+}
 const loot = read('loot').data
 const text = read('text-traits').data
 const help = read('text-help').data
@@ -290,7 +303,7 @@ function tidy(raw: string): string {
 function describe(traitId: string): string | null {
   const raw = dictOf(text[traitId]).description
   if (typeof raw !== 'string') return null
-  const values = extractedValues(dictOf(dictOf(generated.data)[traitId]))
+  const values = extractedValues(dictOf(dictOf(generated.data)[traitId]), externalTables)
   return (
     raw
       // The published glossary, so the tool says the game's own words.

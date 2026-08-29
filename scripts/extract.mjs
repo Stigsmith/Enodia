@@ -216,6 +216,22 @@ function loadOrder() {
     'ColorData.lua',
     'EffectData.lua',
     'EnemySets.lua',
+    /**
+     * `WeaponData`, because a boon's own description reads numbers out of it.
+     *
+     * `{$TooltipData.ExtractData.X}` with an `External` entry names a table
+     * and a property on it. `EffectData` was already loaded and simply never
+     * emitted; this adds the other one that answers.
+     *
+     * **`ProjectileData` was tried and does not answer.** Its three hero files
+     * load cleanly and give 134 entries, and **not one of them declares
+     * `Damage` or `Fuse`**, which is what the 50 `ProjectileBase` entries ask
+     * for. `ProjectileData_Gods.lua` only carries overrides, mostly colours;
+     * `GetBaseDataValue({ Type = "Projectile" })` is an engine call reading
+     * the binary data beside the Lua. So those numbers are not in Scripts at
+     * all and no amount of loading will find them.
+     */
+    'WeaponData.lua',
     'LootData.lua',
     ...pick(/^LootData_.*\.lua$/),
     '@buildLootData',
@@ -350,6 +366,13 @@ const tables = {
   // What can sit behind an Exit, per region. Not just gods: hammers, Selene,
   // Hermes, health and Magick drops, and the Encounter gods all live here.
   'reward-stores': 'RewardStoreData',
+  // Already loaded for real rather than stubbed, because the trait data does
+  // arithmetic on it. It was never emitted, and a trait's own description asks
+  // it for numbers: `{$TooltipData.ExtractData.X}` with an `External` entry of
+  // BaseType EffectData or EffectLuaData reads a duration or a stack count out
+  // of here. See scripts/values.ts.
+  effects: 'EffectData',
+  weapons: 'WeaponData',
 }
 
 mkdirSync(OUT, { recursive: true })

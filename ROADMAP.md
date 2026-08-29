@@ -14,7 +14,7 @@ Last updated 29 August 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete** |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 220, across 11 files |
+| **Tests** | 230, across 11 files |
 | **Validator** | 8 checks, 0 failures, 3 warnings |
 | **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
@@ -45,7 +45,7 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 
 | Step | What | State |
 |---:|---|---|
-| 1 | Extractor, Lua to `data/generated` | **Done.** 62 files, zero failures, deterministic: a re-run against the same build changes nothing but the date |
+| 1 | Extractor, Lua to `data/generated` | **Done.** 63 files, zero failures, deterministic: a re-run against the same build changes nothing but the date |
 | 2 | Validator wired into prebuild | **Done.** 8 checks. `npm run build` stops on a broken reference, and it has caught two of mine |
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
@@ -68,7 +68,7 @@ already true.
 | | |
 |---|---|
 | `npm run prune` | Ships what the app references. **55 MB and 940 files down to 10 MB and 518** |
-| Boon text | 252 of 567 descriptions were wrong. `#` placeholders **422 down to 201** |
+| Boon text | 259 of 567 descriptions were wrong. `#` placeholders **422 down to 193** |
 | Corrections | "This did not happen" on every station, replaying the run |
 | Keyboard | An `h1`, a skip link, named landmarks |
 
@@ -83,21 +83,18 @@ Phase 1 is done and nothing below blocks anything else. In the order I would tak
 people using it. The build is 10 MB, it runs from a plain static server, and
 `.claude/launch.json` has a `dist` entry to check it first.
 
-**2. Extract `ProjectileData` and `WeaponData`.** The clearest measured gap: 21 of the
-remaining `#` are `External` values living in those tables and another 10 want
-`MultiplyByBase`, which needs the same. `EffectData` is already loaded by the extractor and
-simply never emitted, so that part is one line in the `tables` map. The rest means adding
-files to a 62-file load order that currently reports zero failures, so it wants care and a
-check that the count and the checksums hold.
+**2. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
+of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
+does not have the numbers at all. See above.
 
-**3. The `feeds` tag.** The largest hand-authoring job in the project and the owner's, and
-three separate features are waiting on it: the briefing's centre of mass, any rule about
-what a boon actually does, and archetypes. Nothing else unlocks as much.
+The `feeds` tag is the largest hand-authoring job in the project and the owner's, and three
+separate features wait on it: the briefing's centre of mass, any rule about what a boon
+actually does, and archetypes. Nothing else unlocks as much.
 
-**4. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
+**3. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
 walking `InheritFrom` itself.
 
-**5. Phase 2.** `REQUIREMENTS.md` 7.
+**4. Phase 2.** `REQUIREMENTS.md` 7.
 
 ---
 
@@ -373,11 +370,23 @@ multiply by something the run carries, `LuckModifiedPercent` by the hero's Luck 
 `FlatHeal` by the healing multiplier, and every one of those is 1 on a fresh hero. The game
 shows a larger number once a run has boons in it.
 
-**What is still `#`, and why.** 21 are `External` and live in the projectile, weapon and
-effect tables this project does not extract. The rest want a format that needs those tables
-or the state of a run: `MultiplyByBase` wants a projectile's damage, `Rarity` wants a rarity
-key, `SlottedBoon` wants what is in a slot right now. **Extracting `ProjectileData` and
-`WeaponData` would close most of the remainder**, and is the obvious next move on this.
+**External values are read too, and one of them turned out not to exist.** An `External`
+entry names another table. `EffectData` was already loaded by the extractor and simply never
+emitted; `WeaponData` was added; `hero.json` was already there. 168 of the 236 External
+entries resolve now, and the seven descriptions it fixed are **every one of Selene's Hexes**,
+which all read "for # Sec." before.
+
+**`ProjectileBase` is not answerable from the Lua, and that is settled.** It is 50 of the
+236 and asks for `Damage`, `Fuse` and `TotalFuse`. `ProjectileData` and its hero files were
+loaded to find them, gave 134 entries, and **not one declares any of the three**:
+`ProjectileData_Gods.lua` carries overrides and mostly colours, and
+`GetBaseDataValue({ Type = "Projectile" })` is an engine call reading the binary data beside
+the Scripts folder. The files were dropped again rather than left loading for nothing, and
+the reason is in `scripts/values.ts` so nobody goes looking twice.
+
+**What is left is `#` because it depends on a run**: `SlottedBoon` wants what is in a slot
+right now, `ResourceAmount` a count, `MultiplyByBase` a projectile's damage. **422 down to
+193.**
 
 **A mis-tap no longer costs a run**
 

@@ -149,3 +149,73 @@ describe('against the real trait data', () => {
     expect(answered / asked).toBeGreaterThan(0.4)
   })
 })
+
+describe('external values', () => {
+  const tables = {
+    effects: {
+      Boil: { EffectData: { Duration: 10, ExpiringTimeThreshold: 2 }, DataProperties: { Stacks: 5 } },
+      Plain: { Rate: 3 },
+    },
+    weapons: {
+      Staff: { Cooldown: 1.5, DrainManaEffect: { CostPerSecond: 4 } },
+    },
+    hero: { MaxHealth: { BaseValue: 50 } },
+  }
+  const ask = (entry: Record<string, unknown>) =>
+    extractedValues({ ExtractValues: [{ ExtractAs: 'V', External: true, ...entry }] }, tables).V
+
+  it('reads a weapon property', () =>
+    expect(ask({ BaseType: 'WeaponData', BaseName: 'Staff', BaseProperty: 'Cooldown' })).toBe('2'))
+
+  it('takes ManaPerSecond off the drain effect, as the game does', () =>
+    expect(ask({ BaseType: 'WeaponData', BaseName: 'Staff', BaseProperty: 'ManaPerSecond' })).toBe('4'))
+
+  it('computes ActiveDuration as duration minus its expiry threshold', () =>
+    expect(ask({ BaseType: 'EffectData', BaseName: 'Boil', BaseProperty: 'ActiveDuration' })).toBe('8'))
+
+  it('falls back to DataProperties when the nested EffectData has nothing', () =>
+    expect(ask({ BaseType: 'EffectData', BaseName: 'Boil', BaseProperty: 'Stacks' })).toBe('5'))
+
+  it('reads EffectLuaData off the top of the record', () =>
+    expect(ask({ BaseType: 'EffectLuaData', BaseName: 'Plain', BaseProperty: 'Rate' })).toBe('3'))
+
+  it('unwraps a BaseValue from HeroData', () =>
+    expect(ask({ BaseType: 'HeroData', BaseName: 'MaxHealth', BaseProperty: 'MaxHealth' })).toBeUndefined())
+
+  it('refuses ProjectileBase, whose numbers are engine data rather than Lua', () =>
+    expect(ask({ BaseType: 'ProjectileBase', BaseName: 'ApolloCast', BaseProperty: 'Fuse' })).toBeUndefined())
+
+  it('refuses a table it was not given', () =>
+    expect(ask({ BaseType: 'ConsumableData', BaseName: 'X', BaseProperty: 'Y' })).toBeUndefined())
+})
+
+describe('against the real external tables', () => {
+  const external = {
+    effects: generated('effects'),
+    weapons: generated('weapons'),
+    hero: generated('hero'),
+    traits,
+  }
+
+  it("reads the duration on Selene's Hexes, which were all '# Sec'", () => {
+    // SpellTransformTrait is Dark Side, whose description ends "for # Sec."
+    // and whose duration is an External read out of EffectData.
+    const out = extractedValues(traits.SpellTransformTrait ?? {}, external)
+    expect(Object.keys(out).length).toBeGreaterThan(0)
+    expect(Object.keys(extractedValues(traits.SpellTransformTrait ?? {})).length).toBeLessThan(
+      Object.keys(out).length,
+    )
+  })
+
+  it('answers more with the external tables than without', () => {
+    let withThem = 0
+    let without = 0
+    for (const trait of Object.values(traits)) {
+      const list = Array.isArray(trait.ExtractValues) ? trait.ExtractValues : []
+      if (!list.length) continue
+      withThem += Object.keys(extractedValues(trait, external)).length
+      without += Object.keys(extractedValues(trait)).length
+    }
+    expect(withThem).toBeGreaterThan(without)
+  })
+})

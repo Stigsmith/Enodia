@@ -34,14 +34,42 @@
  * fresh run and the game will show more once the run has boons in it. That is
  * a real difference and the surface should not pretend otherwise.
  *
- * Anything needing a table this project does not extract, or the state of a
- * run in progress, returns null and stays a `#`. `MultiplyByBase` wants a
- * projectile's damage, `Rarity` wants a rarity key, `SlottedBoon` wants what
- * is in a slot right now. Guessing any of them puts a wrong number on a card,
- * which is worse than an admitted gap.
+ * Anything needing the state of a run in progress returns null and stays a
+ * `#`: `SlottedBoon` wants what is in a slot right now, `ResourceAmount` wants
+ * a count. Guessing any of them puts a wrong number on a card, which is worse
+ * than an admitted gap.
+ *
+ * ## External values, and the one that is not there
+ *
+ * An `External` entry names another table and a property on it. Three of them
+ * are reachable and are read here: `EffectData` and `EffectLuaData` out of
+ * `effects.json`, `WeaponData` out of `weapons.json`, `HeroData` out of
+ * `hero.json`.
+ *
+ * **`ProjectileBase` is not, and never will be from this source.** It accounts
+ * for 50 of the 236 External entries and asks for `Damage`, `Fuse` and
+ * `TotalFuse`. `ProjectileData` and its hero files were loaded to find them:
+ * 134 entries, and **not one declares any of the three**.
+ * `ProjectileData_Gods.lua` carries overrides, mostly colours, and
+ * `GetBaseDataValue({ Type = "Projectile" })` is an engine call reading the
+ * binary data beside the Lua. The files were dropped again rather than left
+ * loading for nothing.
  */
 
 type Raw = Record<string, unknown>
+
+/**
+ * The other tables an `External` value can name.
+ *
+ * Passed in rather than imported, so this stays a pure function of its inputs
+ * and a test can hand it whatever it likes.
+ */
+export type Tables = {
+  effects?: Raw
+  weapons?: Raw
+  hero?: Raw
+  traits?: Raw
+}
 
 const isDict = (value: unknown): value is Raw =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -125,6 +153,66 @@ const STATIC_FORMATS: Record<string, (value: number) => number> = {
 }
 
 /**
+ * An `External` value, out of whichever table it names.
+ *
+ * `TraitLogic.ExtractValue` branches on `BaseType`, and these are the branches
+ * whose table is in `data/generated`. The special cases are the game's own:
+ * `ActiveDuration` is a duration minus its expiry threshold, `ManaPerSecond`
+ * comes off the weapon's drain effect, and an `EffectData` property is looked
+ * for in the nested `EffectData` first and in `DataProperties` after.
+ */
+function externalValue(entry: Raw, tables: Tables): number | null {
+  const name = typeof entry.BaseName === 'string' ? entry.BaseName : null
+  const prop = typeof entry.BaseProperty === 'string' ? entry.BaseProperty : null
+  if (!name || !prop) return null
+
+  const at = (table: Raw | undefined, key: string): unknown =>
+    table && isDict(table[key]) ? (table[key] as Raw)[prop] : undefined
+
+  switch (entry.BaseType) {
+    case 'EffectLuaData':
+      return numberOf(at(tables.effects, name))
+
+    case 'EffectData': {
+      const record = tables.effects?.[name]
+      if (!isDict(record)) return null
+      const inner = isDict(record.EffectData) ? record.EffectData : null
+      if (prop === 'ActiveDuration' && inner) {
+        const duration = numberOf(inner.Duration)
+        const expiring = numberOf(inner.ExpiringTimeThreshold)
+        return duration === null || expiring === null ? null : duration - expiring
+      }
+      if (inner && prop in inner) return numberOf(inner[prop])
+      const props = isDict(record.DataProperties) ? record.DataProperties : null
+      return props ? numberOf(props[prop]) : null
+    }
+
+    case 'Weapon':
+    case 'WeaponData': {
+      const record = tables.weapons?.[name]
+      if (!isDict(record)) return null
+      if (prop === 'ManaPerSecond' && isDict(record.DrainManaEffect)) {
+        return numberOf((record.DrainManaEffect as Raw).CostPerSecond)
+      }
+      return numberOf(record[prop])
+    }
+
+    case 'HeroData':
+      return numberOf(at(tables.hero, name))
+
+    case 'TraitData':
+      return numberOf(at(tables.traits, name))
+
+    /**
+     * ProjectileBase, and everything else, is not answerable here. See the
+     * docblock: the projectile numbers are engine data rather than Lua.
+     */
+    default:
+      return null
+  }
+}
+
+/**
  * Fields that make a value depend on the run rather than on the trait.
  *
  * `FormatExtractedValue` applies these after the format, and every one of them
@@ -156,7 +244,7 @@ const RARITY_ORDER = ['Common', 'Rare', 'Epic', 'Heroic']
  *
  * Keyed by `ExtractAs`, which is the name the description uses.
  */
-export function extractedValues(trait: Raw): Record<string, string> {
+export function extractedValues(trait: Raw, tables: Tables = {}): Record<string, string> {
   const list = Array.isArray(trait.ExtractValues) ? trait.ExtractValues : []
   if (!list.length) return {}
 
@@ -169,9 +257,6 @@ export function extractedValues(trait: Raw): Record<string, string> {
     const name = entry.ExtractAs
     if (typeof name !== 'string') continue
 
-    // External values live in the projectile, weapon and effect tables, which
-    // this project does not extract. 21 of the placeholders it is asked for.
-    if (entry.External) continue
     if (RUN_DEPENDENT.some((field) => field in entry)) continue
 
     const format = typeof entry.Format === 'string' ? entry.Format : null
@@ -189,9 +274,10 @@ export function extractedValues(trait: Raw): Record<string, string> {
 
     if (format && !(format in STATIC_FORMATS)) continue
 
-    // `FormatExtractedValue` defaults a missing Key to ChangeValue.
+    // An External value comes from another table; everything else comes from
+    // the trait, with a missing Key defaulting to ChangeValue as the game does.
     const key = typeof entry.Key === 'string' ? entry.Key : 'ChangeValue'
-    const value = numberOf(merged[key])
+    const value = entry.External ? externalValue(entry, tables) : numberOf(merged[key])
     if (value === null) continue
 
     let result = format ? (STATIC_FORMATS[format] as (v: number) => number)(value) : value
