@@ -18,7 +18,8 @@
     "data": "node scripts/build-app-data.ts",
     "sprites": "node scripts/sprites.ts",
     "chrome": "node scripts/chrome.ts",
-    "reward-frame": "node scripts/reward-frame.ts"
+    "reward-frame": "node scripts/reward-frame.ts",
+    "health": "node scripts/health.ts"
   },
   "dependencies": {
     "react": "^19.2.8",

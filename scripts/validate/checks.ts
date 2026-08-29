@@ -816,7 +816,18 @@ export function checkRoster(bundle: Bundle): Finding[] {
 //    Schema breaks fail. Orphans are reported, never silently dropped.
 // ---------------------------------------------------------------------------
 
-const CURATED_SOURCES = ['curator', 'wiki']
+/**
+ * Where a curated record comes from, and the three are not equal.
+ *
+ * `source` traces to a named symbol in the game's Lua and is a fact. `wiki` is
+ * a lead somebody verified. `curator` is a judgement and the owner's to make.
+ *
+ * `source` was added when the first rule pack landed: every rule in it is
+ * derived from the game's own tables, and calling that `curator` would have
+ * filed a fact as an opinion, which is the exact confusion CLAUDE.md's order of
+ * authority exists to prevent.
+ */
+const CURATED_SOURCES = ['source', 'curator', 'wiki']
 
 export function checkCurated(bundle: Bundle): Finding[] {
   if (!bundle.curated.length) {
@@ -883,7 +894,11 @@ export function checkCurated(bundle: Bundle): Finding[] {
           ]),
         )
       }
-      if (knownIds.size && !knownIds.has(id) && !stringsOf(record.aliases).some((a) => knownIds.has(a))) {
+      // A rule's id is its own name, not a trait's. Only records that claim to
+      // be about something generated get checked against it, or every rule in
+      // a rule pack reports as an orphan and the warning stops meaning
+      // anything.
+      if (!isRule && knownIds.size && !knownIds.has(id) && !stringsOf(record.aliases).some((a) => knownIds.has(a))) {
         orphans.push(id)
       }
     })

@@ -13,7 +13,7 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 9 of 11 complete, step 10 next. **Step 8 was the first shippable point and it is done** |
+| **Build order step** | 10 of 11 complete, step 11 next. **Step 8 was the first shippable point and it is done** |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
@@ -47,8 +47,8 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 7 | Setup screen, and the rail | **Done.** Weapon, aspect and Exits in, a real RunContext out, and the rail fills as you log |
 | 8 | **The timeline shell.** First shippable point | **Done.** Deaths recorded at the pick that caused them, verdicts in the present entry |
 | 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | **Done.** A trail per run, the diff, the pin, and the card. 16 tests |
-| 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | Next |
-| 11 | The offer block inside the present entry | |
+| 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | **Done.** 5 rules as data, the harness that measures them, 17 tests |
+| 11 | The offer block inside the present entry | Next |
 
 Later phases are scoped in `REQUIREMENTS.md` 7: **2** before the run, **3** memory,
 **4** automation and community.
@@ -207,6 +207,43 @@ their own set, so an aspect chosen at setup can settle a build before the first 
   `BoostedRandomLoot`, which are a boon from any god and therefore spend an Olympian slot,
   plus `ShopHermesUpgrade`, `SpellDrop` and `WeaponUpgradeDrop`. So picking Charon asks the
   same question the other kinds do, and his Poms and health go under "Something else"
+
+**Step 10, and what the harness caught**
+
+`npm run health` measures each rule against 300 random legal runs and reports the share of
+its eligible pool it fires on. `DESIGN.md` 5.1 flags anything at 60 percent, because a rule
+that fires on most of what it sees is a constant rather than advice.
+
+It earned its place immediately, and not in the way it was meant to. The first run reported
+`feeds-a-target-at-risk` at **73.6 percent** and two rules at **0.0**, and all three numbers
+were wrong: the sampler ran every simulated run to completion, so every context it measured
+had **zero Exits left**. AT_RISK is universal at the end of a run and `exitsLeftAtLeast` can
+never hold there. Fixed, the same rules read 3.0, 30.4 and 32.3 percent. **A measurement
+harness can be wrong in the direction of confidence**, and this one nearly got a good rule
+cut and shipped two dead ones.
+
+| Rule | Fires on | Of runs |
+|---|---:|---:|
+| `last-piece` | 32.3% | 72% |
+| `spends-the-last-god-slot` | 30.4% | 30% |
+| `shuts-a-slot-others-need` | 3.0% | 9% |
+| `feeds-a-target-at-risk` | 3.0% | 5% |
+| `free-of-the-cap` | not measurable | |
+
+**"Not measurable" is reported apart from "never fires",** because they are different
+findings and treating them alike gets good rules cut. `runsim` draws Olympian Exits only, so
+a rule about Hermes, Selene or Chaos has no pool in the harness at all.
+
+Two things the rule engine settled that the spec left open. **A binding means the same thing
+on both sides of a rule**: `$target` in `when` and in `match` is one target, tried in turn,
+and the first that satisfies both is the one that fires and the one the sentence names.
+Without that, the coupling rule degrades to "some duo is live and this feeds some duo",
+which on 47 targets is nearly everything. And **a rule fires at most once** however many
+targets a boon feeds, or the score runs away from the sentence explaining it.
+
+`source` is a third provenance beside `curator` and `wiki`, and the validator now allows it.
+Every rule shipped is derived from the game's own tables, and filing that as `curator` would
+have recorded a fact as an opinion.
 
 **Step 9, and the one design decision in it**
 
