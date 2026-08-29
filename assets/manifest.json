@@ -43,11 +43,6 @@
    "source": "wiki"
   },
   {
-   "name": "chrome",
-   "count": 59,
-   "source": "game"
-  },
-  {
    "name": "duos",
    "count": 48,
    "source": "mixed",
@@ -118,7 +113,7 @@
   },
   {
    "name": "shell",
-   "count": 37,
+   "count": 96,
    "source": "game"
   },
   {
@@ -3817,478 +3812,6 @@
    "sourcePage": "Characters-Hades II"
   },
   {
-   "id": "backdrop-mel",
-   "category": "chrome",
-   "file": "chrome/backdrop-mel.png",
-   "bytes": 318901,
-   "sha256": "030a3ab002ba091b166a441ac2380cee38e755813cd80406e7063b4a967e293b",
-   "source": "game"
-  },
-  {
-   "id": "backing-palace-of-zeus",
-   "category": "chrome",
-   "file": "chrome/backing-palace-of-zeus.png",
-   "bytes": 273954,
-   "sha256": "b5c29003a9aaa0064f85853565562d8b38e211e7e7f79b7606341e068d96ce3d",
-   "source": "game"
-  },
-  {
-   "id": "box-confirm",
-   "category": "chrome",
-   "file": "chrome/box-confirm.png",
-   "bytes": 222457,
-   "sha256": "7ee8d9cdfc16b1215b599020b232d9ce9ce00d14f3831e1f7cd50c571c0cf507",
-   "source": "game"
-  },
-  {
-   "id": "box-halfscreen",
-   "category": "chrome",
-   "file": "chrome/box-halfscreen.png",
-   "bytes": 314895,
-   "sha256": "88c90b3d4afc8034e91e833dfff2d511e78b925c99703bcd66443ad174d13dcf",
-   "source": "game"
-  },
-  {
-   "id": "box-pause",
-   "category": "chrome",
-   "file": "chrome/box-pause.png",
-   "bytes": 246356,
-   "sha256": "aff45073e3d834cb80ff99e1cefb4ed22950295524994dcc6cb29e6d6ca77efe",
-   "source": "game"
-  },
-  {
-   "id": "button-cancel-highlight",
-   "category": "chrome",
-   "file": "chrome/button-cancel-highlight.png",
-   "bytes": 15345,
-   "sha256": "d5acec995169bc832372f5205816b7aff622dacbd46339fd88ce584ae8c2856e",
-   "source": "game"
-  },
-  {
-   "id": "button-cancel",
-   "category": "chrome",
-   "file": "chrome/button-cancel.png",
-   "bytes": 11417,
-   "sha256": "de760619b9e837f9df193f3eb79d95ba9c700d8a0298f4bcd8ee9fb645e5f4ae",
-   "source": "game"
-  },
-  {
-   "id": "button-confirm-highlight",
-   "category": "chrome",
-   "file": "chrome/button-confirm-highlight.png",
-   "bytes": 15445,
-   "sha256": "20299c523b9b9a53b93d310ea470873f540862322bfc4412cdf269130dad95da",
-   "source": "game"
-  },
-  {
-   "id": "button-confirm",
-   "category": "chrome",
-   "file": "chrome/button-confirm.png",
-   "bytes": 11167,
-   "sha256": "191262086e533392c09ebaa1a7a1d6be6fe2177f4b54ec66612530b4b69de3a6",
-   "source": "game"
-  },
-  {
-   "id": "button-highlight",
-   "category": "chrome",
-   "file": "chrome/button-highlight.png",
-   "bytes": 18115,
-   "sha256": "a9d5fa3f15cd80f98fe689fa10aa439ab88cc5956b451247ff88d282f3d8f1cd",
-   "source": "game"
-  },
-  {
-   "id": "button",
-   "category": "chrome",
-   "file": "chrome/button.png",
-   "bytes": 12239,
-   "sha256": "6778aff6238818dc7c5111e9fa731ebbc6eedd9fb086d3f2ba0493d72d076b46",
-   "source": "game"
-  },
-  {
-   "id": "choicebox-highlight",
-   "category": "chrome",
-   "file": "chrome/choicebox-highlight.png",
-   "bytes": 19237,
-   "sha256": "c418403a13d16b4052562c7e94e9e5a3d4efb335d1a2f0711871fbea50b0f5de",
-   "source": "game"
-  },
-  {
-   "id": "choicebox",
-   "category": "chrome",
-   "file": "chrome/choicebox.png",
-   "bytes": 11353,
-   "sha256": "ea88fa79a39db71c5b1a0617468d60bd9476849dab61dc4d4c912f68c05b285f",
-   "source": "game"
-  },
-  {
-   "id": "circle-filigree",
-   "category": "chrome",
-   "file": "chrome/circle-filigree.png",
-   "bytes": 57904,
-   "sha256": "a72257cb911a958a467d57404b4b374899d1d684fa19e955d920ce932349239d",
-   "source": "game"
-  },
-  {
-   "id": "confirm-button-highlight",
-   "category": "chrome",
-   "file": "chrome/confirm-button-highlight.png",
-   "bytes": 15259,
-   "sha256": "9813f50fd104b7a00425965c5a0e1bc5318747f4ead26b7853ce1a6398d4c4e7",
-   "source": "game"
-  },
-  {
-   "id": "confirm-button",
-   "category": "chrome",
-   "file": "chrome/confirm-button.png",
-   "bytes": 15030,
-   "sha256": "4c5aff39408522039c469b3f248376531361d09bbe4824921b9e43b63c23b414",
-   "source": "game"
-  },
-  {
-   "id": "dialogue-olympian",
-   "category": "chrome",
-   "file": "chrome/dialogue-olympian.png",
-   "bytes": 207468,
-   "sha256": "4f1e1b452d6357cc464b59ec5b0aa964b6a965d94239c6bf2dc1a0ea51414b9b",
-   "source": "game"
-  },
-  {
-   "id": "dialogue-static",
-   "category": "chrome",
-   "file": "chrome/dialogue-static.png",
-   "bytes": 304844,
-   "sha256": "3dc81544bf6f6a4512c0278d4dcf9470eccd75394d2588ed0e4db1a7c4dbd328",
-   "source": "game"
-  },
-  {
-   "id": "divider-long",
-   "category": "chrome",
-   "file": "chrome/divider-long.png",
-   "bytes": 1278,
-   "sha256": "6bb8029d90e5203d198cbb88254a3540ab20b4209ac16b7e456a46eb20039ec3",
-   "source": "game"
-  },
-  {
-   "id": "divider",
-   "category": "chrome",
-   "file": "chrome/divider.png",
-   "bytes": 818,
-   "sha256": "b5d8e471e02c86461ffbc3c9e40d9083878811b66e9ee5b872be854ac1541541",
-   "source": "game"
-  },
-  {
-   "id": "exit-button-highlight",
-   "category": "chrome",
-   "file": "chrome/exit-button-highlight.png",
-   "bytes": 29242,
-   "sha256": "5d80a716466fd3bc94ed827b018e0f6d6301e7659bca0e89809953bf3ee054e2",
-   "source": "game"
-  },
-  {
-   "id": "exit-button",
-   "category": "chrome",
-   "file": "chrome/exit-button.png",
-   "bytes": 29853,
-   "sha256": "e25da48c4b7ff66124283772ae700c3a8b54152ecbfea60186c5d01eb0c42d75",
-   "source": "game"
-  },
-  {
-   "id": "hammer-feathers",
-   "category": "chrome",
-   "file": "chrome/hammer-feathers.png",
-   "bytes": 212449,
-   "sha256": "ce515dd31c6e75997ac9a1f9e39f61dd18eecfcca9c9932604d793cc18ad8d87",
-   "source": "game"
-  },
-  {
-   "id": "icon-backing",
-   "category": "chrome",
-   "file": "chrome/icon-backing.png",
-   "bytes": 19982,
-   "sha256": "f1971e71d86a106c7981c373e3f44ed965f5a3f155bc5b595eaa2a6926acff8b",
-   "source": "game"
-  },
-  {
-   "id": "info-button-highlight",
-   "category": "chrome",
-   "file": "chrome/info-button-highlight.png",
-   "bytes": 37610,
-   "sha256": "52d405bb2db1d3430783a3910ae028ebcf30d85951dd393f9720141e89cd6923",
-   "source": "game"
-  },
-  {
-   "id": "info-button",
-   "category": "chrome",
-   "file": "chrome/info-button.png",
-   "bytes": 35337,
-   "sha256": "a4e7ec37d8556dac406d5561545921991018641de7c059ab2b5de296401dc16a",
-   "source": "game"
-  },
-  {
-   "id": "item-consume",
-   "category": "chrome",
-   "file": "chrome/item-consume.png",
-   "bytes": 33952,
-   "sha256": "dc6f12dca5c2a9df3ad2eabf3c8446945f87cbc650213bad7a1110e3fd7c9e9c",
-   "source": "game"
-  },
-  {
-   "id": "lob-decal",
-   "category": "chrome",
-   "file": "chrome/lob-decal.png",
-   "bytes": 735750,
-   "sha256": "9c9fe6cb7352b192282a7ebb3806c7a9c8fdf36495911c43d42e28c36733516f",
-   "source": "game"
-  },
-  {
-   "id": "location-artemis",
-   "category": "chrome",
-   "file": "chrome/location-artemis.png",
-   "bytes": 308601,
-   "sha256": "130e89ebaccca4fb78a496de9a9717cf0f0c3b7ebf72df683cb2b50f30cc4681",
-   "source": "game"
-  },
-  {
-   "id": "location-athena",
-   "category": "chrome",
-   "file": "chrome/location-athena.png",
-   "bytes": 312744,
-   "sha256": "882c548ee221bd8062e702c924a36915728a07ace5280a7c672a13388a10f93f",
-   "source": "game"
-  },
-  {
-   "id": "location-gradient",
-   "category": "chrome",
-   "file": "chrome/location-gradient.png",
-   "bytes": 200506,
-   "sha256": "d8fae9df981fdf8e8cdd3971eb23e315f44fdbd311334094d38133e3f6af572c",
-   "source": "game"
-  },
-  {
-   "id": "location-minos",
-   "category": "chrome",
-   "file": "chrome/location-minos.png",
-   "bytes": 301806,
-   "sha256": "5fd6b7883dbacb9c90b942588e4fc4a6447e08721f2bae3b126fe93aaa8ec83c",
-   "source": "game"
-  },
-  {
-   "id": "location-star",
-   "category": "chrome",
-   "file": "chrome/location-star.png",
-   "bytes": 2792,
-   "sha256": "639dff6478e7bddcc8e422341076a22d7fbfab32efe26c63766028179b4a1b10",
-   "source": "game"
-  },
-  {
-   "id": "location-zagreus",
-   "category": "chrome",
-   "file": "chrome/location-zagreus.png",
-   "bytes": 271717,
-   "sha256": "a489e03b4cd3d47930063a0b99d6597bc2aabf9e36cd3ada5f82dedc2a4c50e0",
-   "source": "game"
-  },
-  {
-   "id": "medallion",
-   "category": "chrome",
-   "file": "chrome/medallion.png",
-   "bytes": 674282,
-   "sha256": "78211cd751666e5dfa329a234ee4426a1b941cec1b3a493ac934ee233f3ca449",
-   "source": "game"
-  },
-  {
-   "id": "resource-backing-harvest",
-   "category": "chrome",
-   "file": "chrome/resource-backing-harvest.png",
-   "bytes": 31236,
-   "sha256": "f746fdccc6c418c5544000126b51d93eb7a85051f889aff871dd9d912062f772",
-   "source": "game"
-  },
-  {
-   "id": "resource-backing-long",
-   "category": "chrome",
-   "file": "chrome/resource-backing-long.png",
-   "bytes": 17420,
-   "sha256": "4837cc61c2f0d7525d0f6027d2cfaece05423b28062d623b16bab4128cb05051",
-   "source": "game"
-  },
-  {
-   "id": "resource-backing",
-   "category": "chrome",
-   "file": "chrome/resource-backing.png",
-   "bytes": 14535,
-   "sha256": "48ffe94471ce67b66977de834b8f04407009999c69b67ce793bc65c2d64b5db4",
-   "source": "game"
-  },
-  {
-   "id": "reward-glow",
-   "category": "chrome",
-   "file": "chrome/reward-glow.png",
-   "bytes": 22709,
-   "sha256": "365f815c08aa67e89056b72a52948e7174ce7d8e7d72af1197e0526454b7afe4",
-   "source": "game"
-  },
-  {
-   "id": "sidebars",
-   "category": "chrome",
-   "file": "chrome/sidebars.png",
-   "bytes": 49311,
-   "sha256": "75b6f072e73caea9c716387bbe106c89fc9ae2943ad56ef22a22fea8ada28b53",
-   "source": "game"
-  },
-  {
-   "id": "sorcery-circle",
-   "category": "chrome",
-   "file": "chrome/sorcery-circle.png",
-   "bytes": 904600,
-   "sha256": "4c06148a2cc5f5f1909920e2f8dc96d7ad20acec65076066533951d3194b979d",
-   "source": "game"
-  },
-  {
-   "id": "spell-slot-highlight",
-   "category": "chrome",
-   "file": "chrome/spell-slot-highlight.png",
-   "bytes": 18451,
-   "sha256": "470fac1a3c78f68e70f8d58c16c023c2d8a9300104b8d446fa47ca41553f5ec0",
-   "source": "game"
-  },
-  {
-   "id": "spell-slot",
-   "category": "chrome",
-   "file": "chrome/spell-slot.png",
-   "bytes": 314260,
-   "sha256": "08dbcffd99c6e67496c25776f233a828a2851454acd39b6c4d1bcec1909e39b8",
-   "source": "game"
-  },
-  {
-   "id": "splash-dreamrun",
-   "category": "chrome",
-   "file": "chrome/splash-dreamrun.png",
-   "bytes": 1624269,
-   "sha256": "7f037850de3650ea102d667ee1594fce9abd740e5cf9ec05fff8bdd405587013",
-   "source": "game"
-  },
-  {
-   "id": "splash-surface",
-   "category": "chrome",
-   "file": "chrome/splash-surface.png",
-   "bytes": 1094739,
-   "sha256": "bd30c71032e5d2a0505a95eec0873bec0c5a466b00adfaec499bc4841b65dded",
-   "source": "game"
-  },
-  {
-   "id": "splash-underworld",
-   "category": "chrome",
-   "file": "chrome/splash-underworld.png",
-   "bytes": 1214696,
-   "sha256": "1ba1597f04f414eac42447c8b730e1e0e92377a6c44a0701c41676543565d99e",
-   "source": "game"
-  },
-  {
-   "id": "subtitle-backing",
-   "category": "chrome",
-   "file": "chrome/subtitle-backing.png",
-   "bytes": 6546,
-   "sha256": "deb62f39bffa41894e12bd7e75cfbc44c55bdc912dffffa966057c52ea8160de",
-   "source": "game"
-  },
-  {
-   "id": "subtitle-generic",
-   "category": "chrome",
-   "file": "chrome/subtitle-generic.png",
-   "bytes": 18534,
-   "sha256": "bf3d402d8c6a6c10ded0d44ac92a15d2e83e97ed901a8ca76cac9266cb28584f",
-   "source": "game"
-  },
-  {
-   "id": "timer-backing",
-   "category": "chrome",
-   "file": "chrome/timer-backing.png",
-   "bytes": 19442,
-   "sha256": "b6882f532587faa2c55b955ee525119dc3331ca4683b6eddc6f23c20b57b2c10",
-   "source": "game"
-  },
-  {
-   "id": "tooltip-backing",
-   "category": "chrome",
-   "file": "chrome/tooltip-backing.png",
-   "bytes": 23530,
-   "sha256": "aaeb2fd095d1eb3f8e10289f5e7dfe68541dbe16d956cb57d181a41756f6c7b0",
-   "source": "game"
-  },
-  {
-   "id": "trash-button-highlight",
-   "category": "chrome",
-   "file": "chrome/trash-button-highlight.png",
-   "bytes": 11413,
-   "sha256": "fdc547eecf4653021aa1198050bc6bbe5ff4626281a8a4860749d108fd61e51c",
-   "source": "game"
-  },
-  {
-   "id": "trash-button",
-   "category": "chrome",
-   "file": "chrome/trash-button.png",
-   "bytes": 8797,
-   "sha256": "8b62dcff7baf172b000ab2a3a979efa8b604d5cc47ffa994bc42551ffdd622c5",
-   "source": "game"
-  },
-  {
-   "id": "tray-backing",
-   "category": "chrome",
-   "file": "chrome/tray-backing.png",
-   "bytes": 163527,
-   "sha256": "dcfe7b285acd75490c52b0cc8d5ced9968a7a597297616ad1de70b65044914a6",
-   "source": "game"
-  },
-  {
-   "id": "tray-header",
-   "category": "chrome",
-   "file": "chrome/tray-header.png",
-   "bytes": 28020,
-   "sha256": "227a645f7dd74361605afb3a4b23d302dd4699010821c1bba15df10b9fadf400",
-   "source": "game"
-  },
-  {
-   "id": "tray-panel",
-   "category": "chrome",
-   "file": "chrome/tray-panel.png",
-   "bytes": 162167,
-   "sha256": "1e8e099dc7fa91debf502fe25914c00ac0fa4e63c0c2411d641f57c91a3454a7",
-   "source": "game"
-  },
-  {
-   "id": "tray-tab-highlight",
-   "category": "chrome",
-   "file": "chrome/tray-tab-highlight.png",
-   "bytes": 14603,
-   "sha256": "0a03a6b6b8e472ba7b8afc8eba47a3bbb69c8bbf708bfdda777241023817fbec",
-   "source": "game"
-  },
-  {
-   "id": "tray-tab",
-   "category": "chrome",
-   "file": "chrome/tray-tab.png",
-   "bytes": 8386,
-   "sha256": "272342810c3ddff9ab3d3d229796458b7bcc37ffc1ef19bb4fedba95fff11553",
-   "source": "game"
-  },
-  {
-   "id": "victory-surface",
-   "category": "chrome",
-   "file": "chrome/victory-surface.png",
-   "bytes": 274814,
-   "sha256": "22a14560cf13e74c27c1a47ad81d65f097e372d3a6539442dc509b62ebdbd7b9",
-   "source": "game"
-  },
-  {
-   "id": "victory-underworld",
-   "category": "chrome",
-   "file": "chrome/victory-underworld.png",
-   "bytes": 284537,
-   "sha256": "1c7b5e8645acdf701eb79324705c3140e1620c26f0573800d53e32b92695acbb",
-   "source": "game"
-  },
-  {
    "id": "aphrodite-symbol",
    "category": "duos",
    "file": "duos/aphrodite-symbol.webp",
@@ -7928,6 +7451,14 @@
    "needsProvenance": true
   },
   {
+   "id": "backdrop-mel",
+   "category": "shell",
+   "file": "shell/backdrop-mel.png",
+   "bytes": 318901,
+   "sha256": "030a3ab002ba091b166a441ac2380cee38e755813cd80406e7063b4a967e293b",
+   "source": "game"
+  },
+  {
    "id": "background-confirm",
    "category": "shell",
    "file": "shell/background-confirm.png",
@@ -7944,6 +7475,38 @@
    "source": "game"
   },
   {
+   "id": "backing-palace-of-zeus",
+   "category": "shell",
+   "file": "shell/backing-palace-of-zeus.png",
+   "bytes": 273954,
+   "sha256": "b5c29003a9aaa0064f85853565562d8b38e211e7e7f79b7606341e068d96ce3d",
+   "source": "game"
+  },
+  {
+   "id": "box-confirm",
+   "category": "shell",
+   "file": "shell/box-confirm.png",
+   "bytes": 222457,
+   "sha256": "7ee8d9cdfc16b1215b599020b232d9ce9ce00d14f3831e1f7cd50c571c0cf507",
+   "source": "game"
+  },
+  {
+   "id": "box-halfscreen",
+   "category": "shell",
+   "file": "shell/box-halfscreen.png",
+   "bytes": 314895,
+   "sha256": "88c90b3d4afc8034e91e833dfff2d511e78b925c99703bcd66443ad174d13dcf",
+   "source": "game"
+  },
+  {
+   "id": "box-pause",
+   "category": "shell",
+   "file": "shell/box-pause.png",
+   "bytes": 246356,
+   "sha256": "aff45073e3d834cb80ff99e1cefb4ed22950295524994dcc6cb29e6d6ca77efe",
+   "source": "game"
+  },
+  {
    "id": "box-settings",
    "category": "shell",
    "file": "shell/box-settings.png",
@@ -7952,11 +7515,59 @@
    "source": "game"
   },
   {
+   "id": "button-cancel-highlight",
+   "category": "shell",
+   "file": "shell/button-cancel-highlight.png",
+   "bytes": 15345,
+   "sha256": "d5acec995169bc832372f5205816b7aff622dacbd46339fd88ce584ae8c2856e",
+   "source": "game"
+  },
+  {
+   "id": "button-cancel",
+   "category": "shell",
+   "file": "shell/button-cancel.png",
+   "bytes": 11417,
+   "sha256": "de760619b9e837f9df193f3eb79d95ba9c700d8a0298f4bcd8ee9fb645e5f4ae",
+   "source": "game"
+  },
+  {
+   "id": "button-confirm-highlight",
+   "category": "shell",
+   "file": "shell/button-confirm-highlight.png",
+   "bytes": 15445,
+   "sha256": "20299c523b9b9a53b93d310ea470873f540862322bfc4412cdf269130dad95da",
+   "source": "game"
+  },
+  {
+   "id": "button-confirm",
+   "category": "shell",
+   "file": "shell/button-confirm.png",
+   "bytes": 11167,
+   "sha256": "191262086e533392c09ebaa1a7a1d6be6fe2177f4b54ec66612530b4b69de3a6",
+   "source": "game"
+  },
+  {
+   "id": "button-highlight",
+   "category": "shell",
+   "file": "shell/button-highlight.png",
+   "bytes": 18115,
+   "sha256": "a9d5fa3f15cd80f98fe689fa10aa439ab88cc5956b451247ff88d282f3d8f1cd",
+   "source": "game"
+  },
+  {
    "id": "button-press",
    "category": "shell",
    "file": "shell/button-press.png",
    "bytes": 6669,
    "sha256": "f58dae8949613ba355b0ca9d12fd1ebe8095cd2113344cf2509e7950b9e8b2f1",
+   "source": "game"
+  },
+  {
+   "id": "button",
+   "category": "shell",
+   "file": "shell/button.png",
+   "bytes": 12239,
+   "sha256": "6778aff6238818dc7c5111e9fa731ebbc6eedd9fb086d3f2ba0493d72d076b46",
    "source": "game"
   },
   {
@@ -8000,6 +7611,30 @@
    "source": "game"
   },
   {
+   "id": "choicebox-highlight",
+   "category": "shell",
+   "file": "shell/choicebox-highlight.png",
+   "bytes": 19237,
+   "sha256": "c418403a13d16b4052562c7e94e9e5a3d4efb335d1a2f0711871fbea50b0f5de",
+   "source": "game"
+  },
+  {
+   "id": "choicebox",
+   "category": "shell",
+   "file": "shell/choicebox.png",
+   "bytes": 11353,
+   "sha256": "ea88fa79a39db71c5b1a0617468d60bd9476849dab61dc4d4c912f68c05b285f",
+   "source": "game"
+  },
+  {
+   "id": "circle-filigree",
+   "category": "shell",
+   "file": "shell/circle-filigree.png",
+   "bytes": 57904,
+   "sha256": "a72257cb911a958a467d57404b4b374899d1d684fa19e955d920ce932349239d",
+   "source": "game"
+  },
+  {
    "id": "cloudfail",
    "category": "shell",
    "file": "shell/cloudfail.png",
@@ -8021,6 +7656,54 @@
    "file": "shell/cloudsyncconflict.png",
    "bytes": 17742,
    "sha256": "bcaa0e46b5885d3a61635d63011afcff8d69020674350efb05735c87a05b891b",
+   "source": "game"
+  },
+  {
+   "id": "confirm-button-highlight",
+   "category": "shell",
+   "file": "shell/confirm-button-highlight.png",
+   "bytes": 15259,
+   "sha256": "9813f50fd104b7a00425965c5a0e1bc5318747f4ead26b7853ce1a6398d4c4e7",
+   "source": "game"
+  },
+  {
+   "id": "confirm-button",
+   "category": "shell",
+   "file": "shell/confirm-button.png",
+   "bytes": 15030,
+   "sha256": "4c5aff39408522039c469b3f248376531361d09bbe4824921b9e43b63c23b414",
+   "source": "game"
+  },
+  {
+   "id": "dialogue-olympian",
+   "category": "shell",
+   "file": "shell/dialogue-olympian.png",
+   "bytes": 207468,
+   "sha256": "4f1e1b452d6357cc464b59ec5b0aa964b6a965d94239c6bf2dc1a0ea51414b9b",
+   "source": "game"
+  },
+  {
+   "id": "dialogue-static",
+   "category": "shell",
+   "file": "shell/dialogue-static.png",
+   "bytes": 304844,
+   "sha256": "3dc81544bf6f6a4512c0278d4dcf9470eccd75394d2588ed0e4db1a7c4dbd328",
+   "source": "game"
+  },
+  {
+   "id": "divider-long",
+   "category": "shell",
+   "file": "shell/divider-long.png",
+   "bytes": 1278,
+   "sha256": "6bb8029d90e5203d198cbb88254a3540ab20b4209ac16b7e456a46eb20039ec3",
+   "source": "game"
+  },
+  {
+   "id": "divider",
+   "category": "shell",
+   "file": "shell/divider.png",
+   "bytes": 818,
+   "sha256": "b5d8e471e02c86461ffbc3c9e40d9083878811b66e9ee5b872be854ac1541541",
    "source": "game"
   },
   {
@@ -8048,11 +7731,163 @@
    "source": "game"
   },
   {
+   "id": "exit-button-highlight",
+   "category": "shell",
+   "file": "shell/exit-button-highlight.png",
+   "bytes": 29242,
+   "sha256": "5d80a716466fd3bc94ed827b018e0f6d6301e7659bca0e89809953bf3ee054e2",
+   "source": "game"
+  },
+  {
+   "id": "exit-button",
+   "category": "shell",
+   "file": "shell/exit-button.png",
+   "bytes": 29853,
+   "sha256": "e25da48c4b7ff66124283772ae700c3a8b54152ecbfea60186c5d01eb0c42d75",
+   "source": "game"
+  },
+  {
+   "id": "hammer-feathers",
+   "category": "shell",
+   "file": "shell/hammer-feathers.png",
+   "bytes": 212449,
+   "sha256": "ce515dd31c6e75997ac9a1f9e39f61dd18eecfcca9c9932604d793cc18ad8d87",
+   "source": "game"
+  },
+  {
+   "id": "icon-backing",
+   "category": "shell",
+   "file": "shell/icon-backing.png",
+   "bytes": 19982,
+   "sha256": "f1971e71d86a106c7981c373e3f44ed965f5a3f155bc5b595eaa2a6926acff8b",
+   "source": "game"
+  },
+  {
+   "id": "info-button-highlight",
+   "category": "shell",
+   "file": "shell/info-button-highlight.png",
+   "bytes": 37610,
+   "sha256": "52d405bb2db1d3430783a3910ae028ebcf30d85951dd393f9720141e89cd6923",
+   "source": "game"
+  },
+  {
+   "id": "info-button",
+   "category": "shell",
+   "file": "shell/info-button.png",
+   "bytes": 35337,
+   "sha256": "a4e7ec37d8556dac406d5561545921991018641de7c059ab2b5de296401dc16a",
+   "source": "game"
+  },
+  {
+   "id": "item-consume",
+   "category": "shell",
+   "file": "shell/item-consume.png",
+   "bytes": 33952,
+   "sha256": "dc6f12dca5c2a9df3ad2eabf3c8446945f87cbc650213bad7a1110e3fd7c9e9c",
+   "source": "game"
+  },
+  {
+   "id": "lob-decal",
+   "category": "shell",
+   "file": "shell/lob-decal.png",
+   "bytes": 735750,
+   "sha256": "9c9fe6cb7352b192282a7ebb3806c7a9c8fdf36495911c43d42e28c36733516f",
+   "source": "game"
+  },
+  {
+   "id": "location-artemis",
+   "category": "shell",
+   "file": "shell/location-artemis.png",
+   "bytes": 308601,
+   "sha256": "130e89ebaccca4fb78a496de9a9717cf0f0c3b7ebf72df683cb2b50f30cc4681",
+   "source": "game"
+  },
+  {
+   "id": "location-athena",
+   "category": "shell",
+   "file": "shell/location-athena.png",
+   "bytes": 312744,
+   "sha256": "882c548ee221bd8062e702c924a36915728a07ace5280a7c672a13388a10f93f",
+   "source": "game"
+  },
+  {
+   "id": "location-gradient",
+   "category": "shell",
+   "file": "shell/location-gradient.png",
+   "bytes": 200506,
+   "sha256": "d8fae9df981fdf8e8cdd3971eb23e315f44fdbd311334094d38133e3f6af572c",
+   "source": "game"
+  },
+  {
+   "id": "location-minos",
+   "category": "shell",
+   "file": "shell/location-minos.png",
+   "bytes": 301806,
+   "sha256": "5fd6b7883dbacb9c90b942588e4fc4a6447e08721f2bae3b126fe93aaa8ec83c",
+   "source": "game"
+  },
+  {
+   "id": "location-star",
+   "category": "shell",
+   "file": "shell/location-star.png",
+   "bytes": 2792,
+   "sha256": "639dff6478e7bddcc8e422341076a22d7fbfab32efe26c63766028179b4a1b10",
+   "source": "game"
+  },
+  {
+   "id": "location-zagreus",
+   "category": "shell",
+   "file": "shell/location-zagreus.png",
+   "bytes": 271717,
+   "sha256": "a489e03b4cd3d47930063a0b99d6597bc2aabf9e36cd3ada5f82dedc2a4c50e0",
+   "source": "game"
+  },
+  {
+   "id": "medallion",
+   "category": "shell",
+   "file": "shell/medallion.png",
+   "bytes": 674282,
+   "sha256": "78211cd751666e5dfa329a234ee4426a1b941cec1b3a493ac934ee233f3ca449",
+   "source": "game"
+  },
+  {
    "id": "optionselectoricon",
    "category": "shell",
    "file": "shell/optionselectoricon.png",
    "bytes": 15318,
    "sha256": "46471b1a7e970c4513f620fd7e7bc6f721ad1feccd191797549e4e83e5fc0663",
+   "source": "game"
+  },
+  {
+   "id": "resource-backing-harvest",
+   "category": "shell",
+   "file": "shell/resource-backing-harvest.png",
+   "bytes": 31236,
+   "sha256": "f746fdccc6c418c5544000126b51d93eb7a85051f889aff871dd9d912062f772",
+   "source": "game"
+  },
+  {
+   "id": "resource-backing-long",
+   "category": "shell",
+   "file": "shell/resource-backing-long.png",
+   "bytes": 17420,
+   "sha256": "4837cc61c2f0d7525d0f6027d2cfaece05423b28062d623b16bab4128cb05051",
+   "source": "game"
+  },
+  {
+   "id": "resource-backing",
+   "category": "shell",
+   "file": "shell/resource-backing.png",
+   "bytes": 14535,
+   "sha256": "48ffe94471ce67b66977de834b8f04407009999c69b67ce793bc65c2d64b5db4",
+   "source": "game"
+  },
+  {
+   "id": "reward-glow",
+   "category": "shell",
+   "file": "shell/reward-glow.png",
+   "bytes": 22709,
+   "sha256": "365f815c08aa67e89056b72a52948e7174ce7d8e7d72af1197e0526454b7afe4",
    "source": "game"
   },
   {
@@ -8208,6 +8043,150 @@
    "source": "game"
   },
   {
+   "id": "sidebars",
+   "category": "shell",
+   "file": "shell/sidebars.png",
+   "bytes": 49311,
+   "sha256": "75b6f072e73caea9c716387bbe106c89fc9ae2943ad56ef22a22fea8ada28b53",
+   "source": "game"
+  },
+  {
+   "id": "sorcery-circle",
+   "category": "shell",
+   "file": "shell/sorcery-circle.png",
+   "bytes": 904600,
+   "sha256": "4c06148a2cc5f5f1909920e2f8dc96d7ad20acec65076066533951d3194b979d",
+   "source": "game"
+  },
+  {
+   "id": "spell-slot-highlight",
+   "category": "shell",
+   "file": "shell/spell-slot-highlight.png",
+   "bytes": 18451,
+   "sha256": "470fac1a3c78f68e70f8d58c16c023c2d8a9300104b8d446fa47ca41553f5ec0",
+   "source": "game"
+  },
+  {
+   "id": "spell-slot",
+   "category": "shell",
+   "file": "shell/spell-slot.png",
+   "bytes": 314260,
+   "sha256": "08dbcffd99c6e67496c25776f233a828a2851454acd39b6c4d1bcec1909e39b8",
+   "source": "game"
+  },
+  {
+   "id": "splash-dreamrun",
+   "category": "shell",
+   "file": "shell/splash-dreamrun.png",
+   "bytes": 1624269,
+   "sha256": "7f037850de3650ea102d667ee1594fce9abd740e5cf9ec05fff8bdd405587013",
+   "source": "game"
+  },
+  {
+   "id": "splash-surface",
+   "category": "shell",
+   "file": "shell/splash-surface.png",
+   "bytes": 1094739,
+   "sha256": "bd30c71032e5d2a0505a95eec0873bec0c5a466b00adfaec499bc4841b65dded",
+   "source": "game"
+  },
+  {
+   "id": "splash-underworld",
+   "category": "shell",
+   "file": "shell/splash-underworld.png",
+   "bytes": 1214696,
+   "sha256": "1ba1597f04f414eac42447c8b730e1e0e92377a6c44a0701c41676543565d99e",
+   "source": "game"
+  },
+  {
+   "id": "subtitle-backing",
+   "category": "shell",
+   "file": "shell/subtitle-backing.png",
+   "bytes": 6546,
+   "sha256": "deb62f39bffa41894e12bd7e75cfbc44c55bdc912dffffa966057c52ea8160de",
+   "source": "game"
+  },
+  {
+   "id": "subtitle-generic",
+   "category": "shell",
+   "file": "shell/subtitle-generic.png",
+   "bytes": 18534,
+   "sha256": "bf3d402d8c6a6c10ded0d44ac92a15d2e83e97ed901a8ca76cac9266cb28584f",
+   "source": "game"
+  },
+  {
+   "id": "timer-backing",
+   "category": "shell",
+   "file": "shell/timer-backing.png",
+   "bytes": 19442,
+   "sha256": "b6882f532587faa2c55b955ee525119dc3331ca4683b6eddc6f23c20b57b2c10",
+   "source": "game"
+  },
+  {
+   "id": "tooltip-backing",
+   "category": "shell",
+   "file": "shell/tooltip-backing.png",
+   "bytes": 23530,
+   "sha256": "aaeb2fd095d1eb3f8e10289f5e7dfe68541dbe16d956cb57d181a41756f6c7b0",
+   "source": "game"
+  },
+  {
+   "id": "trash-button-highlight",
+   "category": "shell",
+   "file": "shell/trash-button-highlight.png",
+   "bytes": 11413,
+   "sha256": "fdc547eecf4653021aa1198050bc6bbe5ff4626281a8a4860749d108fd61e51c",
+   "source": "game"
+  },
+  {
+   "id": "trash-button",
+   "category": "shell",
+   "file": "shell/trash-button.png",
+   "bytes": 8797,
+   "sha256": "8b62dcff7baf172b000ab2a3a979efa8b604d5cc47ffa994bc42551ffdd622c5",
+   "source": "game"
+  },
+  {
+   "id": "tray-backing",
+   "category": "shell",
+   "file": "shell/tray-backing.png",
+   "bytes": 163527,
+   "sha256": "dcfe7b285acd75490c52b0cc8d5ced9968a7a597297616ad1de70b65044914a6",
+   "source": "game"
+  },
+  {
+   "id": "tray-header",
+   "category": "shell",
+   "file": "shell/tray-header.png",
+   "bytes": 28020,
+   "sha256": "227a645f7dd74361605afb3a4b23d302dd4699010821c1bba15df10b9fadf400",
+   "source": "game"
+  },
+  {
+   "id": "tray-panel",
+   "category": "shell",
+   "file": "shell/tray-panel.png",
+   "bytes": 162167,
+   "sha256": "1e8e099dc7fa91debf502fe25914c00ac0fa4e63c0c2411d641f57c91a3454a7",
+   "source": "game"
+  },
+  {
+   "id": "tray-tab-highlight",
+   "category": "shell",
+   "file": "shell/tray-tab-highlight.png",
+   "bytes": 14603,
+   "sha256": "0a03a6b6b8e472ba7b8afc8eba47a3bbb69c8bbf708bfdda777241023817fbec",
+   "source": "game"
+  },
+  {
+   "id": "tray-tab",
+   "category": "shell",
+   "file": "shell/tray-tab.png",
+   "bytes": 8386,
+   "sha256": "272342810c3ddff9ab3d3d229796458b7bcc37ffc1ef19bb4fedba95fff11553",
+   "source": "game"
+  },
+  {
    "id": "uparrow-base",
    "category": "shell",
    "file": "shell/uparrow-base.png",
@@ -8221,6 +8200,22 @@
    "file": "shell/uparrow-highlight.png",
    "bytes": 13542,
    "sha256": "bec66d81e59d905abf12b8940a12151eeeec937c5b7370e7c32b6013daf73c09",
+   "source": "game"
+  },
+  {
+   "id": "victory-surface",
+   "category": "shell",
+   "file": "shell/victory-surface.png",
+   "bytes": 274814,
+   "sha256": "22a14560cf13e74c27c1a47ad81d65f097e372d3a6539442dc509b62ebdbd7b9",
+   "source": "game"
+  },
+  {
+   "id": "victory-underworld",
+   "category": "shell",
+   "file": "shell/victory-underworld.png",
+   "bytes": 284537,
+   "sha256": "1c7b5e8645acdf701eb79324705c3140e1620c26f0573800d53e32b92695acbb",
    "source": "game"
   },
   {

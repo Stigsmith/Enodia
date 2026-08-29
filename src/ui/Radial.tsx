@@ -38,6 +38,16 @@ export type RadialItem = {
   /** the second line in the tooltip, when there is something worth saying */
   note?: string | null
   art?: ArtShape
+  /**
+   * How much of the usual size this one's art should take, when its own canvas
+   * is padded differently from its neighbours'.
+   *
+   * The shelf keeps game art exactly as the game ships it, so an icon drawn
+   * small inside a large transparent canvas renders small. `Story.png` fills
+   * 42 percent of its canvas where the Chaos gate fills 90 and the boon mark
+   * 97, and no display rule can know that without being told.
+   */
+  scale?: number
 }
 
 const DEFAULT_ART: Record<'default' | 'renders' | 'portraits', ArtShape> = {
@@ -104,7 +114,7 @@ export function Radial({
           <li
             key={item.id}
             className={`bubble-slot is-${item.art ?? DEFAULT_ART[variant]}`}
-            style={{ '--index': index } as React.CSSProperties}
+            style={{ '--index': index, '--art-scale': item.scale ?? 1 } as React.CSSProperties}
           >
             <button
               type="button"

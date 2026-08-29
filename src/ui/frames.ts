@@ -163,7 +163,7 @@ export const FRAMES: FrameOption[] = [
     id: 'filigree',
     name: 'Filigree',
     note: 'UnlockTextCircleBacking. A filled disc with wings, so it tints what it sits on',
-    file: 'chrome/circle-filigree.png',
+    file: 'shell/circle-filigree.png',
     width: 1.75,
     opacity: 0.42,
     aspect: '482 / 269',
