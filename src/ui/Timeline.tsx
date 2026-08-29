@@ -19,6 +19,12 @@
  * **Future stations carry shape, never content.** `RewardLogic.ChooseLoot`
  * draws uniformly from the eligible set, so predicting which god sits behind an
  * unreached Exit would be an invented offer model.
+ *
+ * **A logged station can be taken back.** `DESIGN.md` 8 asks for "the entry
+ * point for correcting a mistake" and the station is it: a mis-tap is noticed
+ * by looking at what got logged, so the way to undo it belongs where it is
+ * being looked at. Removing one replays the whole run, so everything after it
+ * comes back, deaths included.
  */
 
 import { useEffect, useRef } from 'react'
@@ -33,6 +39,7 @@ export function Timeline({
   run,
   onTake,
   onSkip,
+  onForget,
   /**
    * Whether to carry the page to the present on mount.
    *
@@ -46,6 +53,8 @@ export function Timeline({
   run: RunContext
   onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
   onSkip: (god: string | null, kind: RunEntry['kind']) => void
+  /** take a logged entry back out, replaying everything after it */
+  onForget: (exit: number, kind: RunEntry['kind']) => void
   scrollToPresent?: boolean
 }) {
   const present = useRef<HTMLLIElement>(null)
@@ -60,8 +69,8 @@ export function Timeline({
 
   return (
     <ol className="path" aria-label="The run">
-      {entries.map((entry) => (
-        <Station key={entry.exit} entry={entry} />
+      {entries.map((entry, index) => (
+        <Station key={`${entry.kind}-${entry.exit}-${index}`} entry={entry} onForget={onForget} />
       ))}
 
       <li className="station is-present" ref={present}>
@@ -82,7 +91,7 @@ export function Timeline({
   )
 }
 
-function Station({ entry }: { entry: RunEntry }) {
+function Station({ entry, onForget }: { entry: RunEntry; onForget: (exit: number, kind: RunEntry['kind']) => void }) {
   const taken = entry.taken ? traits.get(entry.taken) : null
   const icon = entry.taken ? iconOf.get(entry.taken) : null
 
@@ -115,6 +124,12 @@ function Station({ entry }: { entry: RunEntry }) {
         )}
 
         {entry.died.length ? <Deaths died={entry.died} /> : null}
+
+        {/* Quiet, and last. It is the thing you want the moment you notice,
+            and never the thing you want to see while reading the run. */}
+        <button type="button" className="station-forget" onClick={() => onForget(entry.exit, entry.kind)}>
+          This did not happen
+        </button>
       </div>
     </li>
   )

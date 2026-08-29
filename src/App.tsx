@@ -29,7 +29,7 @@ import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
 
 export function App() {
-  const { run, entries, pinned, lastPickAt, start, end, take, skip, pin } = useRun()
+  const { run, entries, pinned, lastPickAt, start, end, take, skip, pin, forget } = useRun()
 
   // The saved frame, before anything draws a ring. The menu owns it after
   // that; this only makes a reload keep what was chosen.
@@ -159,6 +159,7 @@ export function App() {
           run={run}
           onTake={take}
           onSkip={skip}
+          onForget={forget}
           scrollToPresent={!showBriefing}
         />
         <Colophon />
