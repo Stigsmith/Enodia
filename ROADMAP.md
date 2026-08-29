@@ -309,12 +309,29 @@ an inline noun for a few: `Omega` is "Ω Moves", and reading it off the glossary
 a strippable decoration: `ArmorTotal` is not `Armor`, and stripping it turned "+1 armour"
 into "+1". The hand table wins and the glossary fills in behind it.
 
-**Still unread: `{$TooltipData.ExtractData.X}`, and it renders as `#`.** It names an entry
-in the trait's own `ExtractValues`, which names a `Key`, which is reported by one of the
-trait's function args. **Only 34 of 384 complete that chain** in the data as extracted: 236
-are `External` and point at another table entirely, and there are **37 distinct `Format`
-values** to apply once a number is found. Guessing any of it puts wrong numbers on a card,
-which is worse than an admitted gap.
+**The numbers are in too.** `scripts/values.ts` is `TraitLogic.ExtractValues` and
+`FormatExtractedValue` followed to the letter, for the part of them that is static:
+`{$TooltipData.ExtractData.StrikeChance}` walks the trait's `ExtractValues` to a `Key`, to
+whichever subtable reports it, to the number. **`ReportValues` is hoisted from any depth**,
+which is what took two attempts: a pass that looked only at
+`<name>Function.FunctionArgs.ReportValues` resolved 34 of 384, and walking properly resolves
+241. 20 tests, and the game's own comments on its formats are the assertions: "eg 0.5
+becomes 50", "eg 1.3 becomes 30". One of those comments disagrees with its own code, which
+returns +30; the minus lives in the sentence rather than in the number.
+
+**252 of 567 descriptions changed and `#` went from 422 to 213.** Zero holes left, zero raw
+identifiers, zero names shipping markup.
+
+**These are base values**, and the surface should say so eventually. Several formats
+multiply by something the run carries, `LuckModifiedPercent` by the hero's Luck and
+`FlatHeal` by the healing multiplier, and every one of those is 1 on a fresh hero. The game
+shows a larger number once a run has boons in it.
+
+**What is still `#`, and why.** 21 are `External` and live in the projectile, weapon and
+effect tables this project does not extract. The rest want a format that needs those tables
+or the state of a run: `MultiplyByBase` wants a projectile's damage, `Rarity` wants a rarity
+key, `SlottedBoon` wants what is in a slot right now. **Extracting `ProjectileData` and
+`WeaponData` would close most of the remainder**, and is the obvious next move on this.
 
 **Engine**
 
