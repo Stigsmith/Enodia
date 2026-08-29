@@ -531,6 +531,59 @@ for (const [setName, members] of Object.entries(unitSets)) {
   }
 }
 
+/**
+ * The Arcana, for the build manager.
+ *
+ * `MetaUpgradeCardData` is 27 records and two of them are `DebugOnly`
+ * scaffolding, so 25 real cards. `CLAUDE.md` records that the art maps by
+ * `Image = "CardArt_NN"` with a source comment naming each card; the library
+ * is filed under the card's display name instead, which joins for 23 of 25
+ * directly. `The Enchantress` and `The Fates` kept their article in the
+ * filename, so both shapes are tried.
+ */
+const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
+  .filter(([, record]) => {
+    const card = dictOf(record)
+    return !card.DebugOnly && typeof card.Image === 'string'
+  })
+  .map(([id, record]) => {
+    const card = dictOf(record)
+    const raw = dictOf(text[id]).name
+    const name = typeof raw === 'string' ? raw : ''
+    const slug = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''
+    const bare = slug.replace(/^the-/, '')
+    return {
+      id,
+      name,
+      text: describe(id),
+      cost: typeof card.Cost === 'number' ? card.Cost : null,
+      icon: icons.get(bare)?.file ?? icons.get(slug)?.file ?? null,
+    }
+  })
+  .filter((card) => card.name)
+  .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+
+/**
+ * The five familiars.
+ *
+ * `FamiliarOrderData` in `FamiliarData.lua` lists them and `HelpText` names
+ * them, so nothing new needed extracting. The art is one image each in
+ * `assets/familiars/`, beside their skins and their stat icons.
+ */
+const FAMILIARS = [
+  { id: 'CatFamiliar', slug: 'cat' },
+  { id: 'FrogFamiliar', slug: 'frog' },
+  { id: 'RavenFamiliar', slug: 'raven' },
+  { id: 'HoundFamiliar', slug: 'hound' },
+  { id: 'PolecatFamiliar', slug: 'polecat' },
+]
+
+const familiars = FAMILIARS.map((familiar) => ({
+  id: familiar.id,
+  name: (() => { const n = dictOf(help[familiar.id]).name; return typeof n === 'string' && n ? n : familiar.id })(),
+  icon: icons.get(`familiars-${familiar.slug}-01`)?.file ?? null,
+}))
+
 const bundle = {
   _provenance: {
     ...generated._provenance,
@@ -552,6 +605,8 @@ const bundle = {
   })),
   pools,
   sources,
+  arcana: arcanaCards,
+  familiars,
   traits: records,
 }
 
@@ -564,6 +619,10 @@ const withArt = records.filter((record) => 'icon' in record).length
 console.log(`data/app/app-data.json  ${(bytes / 1024).toFixed(0)} KB`)
 console.log(`  ${records.length} named traits of ${traits.size}, ${withArt} with art`)
 console.log(`  ${bundle.olympians.length} Olympians, ${bundle.weapons.length} weapons, ${pools.length} god pools`)
+console.log(
+  `  ${arcanaCards.length} Arcana (${arcanaCards.filter((c) => c.icon).length} with art), ` +
+    `${familiars.length} familiars (${familiars.filter((f) => f.icon).length} with art)`,
+)
 const byKind = sources.reduce<Record<string, number>>((tally, source) => {
   tally[source.kind] = (tally[source.kind] ?? 0) + 1
   return tally

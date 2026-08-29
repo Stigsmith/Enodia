@@ -1,0 +1,1241 @@
+/* =========================================================================
+ * The build manager.
+ *
+ * Five layouts, one mark. Everything shared lives at the top and every variant
+ * below it is arrangement only: no variant redefines what a boon icon looks
+ * like, because then the comparison would be between five renderers rather
+ * than five designs.
+ *
+ * BOTH SHAPES, THROUGHOUT. Every variant is authored narrow first and then
+ * given the width it wants at `--wide` (60rem) and again at `--ultra` (100rem).
+ * A phone is one column of everything. A 21:9 screen is the reason `--ultra`
+ * exists: at 3440 pixels the run surface's 60rem cap left two thirds of the
+ * screen empty, and a build manager that did the same would be worse, because
+ * this is the screen where more room means more build on the page.
+ *
+ * No literal colour. VISUAL.md rule 2.
+ * ===================================================================== */
+
+/* One scale, four rungs.
+ *
+ * No variant names a length. It asks for a rung, so widening the window grows
+ * all five together and the comparison between them stays a comparison of
+ * arrangement. Adding a breakpoint means editing four numbers, not thirty.
+ *
+ * **This is the fix for the wide screen.** More columns alone was not enough:
+ * at 2560 the contact sheet went to three abreast and every icon in it was
+ * still 41 pixels, so the page read as a small thing floating in a large one.
+ * A wide screen wants a bigger drawing, not only a wider one. */
+.builds {
+  --mark-s: 2.6rem;
+  --mark-m: 3rem;
+  --mark-l: 3.4rem;
+  --mark-xl: 4.4rem;
+  --mark: var(--mark-m);
+  max-width: 100%;
+  padding: 1.25rem 1rem 4rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 60rem) {
+  .builds {
+    padding: 1.75rem 2rem 4rem;
+    max-width: 76rem;
+  }
+}
+
+/* 21:9 and wider. The stage stops being a column and becomes a field, and
+ * everything on it grows by about a fifth. */
+@media (min-width: 100rem) {
+  .builds {
+    --mark-s: 3.1rem;
+    --mark-m: 3.6rem;
+    --mark-l: 4.1rem;
+    --mark-xl: 5.4rem;
+    max-width: 140rem;
+    padding: 2rem 3rem 4rem;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * The chrome round the five: title, switcher, build picker, the honest note.
+ * ---------------------------------------------------------------------- */
+
+.builds-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.builds-top h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.35rem, 4vw, 1.9rem);
+  letter-spacing: 0.05em;
+  color: var(--jade-hot);
+}
+
+.builds-back {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.builds-back:hover {
+  border-color: var(--jade-dim);
+  color: var(--bone);
+}
+
+.builds-note {
+  margin: 0;
+  flex: 1 1 16rem;
+  color: var(--bone-faint);
+  font-size: 0.8rem;
+}
+
+.builds-variants {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0;
+}
+
+.builds-variant {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color var(--t-response) var(--e-response),
+    border-color var(--t-response) var(--e-response);
+}
+
+.builds-variant:hover {
+  border-color: var(--jade-dim);
+  color: var(--bone);
+}
+
+.builds-variant.is-on {
+  border-color: var(--jade);
+  background: var(--ink-850);
+  color: var(--jade-hot);
+}
+
+/* The case for and against, side by side, because the against is the part
+ * that decides. It is not hidden behind a hover. */
+.builds-approach {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.7rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--jade-dim);
+  background: var(--ink-900);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.builds-approach-for {
+  color: var(--bone-dim);
+}
+
+.builds-approach-against {
+  color: var(--bone-faint);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 60rem) {
+  .builds-approach {
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 1.5rem;
+  }
+}
+
+.builds-picker {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin: 0.9rem 0 0;
+}
+
+.builds-pick {
+  padding: 0.3rem 0.7rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.builds-pick:hover {
+  color: var(--bone-dim);
+}
+
+.builds-pick.is-on {
+  border-bottom-color: var(--jade);
+  color: var(--bone);
+}
+
+.builds-stage {
+  margin-top: 1.25rem;
+}
+
+.builds-disclaimer {
+  margin: 2.5rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--div-1);
+  color: var(--bone-faint);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  max-width: 46rem;
+}
+
+/* -------------------------------------------------------------------------
+ * THE MARK. One piece of a build, and the only thing all five share.
+ *
+ * A rounded square, never a circle: the game's icons are rounded squares and
+ * `frames/frame-*.png` are drawn to fit them. A circular crop cuts the corner
+ * art off, which CLAUDE.md already records once.
+ * ---------------------------------------------------------------------- */
+
+.mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--mark, 3rem);
+  height: var(--mark, 3rem);
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+button.mark {
+  cursor: pointer;
+}
+
+.mark-art {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: calc(var(--mark, 3rem) * 0.18);
+  grid-area: 1 / 1;
+}
+
+/* The frame overhangs the art, which is how the game draws it: the frame's
+ * own border sits outside the 90 pixel icon rather than on top of it. */
+.mark-frame {
+  grid-area: 1 / 1;
+  width: 118%;
+  height: 118%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* A missing icon becomes a letter, not a hole. */
+.mark-stub {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--mark, 3rem) * 0.18);
+  background: var(--ink-800);
+  color: var(--bone-faint);
+  font-family: var(--display);
+  font-size: calc(var(--mark, 3rem) * 0.42);
+}
+
+/* The slot glyph, tucked into the corner. Small, because it is a reminder of
+ * which slot this occupies and not a second icon. */
+.mark-glyph {
+  position: absolute;
+  right: -8%;
+  bottom: -8%;
+  width: 42%;
+  height: 42%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px var(--ink-950));
+  pointer-events: none;
+}
+
+/* The thing the build is for. One ring, in the event colour, and nothing
+ * else: the centrepiece has to read as different at a glance in every one of
+ * the five layouts, and size alone does not survive the contact sheet. */
+.mark.is-centrepiece::after {
+  content: '';
+  position: absolute;
+  inset: -14%;
+  border-radius: calc(var(--mark, 3rem) * 0.26);
+  box-shadow: 0 0 0 1px var(--rim-magenta), 0 0 12px -2px var(--rim-magenta);
+  pointer-events: none;
+}
+
+/* An Arcana card is not a square, and forcing it into one drew a sliver with
+ * its caption pushed off the bottom. The art is roughly 2:3, so the mark takes
+ * that shape and `--mark` still governs its height. No rarity frame either:
+ * these carry their own painted border. */
+.mark.is-arcana {
+  width: calc(var(--mark, 3rem) * 0.66);
+}
+
+.mark.is-arcana .mark-art {
+  border-radius: 2px;
+  border: 1px solid var(--div-2);
+}
+
+.mark.is-arcana .mark-frame {
+  display: none;
+}
+
+/* A mark with its name. */
+.named {
+  display: flex;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.named.is-under {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: calc(var(--mark, 3rem) + 2.6rem);
+}
+
+.named.is-beside {
+  align-items: center;
+}
+
+.named-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.named-name {
+  color: var(--bone-dim);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.named.is-centrepiece .named-name {
+  color: var(--bone);
+}
+
+.named-slot {
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* =========================================================================
+ * VARIANT 1: LOADOUT. The game's own tray.
+ * ===================================================================== */
+
+.loadout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 60rem) {
+  .loadout {
+    grid-template-columns: 17rem 1fr;
+    align-items: start;
+  }
+}
+
+@media (min-width: 100rem) {
+  .loadout {
+    grid-template-columns: 19rem 1fr;
+    gap: 2rem;
+  }
+}
+
+/* The game's own tray header plate, nine-sliced. It has hard vertical ends and
+ * a repeatable middle, which is what makes it safe for variable-length copy;
+ * `resource-backing-harvest.png` is an oval and is not. */
+.tray-head {
+  margin: 0 0 0.5rem;
+  padding: 0.4rem 1rem 0.5rem;
+  border-image: url('/shell/tray-header.png') 18 40 20 40 fill / 18px 40px 20px 40px;
+  font-family: var(--display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--bone);
+}
+
+.tray-say {
+  margin: 0 0 0.7rem;
+  color: var(--bone-faint);
+  font-size: 0.75rem;
+}
+
+.loadout-slots ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.6rem;
+  list-style: none;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+/* The game's tray texture, as a surface rather than a picture. At full
+ * strength its central motif read as a watermark behind the slot names. */
+.loadout-slots ul::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-soft);
+  background: url('/shell/tray-backing.png') center / cover no-repeat;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.loadout-slots ul {
+  position: relative;
+  isolation: isolate;
+}
+
+.loadout-slot {
+  position: relative;
+}
+
+.loadout-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--r-hair);
+}
+
+.loadout-slot.is-open {
+  background: color-mix(in srgb, var(--ink-950) 55%, transparent);
+}
+
+.loadout-empty {
+  display: grid;
+  place-items: center;
+  width: var(--mark-l);
+  height: var(--mark-l);
+  flex: none;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+}
+
+.loadout-empty img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  opacity: 0.35;
+}
+
+.loadout-slot-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.loadout-slot-name {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.loadout-slot-fill {
+  font-size: 0.85rem;
+  color: var(--bone);
+}
+
+.loadout-slot.is-open .loadout-slot-fill {
+  color: var(--bone-faint);
+  font-style: italic;
+}
+
+.loadout-trays {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.loadout-tray {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem 0.9rem;
+  padding: 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+@media (min-width: 100rem) {
+  .loadout-trays {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+/* =========================================================================
+ * VARIANT 2: POSTER. One build as a page.
+ * ===================================================================== */
+
+.poster {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.poster-head {
+  position: relative;
+  display: grid;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--div-2);
+}
+
+.poster-render {
+  width: 100%;
+  max-width: 22rem;
+  max-height: 42vh;
+  margin: 0 auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px var(--ink-950));
+}
+
+.poster-title {
+  text-align: center;
+}
+
+.poster-arm {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.poster-arm span::before {
+  content: '\00b7';
+  margin: 0 0.45rem;
+}
+
+.poster-title h3 {
+  margin: 0.35rem 0 0;
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--bone);
+}
+
+.poster-say {
+  margin: 0.4rem auto 0;
+  max-width: 26rem;
+  color: var(--bone-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* The centrepiece, and the only thing on the page that gets a box. */
+.poster-centre {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin: 1.25rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--rim-magenta) 35%, var(--div-2));
+  border-radius: var(--r-card);
+  background: var(--ink-900);
+}
+
+.poster-centre h4 {
+  margin: 0 0 0.3rem;
+  font-family: var(--display);
+  font-size: 1rem;
+  color: var(--bone);
+}
+
+.poster-centre p {
+  margin: 0;
+  color: var(--bone-dim);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.poster-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 1.4rem 0 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.poster-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--div-2);
+}
+
+.poster-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem 0.6rem;
+}
+
+.poster-arcana {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+.poster-card {
+  margin: 0;
+  text-align: center;
+}
+
+.poster-card img {
+  width: 100%;
+  border-radius: var(--r-hair);
+  border: 1px solid var(--div-2);
+  display: block;
+}
+
+.poster-card figcaption {
+  margin-top: 0.25rem;
+  font-size: 0.6rem;
+  line-height: 1.3;
+  color: var(--bone-faint);
+}
+
+/* Wide: the render goes beside the words instead of above them, which is the
+ * whole reason this variant benefits from a big screen. */
+@media (min-width: 60rem) {
+  .poster {
+    max-width: 62rem;
+  }
+
+  .poster-head {
+    grid-template-columns: 20rem 1fr;
+    align-items: center;
+    gap: 2rem;
+    text-align: left;
+  }
+
+  .poster-title {
+    text-align: left;
+  }
+
+  .poster-say {
+    margin-left: 0;
+  }
+
+  .poster-render {
+    margin: 0;
+    max-width: 20rem;
+    max-height: 26rem;
+  }
+}
+
+@media (min-width: 100rem) {
+  .poster-head {
+    grid-template-columns: 30rem 1fr;
+  }
+
+  .poster-render {
+    max-width: 30rem;
+    max-height: 34rem;
+  }
+
+  .poster {
+    max-width: 96rem;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-areas:
+      'head head'
+      'centre centre'
+      'run cross';
+    gap: 0 3rem;
+    align-items: start;
+  }
+
+  .poster-head {
+    grid-area: head;
+  }
+
+  .poster-centre {
+    grid-area: centre;
+  }
+
+  .poster-run {
+    grid-area: run;
+  }
+
+  .poster-crossroads {
+    grid-area: cross;
+  }
+}
+
+/* =========================================================================
+ * VARIANT 3: CONSTELLATION. Fixed positions round the arm.
+ * ===================================================================== */
+
+.constel {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+}
+
+.constel-wheel {
+  position: relative;
+  width: min(21rem, 88vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* The ring the spokes sit on, drawn rather than art: nothing in the package is
+ * a plain circle, which frames.ts records at length. */
+.constel-wheel::before {
+  content: '';
+  position: absolute;
+  inset: 7%;
+  border-radius: 50%;
+  border: 1px solid var(--div-2);
+}
+
+.constel-hub {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44%;
+  height: 44%;
+}
+
+.constel-render {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px var(--ink-950));
+}
+
+.constel-hub-name {
+  position: absolute;
+  bottom: -1.2rem;
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+  white-space: nowrap;
+}
+
+/* Each spoke is a full-size box rotated about the wheel's centre, with its node
+ * pinned to the top edge and counter-rotated so it stays upright. The node's
+ * distance from the middle is therefore the wheel's own half-height, which is
+ * the point: the ring scales with the wheel and no JavaScript computes a sine.
+ *
+ * **`--reach` has to be a length, not a percentage.** It was `41%` and every
+ * spoke sat on top of the hub, because a percentage in `translate` resolves
+ * against the translated element, and that is the 6.5rem node rather than the
+ * 26rem wheel. `top` is a percentage of the containing block, which is the
+ * wheel, so the offset belongs there instead. */
+.constel-spoke {
+  --reach: 7%;
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--angle));
+  pointer-events: none;
+}
+
+.constel-node {
+  position: absolute;
+  left: 50%;
+  top: var(--reach);
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  width: 6.5rem;
+  transform: translate(-50%, -50%) rotate(calc(var(--angle) * -1));
+  pointer-events: auto;
+}
+
+.constel-node-name {
+  font-size: 0.66rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bone-dim);
+}
+
+.constel-spoke.is-open .constel-node-name {
+  color: var(--bone-faint);
+  font-style: italic;
+}
+
+.constel-empty {
+  display: grid;
+  place-items: center;
+  width: var(--mark-l);
+  height: var(--mark-l);
+  border: 1px dashed var(--div-4);
+  border-radius: 50%;
+}
+
+.constel-empty img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  opacity: 0.3;
+}
+
+.constel-field {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  max-width: 40rem;
+}
+
+.constel-loose {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  width: 5.4rem;
+}
+
+.constel-loose-name {
+  font-size: 0.64rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bone-faint);
+}
+
+.constel-rim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-1);
+  width: 100%;
+  max-width: 40rem;
+}
+
+.constel-rim-div {
+  width: 1px;
+  height: 1.6rem;
+  background: var(--div-3);
+  margin: 0 0.35rem;
+}
+
+.constel-card img {
+  height: var(--mark-m);
+  width: auto;
+  border-radius: var(--r-hair);
+  border: 1px solid var(--div-2);
+  display: block;
+}
+
+/* Wide: the wheel grows and the loose field moves beside it rather than under,
+ * so the whole build is one figure instead of a figure and a list. */
+@media (min-width: 60rem) {
+  .constel {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'wheel field'
+      'rim rim';
+    justify-items: start;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .constel-wheel {
+    grid-area: wheel;
+    width: 26rem;
+  }
+
+  .constel-field {
+    grid-area: field;
+    justify-content: flex-start;
+  }
+
+  .constel-rim {
+    grid-area: rim;
+    justify-content: flex-start;
+    max-width: none;
+  }
+}
+
+@media (min-width: 100rem) {
+  .constel-wheel {
+    width: 34rem;
+  }
+
+  .constel-loose {
+    width: 6.2rem;
+  }
+}
+
+/* =========================================================================
+ * VARIANT 4: RIBBON. An order, with a destination.
+ * ===================================================================== */
+
+.ribbon {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 44rem;
+}
+
+.ribbon-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: 0.9rem;
+  padding: 0 0 1.6rem;
+}
+
+/* The thread down the left, which is the only thing making this a sequence
+ * rather than four boxes. It stops at the last step. */
+.ribbon-step::before {
+  content: '';
+  position: absolute;
+  left: 1.1rem;
+  top: 2.2rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--div-2);
+}
+
+.ribbon-step:last-child::before {
+  display: none;
+}
+
+.ribbon-num {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid var(--div-3);
+  border-radius: 50%;
+  background: var(--ink-950);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--bone-faint);
+}
+
+.ribbon-step.is-end .ribbon-num {
+  border-color: var(--rim-magenta);
+  color: var(--rim-magenta);
+}
+
+.ribbon-body h4 {
+  margin: 0.25rem 0 0.2rem;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+
+.ribbon-say {
+  margin: 0 0 0.7rem;
+  color: var(--bone-faint);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  max-width: 34rem;
+}
+
+.ribbon-pieces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 0.55rem;
+}
+
+.ribbon-piece {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  width: 5.2rem;
+}
+
+.ribbon-piece-name {
+  font-size: 0.63rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bone-faint);
+}
+
+.ribbon-step.is-end .ribbon-piece {
+  width: 7rem;
+}
+
+.ribbon-step.is-end .ribbon-piece-name {
+  font-family: var(--display);
+  font-size: 0.85rem;
+  color: var(--bone);
+}
+
+/* Wide: the step's label moves into its own column so the pieces start at the
+ * same x on every row, which is what turns a list into a table you can scan. */
+@media (min-width: 60rem) {
+  .ribbon {
+    max-width: 68rem;
+  }
+
+  .ribbon-step {
+    grid-template-columns: 2.2rem 15rem 1fr;
+    align-items: start;
+    gap: 1.4rem;
+  }
+
+  .ribbon-body {
+    display: contents;
+  }
+
+  .ribbon-body h4 {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ribbon-say {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+  }
+
+  .ribbon-pieces {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (min-width: 100rem) {
+  .ribbon {
+    max-width: 96rem;
+  }
+
+  .ribbon-step {
+    grid-template-columns: 2.2rem 20rem 1fr;
+  }
+}
+
+/* =========================================================================
+ * VARIANT 5: CONTACT SHEET. Uniform, and several at once.
+ * ===================================================================== */
+
+.builds-sheet {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 60rem) {
+  .builds-sheet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* This is the variant that most wants a 21:9 screen: three builds abreast is
+ * the arrangement it was designed for and the one that makes its bands line
+ * up in columns. */
+@media (min-width: 100rem) {
+  .builds-sheet {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.contact {
+  padding: 0.9rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.contact-head h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: var(--bone);
+}
+
+.contact-head p {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  color: var(--bone-faint);
+}
+
+.contact-gods::before {
+  content: '\00b7';
+  margin: 0 0.4rem;
+}
+
+.contact-band {
+  margin-top: 0.8rem;
+}
+
+.contact-rule {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.contact-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.contact-tile {
+  display: grid;
+  place-items: center;
+}
+
+.contact-empty {
+  display: grid;
+  place-items: center;
+  width: var(--mark-s);
+  height: var(--mark-s);
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+}
+
+.contact-empty img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  opacity: 0.3;
+}
+
+.contact-tile.is-card img {
+  height: var(--mark-s);
+  width: auto;
+  border-radius: 2px;
+  border: 1px solid var(--div-2);
+  display: block;
+}
+
+/* =========================================================================
+ * The detail card, shared by all five.
+ * ===================================================================== */
+
+.piececard {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--ink-950) 78%, transparent);
+}
+
+@media (min-width: 40rem) {
+  .piececard {
+    place-items: center;
+  }
+}
+
+.piececard-body {
+  width: min(28rem, 100%);
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-card);
+  background: var(--ink-850);
+}
+
+.piececard-body header {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.piececard-body header img {
+  width: 3.2rem;
+  height: 3.2rem;
+  object-fit: contain;
+  border-radius: var(--r-hair);
+  flex: none;
+}
+
+.piececard-body h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  color: var(--bone);
+}
+
+.piececard-body header p {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.06em;
+  color: var(--bone-faint);
+}
+
+.piececard-body header p span + span::before {
+  content: '\00b7';
+  margin: 0 0.4rem;
+}
+
+.piececard-text {
+  margin: 0.8rem 0 1rem;
+  color: var(--bone-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.piececard-gap {
+  margin: 0.8rem 0 1rem;
+  color: var(--bone-faint);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.piececard-body > button {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.piececard-body > button:hover {
+  border-color: var(--jade-dim);
+  color: var(--bone);
+}

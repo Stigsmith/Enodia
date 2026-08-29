@@ -20,7 +20,8 @@
     "chrome": "node scripts/chrome.ts",
     "reward-frame": "node scripts/reward-frame.ts",
     "health": "node scripts/health.ts",
-    "prune": "node scripts/prune.ts"
+    "prune": "node scripts/prune.ts",
+    "artifact": "node scripts/artifact.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
