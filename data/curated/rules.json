@@ -63,6 +63,7 @@
       "match": { "spendsAGodSlot": true },
       "delta": -8,
       "say": "Taking this spends one of your four Olympian slots on a new god.",
+      "sayAll": "Any of these spends one of your four Olympian slots on a new god.",
       "source": "source",
       "why": "HeroData.MaxGodsPerRun, counted by ReachedMaxGods over loot carrying GodLoot. Fires on 30% of offers, which is roughly how often a new god is behind an Exit."
     },
@@ -72,6 +73,7 @@
       "match": { "god": ["Hermes", "Selene", "Chaos"] },
       "delta": 6,
       "say": "Costs no Olympian slot: the cap counts only loot carrying GodLoot.",
+      "sayAll": "None of these costs an Olympian slot: the cap counts only loot carrying GodLoot.",
       "source": "source",
       "why": "LootData.BaseLoot gives GodLoot true by inheritance and these three do not carry it. Unmeasured, see knownGaps."
     }

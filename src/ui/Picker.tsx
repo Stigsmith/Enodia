@@ -20,11 +20,12 @@
 
 import { useState } from 'react'
 
-import { godPools, iconOf, sources, traits } from '../data/app.ts'
+import { godPools, sources, traits } from '../data/app.ts'
 import type { RewardSource } from '../data/app.ts'
 import { canBeOffered } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
 import { eligibleGods } from '../engine/runsim.ts'
+import { Offer } from './Offer.tsx'
 import { Radial } from './Radial.tsx'
 import type { ArtShape, RadialItem } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
@@ -273,7 +274,7 @@ export function Picker({
     )
   }
 
-  // Step 3. Which one.
+  // Step 3. Which one, ranked.
   const options = offerable(source)
   return (
     <PickerStep label={`What ${source.name} gave`} onBack={reset}>
@@ -302,28 +303,18 @@ export function Picker({
         </button>
       </div>
 
-      <ul className="boon-list">
-        {options.map((id) => {
-          const trait = traits.get(id)
-          const icon = iconOf.get(id)
-          return (
-            <li key={id}>
-              <button
-                type="button"
-                className="boon"
-                onClick={() => {
-                  onTake(id, rarity, source.kind === 'olympian' ? source.id : null, where(kind))
-                  reset()
-                }}
-              >
-                {icon ? <img src={`/${icon}`} alt="" loading="lazy" /> : <span className="boon-blank" />}
-                <span className="boon-name">{trait?.name}</span>
-                {trait?.slot ? <span className="boon-slot">{trait.slot}</span> : null}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      {/* Build order step 11. The list is ranked and each card carries one
+          sentence about this run, from engine/offer.ts. */}
+      <Offer
+        run={run}
+        candidates={options}
+        god={source.kind === 'olympian' ? source.id : null}
+        rarity={rarity}
+        onTake={(id) => {
+          onTake(id, rarity, source.kind === 'olympian' ? source.id : null, where(kind))
+          reset()
+        }}
+      />
 
       <button
         type="button"

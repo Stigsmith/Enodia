@@ -50,28 +50,47 @@ export function rate(subject: Subject, rules: readonly Rule[], ctx: RuleContext)
 }
 
 /**
- * Rate a whole offer and order it.
+ * The order an offer is shown in.
  *
- * Highest first. **Unrated sorts last but is never dropped**, which
- * `DESIGN.md` 8 requires by name: filtering out the unrated makes every new
- * boon invisible, and a new boon is exactly the thing a player most wants to
- * see. Ties break on the trait's own name so the order is stable between
- * renders rather than depending on the offer's arrival order.
+ * Score first, then unrated after rated at the same score, then name.
+ *
+ * **`DESIGN.md` 8 says unrated "sorts last", and taken literally that is
+ * wrong.** It was written when every delta was a bonus, and it holds
+ * perfectly there. With a penalty in the pack it puts a boon we know shuts a
+ * slot *above* one we know nothing about, which tells a player the opposite of
+ * what we mean.
+ *
+ * What the rule is actually protecting is in the same sentence: unrated
+ * "survives every filter floor, because filtering out the unrated makes every
+ * new boon invisible". Nothing is dropped here and nothing is hidden. Unrated
+ * scores zero, sits among the other zeroes, and loses the tie to anything we
+ * had something to say about.
+ *
+ * Name breaks the last tie so the order is stable between renders rather than
+ * depending on the offer's arrival order.
  */
+export function order<T extends { score: number; unrated: boolean; id: TraitId }>(
+  rated: readonly T[],
+  ctx: RuleContext,
+): T[] {
+  return [...rated].sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score
+    if (a.unrated !== b.unrated) return a.unrated ? 1 : -1
+    const nameA = ctx.traits.get(a.id)?.name ?? a.id
+    const nameB = ctx.traits.get(b.id)?.name ?? b.id
+    return nameA.localeCompare(nameB)
+  })
+}
+
 export function rateOffer(
   subjects: readonly Subject[],
   rules: readonly Rule[],
   ctx: RuleContext,
 ): Rated[] {
-  return subjects
-    .map((subject) => rate(subject, rules, ctx))
-    .sort((a, b) => {
-      if (a.unrated !== b.unrated) return a.unrated ? 1 : -1
-      if (b.score !== a.score) return b.score - a.score
-      const nameA = ctx.traits.get(a.id)?.name ?? a.id
-      const nameB = ctx.traits.get(b.id)?.name ?? b.id
-      return nameA.localeCompare(nameB)
-    })
+  return order(
+    subjects.map((subject) => rate(subject, rules, ctx)),
+    ctx,
+  )
 }
 
 /** The whole job in one call, for a caller that has no context yet. */

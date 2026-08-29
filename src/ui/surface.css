@@ -3025,3 +3025,225 @@ body::before {
 .station-deaths[open] summary::after {
   transform: rotate(180deg);
 }
+
+/* ----------------------------------------------------------------- offer -- */
+
+/* The offer block. DESIGN.md 8: cards and sentences, never a table.
+ *
+ * Three registers on every card and they are kept apart by weight, because a
+ * judgement and a sourced fact must never look equally weighed:
+ *
+ *   the game's own sentence   quiet, and the widest thing on the card
+ *   ours                      marked as ours with a rule, in jade
+ *   what it closes            loudest, because it is the irreversible part
+ */
+.offer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.offer-card button {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.8rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  color: var(--bone);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--t-response) var(--e-response),
+    background var(--t-response) var(--e-response);
+}
+
+.offer-card button:hover,
+.offer-card button:focus-visible {
+  border-color: var(--jade-dim);
+  background: var(--ink-850);
+  outline: none;
+}
+
+/* A card that would close something wears the mark a station's deaths wear, so
+ * the cost reads the same wherever it appears in the product. */
+.offer-card.has-cost button {
+  border-left: 2px solid var(--rim-magenta);
+}
+
+.offer-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+}
+
+.offer-mark img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-soft);
+  object-fit: contain;
+}
+
+.offer-blank {
+  width: 70%;
+  height: 70%;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-soft);
+}
+
+.offer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.offer-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.offer-name {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.offer-slot {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* Unrated is a state, not a hole. DESIGN.md 8 makes it first-class, so it is
+ * labelled rather than left blank and it is never a reason to hide a card. */
+.offer-unrated {
+  padding: 0.02rem 0.35rem;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--bone-faint);
+}
+
+.offer-text {
+  font-family: var(--body);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bone-dim);
+}
+
+/* Ours. The rule down the left is what says so: nothing else on the card has
+ * one, so the eye reads it as a different kind of statement before the words. */
+.offer-say {
+  margin-top: 0.2rem;
+  padding-left: 0.55rem;
+  border-left: 2px solid var(--jade-dim);
+  font-family: var(--body);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--jade-hot);
+}
+
+.offer-closes {
+  margin-top: 0.15rem;
+  font-family: var(--body);
+  font-size: 0.8rem;
+  color: var(--rim-magenta);
+}
+
+.offer-empty {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--bone-faint);
+}
+
+/* The shared cost, stated once above the offer.
+ *
+ * It is a fact about the god rather than about any card, so it sits apart from
+ * them and it is closed by default: the number is the news, the list of three
+ * dozen names is only wanted by somebody who asks. */
+.offer-shared {
+  margin: 0 0 0.6rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-left: 2px solid var(--rim-magenta);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+  text-align: left;
+}
+
+.offer-shared summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.offer-shared summary::-webkit-details-marker {
+  display: none;
+}
+
+.offer-shared summary strong {
+  font-family: var(--mono);
+  color: var(--rim-magenta);
+}
+
+.offer-shared p {
+  margin: 0.35rem 0 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+/* Everything true of every card, above them.
+ *
+ * It answers "what does taking anything here cost", which is a different
+ * question from "which of these", so it sits apart and reads as context
+ * rather than as another card. */
+.offer-common {
+  margin: 0 0 0.7rem;
+  padding: 0.5rem 0.75rem 0.6rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-950);
+  text-align: left;
+}
+
+.offer-common-head {
+  margin: 0 0 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.offer-common-say {
+  margin: 0 0 0.25rem;
+  font-family: var(--body);
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+}
+
+.offer-common .offer-shared {
+  margin: 0.35rem 0 0;
+  border: 0;
+  border-left: 2px solid var(--rim-magenta);
+  border-radius: 0;
+  background: none;
+  padding: 0.1rem 0 0.1rem 0.55rem;
+}
