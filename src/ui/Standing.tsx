@@ -57,7 +57,7 @@ export function Standing({
   const gods = godPriority(run, traits).filter((god) => god.keeps.length || god.kills.length)
 
   return (
-    <aside className={`standing${open ? ' is-open' : ''}`}>
+    <aside className={`standing${open ? ' is-open' : ''}`} aria-label="What is still open">
       <button type="button" className="standing-handle" onClick={() => setOpen((was) => !was)} aria-expanded={open}>
         {open ? 'Close' : `${live.length} still open`}
       </button>

@@ -3289,3 +3289,46 @@ body::before {
     opacity: 0.6;
   }
 }
+
+/* The skip link.
+ *
+ * Off screen until it has focus, which is the only way it should ever appear:
+ * it is the first thing a keyboard reaches and it must not be the first thing
+ * everyone else sees. */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 50%;
+  z-index: 50;
+  transform: translate(-50%, -150%);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--jade);
+  border-radius: var(--r-pill);
+  background: var(--ink-850);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--jade-hot);
+  text-decoration: none;
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+  outline: none;
+}
+
+/* The present station takes focus when the skip link lands on it, and should
+ * not draw a ring around the whole half-screen while doing so. */
+.station.is-present:focus {
+  outline: none;
+}
+
+.station.is-present:focus-visible .picker-label {
+  outline: 2px solid var(--jade);
+  outline-offset: 4px;
+}
+
+.topbar-run {
+  margin: 0;
+  font-weight: inherit;
+}

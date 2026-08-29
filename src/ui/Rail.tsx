@@ -80,8 +80,14 @@ export function Rail({ held }: { held: Held }) {
               </span>
 
               {/* The tooltip. Hover or focus, and it says what the thing does. */}
+              {/* aria-hidden, not role="tooltip".
+                *
+                * A tooltip role is only meaningful when something points at it
+                * with aria-describedby, and nothing here does. What it says is
+                * already in the visually-hidden line above, so announcing it
+                * twice is the only thing the role was achieving. */}
               {occupant ? (
-                <span className="rail-tip" role="tooltip">
+                <span className="rail-tip" aria-hidden="true">
                   <span className="rail-tip-name">{occupant.name}</span>
                   <span className="rail-tip-meta">
                     {label} · {rarity}
@@ -89,7 +95,7 @@ export function Rail({ held }: { held: Held }) {
                   {occupant.text ? <span className="rail-tip-text">{occupant.text}</span> : null}
                 </span>
               ) : (
-                <span className="rail-tip" role="tooltip">
+                <span className="rail-tip" aria-hidden="true">
                   <span className="rail-tip-name">{label} is open</span>
                   <span className="rail-tip-text">
                     Every god's {label} boon is still on the table while this stays dark.

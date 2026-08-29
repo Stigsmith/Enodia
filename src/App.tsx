@@ -105,6 +105,28 @@ export function App() {
   return (
     <div className="surface">
       <Hecate />
+
+      {/* The picker is the live end of the path, so it is last in the
+        * document: everything logged comes first, and each logged station
+        * carries a correction of its own. On a keyboard that is a dozen tab
+        * stops before the thing the player opened the page to do.
+        *
+        * A button rather than an `href="#present"`, because the timeline
+        * lives in its own scroll container and the anchor did nothing there:
+        * the hash stayed empty and focus fell through to the next control.
+        * Moving focus and scrolling explicitly works wherever the target is. */}
+      <button
+        type="button"
+        className="skip-link"
+        onClick={() => {
+          const present = document.getElementById('present')
+          present?.scrollIntoView({ block: 'center' })
+          present?.focus()
+        }}
+      >
+        Skip to this Exit
+      </button>
+
       <header className="topbar">
         <Menu onStartRun={end} hasRun onEndRun={end} onShowBriefing={openBriefing} />
 
@@ -119,7 +141,22 @@ export function App() {
          * The mark is the aspect's own square icon, not the weapon's cutout:
          * the aspect is the thing that was chosen and the thing that changes
          * how the run plays. */}
-        <p className="topbar-run">
+        {/* The page's subject, and its only h1.
+         *
+         * The run surface had none: the document went straight to an h2 and a
+         * screen reader had nothing to announce the page as. The arm and its
+         * aspect are what this page is about. */}
+        <h1
+          className="topbar-run"
+          /**
+           * Named explicitly, because the separators between these are CSS
+           * `::before` content and there is no whitespace between the spans.
+           * Read off the DOM it announced as "DescuraWitch's StaffUnderworld".
+           */
+          aria-label={[weapon?.arm, aspect?.name?.replace(/^Aspect of /, ''), weapon?.name, run.path === 'surface' ? 'Surface' : run.path ? 'Underworld' : null]
+            .filter(Boolean)
+            .join(', ')}
+        >
           {aspectIcon ? <img className="topbar-mark" src={`/${aspectIcon}`} alt="" /> : null}
           <span className="topbar-arm">{weapon?.arm ?? 'Unknown arm'}</span>
           {aspect ? <span className="topbar-aspect">{aspect.name?.replace(/^Aspect of /, '')}</span> : null}
@@ -127,7 +164,7 @@ export function App() {
           {run.path ? (
             <span className="topbar-aspect">{run.path === 'surface' ? 'Surface' : 'Underworld'}</span>
           ) : null}
-        </p>
+        </h1>
 
         {/* An estimate, and it says so.
          *

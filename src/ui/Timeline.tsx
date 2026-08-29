@@ -73,7 +73,7 @@ export function Timeline({
         <Station key={`${entry.kind}-${entry.exit}-${index}`} entry={entry} onForget={onForget} />
       ))}
 
-      <li className="station is-present" ref={present}>
+      <li className="station is-present" id="present" ref={present} tabIndex={-1}>
         <span className="station-mark" aria-hidden="true" />
         <div className="station-body">
           <p className="station-exit">Exit {entries.filter((entry) => entry.kind === 'exit').length + 1}</p>
