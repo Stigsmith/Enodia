@@ -134,6 +134,9 @@ function Deaths({ died }: { died: string[] }) {
 
   return (
     <details className="station-deaths">
+      {/* The game's own downward pointer as the disclosure marker, in place of
+          the browser's triangle. DialogueContinueArrow, which is what it puts
+          under a line of dialogue that has more behind it. */}
       <summary>
         <span className="entry-deaths-count">
           {died.length === 1 ? '1 closed here' : `${died.length} closed here`}

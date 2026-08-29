@@ -30,7 +30,7 @@ import type { ArtShape } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
 import type { RunEntry } from '../state/run.ts'
 
-type Kind = 'boon' | 'other' | 'hammer' | 'shop' | 'encounter' | 'artifact'
+type Kind = 'boon' | 'other' | 'chaos' | 'hammer' | 'shop' | 'story' | 'encounter' | 'artifact'
 
 const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note: string }[] = [
   {
@@ -56,6 +56,14 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
     note: 'Hermes or Selene. Neither counts against the cap',
   },
   {
+    id: 'chaos',
+    name: 'A Chaos gate',
+    // Items/Loot/PreviewOnly/ChaosGate.png, the preview the game draws on one.
+    icon: 'icons/chaos-gate.png',
+    art: 'icon',
+    note: 'Its own Exit, and its own price. Costs no Olympian slot',
+  },
+  {
     id: 'encounter',
     name: 'An Encounter',
     icon: 'gods/artemis.webp',
@@ -70,9 +78,21 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
     note: 'An Exit like any other. What you bought is what counts',
   },
   {
+    id: 'story',
+    name: 'A Story Exit',
+    // Items/Loot/PreviewOnly/Story.png, which is the preview the game draws on
+    // one. `ChosenRewardType == "Story"` is a real reward type beside Boon,
+    // Devotion and Shop.
+    icon: 'icons/story.png',
+    art: 'icon',
+    note: 'Echo, Medea and the rest. Costs an Exit, and what it gives is theirs to decide',
+  },
+  {
     id: 'artifact',
     name: 'Something else',
-    icon: 'artifacts/pom-of-power.webp',
+    // The game's MysteryResource, not a Pom. A Pom is one of the things this
+    // covers and standing for all of them made it look like the only one.
+    icon: 'icons/mystery.png',
     art: 'icon',
     note: 'A Pom, health, gold. Half the reward slots, and none of them move a verdict',
   },
@@ -137,9 +157,17 @@ export function Picker({
           (s.kind === 'hammer' && s.weapon === run.weapon),
       )
     }
+    /**
+     * Chaos, on its own.
+     *
+     * It sat under the Encounters, which was wrong twice over. `LootData_Chaos`
+     * carries a `DoorIcon`, so a Chaos gate is a real Exit reward and costs an
+     * Exit, where an Encounter costs none. And Chaos is not one of the four
+     * gods who turn up inside a Location.
+     */
+    if (which === 'chaos') return sources.filter((s) => s.kind === 'other' && s.id === 'Chaos')
     if (which === 'encounter') {
       return sources.filter((s) => {
-        if (s.kind === 'other' && s.id === 'Chaos') return true
         if (s.kind !== 'encounter') return false
         return !s.path || !run.path || s.path === run.path
       })
@@ -190,6 +218,21 @@ export function Picker({
         />
       </PickerStep>
     )
+  }
+
+  /**
+   * A Story Exit ends the step where it starts.
+   *
+   * `ChosenRewardType == "Story"` is its own reward type, and what is behind
+   * one is a scene rather than a loot table: Medea can be worth a great deal
+   * and the files do not say so anywhere this project could read. It costs an
+   * Exit, which is the part that matters to the engine, and the rest is the
+   * player's to remember.
+   */
+  if (kind === 'story') {
+    onSkip(null, 'exit')
+    reset()
+    return null
   }
 
   // The artifacts end the step early: none of them changes what is reachable.

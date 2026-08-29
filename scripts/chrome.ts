@@ -35,10 +35,21 @@ import { slugify } from '../src/data/icons.ts'
 const ROOT = resolve(import.meta.dirname, '..')
 const ASSETS = join(ROOT, 'assets')
 const GUI = join(ROOT, 'extracted/gui/textures/GUI')
+/**
+ * `ScriptsBase.pkg`, extracted separately.
+ *
+ * Two packages, two trees, and the second one was invisible to this script
+ * until the Exit reward marker turned out to live in it. A pick names its tree.
+ */
+const SCRIPTSBASE = join(ROOT, 'extracted/scriptsbase/textures')
+/** `GUI.pkg` also carries a top-level Items tree beside its GUI one. */
+const ITEMS = join(ROOT, 'extracted/gui/textures/Items')
 
 type Pick = {
-  /** path under extracted/gui/textures/GUI */
+  /** path under the tree named by `tree`, which defaults to GUI.pkg's GUI */
   from: string
+  /** which extraction tree `from` is relative to */
+  tree?: 'gui' | 'items' | 'scriptsbase'
   /** path under assets/ */
   to: string
   /** what it is for, in the owner's words where there are any */
@@ -124,6 +135,74 @@ const PICKS: Pick[] = [
   { from: 'Screens/TalentScreen/TalentTreeIconsHilight.png', to: 'frames/halo.png', note: 'a filled glow, for behind' },
   { from: 'Screens/CosmeticIcons/cosmetic_cauldronRing01.png', to: 'frames/orbit.png', note: 'a thin band, not a full ring' },
 
+  // The tray, in the pieces the owner asked for. TraitTrayBacking is the one
+  // with a header baked in, which is why two of them side by side never lined
+  // up; _NoHeader is the plain panel and it tiles.
+  { from: 'HUD/TraitTrayBacking_NoHeader.png', to: 'chrome/tray-panel.png', note: 'page backdrop, plain' },
+  { from: 'HUD/TraitTrayHeader.png', to: 'chrome/tray-header.png', note: 'tray header ribbon' },
+  { from: 'HUD/TraitTrayTab.png', to: 'chrome/tray-tab.png', note: 'tab' },
+  { from: 'HUD/TraitTrayTabHighlight.png', to: 'chrome/tray-tab-highlight.png', note: 'tab, hovered' },
+
+  // Circles that are actually circles, drawn face on rather than in world
+  // space. These are what the radial has been wanting all along.
+  {
+    from: 'Fx/HeroTouchdownCircles/HeroTouchdownCircleA.png',
+    to: 'frames/circle-script.png',
+    tree: 'scriptsbase',
+    note: 'a witch circle, script around the rim',
+  },
+  {
+    from: 'Fx/HeroTouchdownCircles/HeroTouchdownCircleB.png',
+    to: 'frames/circle-script-b.png',
+    tree: 'scriptsbase',
+    note: 'the same with a triangle inscribed',
+  },
+  {
+    from: 'Fx/Sorcery/SorceryWolfHowlDecal.png',
+    to: 'chrome/sorcery-circle.png',
+    tree: 'scriptsbase',
+    note: 'the radial backdrop: a lit nonagram',
+  },
+
+  // Icons.
+  { from: 'Loot/PreviewOnly/Story.png', to: 'icons/story.png', tree: 'items', note: 'a Story Exit, Echo or Medea' },
+  { from: 'Loot/MysteryResource.png', to: 'icons/mystery.png', tree: 'items', note: 'something unknown' },
+  {
+    from: 'Loot/PreviewOnly/ChaosGate.png',
+    to: 'icons/chaos-gate.png',
+    tree: 'items',
+    note: 'a Chaos gate. LootData_Chaos carries a DoorIcon, so it is a real Exit reward',
+  },
+  {
+    from: 'Screens/QuestLogScreen/questComplete.png',
+    to: 'icons/complete.png',
+    tree: 'scriptsbase',
+    note: 'a checkmark',
+  },
+  {
+    from: 'GUI/Screens/MetaUpgrade/MaxUpgrade.png',
+    to: 'icons/max-upgrade.png',
+    tree: 'scriptsbase',
+    note: 'at its maximum',
+  },
+  { from: 'Icons/LoadingSymbol_01.png', to: 'icons/loading.png', note: 'a witch sigil, for waiting' },
+  { from: 'Shell/OptionSelectorIcon.png', to: 'icons/selected.png', note: 'what is chosen, in a menu' },
+
+  // Backdrops and furniture held for later.
+  {
+    from: 'LocationBackings/PalaceofZeusBacking/PalaceofZeusBacking.png',
+    to: 'chrome/backing-palace-of-zeus.png',
+    note: 'an Olympian theme, later',
+  },
+  { from: 'LocationBackings/LocationBackingStar.png', to: 'chrome/location-star.png', note: 'a Location nameplate rule' },
+  { from: 'LobSpecialDecal.png', to: 'chrome/lob-decal.png', note: 'an astrolabe, as a backdrop' },
+  {
+    from: 'Screens/DialogueBox-Loop/DialogueBoxStatic.png',
+    to: 'chrome/dialogue-static.png',
+    note: 'the dialogue box everyone who is not an Olympian gets',
+  },
+  { from: 'Screens/DialogueContinueArrow.png', to: 'icons/continue.png', note: 'a pointer, downwards' },
+
   // Rarity. All four were already on the shelf under the name the app uses,
   // byte for byte, and they stay in the table so it is a complete record of
   // what was asked for rather than of what happened to be missing.
@@ -150,7 +229,12 @@ const PICKS: Pick[] = [
  * character and every name in it already belongs to `gods/` or `characters/`.
  * Without it, `gifts/` sorts before `gods/` and silently wins every collision.
  */
-const SWEEPS: { from: string; to: string; suffix?: string; note: string }[] = [
+const SWEEPS: { from: string; to: string; suffix?: string; prefix?: string; note: string }[] = [
+  {
+    from: 'Shell',
+    to: 'shell',
+    note: "the game's own menu furniture, whole. Buttons, arrows, boxes, selectors",
+  },
   { from: 'Screens/FamiliarIcons', to: 'familiars', note: 'the five familiars, their skins and their stat icons' },
   {
     from: 'Screens/AwardMenu/KeepsakeMaxGift/KeepsakeMaxGift_big',
@@ -194,8 +278,10 @@ let already = 0
 const refused: string[] = []
 const collided: string[] = []
 
-function take(from: string, to: string, note: string) {
-  const src = join(GUI, from)
+const TREES = { gui: GUI, items: ITEMS, scriptsbase: SCRIPTSBASE }
+
+function take(from: string, to: string, note: string, tree: keyof typeof TREES = 'gui') {
+  const src = join(TREES[tree], from)
   if (!existsSync(src)) {
     refused.push(`${from} is not in the extraction`)
     return
@@ -228,7 +314,7 @@ function take(from: string, to: string, note: string) {
 }
 
 console.log('picks:')
-for (const pick of PICKS) take(pick.from, pick.to, pick.note)
+for (const pick of PICKS) take(pick.from, pick.to, pick.note, pick.tree ?? 'gui')
 
 for (const sweep of SWEEPS) {
   const dir = join(GUI, sweep.from)
@@ -239,7 +325,7 @@ for (const sweep of SWEEPS) {
   const files = readdirSync(dir).filter((name) => /\.png$/i.test(name))
   console.log(`\n${sweep.to}/  (${files.length} files, ${sweep.note}):`)
   for (const name of files) {
-    const slug = `${slugify(name.replace(/\.[^.]+$/, ''))}${sweep.suffix ?? ''}`
+    const slug = `${sweep.prefix ?? ''}${slugify(name.replace(/\.[^.]+$/, ''))}${sweep.suffix ?? ''}`
     take(join(sweep.from, name).replace(/\\/g, '/'), `${sweep.to}/${slug}.png`, sweep.note)
   }
 }

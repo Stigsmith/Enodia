@@ -166,6 +166,9 @@ function Pinned({ verdict }: { verdict: Verdict }) {
         {icon ? <img src={`/${icon}`} alt="" /> : null}
         <div>
           <p className="briefing-pinned-name">
+            {verdict.state === 'ON_TRACK' ? (
+              <img className="target-done" src="/icons/complete.png" alt="" aria-hidden="true" />
+            ) : null}
             {trait?.name ?? verdict.target}
             <span className="briefing-pinned-state">{STATE_WORD[verdict.state]}</span>
           </p>

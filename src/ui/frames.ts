@@ -116,6 +116,27 @@ export const FRAMES: FrameOption[] = [
     ].join(', '),
   },
 
+  // Hecate's own circles, and the first thing in the whole package that is a
+  // circle drawn face on rather than a world object squashed onto a floor.
+  // `Fx/HeroTouchdownCircles`, which is what the game draws under Melinoe when
+  // she lands.
+  {
+    id: 'script',
+    name: 'Witch circle',
+    note: "Hecate's own, script around the rim. Drawn face on, so nothing had to be un-warped",
+    file: 'frames/circle-script.png',
+    hole: 0.76,
+    opacity: 0.9,
+  },
+  {
+    id: 'script-b',
+    name: 'Witch circle, sealed',
+    note: 'The same with a triangle inscribed, which crosses what it rings',
+    file: 'frames/circle-script-b.png',
+    hole: 0.76,
+    opacity: 0.85,
+  },
+
   // The game's own Exit reward marker, which is what it draws on an Exit when
   // there is something behind it. `scripts/reward-frame.ts` has the chain it
   // was traced through and why the disc had to be squared up first.
@@ -184,11 +205,16 @@ export const FRAMES: FrameOption[] = [
 ]
 
 /**
- * The game's own Exit reward marker, on the ring where a player logs an Exit.
+ * The game's own Exit reward marker.
  *
- * The run picker is asking "what did this Exit give", and this is the thing the
- * game draws on an Exit when it has something behind it. Nothing invented is
- * going to beat that.
+ * It is world art un-warped rather than art that was drawn face on, which is
+ * an argument for `script` and was the reason this moved to it for one commit.
+ * The owner looked at both and picked this one, which settles it: the run
+ * picker asks "what did this Exit give" and this is what the game puts on an
+ * Exit that has something behind it.
+ *
+ * `script` is still here, and it is the honest fallback if the un-warp ever
+ * stops matching a patch.
  */
 export const DEFAULT_FRAME = 'reward'
 
