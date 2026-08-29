@@ -8,8 +8,14 @@
       "port": 5173
     },
     {
+      "name": "dist",
+      "runtimeExecutable": "C:\\Users\\you\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8778", "--bind", "127.0.0.1", "--directory", "dist"],
+      "port": 8778
+    },
+    {
       "name": "placeholder",
-      "runtimeExecutable": "C:\Users\you\AppData\Local\Programs\Python\Python312\python.exe",
+      "runtimeExecutable": "C:\\Users\\you\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
       "runtimeArgs": ["-m", "http.server", "8777", "--bind", "127.0.0.1", "--directory", "placeholder"],
       "port": 8777
     }

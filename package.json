@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/validate.ts && node scripts/build-app-data.ts",
-    "build": "vite build",
+    "build": "vite build && node scripts/prune.ts",
     "preview": "vite preview",
     "validate": "node scripts/validate.ts",
     "extract": "node scripts/extract.mjs",
@@ -19,7 +19,8 @@
     "sprites": "node scripts/sprites.ts",
     "chrome": "node scripts/chrome.ts",
     "reward-frame": "node scripts/reward-frame.ts",
-    "health": "node scripts/health.ts"
+    "health": "node scripts/health.ts",
+    "prune": "node scripts/prune.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
