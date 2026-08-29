@@ -1,0 +1,79 @@
+{
+  "note": [
+    "Rules, as data. DESIGN.md 5. The engine that reads these is src/engine/rules.ts",
+    "and it contains no rule of its own.",
+    "",
+    "Every rule carries a `say`, and the validator fails the build without one:",
+    "the surface renders the sentence and never the number, so a score that",
+    "cannot explain itself is a score nobody should trust.",
+    "",
+    "`source` says where a rule comes from and the three values are not equal.",
+    "`source` means it traces to a named symbol in the game's Lua and is a fact.",
+    "`wiki` is a lead somebody verified. `curator` is a judgement, and the owner's",
+    "to make. Nothing here is `curator` yet, because every rule below is derived",
+    "from the game's own tables rather than from an opinion about what is good.",
+    "",
+    "npm run health measures each one against 300 random legal runs and flags",
+    "anything firing on 60 percent or more of its eligible pool. A rule that",
+    "fires on everything says nothing. Run it before adding the next one."
+  ],
+  "knownGaps": [
+    "No rule here judges whether a boon is good. That is the owner's and it is in no file.",
+    "free-of-the-cap cannot be measured by npm run health: runsim draws Olympian Exits only, so Hermes, Selene and Chaos never appear in a simulated offer even though they are three of the eighteen slots in RewardStoreData.RunProgress. Extend the simulator before trusting its number.",
+    "Nothing reads data/generated/stacking.json yet. A rule keyed on a boon already at its diminishing point wants it, and the 20 curves are sitting there.",
+    "No rule knows what a boon does. That needs the curated feeds tag, DESIGN.md 12 item 8, which the briefing's centre of mass is also waiting on."
+  ],
+  "records": [
+    {
+      "id": "last-piece",
+      "aliases": [],
+      "each": "liveTarget",
+      "when": { "reachable": ["REACHABLE", "AT_RISK"], "minPicksAtMost": 1 },
+      "match": { "prerequisiteFor": ["$target"] },
+      "delta": 25,
+      "say": "This is the last piece of {target}.",
+      "source": "source",
+      "why": "DESIGN.md 5 names this as the rule coupling the two engines. Fires on 32% of offers."
+    },
+    {
+      "id": "feeds-a-target-at-risk",
+      "aliases": [],
+      "each": "liveTarget",
+      "when": { "reachable": ["AT_RISK"] },
+      "match": { "prerequisiteFor": ["$target"] },
+      "delta": 15,
+      "say": "{target} is running out of Exits, and this is one of the pieces.",
+      "source": "source",
+      "why": "Fires on 3% of offers. AT_RISK is rare until a run is nearly over, which is the point."
+    },
+    {
+      "id": "shuts-a-slot-others-need",
+      "aliases": [],
+      "when": { "atGodCap": false },
+      "match": { "shutsItsSlot": true },
+      "delta": -20,
+      "say": "Heroic is the top of the ladder, so this shuts its slot for the rest of the run.",
+      "source": "source",
+      "why": "TraitRarityData.RarityUpgradeOrder ends at Heroic and GetReplacementTraits only offers a swap while the held boon can still be upgraded. Fires on 3% of offers."
+    },
+    {
+      "id": "spends-the-last-god-slot",
+      "aliases": [],
+      "when": { "atGodCap": false, "exitsLeftAtLeast": 1 },
+      "match": { "spendsAGodSlot": true },
+      "delta": -8,
+      "say": "Taking this spends one of your four Olympian slots on a new god.",
+      "source": "source",
+      "why": "HeroData.MaxGodsPerRun, counted by ReachedMaxGods over loot carrying GodLoot. Fires on 30% of offers, which is roughly how often a new god is behind an Exit."
+    },
+    {
+      "id": "free-of-the-cap",
+      "aliases": [],
+      "match": { "god": ["Hermes", "Selene", "Chaos"] },
+      "delta": 6,
+      "say": "Costs no Olympian slot: the cap counts only loot carrying GodLoot.",
+      "source": "source",
+      "why": "LootData.BaseLoot gives GodLoot true by inheritance and these three do not carry it. Unmeasured, see knownGaps."
+    }
+  ]
+}
