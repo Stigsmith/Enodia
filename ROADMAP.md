@@ -14,7 +14,7 @@ Last updated 29 August 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete** |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 230, across 11 files |
+| **Tests** | 249, across 12 files |
 | **Validator** | 8 checks, 0 failures, 3 warnings |
 | **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
@@ -71,6 +71,60 @@ already true.
 | Boon text | 259 of 567 descriptions were wrong. `#` placeholders **422 down to 193** |
 | Corrections | "This did not happen" on every station, replaying the run |
 | Keyboard | An `h1`, a skip link, named landmarks |
+| Arcana and familiars | 25 cards and 5 familiars in the bundle, all 30 with art |
+| **The build manager** | Five layouts to choose between, and both aspect ratios |
+| `npm run artifact` | The build manager as one self contained HTML file, 2.2 MB, art inlined |
+
+---
+
+### The build manager, and why it is five things
+
+**The owner reordered the product.** The run companion is for a newcomer. A player with 300
+hours marks a build in the game and plays; what they need is *inspiration* ("what shall I
+try this run") and *gap analysis* ("what am I defaulting to, and what would break it").
+Both are answered by looking at builds rather than by logging one, so the build manager is
+the core rather than a phase 3 extra.
+
+**The crux is visual and it is unsolved, so it is not being guessed at.** A loadout is
+eighteen items across six categories and every obvious way to draw it is cluttered or a
+spreadsheet. Five layouts are on screen behind a switcher, each built to a different design
+philosophy, each stating what it gives up. One gets chosen and four files get deleted.
+
+| Variant | Approach | Good at | Gives up |
+|---|---|---|---|
+| Loadout | mimic the game's own tray | recognition, density | character. Three look alike |
+| Poster | one build as a page, art large | "what shall I try" | comparison. One at a time |
+| Constellation | five fixed clock positions | shape, and gaps at a glance | names. Leans on the art |
+| Ribbon | an order, not an inventory | use at an Exit | the whole. No shape in it |
+| Contact sheet | uniform tiles, several at once | difference | everything else |
+
+`src/ui/build-pieces.ts` resolves a build once and all five draw from it, so the comparison
+is between five designs rather than five renderers. The split it imposes is the one the
+owner's two questions fall along: **what is committed at the Crossroads** against **what is
+found in the run**.
+
+**There is a shareable copy.** `npm run artifact` builds `artifact/` and folds the
+stylesheet, the module and 59 images into a single 2.2 MB HTML file that runs from anywhere
+with no server. It is the same components: nothing in `artifact/` reimplements a layout. It
+ships two ways, as an Artifact and as `dist/builds.html`, so the build manager has a direct
+URL rather than living three clicks into a menu.
+
+Writing it hit **the charset bug for the third time**, and for the second time in a wrapper
+that hides it. The page was written without a `<meta charset>` because the Artifact wrapper
+injects one; served as `dist/builds.html` from a plain server, which injects nothing, the
+browser guessed GBK and every interpunct rendered as a Chinese character. `Descura 路
+Poseidon + Zeus`. `artifact/` is inside the validator's charset check now.
+
+**Both shapes work.** Every variant is authored narrow first, then given `60rem` and again
+`100rem`. Mark sizes are four rungs on one scale, so a 21:9 screen gets a bigger drawing
+rather than only a wider one, which was the actual complaint: at 2560 the sheet went three
+abreast and every icon in it was still 41 pixels.
+
+**The three sample builds are samples and say so on screen.** Every id is real, every duo
+holds its prerequisites, no two boons contend for a slot, and `builds.test.ts` fails the
+build if that stops being true. Writing them caught three errors that would have looked
+plausible on a page. **Which build is worth playing is not claimed anywhere**, because it is
+not in any file. `data/curated/builds.json` is still empty and still the owner's.
 
 
 ---
@@ -79,11 +133,15 @@ already true.
 
 Phase 1 is done and nothing below blocks anything else. In the order I would take them.
 
-**1. Point Netlify at `dist/`.** The owner's call, and the only thing between this and
+**1. Pick a build manager layout.** The owner's call and it blocks the whole feature: the
+next thing to build is real build definitions, and their shape depends on which of the five
+survives. Menu, Builds. Four files get deleted the moment one is chosen.
+
+**2. Point Netlify at `dist/`.** The owner's call, and the only thing between this and
 people using it. The build is 10 MB, it runs from a plain static server, and
 `.claude/launch.json` has a `dist` entry to check it first.
 
-**2. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
+**3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
 of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
 does not have the numbers at all. See above.
 
@@ -91,10 +149,10 @@ The `feeds` tag is the largest hand-authoring job in the project and the owner's
 separate features wait on it: the briefing's centre of mass, any rule about what a boon
 actually does, and archetypes. Nothing else unlocks as much.
 
-**3. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
+**4. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
 walking `InheritFrom` itself.
 
-**4. Phase 2.** `REQUIREMENTS.md` 7.
+**5. Phase 2.** `REQUIREMENTS.md` 7.
 
 ---
 
@@ -106,6 +164,8 @@ walking `InheritFrom` itself.
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
+| Which build manager layout | The owner | Five are on screen behind a switcher, each stating what it gives up. Real build definitions wait on the answer |
+| Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The three in `src/data/builds.ts` are samples for testing layouts and are labelled as such on the page |
 
 ---
 

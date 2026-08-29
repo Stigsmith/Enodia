@@ -5,6 +5,7 @@ import './ui/tokens.css'
 import './ui/base.css'
 import './ui/surface.css'
 import './ui/sprites.css'
+import './ui/builds.css'
 import { App } from './App.tsx'
 
 const root = document.getElementById('root')

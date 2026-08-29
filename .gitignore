@@ -12,6 +12,8 @@ node_modules/
 # in version control and still the thing deployed to Netlify until the app ships.
 # Serve it on 8777 with the `placeholder` config in .claude/launch.json.
 dist/
+# `npm run artifact` output: one self contained HTML file, rebuildable.
+dist-artifact/
 
 *.local
 .DS_Store

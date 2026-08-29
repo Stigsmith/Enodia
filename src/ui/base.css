@@ -28,6 +28,22 @@ body {
   padding: 2.5rem 1.25rem 4rem;
 }
 
+/* The build manager sets its own width, and it wants the room. The 46rem cap
+ * is for the setup screen, which is a form.
+ *
+ * **It scrolls itself, not the page.** `Hecate` is a fixed, blurred backdrop,
+ * and scrolling the document behind one of those left whole bands of the page
+ * unpainted: the DOM was laid out correctly and the pixels were not there. The
+ * run surface never hit it because it pins to 100dvh and scrolls a container,
+ * which is the same thing this does now. */
+.shell.is-wide {
+  max-width: none;
+  padding: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .wordmark {
   margin: 0;
   font-family: var(--display);

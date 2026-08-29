@@ -101,6 +101,19 @@ function loadSources(): SourceFile[] {
   for (const path of walk(join(ROOT, 'src'))) {
     if (!path.includes('.test.')) add(path)
   }
+  /**
+   * The standalone build manager page, and its charset in particular.
+   *
+   * `npm run artifact` writes it and it ships two ways: as an Artifact, whose
+   * wrapper injects a charset, and as `dist/builds.html` behind a plain server,
+   * which injects nothing. It was written without one and every interpunct in
+   * it came out as a Chinese character, invisible in the wrapper and visible on
+   * the server. The charset check is exactly the check that catches that, so
+   * this page is inside it now.
+   */
+  for (const path of walk(join(ROOT, 'artifact'))) {
+    if (!path.includes('.test.')) add(path)
+  }
   // The hand-authored page the app replaces. Checked, reported, never fatal.
   add(join(ROOT, 'placeholder/index.html'), true)
 

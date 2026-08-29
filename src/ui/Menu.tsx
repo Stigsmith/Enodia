@@ -30,12 +30,15 @@ export function Menu({
   hasRun,
   onEndRun,
   onShowBriefing,
+  onShowBuilds,
 }: {
   onStartRun: () => void
   hasRun: boolean
   onEndRun: () => void
   /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
   onShowBriefing?: () => void
+  /** the build manager, which is a screen rather than an overlay */
+  onShowBuilds?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
@@ -86,7 +89,16 @@ export function Menu({
     {
       title: 'Builds',
       entries: [
-        { label: 'Build manager', note: 'Define a build and track it. Waiting on the first definition' },
+        onShowBuilds
+          ? {
+              label: 'Build manager',
+              note: 'Five layouts to choose between, on three sample builds',
+              action: () => {
+                onShowBuilds()
+                setOpen(false)
+              },
+            }
+          : { label: 'Build manager', note: 'Define a build and track it. Waiting on the first definition' },
         { label: 'Build exchange', note: 'Share and import builds. Phase 4' },
       ],
     },

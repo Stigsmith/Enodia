@@ -103,6 +103,34 @@ export type RewardSource = {
 
 export const sources: readonly RewardSource[] = bundle.sources as RewardSource[]
 
+/**
+ * The Arcana, the board Melinoe lays out before a run.
+ *
+ * 25 real cards. `MetaUpgradeCardData` holds 27 and two are `DebugOnly`
+ * scaffolding. `cost` is the Grasp each one takes off the board's total, which
+ * is the only number that governs whether a set of five can be played at once.
+ */
+export type ArcanaCard = {
+  id: string
+  name: string
+  text: string | null
+  cost: number | null
+  icon: string | null
+}
+
+export const arcana: readonly ArcanaCard[] = bundle.arcana as ArcanaCard[]
+
+export const arcanaById: ReadonlyMap<string, ArcanaCard> = new Map(arcana.map((card) => [card.id, card]))
+
+/** The five familiars, by the id `FamiliarOrderData` lists. */
+export type Familiar = { id: string; name: string; icon: string | null }
+
+export const familiars: readonly Familiar[] = bundle.familiars as Familiar[]
+
+export const familiarById: ReadonlyMap<string, Familiar> = new Map(familiars.map((one) => [one.id, one]))
+
+export const weaponById: ReadonlyMap<WeaponId, Weapon> = new Map(weapons.map((one) => [one.id, one]))
+
 /** Each god's offer pools, for the Exit picker and the simulator. */
 export const godPools: ReadonlyMap<GodId, { priority: TraitId[]; pool: TraitId[] }> = new Map(
   (bundle.pools as { god: string; priority: string[]; pool: string[] }[]).map((entry) => [

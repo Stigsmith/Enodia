@@ -19,6 +19,8 @@ import { reachable } from './engine/reachability.ts'
 import { loadPrefs } from './state/prefs.ts'
 import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
 import { Briefing } from './ui/Briefing.tsx'
+import { Hecate } from './ui/Hecate.tsx'
+import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
@@ -47,6 +49,15 @@ export function App() {
    */
   const [card, setCard] = useState<Card | null>(null)
   const [showBriefing, setShowBriefing] = useState(false)
+
+  /**
+   * The build manager, which is a screen rather than an overlay.
+   *
+   * It replaces the surface entirely while it is open, because it is a place a
+   * player goes between runs and looking at it is the whole activity. Coming
+   * back leaves the run exactly as it was: the run lives in `useRun`, not here.
+   */
+  const [showBuilds, setShowBuilds] = useState(false)
 
   const buildCard = useCallback(
     (ctx: RunContext) => brief(ctx, lastSeen(loadTrail()), traits, { pinned, exit: entries.length }),
@@ -77,12 +88,26 @@ export function App() {
     saveTrail(markSeen(loadTrail(), entries.length))
   }
 
+  if (showBuilds) {
+    return (
+      <div className="shell is-wide">
+        <Hecate />
+        <Builds onClose={() => setShowBuilds(false)} />
+      </div>
+    )
+  }
+
   if (!run) {
     return (
       <main className="shell">
         <Hecate />
         <header className="masthead">
-          <Menu onStartRun={() => {}} hasRun={false} onEndRun={end} />
+          <Menu
+            onStartRun={() => {}}
+            hasRun={false}
+            onEndRun={end}
+            onShowBuilds={() => setShowBuilds(true)}
+          />
           <div>
             <h1 className="wordmark">Enodia</h1>
             <p className="tagline">A build companion for Hades II, read at an Exit.</p>
@@ -128,7 +153,13 @@ export function App() {
       </button>
 
       <header className="topbar">
-        <Menu onStartRun={end} hasRun onEndRun={end} onShowBriefing={openBriefing} />
+        <Menu
+          onStartRun={end}
+          hasRun
+          onEndRun={end}
+          onShowBriefing={openBriefing}
+          onShowBuilds={() => setShowBuilds(true)}
+        />
 
         {/* The arm, by its own name.
          *
@@ -207,25 +238,6 @@ export function App() {
   )
 }
 
-/**
- * The room the tool is standing in.
- *
- * `tokens.css` takes jade from Hecate's portrait and calls it the living
- * light, so the page is lit by it and by nothing else. Three fixed layers
- * behind everything: drifting blooms, two fields of rising dust, and a
- * vignette. All of it is decoration, so it is aria-hidden and inert, and
- * `prefers-reduced-motion` stops every animation in it.
- */
-function Hecate() {
-  return (
-    <div className="hecate" aria-hidden="true">
-      <div className="hecate-glow" />
-      <div className="hecate-motes is-far" />
-      <div className="hecate-motes" />
-      <div className="hecate-vignette" />
-    </div>
-  )
-}
 
 function Colophon() {
   return (
