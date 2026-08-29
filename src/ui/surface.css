@@ -209,7 +209,7 @@
 .quiet {
   border: 0 solid transparent;
   border-width: 1.15rem 1.7rem;
-  border-image: url('/chrome/button.png') 38 fill / 1.15rem 1.7rem stretch;
+  border-image: url('/shell/button.png') 38 fill / 1.15rem 1.7rem stretch;
   border-radius: 0;
   padding: 0 0.3rem;
   min-height: 2.3rem;
@@ -223,7 +223,7 @@
 
 .quiet:hover,
 .quiet:focus-visible {
-  border-image-source: url('/chrome/button-highlight.png');
+  border-image-source: url('/shell/button-highlight.png');
   color: var(--bone);
   outline: none;
 }
@@ -819,7 +819,7 @@
   width: 96%;
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%);
-  background: url('/chrome/sorcery-circle.png') center / contain no-repeat;
+  background: url('/shell/sorcery-circle.png') center / contain no-repeat;
   opacity: 0.1;
   pointer-events: none;
   animation: sorcery-breathe 14s ease-in-out infinite;
@@ -1044,8 +1044,8 @@
  * cutout with empty corners, so it takes far more of the circle before it
  * touches anything. */
 .bubble-slot.is-icon .bubble img {
-  width: 60%;
-  height: 60%;
+  width: calc(60% * var(--art-scale, 1));
+  height: calc(60% * var(--art-scale, 1));
 }
 
 .bubble-slot.is-render .bubble img {
@@ -1251,10 +1251,23 @@
 
 /* The rail. A column now, and it never scrolls away. */
 .railbar {
+  position: relative;
   grid-area: rail;
   padding: 0.8rem 0.6rem;
   border-right: 1px solid var(--div-2);
   background: var(--ink-950);
+}
+
+/* The rail sits on the game's own `SideBars_01`, 380 by 1080, drawn for
+ * exactly this: a full-height strip down the edge of the screen.
+ *
+ * **Only where the rail is actually a sidebar.** Below this width the layout
+ * lays it out as a strip across the top, and a tall narrow texture stretched
+ * into a short wide box is a smear. */
+@media (min-width: 60rem) {
+  .railbar {
+    background: var(--ink-950) url('/shell/sidebars.png') right center / 100% 100% no-repeat;
+  }
 }
 
 .railbar .rail {
@@ -1796,7 +1809,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: url('/chrome/tray-panel.png') center / cover no-repeat;
+  background: url('/shell/tray-panel.png') center / cover no-repeat;
   opacity: 0.09;
   pointer-events: none;
 }
@@ -1806,7 +1819,7 @@ body::before {
     right: 50%;
     /* `cover`, not a stretch. The panel is 1280 by 1793 and forcing it to a
      * half-screen box would squash the smoke visibly even at nine percent. */
-    background: url('/chrome/tray-panel.png') right center / cover no-repeat;
+    background: url('/shell/tray-panel.png') right center / cover no-repeat;
   }
 
   /* The right half, mirrored. A second element rather than a transform on the
@@ -1820,7 +1833,7 @@ body::before {
     bottom: 0;
     left: 50%;
     z-index: 0;
-    background: url('/chrome/tray-panel.png') left center / cover no-repeat;
+    background: url('/shell/tray-panel.png') left center / cover no-repeat;
     transform: scaleX(-1);
     opacity: 0.09;
     pointer-events: none;
@@ -2022,31 +2035,51 @@ body::before {
 .block-heading {
   padding-bottom: 0.3rem;
   border-bottom: 1px solid transparent;
-  border-image: url('/chrome/divider-long.png') 0 0 7 0 / 0 0 3px 0 stretch;
+  border-image: url('/shell/divider-long.png') 0 0 7 0 / 0 0 3px 0 stretch;
 }
 
 /* The tray handle wears the tray's own header ribbon. */
 .tray-handle {
-  background: url('/chrome/tray-header.png') left center / auto 190% no-repeat;
+  background: url('/shell/tray-header.png') left center / auto 190% no-repeat;
 }
 
-/* The caption sits on the game's own subtitle plate.
+/* The caption sits on `SpellScreenSlot`.
  *
- * It was the tooltip nine-slice, which has hard corners and four little tick
- * marks, and stretching that to the width of the ring drew a box around a line
- * of text that did not need one. `SubtitleBacking` has no frame at all: it is a
- * soft dark fade that lets a line sit on the page. Which is what this is, and
- * the game uses it for exactly this.
+ * Three plates were tried before it and each failed the same test: **the
+ * caption changes length on every hover**, from two words to a full sentence,
+ * so whatever holds it has to grow without deforming.
  *
- * Stretched rather than nine-sliced, because there is nothing in it that a
- * stretch can smear. */
+ * The tooltip nine-slice drew a hard-cornered box with tick marks around a
+ * single line. The subtitle plate was so soft it read as nothing. And
+ * `ResourceBacking_Harvest` is a 468 by 180 oval with a heavy floral ornament
+ * along the bottom: sized to its own proportions it looks right for one line
+ * and grows into a wall for four, and stretched to fit it smears the flowers.
+ * An oval with ornament on one edge cannot be nine-sliced, so it cannot take
+ * copy of unknown length. It is still on the shelf for somewhere the text is
+ * fixed.
+ *
+ * `SpellScreenSlot` is a rounded rectangle with a hairline, which is exactly
+ * the shape that nine-slices: 46 pixels off each edge keeps the corners whole
+ * and stretches only the flat runs between them, at any size. */
 .radial-caption {
-  padding: 0.7rem 1.4rem 0.9rem;
-  background: url('/chrome/subtitle-backing.png') center / 100% 100% no-repeat;
+  width: min(26rem, 94%);
+  margin: 0.4rem auto 0;
+  padding: 0.1rem 0.6rem 0.3rem;
+  border: 0 solid transparent;
+  border-width: 0.85rem;
+  border-image: url('/shell/spell-slot.png') 46 fill / 0.85rem stretch;
 }
 
 .radial-caption:empty {
-  background: none;
+  border-image: none;
+}
+
+/* Sentence case, not shouted. The caption is a sentence about the thing under
+ * the cursor and it changes on every hover, so it was the loudest moving text
+ * on the page. */
+.radial-caption-idle,
+.radial-caption-name {
+  text-transform: none;
 }
 
 /* Whatever is framing a bubble today.
@@ -2251,7 +2284,7 @@ body::before {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: url('/chrome/tray-backing.png') top left / 150% auto no-repeat;
+  background: url('/shell/tray-backing.png') top left / 150% auto no-repeat;
   opacity: 0.07;
   pointer-events: none;
 }
@@ -2553,11 +2586,25 @@ body::before {
   align-items: center;
 }
 
+/* "What did this Exit give", on the tray's own header ribbon.
+ *
+ * `TraitTrayHeader` is 988 by 120 and is what the game puts a section name on.
+ * Stretched to the heading's own box rather than nine-sliced: the ribbon is
+ * not symmetric, it has a longer tail at one end, so slicing equal caps off
+ * each side cut it in the wrong places and let the art run past the text. It
+ * is a flat ribbon, so stretching it is the thing that costs nothing. */
 .picker-label {
-  margin: 0 0 0.4rem;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 0.8rem;
+  padding: 0.55rem 2.4rem 0.7rem;
+  background: url('/shell/tray-header.png') center / 100% 100% no-repeat;
   font-family: var(--display);
   font-size: 0.95rem;
   letter-spacing: 0.05em;
+  text-align: center;
+  white-space: nowrap;
   color: var(--jade-hot);
 }
 

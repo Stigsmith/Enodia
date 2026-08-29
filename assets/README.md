@@ -74,14 +74,13 @@ their source pages the first time, which is how that got noticed.
 | `artifacts/` | 11 | wiki | Consumables and run items | partial |
 | `biomes/` | 9 | mixed, 8 wiki and 1 game | Region art | complete, Tartarus came out of the run history icons |
 | `elements/` | 6 | wiki | Aether, Air, Earth, Fire, Water, Elemental Essence | complete |
-| `ui/` | 19 | wiki | Wiki section icons | low value, `icons/` and `chrome/` replace it |
+| `ui/` | 19 | wiki | Wiki section icons | low value, `icons/` and `shell/` replace it |
 | `slots/` | 5 | wiki | Attack, Special, Cast, Dash, Magick | complete |
 | `arcana/` | 25 | game | Arcana cards, named, from game files | complete |
 | `vows/` | 19 | game | Oath of the Unseen, from game files | complete |
 | `rarity/` | 4 | game | Common/Rare/Epic/Heroic. These are `Icons/CardRarityIcon_*` | complete |
 | `hexes/` | 9 | game | Selene's Hex duos, one per Olympian, from game files | complete, 9 of 9 |
-| `chrome/` | 60 | game | The game's own furniture: boxes, backings, medallion, splash art | picked by hand, see `scripts/chrome.ts` |
-| `shell/` | 37 | game | `GUI/Shell` whole: buttons, arrows, toggles, sliders, selectors | swept |
+| `shell/` | 96 | game | Every piece of the game's UI furniture: boxes, buttons, arrows, backings, sidebars, medallion, splash art | `GUI/Shell` swept whole, the rest picked by hand |
 | `frames/` | 27 | game | Boon and rarity frames, every ring the radial can wear, the Exit reward marker, and Hecate's touchdown circles | see `src/ui/frames.ts` |
 | `icons/` | 15 | game | The game's own UI icons: boon, gold, reroll, story, Chaos gate, checkmark, mystery | picked by hand |
 | `familiars/` | 50 | game | The five familiars, their six skins each and their stat icons | complete, unused so far |
@@ -256,7 +255,7 @@ and 1.1 to 0.8 as they fade up. Two counter-rotating medallions, then it chains 
 `HammerScreen_Feathers`, which is `HammerBackground.png`.
 
 That is a worked example of the ambient tier in `VISUAL.md`, and of the tone-on-tone
-ornament that brief says the page is missing. Both images are now in `chrome/`.
+ornament that brief says the page is missing. Both images are now in `shell/`.
 
 ### Three trees, not one
 
@@ -325,10 +324,10 @@ real Exit shows. Neither number is hardcoded: both are measured off the shipped 
 every run, so a patch that redraws the marker gets followed rather than fought.
 
 `npm run reward-frame` writes `frames/reward-marker.png`, `frames/reward-wings.png`, both
-`-meta` variants, and `chrome/reward-glow.png`.
+`-meta` variants, and `shell/reward-glow.png`.
 
 **A front-facing cousin does exist**, and it was already on this shelf:
-`chrome/circle-filigree.png`, which is `UnlockTextCircleBacking.png` out of `GUI.pkg`. Its
+`shell/circle-filigree.png`, which is `UnlockTextCircleBacking.png` out of `GUI.pkg`. Its
 disc measures 260 by 251, so it really is round, because it is a UI element rather than a
 world one. Same motif, a plate with ornaments either side; different ornament, gold
 scrollwork rather than silver crescents.
@@ -346,7 +345,7 @@ boon larger than about 80 pixels needs a different image, and there is not one.
 The same is not true of the gods: `gods/` is 214 wide and `gifts/` is 240, so a portrait can
 be drawn much larger than a boon before it softens.
 
-### Chrome is picked by hand, and `scripts/chrome.ts` is the record
+### The shelf is picked by hand, and `scripts/chrome.ts` is the record
 
 `npm run assets -- --fill` finds boon art by matching the trait data's `Icon` fields against
 the extraction. **Chrome has no trait data behind it.** A pause box or a button plate is on
@@ -366,11 +365,11 @@ It is idempotent and it refuses two things:
   suffix for exactly this reason, and anything else that would collide is named and skipped
 - **Copying something already here.** Six of the 43 files picked on 28 August 2026 were on
   the shelf already, byte for byte, under the names the app uses: the four rarity icons
-  (`Icons/CardRarityIcon_*`), `chrome/tooltip-backing.png` (`Tooltip_Backing_01.png`) and
-  `chrome/resource-backing.png` (`ResourceBacking.png`). They stay in the table so it is a
+  (`Icons/CardRarityIcon_*`), `shell/tooltip-backing.png` (`Tooltip_Backing_01.png`) and
+  `shell/resource-backing.png` (`ResourceBacking.png`). They stay in the table so it is a
   record of what was asked for rather than of what happened to be missing
 
-**`chrome/circle-filigree.png` is `UnlockTextCircleBacking.png`,** and it is a filled disc
+**`shell/circle-filigree.png` is `UnlockTextCircleBacking.png`,** and it is a filled disc
 with gold flourishes rather than a ring with a hole. That is why art behind it shows through
 tinted, and why it is the only frame option with a non-square aspect.
 
@@ -423,7 +422,7 @@ game's own 90x90 aspect icon, is the working image and it is consistent with the
 
 ### The animated plates
 
-Each is a full in-and-out sequence: it starts empty, peaks, and fades back out. `chrome/`
+Each is a full in-and-out sequence: it starts empty, peaks, and fades back out. `shell/`
 holds the peak frame of each, which is the resting look.
 
 | Sequence | Frames | Size | What it is |

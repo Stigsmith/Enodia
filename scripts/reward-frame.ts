@@ -201,7 +201,7 @@ if os.path.exists(glow):
     path = os.path.join(OUT, "chrome", "reward-glow.png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     Image.open(glow).convert("RGBA").save(path, optimize=True)
-    report.append({"name": "chrome/reward-glow.png", "size": Image.open(path).size,
+    report.append({"name": "shell/reward-glow.png", "size": Image.open(path).size,
                    "bytes": os.path.getsize(path)})
 
 print(json.dumps(report))

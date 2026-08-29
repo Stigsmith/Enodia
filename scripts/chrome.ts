@@ -65,65 +65,65 @@ type Pick = {
  */
 const PICKS: Pick[] = [
   // Panels, large enough to hold a paragraph.
-  { from: 'Shell/background_confirm.png', to: 'chrome/box-confirm.png', note: 'large textbox, 1287x794' },
-  { from: 'Shell/Box_Pause.png', to: 'chrome/box-pause.png', note: 'large textbox, 1173x1063' },
-  { from: 'Shell/Box_HalfScreen.png', to: 'chrome/box-halfscreen.png', note: 'large textbox, 1248x1104' },
+  { from: 'Shell/background_confirm.png', to: 'shell/box-confirm.png', note: 'large textbox, 1287x794' },
+  { from: 'Shell/Box_Pause.png', to: 'shell/box-pause.png', note: 'large textbox, 1173x1063' },
+  { from: 'Shell/Box_HalfScreen.png', to: 'shell/box-halfscreen.png', note: 'large textbox, 1248x1104' },
 
   // Panels for a line or two.
-  { from: 'ResourceBacking.png', to: 'chrome/resource-backing.png', note: 'small text window' },
-  { from: 'ResourceBacking_Harvest.png', to: 'chrome/resource-backing-harvest.png', note: 'small text window' },
-  { from: 'ResourceBacking_Long.png', to: 'chrome/resource-backing-long.png', note: 'small text window, wide' },
-  { from: 'TimerBacking.png', to: 'chrome/timer-backing.png', note: 'small text window' },
-  { from: 'Screens/SpellScreen/SpellScreenSlot.png', to: 'chrome/spell-slot.png', note: 'textbox' },
+  { from: 'ResourceBacking.png', to: 'shell/resource-backing.png', note: 'small text window' },
+  { from: 'ResourceBacking_Harvest.png', to: 'shell/resource-backing-harvest.png', note: 'small text window' },
+  { from: 'ResourceBacking_Long.png', to: 'shell/resource-backing-long.png', note: 'small text window, wide' },
+  { from: 'TimerBacking.png', to: 'shell/timer-backing.png', note: 'small text window' },
+  { from: 'Screens/SpellScreen/SpellScreenSlot.png', to: 'shell/spell-slot.png', note: 'textbox' },
   {
     from: 'Screens/SpellScreen/SpellScreenSlotHighlight.png',
-    to: 'chrome/spell-slot-highlight.png',
+    to: 'shell/spell-slot-highlight.png',
     note: 'textbox, hovered',
   },
 
   // Buttons, each with the state the game draws under the cursor.
-  { from: 'Shell/button.png', to: 'chrome/button.png', note: 'button' },
-  { from: 'Shell/button_highlight.png', to: 'chrome/button-highlight.png', note: 'button, hovered' },
-  { from: 'Screens/TradeScreen/button-cancel.png', to: 'chrome/button-cancel.png', note: 'cancel' },
+  { from: 'Shell/button.png', to: 'shell/button.png', note: 'button' },
+  { from: 'Shell/button_highlight.png', to: 'shell/button-highlight.png', note: 'button, hovered' },
+  { from: 'Screens/TradeScreen/button-cancel.png', to: 'shell/button-cancel.png', note: 'cancel' },
   {
     from: 'Screens/TradeScreen/button-cancel_highlight.png',
-    to: 'chrome/button-cancel-highlight.png',
+    to: 'shell/button-cancel-highlight.png',
     note: 'cancel, hovered',
   },
-  { from: 'Screens/TradeScreen/button-confirm.png', to: 'chrome/button-confirm.png', note: 'confirm' },
+  { from: 'Screens/TradeScreen/button-confirm.png', to: 'shell/button-confirm.png', note: 'confirm' },
   {
     from: 'Screens/TradeScreen/button-confirm_highlight.png',
-    to: 'chrome/button-confirm-highlight.png',
+    to: 'shell/button-confirm-highlight.png',
     note: 'confirm, hovered',
   },
-  { from: 'ConfirmButton.png', to: 'chrome/confirm-button.png', note: 'confirm, round' },
-  { from: 'ConfirmButtonHighlight.png', to: 'chrome/confirm-button-highlight.png', note: 'confirm, round, hovered' },
-  { from: 'ExitButton.png', to: 'chrome/exit-button.png', note: 'exit, round' },
-  { from: 'ExitButtonHighlight.png', to: 'chrome/exit-button-highlight.png', note: 'exit, round, hovered' },
-  { from: 'InfoButton.png', to: 'chrome/info-button.png', note: 'info, round' },
-  { from: 'InfoButtonHighlight.png', to: 'chrome/info-button-highlight.png', note: 'info, round, hovered' },
-  { from: 'TrashButton.png', to: 'chrome/trash-button.png', note: 'bin, for the build manager' },
-  { from: 'TrashButtonHilight.png', to: 'chrome/trash-button-highlight.png', note: 'bin, hovered' },
+  { from: 'ConfirmButton.png', to: 'shell/confirm-button.png', note: 'confirm, round' },
+  { from: 'ConfirmButtonHighlight.png', to: 'shell/confirm-button-highlight.png', note: 'confirm, round, hovered' },
+  { from: 'ExitButton.png', to: 'shell/exit-button.png', note: 'exit, round' },
+  { from: 'ExitButtonHighlight.png', to: 'shell/exit-button-highlight.png', note: 'exit, round, hovered' },
+  { from: 'InfoButton.png', to: 'shell/info-button.png', note: 'info, round' },
+  { from: 'InfoButtonHighlight.png', to: 'shell/info-button-highlight.png', note: 'info, round, hovered' },
+  { from: 'TrashButton.png', to: 'shell/trash-button.png', note: 'bin, for the build manager' },
+  { from: 'TrashButtonHilight.png', to: 'shell/trash-button-highlight.png', note: 'bin, hovered' },
 
   // A row you pick from.
-  { from: 'Screens/Narration-In/ChoiceBox_01.png', to: 'chrome/choicebox.png', note: 'choice box' },
+  { from: 'Screens/Narration-In/ChoiceBox_01.png', to: 'shell/choicebox.png', note: 'choice box' },
   {
     from: 'Screens/Narration-In/ChoiceBox_MouseOver01.png',
-    to: 'chrome/choicebox-highlight.png',
+    to: 'shell/choicebox-highlight.png',
     note: 'choice box, hovered',
   },
 
   // Everything else that frames rather than fills.
-  { from: 'Tooltip_Backing_01.png', to: 'chrome/tooltip-backing.png', note: 'tooltip' },
-  { from: 'SideBars_01.png', to: 'chrome/sidebars.png', note: 'sidebars, 380x1080' },
-  { from: 'Screens/DialogueBoxOlympian-In/DialogueBoxOlympian-In0016.png', to: 'chrome/dialogue-olympian.png', note: 'Olympian dialogue box' },
-  { from: 'Screens/BoonSelect/BoonSelectMelOut/BoonSelectMelOut0001.png', to: 'chrome/backdrop-mel.png', note: 'backdrop' },
+  { from: 'Tooltip_Backing_01.png', to: 'shell/tooltip-backing.png', note: 'tooltip' },
+  { from: 'SideBars_01.png', to: 'shell/sidebars.png', note: 'sidebars, 380x1080' },
+  { from: 'Screens/DialogueBoxOlympian-In/DialogueBoxOlympian-In0016.png', to: 'shell/dialogue-olympian.png', note: 'Olympian dialogue box' },
+  { from: 'Screens/BoonSelect/BoonSelectMelOut/BoonSelectMelOut0001.png', to: 'shell/backdrop-mel.png', note: 'backdrop' },
 
   // Splash art. The chrome/victory-* already on the shelf are the 1920x360
   // banners off the same screens, not these.
-  { from: 'Screens/VictoryScreenUnderworld/VictoryScreenUnderworld.png', to: 'chrome/splash-underworld.png', note: 'splash' },
-  { from: 'Screens/VictoryScreenSurface/VictoryScreenSurface.png', to: 'chrome/splash-surface.png', note: 'splash' },
-  { from: 'Screens/VictoryScreenDreamRun/VictoryScreenDreamRun.png', to: 'chrome/splash-dreamrun.png', note: 'splash' },
+  { from: 'Screens/VictoryScreenUnderworld/VictoryScreenUnderworld.png', to: 'shell/splash-underworld.png', note: 'splash' },
+  { from: 'Screens/VictoryScreenSurface/VictoryScreenSurface.png', to: 'shell/splash-surface.png', note: 'splash' },
+  { from: 'Screens/VictoryScreenDreamRun/VictoryScreenDreamRun.png', to: 'shell/splash-dreamrun.png', note: 'splash' },
 
   // Frame candidates for the radial bubbles, 28 August 2026. The shelf already
   // held frames/circle.png (BoonSelect's stone ring), chrome/circle-filigree.png
@@ -138,10 +138,10 @@ const PICKS: Pick[] = [
   // The tray, in the pieces the owner asked for. TraitTrayBacking is the one
   // with a header baked in, which is why two of them side by side never lined
   // up; _NoHeader is the plain panel and it tiles.
-  { from: 'HUD/TraitTrayBacking_NoHeader.png', to: 'chrome/tray-panel.png', note: 'page backdrop, plain' },
-  { from: 'HUD/TraitTrayHeader.png', to: 'chrome/tray-header.png', note: 'tray header ribbon' },
-  { from: 'HUD/TraitTrayTab.png', to: 'chrome/tray-tab.png', note: 'tab' },
-  { from: 'HUD/TraitTrayTabHighlight.png', to: 'chrome/tray-tab-highlight.png', note: 'tab, hovered' },
+  { from: 'HUD/TraitTrayBacking_NoHeader.png', to: 'shell/tray-panel.png', note: 'page backdrop, plain' },
+  { from: 'HUD/TraitTrayHeader.png', to: 'shell/tray-header.png', note: 'tray header ribbon' },
+  { from: 'HUD/TraitTrayTab.png', to: 'shell/tray-tab.png', note: 'tab' },
+  { from: 'HUD/TraitTrayTabHighlight.png', to: 'shell/tray-tab-highlight.png', note: 'tab, hovered' },
 
   // Circles that are actually circles, drawn face on rather than in world
   // space. These are what the radial has been wanting all along.
@@ -159,7 +159,7 @@ const PICKS: Pick[] = [
   },
   {
     from: 'Fx/Sorcery/SorceryWolfHowlDecal.png',
-    to: 'chrome/sorcery-circle.png',
+    to: 'shell/sorcery-circle.png',
     tree: 'scriptsbase',
     note: 'the radial backdrop: a lit nonagram',
   },
@@ -191,14 +191,14 @@ const PICKS: Pick[] = [
   // Backdrops and furniture held for later.
   {
     from: 'LocationBackings/PalaceofZeusBacking/PalaceofZeusBacking.png',
-    to: 'chrome/backing-palace-of-zeus.png',
+    to: 'shell/backing-palace-of-zeus.png',
     note: 'an Olympian theme, later',
   },
-  { from: 'LocationBackings/LocationBackingStar.png', to: 'chrome/location-star.png', note: 'a Location nameplate rule' },
-  { from: 'LobSpecialDecal.png', to: 'chrome/lob-decal.png', note: 'an astrolabe, as a backdrop' },
+  { from: 'LocationBackings/LocationBackingStar.png', to: 'shell/location-star.png', note: 'a Location nameplate rule' },
+  { from: 'LobSpecialDecal.png', to: 'shell/lob-decal.png', note: 'an astrolabe, as a backdrop' },
   {
     from: 'Screens/DialogueBox-Loop/DialogueBoxStatic.png',
-    to: 'chrome/dialogue-static.png',
+    to: 'shell/dialogue-static.png',
     note: 'the dialogue box everyone who is not an Olympian gets',
   },
   { from: 'Screens/DialogueContinueArrow.png', to: 'icons/continue.png', note: 'a pointer, downwards' },

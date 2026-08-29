@@ -26,13 +26,13 @@ import { canBeOffered } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
 import { eligibleGods } from '../engine/runsim.ts'
 import { Radial } from './Radial.tsx'
-import type { ArtShape } from './Radial.tsx'
+import type { ArtShape, RadialItem } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
 import type { RunEntry } from '../state/run.ts'
 
 type Kind = 'boon' | 'other' | 'chaos' | 'hammer' | 'shop' | 'story' | 'encounter' | 'artifact'
 
-const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note: string }[] = [
+const KINDS: (RadialItem & { id: Kind; note: string })[] = [
   {
     id: 'boon',
     name: 'A boon',
@@ -61,6 +61,7 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
     // Items/Loot/PreviewOnly/ChaosGate.png, the preview the game draws on one.
     icon: 'icons/chaos-gate.png',
     art: 'icon',
+    scale: 1.12,
     note: 'Its own Exit, and its own price. Costs no Olympian slot',
   },
   {
@@ -85,6 +86,9 @@ const KINDS: { id: Kind; name: string; icon: string | null; art: ArtShape; note:
     // Devotion and Shop.
     icon: 'icons/story.png',
     art: 'icon',
+    // Its art fills 42 percent of its own canvas, against 90 for the Chaos
+    // gate beside it, so at the same width it renders half the size.
+    scale: 1.5,
     note: 'Echo, Medea and the rest. Costs an Exit, and what it gives is theirs to decide',
   },
   {
@@ -192,13 +196,7 @@ export function Picker({
         <Radial
           label="What did this Exit give"
           variant="portraits"
-          items={KINDS.map((entry) => ({
-            id: entry.id,
-            name: entry.name,
-            icon: entry.icon,
-            art: entry.art,
-            note: entry.note,
-          }))}
+          items={KINDS}
           chosen={null}
           onChoose={(id) => {
             const next = id as Kind
