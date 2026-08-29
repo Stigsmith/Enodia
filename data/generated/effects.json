@@ -1,0 +1,1910 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-29",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "EffectData",
+  "sha256": "a5416fc14137fd1aaf1294ea05e6c7b0b0d623361fd0fdb62058c9458acb2edd"
+ },
+ "data": {
+  "AcidDoT": {
+   "InheritFrom": [
+    "NoSlowFrameEffect",
+    "NoShakeEffect"
+   ]
+  },
+  "AddHitShields": {
+   "OnApplyFunctionName": "EliteSpreadHitShields"
+  },
+  "AmplifyKnockbackEffect": {
+   "BackVfx": "PoseidonElementalStatusBackLoop",
+   "Chance": 0.25,
+   "Cooldown": 0.6,
+   "DisplaySuffix": "Froth",
+   "EffectData": {
+    "Duration": 3,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 1.05
+   },
+   "OnDamagedFunctionName": "CheckPoseidonFont",
+   "ProjectileName": "PoseidonEffectFont",
+   "ProjectileNameBlacklist": [
+    "PoseidonEffectFont",
+    "SteamBlast"
+   ],
+   "StopVfxes": [
+    "PoseidonElementalStatusFrontLoop",
+    "PoseidonElementalStatusBackLoop"
+   ],
+   "StopVfxesPreventChainOnCancel": [
+    "PoseidonElementalStatusFrontLoop",
+    "PoseidonElementalStatusBackLoop"
+   ],
+   "Vfx": "PoseidonElementalStatusFrontLoop"
+  },
+  "ApolloColorProjectile": {
+   "DamageTextColor": [
+    111,
+    118,
+    255,
+    255
+   ],
+   "DamageTextStartColor": [
+    246,
+    197,
+    25,
+    255
+   ]
+  },
+  "AresStatus": {
+   "BonusBaseDamageOnInflict": 50,
+   "DisplaySuffix": "Rend",
+   "EffectData": {
+    "Duration": 3,
+    "ExtendDurationOnReapply": false,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   },
+   "EffectGroup": "Rend",
+   "SharedVulnerabilityCategory": "Curse",
+   "ShowDuration": false,
+   "Vfx": "AresDebuffFx"
+  },
+  "ArtemisBoonHuntersMark": {
+   "CritVulnerability": 0.3,
+   "EffectData": {
+    "Duration": 6,
+    "Modifier": 1,
+    "TimeModifierFraction": 0
+   },
+   "EffectName": "ArtemisHunterMark",
+   "StopVfxesPreventChain": [
+    "ArtemisCritVulnerabilityStatusIn"
+   ],
+   "Vfx": "ArtemisCritVulnerabilityStatusIn"
+  },
+  "ArtemisHuntersMark": {
+   "CritVulnerability": 1,
+   "EffectName": "WebSlow",
+   "OnApplyFunctionName": "HuntersMarkApplyPresentation",
+   "UnitDeathFunctionName": "HuntersMarkUnitDeathPresentation",
+   "Vfx": "ArtemisCritVulnerabilityStatus"
+  },
+  "AssassinStalkSpeed": {
+   "DataProperties": {
+    "Duration": 999,
+    "Modifier": 2,
+    "Type": "SPEED"
+   },
+   "EffectName": "AssassinStalkSpeed"
+  },
+  "AthenaDeflect": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "Modifier": 1,
+    "Type": "INVULNERABLE"
+   },
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ]
+  },
+  "AthenaInvulnerable": {
+   "BackVfx": "AthenaProtectionBack",
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "FlashBackFxWhenExpiring": false,
+    "FlashFrontFxWhenExpiring": false,
+    "Modifier": 1,
+    "Type": "INVULNERABLE"
+   },
+   "ShowInvincububble": false,
+   "StopVfxesPreventChainOnCancel": [
+    "AthenaProtectionFront",
+    "AthenaProtectionFrontOut",
+    "AthenaProtectionBack",
+    "AthenaProtectionBackOut"
+   ],
+   "Vfx": "AthenaProtectionFront"
+  },
+  "AthenaProjectileDefense": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Deflect": true,
+    "Duration": 8,
+    "Modifier": 1,
+    "Range": 120,
+    "Type": "PROJECTILE_DEFENSE"
+   }
+  },
+  "AttackHighGrip": {
+   "DataProperties": {
+    "Duration": 0.3,
+    "HaltOnEnd": true,
+    "Modifier": 1.3,
+    "Type": "GRIP"
+   },
+   "EffectName": "AttackHighGrip"
+  },
+  "AttackLowGrip": {
+   "DataProperties": {
+    "Duration": 0.3,
+    "HaltOnEnd": true,
+    "Modifier": 0.6,
+    "Type": "GRIP"
+   },
+   "EffectName": "AttackLowGrip"
+  },
+  "AttackLowGripLong": {
+   "DataProperties": {
+    "Duration": 0.6,
+    "HaltOnEnd": true,
+    "Modifier": 0.6,
+    "Type": "GRIP"
+   },
+   "EffectName": "AttackLowGrip"
+  },
+  "AutomatonDefense": {
+   "ClearEffectOnHit": true,
+   "DataProperties": {
+    "ChangeType": "ADD",
+    "Duration": 1.6,
+    "Modifier": 0.1,
+    "Type": "DAMAGE_TAKEN"
+   },
+   "EffectName": "AutomatonDefense"
+  },
+  "AutomatonMark": {
+   "BackVfx": "AutomatonBeamerVulnerableFxBack",
+   "CritVulnerability": 1,
+   "EffectName": "AutomatonMark",
+   "OnApplyFunctionName": "HuntersMarkApplyPresentation",
+   "Vfx": "AutomatonBeamerVulnerableFxFront"
+  },
+  "AxeSpinAttackDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "BigDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "BlindDash": {
+   "EffectData": {
+    "Duration": 9
+   },
+   "InheritFrom": [
+    "BlindEffect"
+   ]
+  },
+  "BlindEffect": {
+   "DisplaySuffix": "Blind",
+   "EffectData": {
+    "DeduplicateGroup": "Blind",
+    "DeepInheritance": true,
+    "Duration": 9,
+    "EffectGroup": "Blind",
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "MissChance": 0.2,
+    "Stacks": false,
+    "StacksWithEffectGroup": "Blind"
+   },
+   "EffectGroup": "Blind",
+   "InheritFrom": [
+    "ApolloColorProjectile"
+   ],
+   "StopVfxes": [
+    "ApolloGroundGlowDebuff",
+    "ApolloBlindDebuffFlare"
+   ],
+   "Vfx": "ApolloBlindDebuffFx"
+  },
+  "BlindPrimary": {
+   "InheritFrom": [
+    "BlindEffect"
+   ]
+  },
+  "BlindRetaliate": {
+   "InheritFrom": [
+    "BlindEffect"
+   ]
+  },
+  "BlindSecondary": {
+   "InheritFrom": [
+    "BlindEffect"
+   ]
+  },
+  "BlockEffect": {
+   "BlockEffect": true
+  },
+  "BlockEmpower": {
+   "DataProperties": {
+    "Duration": 10,
+    "Modifier": 1,
+    "TimeModifierFraction": 0,
+    "Type": "DAMAGE_OUTPUT"
+   },
+   "Name": "BlockEmpower",
+   "Vfx": "ErisPowerUpFx"
+  },
+  "BlockReloadEffect": {
+   "BlockReload": true
+  },
+  "BlockStun": {
+   "EffectData": {
+    "Duration": 0.5
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "OnApplyFunctionName": "OnHitStunApply",
+   "OnClearFunctionName": "OnHitStunClear",
+   "StunAnimationType": "BlockStun",
+   "StunThroughHealthBuffer": true,
+   "Vfx": "DionysusStunnedFx"
+  },
+  "BuffInvulnerable": {
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ]
+  },
+  "BurnBlind": {
+   "DataProperties": {
+    "Duration": 9,
+    "IgnoreName": "_PlayerUnit",
+    "MissChance": 0.2,
+    "Stacks": false
+   }
+  },
+  "BurnCast": {
+   "InheritFrom": [
+    "BurnEffect"
+   ]
+  },
+  "BurnDeath": {
+   "InheritFrom": [
+    "BurnEffect"
+   ]
+  },
+  "BurnEffect": {
+   "AttachIconToUnit": true,
+   "AttachToMarker": true,
+   "BlockCrit": true,
+   "BlockDamageFloor": true,
+   "BlockDoubleDamage": true,
+   "CancelArmorSpark": true,
+   "CancelArmorUnitShake": true,
+   "CancelHitSpark": true,
+   "CancelRumble": true,
+   "CancelUnitHitFlash": true,
+   "CancelUnitShake": true,
+   "Color": [
+    255,
+    165,
+    0,
+    255
+   ],
+   "CustomStackHandling": true,
+   "DamageHoldDuration": 0.15,
+   "DamageInterval": 0.16666666666666666,
+   "DamageOffsetY": 180,
+   "DamagePerSecond": 100,
+   "DamagePresentationInterval": 0.025,
+   "DamageRandomOffsetX": 0,
+   "DamageTextDisplayCount": 40,
+   "DamageTextDisplayWindow": 1,
+   "DamageTextSizeOffsetY": -15,
+   "DisplaySuffix": "Burn",
+   "DurationAlpha": 0.6,
+   "EffectData": {
+    "Amount": 0,
+    "Duration": 3600,
+    "EffectGroup": "Fire",
+    "ExtendDurationOnReapply": true,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Stacks": true,
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "EffectGroup": "Burn",
+   "HideStacks": false,
+   "Icon": "FireWorldSmall",
+   "IconYOffset": 0,
+   "InflictedVfx": "HestiaFlare",
+   "InheritFrom": [
+    "NoSlowFrameEffect",
+    "NoShakeEffect",
+    "HestiaColorProjectile"
+   ],
+   "MaxStacks": 999,
+   "OnApplyFunctionName": "BurnEffectApply",
+   "OnClearFunctionName": "BurnEffectClear",
+   "RapidDamageType": true,
+   "ScaleArgs": {
+    "MaxScale": 2.5,
+    "MinScale": 0.5,
+    "ScaleMaxAbove": 200,
+    "ScaleMinBelow": 5
+   },
+   "ShowDuration": false,
+   "SkipDamageText": true,
+   "TextSizeArgs": {
+    "MaxAbove": 300,
+    "MaxScale": 1.8,
+    "MinBelow": 20,
+    "MinScale": 1.1
+   },
+   "UpdateStacksOnReapply": true
+  },
+  "BurnPrimary": {
+   "InheritFrom": [
+    "BurnEffect"
+   ]
+  },
+  "BurnSecondary": {
+   "InheritFrom": [
+    "BurnEffect"
+   ]
+  },
+  "BurnSprint": {
+   "InheritFrom": [
+    "BurnEffect"
+   ]
+  },
+  "CastGripEffect": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 2,
+    "Modifier": 2,
+    "Type": "GRIP"
+   },
+   "Vfx": "CastSpeedSparkleEmitter"
+  },
+  "CastInvulnerable": {
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ]
+  },
+  "CastSpeedBoostEffect": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 3600,
+    "Modifier": 1.5,
+    "Type": "SPEED"
+   }
+  },
+  "CastVacuumStun": {
+   "EffectData": {
+    "Duration": 1,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "OnApplyFunctionName": "FreezeFrameApply",
+   "OnClearFunctionName": "FreezeFrameClear"
+  },
+  "ChaosStun": {
+   "EffectData": {
+    "Cancelable": false,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 1.2
+   },
+   "Vfx": "DionysusStunnedFx"
+  },
+  "Charm": {
+   "Vfx": "AphroditeDebuffStatus"
+  },
+  "ChillCast": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChillCastBonus": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChillEffect": {
+   "BackVfx": "DemeterRootFxBack",
+   "DisplaySuffix": "Root",
+   "EffectData": {
+    "Duration": 10,
+    "ElapsedTimeMultiplier": 0.01,
+    "ExpiringModifierFalloff": 1,
+    "ExpiringTimeThreshold": 8,
+    "ExtendDurationOnReapply": false,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   },
+   "EffectGroup": "Root",
+   "Icon": "RootSmall",
+   "OnApplyFunctionName": "TimeSlowApply",
+   "OnApplyPresentationFunctionName": "RootApplyPresentation",
+   "OnClearFunctionName": "TimeSlowClear",
+   "OnClearPresentationFunctionName": "RootClearPresentation",
+   "OnEffectStackDecreaseFunctionName": "TimeSlowUpdate",
+   "OnStackDecreasePresentationFunctionName": "RootClearPresentation",
+   "SharedVulnerabilityCategory": "Root",
+   "ShowDuration": true,
+   "Vfx": "DemeterRootFxFront",
+   "VfxRequireKey": "RootActive",
+   "VfxRequiresTimeSlow": true
+  },
+  "ChillPrimary": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChillSecondary": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChillSprint": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChillStatueEffect": {
+   "InheritFrom": [
+    "ChillEffect"
+   ]
+  },
+  "ChronosPolymorphStun": {
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": true,
+    "Duration": 9999
+   },
+   "OnApplyFunctionName": "ChronosPolymorphApply",
+   "OnClearFunctionName": "ChronosPolymorphClear"
+  },
+  "ClearCast": {
+   "DataProperties": {
+    "Amount": 1.5,
+    "CanAffectInvulnerable": true,
+    "Duration": 5,
+    "OnlyAffectName": "_PlayerUnit",
+    "TimeModifierFraction": 0
+   },
+   "Name": "ClearCast",
+   "OnApplyFunctionName": "ClearCastApply",
+   "OnClearFunctionName": "ClearCastClear",
+   "Vfx": "ErisPowerUpFx"
+  },
+  "ClearCastPoseidon": {
+   "InheritFrom": [
+    "ClearCast"
+   ],
+   "StopVfxesPreventChain": [
+    "PoseidonManaBoonFxFront",
+    "PoseidonManaBoonFxBack"
+   ],
+   "Vfx": "PoseidonManaBoonFxEmitter"
+  },
+  "ComboAttackExIndicator": {
+   "AttachIconToHealthbar": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ComboAttackEx",
+   "Icon": "HealthBarMarkerAttackOmega",
+   "OffsetX": -25
+  },
+  "ComboAttackIndicator": {
+   "AttachIconToUnit": true,
+   "AttachToMarker": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ComboAttack",
+   "Icon": "HealthBarMarkerAttack",
+   "IgnoreHideHealthBarOnUnits": {
+    "NPC_Nemesis_01": true,
+    "TyphonHead": true
+   }
+  },
+  "ComboExIndicator": {
+   "AttachIconToUnit": true,
+   "AttachToMarker": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ComboEx",
+   "Icon": "HealthBarMarkerAttackOmega",
+   "IgnoreHideHealthBarOnUnits": {
+    "NPC_Nemesis_01": true,
+    "TyphonHead": true
+   }
+  },
+  "ComboSpecialExIndicator": {
+   "AttachIconToHealthbar": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ComboSpecialEx",
+   "Icon": "HealthBarMarkerSpecialOmega",
+   "OffsetX": 0
+  },
+  "ComboSpecialIndicator": {
+   "AttachIconToUnit": true,
+   "AttachToMarker": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ComboSpecial",
+   "Icon": "HealthBarMarkerSpecial",
+   "IgnoreHideHealthBarOnUnits": {
+    "NPC_Nemesis_01": true,
+    "TyphonHead": true
+   }
+  },
+  "DaggerBlockInvincibubble": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "Modifier": 1,
+    "Type": "INVULNERABLE"
+   },
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ],
+   "OnApplyFunctionName": "EffectUninterruptibleApply",
+   "OnClearFunctionName": "EffectUninterruptibleClear"
+  },
+  "DaggerSpecial1Disable": {
+   "OnApplyFunctionName": "DaggerSpecialTriggerLockApply",
+   "OnClearFunctionName": "DaggerSpecialTriggerLockClear"
+  },
+  "DamageEchoEffect": {
+   "Cooldown": 0.6,
+   "DisplaySuffix": "Amplify",
+   "EffectData": {
+    "DamageThreshold": 120,
+    "Duration": 4,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   },
+   "InheritFrom": [
+    "ZeusColorProjectile"
+   ],
+   "OnApplyFunctionName": "DamageEchoApply",
+   "OnClearFunctionName": "DamageEchoClear",
+   "OnDamagedFunctionName": "DamageEchoProcess",
+   "ProjectileName": "ZeusEchoStrike",
+   "Vfx": "ZeusEchoDebuff"
+  },
+  "DamageEchoPrimary": {
+   "InheritFrom": [
+    "DamageEchoEffect"
+   ]
+  },
+  "DamageEchoSecondary": {
+   "InheritFrom": [
+    "DamageEchoEffect"
+   ]
+  },
+  "DamageEchoSprint": {
+   "InheritFrom": [
+    "DamageEchoEffect"
+   ]
+  },
+  "DamageEchoVulnerabilityPlaceholder": {
+   "DataProperties": {
+    "Duration": 0.5,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   }
+  },
+  "DamageOverTime": {
+   "CancelArmorSpark": true,
+   "CancelArmorUnitShake": true,
+   "CancelHitSpark": true,
+   "CancelRumble": true,
+   "CancelUnitHitFlash": true,
+   "CancelUnitShake": true,
+   "DamageTextColor": [
+    129,
+    82,
+    200,
+    255
+   ],
+   "DamageTextSize": 25,
+   "DamageTextStartColor": [
+    203,
+    135,
+    255,
+    255
+   ],
+   "DataProperties": {
+    "Amount": 25,
+    "CanAffectInvulnerable": true,
+    "Cooldown": 0.5,
+    "Duration": 4,
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "DisplaySuffix": "Poison",
+   "Icon": "PoisonSmall",
+   "InheritFrom": [
+    "NoSlowFrameEffect",
+    "NoShakeEffect"
+   ],
+   "OnApplyFunctionName": "DamageOverTimeApply"
+  },
+  "DamageShareDeath": {
+   "DamageTextColor": [
+    70,
+    177,
+    240,
+    255
+   ],
+   "DamageTextStartColor": [
+    46,
+    223,
+    104,
+    255
+   ]
+  },
+  "DamageShareEffect": {
+   "CancelArmorSpark": true,
+   "CancelArmorUnitShake": true,
+   "CancelHitSpark": true,
+   "CancelRumble": true,
+   "CancelUnitHitFlash": true,
+   "CancelUnitShake": true,
+   "DamageTextColor": [
+    70,
+    177,
+    240,
+    255
+   ],
+   "DamageTextStartColor": [
+    46,
+    223,
+    104,
+    255
+   ],
+   "DisplaySuffix": "DamageShare",
+   "DistanceCheckDamageNumbers": true,
+   "EffectData": {
+    "Amount": 0.3,
+    "Cooldown": 2,
+    "Duration": 8,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 1,
+    "Type": "DAMAGE_OUTPUT"
+   },
+   "EffectGroup": "DamageShare",
+   "Icon": "DamageShareSmall",
+   "OnApplyFunctionName": "DamageShareApply",
+   "OnClearFunctionName": "DamageShareClear",
+   "OnDamagedFunctionName": "ProcessDamageShare",
+   "Range": 1200,
+   "TriggerOnKillingBlow": true,
+   "Using": "HeraRope",
+   "Vfx": "HeraTwistStatus"
+  },
+  "DelayedDamageEffect": {
+   "DataProperties": {
+    "Active": true,
+    "DamageOnExpire": true,
+    "Duration": 1.1,
+    "ExpiringFrontFx": "AresSwordHoverDrop",
+    "ExpiringTimeThreshold": 0.26,
+    "ExtendDurationOnReapply": false,
+    "FrontFx": "AresSwordHoverLoopA",
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Stacks": false,
+    "TimeModifierFraction": 0,
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "SharedVulnerabilityCategory": "Curse"
+  },
+  "DelayedKnockbackEffect": {
+   "CreateAnimationOnDamage": "HephaestusVentExplosion",
+   "DamageTextColor": [
+    255,
+    200,
+    40,
+    255
+   ],
+   "DamageTextStartColor": [
+    255,
+    229,
+    158,
+    255
+   ],
+   "DisplaySuffix": "PoseidonWet",
+   "EffectData": {
+    "Duration": 5,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 1.2,
+    "Type": "DAMAGE_TAKEN"
+   },
+   "EffectGroup": "PoseidonWet",
+   "Vfx": "HephaestusVentDecal"
+  },
+  "DemeterSlow": {
+   "AttackSpeedMultiplier": 1.5,
+   "BackVfx": "DemeterRootFxBack",
+   "SprintSpeedMultiplier": 0.5,
+   "Vfx": "DemeterRootFxFront"
+  },
+  "DemeterStun": {
+   "EffectData": {
+    "Duration": 3,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "OnApplyFunctionName": "FreezeFrameApply",
+   "OnClearFunctionName": "FreezeFrameClear"
+  },
+  "DemeterTickEffect": {
+   "CancelArmorSpark": true,
+   "CancelArmorUnitShake": true,
+   "CancelHitSpark": true,
+   "CancelRumble": true,
+   "CancelUnitHitFlash": true,
+   "DataProperties": {
+    "Amount": 20,
+    "Cooldown": 0.2,
+    "Duration": 3600,
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "DisplaySuffix": "DemeterTick",
+   "RapidDamageType": true
+  },
+  "DoraSlow": {
+   "EffectData": {
+    "Active": true,
+    "Duration": 0.5,
+    "Modifier": 0.8,
+    "Type": "SPEED"
+   },
+   "EffectName": "DoraSlow"
+  },
+  "DrainStun": {
+   "EffectData": {
+    "Duration": 0.5
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "OnApplyFunctionName": "FreezeFrameApply",
+   "OnClearFunctionName": "FreezeFrameClear",
+   "Vfx": "DionysusStunnedFx"
+  },
+  "DrainVulnerabilityEffect": {
+   "EffectData": {
+    "Duration": 10,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 1.3,
+    "Type": "DAMAGE_TAKEN"
+   },
+   "Name": "DrainVulnerabilityEffect",
+   "Vfx": "DemeterSlowFront"
+  },
+  "EliteAttributeStun": {
+   "EffectData": {
+    "Cancelable": false,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 1.2
+   },
+   "Vfx": "DionysusStunnedFx"
+  },
+  "EliteManaDrain": {
+   "OnApplyFunctionArgs": {
+    "Amount": -10
+   },
+   "OnApplyFunctionName": "ShrineEliteAttributeManaDrain"
+  },
+  "EncounterStartInvulnerableBuff": {
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ],
+   "OnApplyFunctionName": "CheckInvulnerableFalloff"
+  },
+  "EncounterStartOffense": {
+   "EffectData": {
+    "Duration": 10,
+    "Modifier": 1,
+    "TimeModifierFraction": 0
+   },
+   "Vfx": "PoseidonEncounterStartBuff"
+  },
+  "ErisSelfBuff": {
+   "Name": "ErisSelfBuff",
+   "OnApplyFunctionName": "ErisSelfBuffApply",
+   "OnClearFunctionName": "ErisSelfBuffClear",
+   "Vfx": "ErisPowerUpFx"
+  },
+  "ExAttackSuitDefense": {
+   "DataProperties": {
+    "AngleCoverage": 3.839724354387525,
+    "CanAffectInvulnerable": true,
+    "Range": 120,
+    "Type": "PROJECTILE_DEFENSE"
+   },
+   "InheritFrom": [
+    "BlockEffect"
+   ]
+  },
+  "ExAttackSuitShield": {
+   "DataProperties": {
+    "AngleCoverage": 3.839724354387525,
+    "CanAffectInvulnerable": true,
+    "Type": "INVULNERABLE"
+   },
+   "InheritFrom": [
+    "BlockEffect"
+   ],
+   "OnClearFunctionName": "ClearSuitAttackShield"
+  },
+  "ExecuteIndicator": {
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "ExecuteMarker",
+   "Icon": "HealthBarMarkerExecute"
+  },
+  "FreezeStun": {
+   "OnApplyFunctionName": "FreezeStunApply"
+  },
+  "Frenzy": {
+   "BaseLifeSteal": 1,
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "Modifier": 0.605,
+    "OnlyAffectName": "_PlayerUnit",
+    "TimeModifierFraction": 0
+   },
+   "Name": "Frenzy",
+   "OnApplyFunctionName": "FrenzyApply",
+   "OnClearFunctionName": "FrenzyClear",
+   "Vfx": "NergalFrenzyFx"
+  },
+  "GhostEffect": {
+   "EffectData": {
+    "CanAffectInvulnerable": true,
+    "DodgeChance": 0,
+    "Duration": 3,
+    "Modifier": 1,
+    "Type": "SPEED"
+   }
+  },
+  "GhostWallHalt": {
+   "DataProperties": {
+    "Duration": 0.12,
+    "HaltOnEnd": true,
+    "Modifier": 1,
+    "Type": "GRIP"
+   },
+   "EffectName": "GhostWallHalt"
+  },
+  "HadesInvisible": {
+   "EffectData": {
+    "Duration": 10
+   },
+   "OnClearFunctionName": "HadesInvisibleClear"
+  },
+  "HadesSweepEffect": {
+   "EffectData": {
+    "Duration": 10,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "Name": "HadesSweep",
+   "Vfx": "MarkTargetHades"
+  },
+  "HecateDarkSide": {
+   "OnApplyFunctionArgs": {
+    "AddIncomingDamageModifier": {
+     "Name": "HecateDarkSide",
+     "PlayerMultiplier": 0.8
+    },
+    "TemporaryWeaponOptions": [
+     "HecateDarkSideRanged",
+     "HecateDarkSideRangedExtended",
+     "HecateDarkSideRing"
+    ]
+   },
+   "OnApplyFunctionName": "HecateDarkSideApply",
+   "OnClearFunctionArgs": {
+    "RemoveIncomingDamageModifier": "HecateDarkSide"
+   },
+   "OnClearFunctionName": "HecateDarkSideClear"
+  },
+  "HecatePolymorphStun": {
+   "OnApplyFunctionName": "HecatePolymorphApply",
+   "OnClearFunctionName": "HecatePolymorphClear"
+  },
+  "HelOverheat": {
+   "DataProperties": {
+    "Duration": 4,
+    "ExtendDurationOnReapply": false,
+    "FlashBackFxWhenExpiring": false,
+    "FlashFrontFxWhenExpiring": false
+   },
+   "OnApplyFunctionName": "OverheatApply",
+   "OnClearFunctionName": "OverheatClear",
+   "Vfx": "HelOverheatFx"
+  },
+  "HeraColorProjectile": {
+   "DamageTextColor": [
+    70,
+    177,
+    240,
+    255
+   ],
+   "DamageTextStartColor": [
+    46,
+    223,
+    104,
+    255
+   ]
+  },
+  "HeroOnHitStun": {
+   "BlockReload": true
+  },
+  "HestiaColorProjectile": {
+   "DamageTextColor": [
+    245,
+    167,
+    66,
+    255
+   ],
+   "DamageTextStartColor": [
+    250,
+    182,
+    97,
+    255
+   ]
+  },
+  "HostilePolymorphSpeed": {
+   "DataProperties": {
+    "Active": true,
+    "Duration": 1,
+    "Modifier": 0.35,
+    "Type": "SPEED"
+   }
+  },
+  "HoundStun": {
+   "EffectData": {
+    "Duration": 1,
+    "ElapsedTimeMultiplier": 0.01,
+    "ExpiringModifierFalloff": 1,
+    "ExpiringTimeThreshold": 1,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "OnApplyFunctionName": "OnHitStunApply",
+   "OnClearFunctionName": "OnHitStunClear",
+   "StunAnimationType": "Default"
+  },
+  "IcarusInvulnerable": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "Modifier": 1,
+    "NoUnitCollision": true,
+    "Type": "INVULNERABLE"
+   },
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ]
+  },
+  "IcedEffect": {
+   "EffectData": {
+    "Duration": 3600,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "Vfx": "DemeterSlowImpact"
+  },
+  "ImpactGrip": {
+   "DataProperties": {
+    "CanAffectInvulnerable": false,
+    "Duration": 0.2,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 10,
+    "Type": "GRIP"
+   },
+   "Name": "ImpactGrip"
+  },
+  "ImpactSlow": {
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": false,
+    "Duration": 0.2,
+    "HaltOnStart": true,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 0.05,
+    "TimeModifierFraction": 0,
+    "Type": "SPEED"
+   },
+   "Name": "ImpactSlow",
+   "StopVfxes": [
+    "GraspingHandsFxLoop"
+   ],
+   "StopVfxesPreventChain": [
+    "GraspingHandsFxIn"
+   ],
+   "Vfx": "GraspingHandsFxIn"
+  },
+  "Inked": {
+   "OnApplyFunctionArgs": {
+    "AnimationName": "OctofishInkInside"
+   },
+   "OnApplyFunctionName": "OctofishInkApply",
+   "OnClearFunctionArgs": {
+    "AnimationName": "OctofishInkInside"
+   },
+   "OnClearFunctionName": "OctofishInkClear"
+  },
+  "InsideCastBuff": {
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": true,
+    "Duration": 0.2,
+    "TimeModifierFraction": 0
+   },
+   "ManaRegenStartVfx": "ManaRegenFlashFx",
+   "MetaUpgradeActiveVfx": "ManaRegenLoopingNoSound",
+   "OnApplyFunctionName": "InsideCastBuffApply",
+   "OnClearFunctionName": "InsideCastBuffClear"
+  },
+  "InvulnerableEffect": {
+   "ShowInvincububble": true
+  },
+  "LaserDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "LaserFireCancelable": {
+   "DataProperties": {
+    "Active": true,
+    "Cancelable": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 3600,
+    "RequestTriggerLock": true
+   },
+   "OnClearFunctionName": "LaserHoldClear"
+  },
+  "LaserFireEndCancelable": {
+   "DataProperties": {
+    "Active": true,
+    "Cancelable": true,
+    "DisableAttack": false,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.2,
+    "RequestTriggerLock": true
+   }
+  },
+  "LavaVignette": {
+   "OnApplyFunctionName": "LavaVignetteApply",
+   "OnClearFunctionName": "LavaVignetteClear"
+  },
+  "LegacyChillEffect": {
+   "DisplaySuffix": "Chill",
+   "EffectData": {
+    "Duration": 3,
+    "ElapsedTimeMultiplier": 0.8,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true
+   },
+   "EffectGroup": "Chill",
+   "OnApplyFunctionName": "TimeSlowApply",
+   "OnApplyPresentationFunctionName": "ChillApplyPresentation",
+   "OnClearFunctionName": "TimeSlowClear",
+   "OnClearPresentationFunctionName": "ChillClearPresentation",
+   "SharedVulnerabilityCategory": "Root",
+   "Vfx": "DemeterSlowFront"
+  },
+  "Lob1Disable": {
+   "OnApplyFunctionName": "BlinkAndSpecialTriggerLockApply",
+   "OnClearFunctionName": "BlinkAndSpecialTriggerLockClear"
+  },
+  "LobWeaponInvulnerable": {
+   "EffectData": {
+    "CanAffectInvulnerable": true,
+    "Duration": 2,
+    "Modifier": 1,
+    "NoUnitCollision": true,
+    "Type": "INVULNERABLE"
+   },
+   "StopVfxes": [
+    "LobInvincibubble"
+   ],
+   "StopVfxesPreventChain": [
+    "LobInvincibubbleIn"
+   ],
+   "Vfx": "LobInvincibubbleIn"
+  },
+  "LobWeaponShortInvulnerable": {
+   "EffectData": {
+    "CanAffectInvulnerable": true,
+    "Duration": 0.05,
+    "Modifier": 1,
+    "Type": "INVULNERABLE"
+   },
+   "OnApplyFunctionName": "LobShortInvulnerableApply",
+   "OnClearFunctionName": "LobShortInvulnerableClear"
+  },
+  "LobWeaponSpecialDisable": {
+   "EffectData": {
+    "Cancelable": false,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "RequestTriggerLock": true
+   },
+   "MaxDuration": 0.12,
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "LobWeaponSpecialDisableCancellable": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "RequestTriggerLock": true
+   },
+   "MaxDuration": 0.3,
+   "OnApplyFunctionName": "LobDisableTriggerLockApply",
+   "OnClearFunctionName": "LobDisableTriggerLockClear"
+  },
+  "LobWeaponSpecialRotateLock": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableAttack": false,
+    "DisableMove": false,
+    "DisableRotate": true
+   },
+   "MaxDuration": 0.3
+  },
+  "ManaSpendBuff": {
+   "Vfx": "AresKillDamageBuffFx"
+  },
+  "MatiHypnosis": {
+   "DataProperties": {
+    "MoveSpeed": 200
+   },
+   "OnApplyFunctionName": "MatiHypnosisApply",
+   "OnClearFunctionName": "MatiHypnosisClear"
+  },
+  "MedeaPoison": {
+   "CancelArmorSpark": true,
+   "CancelArmorUnitShake": true,
+   "CancelCameraShake": true,
+   "CancelHitSpark": true,
+   "CancelRumble": true,
+   "CancelSlowFrames": true,
+   "CancelUnitShake": true,
+   "CancelVulnerabilitySpark": true,
+   "DamageTextSize": 25,
+   "EffectName": "MedeaPoison",
+   "IgnoreInvulnerabilityFrameTrigger": true,
+   "IgnoreOnHitEffects": true,
+   "OnApplyFunctionName": "MedeaPoisonApply",
+   "OnClearFunctionName": "MedeaPoisonClear",
+   "RapidDamageType": true,
+   "ReturnToIdleOnCancelHarvestPoint": true
+  },
+  "MedeaPoisonAllyBoost": {
+   "OnApplyFunctionName": "MedeaPoisonAllyBoostApply",
+   "OnClearFunctionName": "MedeaPoisonAllyBoostClear"
+  },
+  "MeteorGripEffect": {
+   "DataProperties": {
+    "Duration": 0.3,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 10,
+    "Type": "GRIP"
+   },
+   "Name": "MeteorGripEffect"
+  },
+  "MeteorInvincibubble": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 8,
+    "Modifier": 1,
+    "Type": "INVULNERABLE"
+   },
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ]
+  },
+  "MeteorSlowEffect": {
+   "DataProperties": {
+    "Duration": 0.3,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 0.3,
+    "Type": "SPEED"
+   },
+   "Name": "MeteorSlowEffect"
+  },
+  "MeteorVulnerabilityEffect": {
+   "DataProperties": {
+    "Duration": 0.3,
+    "IgnoreName": "_PlayerUnit",
+    "Modifier": 0.3,
+    "Type": "DAMAGE_TAKEN"
+   },
+   "Name": "MeteorVulnerabilityEffect"
+  },
+  "MiasmaSlow": {
+   "AttackSpeedMultiplier": 1.5,
+   "OnApplyFunctionName": "MiasmaSlowApply",
+   "OnClearFunctionName": "MiasmaSlowClear",
+   "SprintSpeedMultiplier": 0.5
+  },
+  "MoonBeamVulnerability": {
+   "DataProperties": {
+    "Duration": 8,
+    "FlashBackFxWhenExpiring": false,
+    "FlashFrontFxWhenExpiring": false,
+    "Modifier": 1.5
+   },
+   "OnApplyFunctionName": "MoonBeamVulnerabilityApply",
+   "OnClearFunctionName": "MoonBeamVulnerabilityClear",
+   "StopVfxesPreventChain": [
+    "SorceryDebuffMoonLoopIn",
+    "SorceryDebuffMoonLoop"
+   ],
+   "Vfx": "SorceryDebuffMoonLoopIn"
+  },
+  "NoShakeEffect": {
+   "CancelCameraShake": true
+  },
+  "NoSlowFrameEffect": {
+   "CancelSlowFrames": true
+  },
+  "NyxBlastReady": {
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": true,
+    "Duration": 3600,
+    "Modifier": 1.05,
+    "TimeModifierFraction": 0,
+    "Type": "SPEED"
+   }
+  },
+  "NyxHitBuff": {
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": true,
+    "TimeModifierFraction": 0
+   },
+   "StopVfxes": [
+    "WeaponBonusFx",
+    "WeaponBonusFxBack"
+   ],
+   "Vfx": "WeaponBonusFxNyx"
+  },
+  "OmegaDamageBuffEffect": {
+   "DataProperties": {
+    "Amount": 1.3,
+    "CanAffectInvulnerable": true,
+    "OnlyAffectName": "_PlayerUnit",
+    "TimeModifierFraction": 0
+   },
+   "Name": "OmegaBuff",
+   "OnApplyFunctionName": "OmegaBuffApply",
+   "OnClearFunctionName": "OmegaBuffClear",
+   "Vfx": "OmegaDamageBuffFx"
+  },
+  "OnHitStun": {
+   "BlockReload": true,
+   "StunAnimationType": "Default"
+  },
+  "OnHitStunAxeBlock": {
+   "InheritFrom": [
+    "OnHitStun"
+   ],
+   "OnApplyFunctionName": "OnHitStunApply",
+   "OnClearFunctionName": "OnHitStunClear"
+  },
+  "OnHitStunHeavy": {
+   "OnApplyFunctionName": "OnHitStunApply",
+   "OnClearFunctionName": "OnHitStunClear",
+   "StunAnimationType": "Heavy"
+  },
+  "OnSprintHitStun": {
+   "DataProperties": {
+    "DisableAttack": false,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.2
+   },
+   "InheritFrom": [
+    "OnHitStun"
+   ],
+   "OnApplyFunctionName": "OnHitStunApply",
+   "OnClearFunctionName": "OnHitStunClear",
+   "StunThroughHealthBuffer": true
+  },
+  "PolymorphCastDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "PolymorphDamageTaken": {
+   "DataProperties": {
+    "Active": true,
+    "Duration": 10,
+    "Modifier": 1.5,
+    "Type": "DAMAGE_TAKEN"
+   },
+   "EffectName": "PolymorphDamageTaken"
+  },
+  "PolymorphStun": {
+   "OnApplyFunctionName": "PolymorphStunApply",
+   "OnClearFunctionName": "PolymorphStunClear"
+  },
+  "PolymorphTag": {
+   "BackVfx": "SorceryNightCurseStatusBack",
+   "DataProperties": {
+    "Active": true,
+    "CanAffectInvulnerable": false,
+    "Duration": 4,
+    "IgnoreExactName": "_PlayerUnit"
+   },
+   "EffectName": "PolymorphTag",
+   "FireProjectileOnApply": {
+    "ProjectileName": "MorphDamageProjectile",
+    "WeaponName": "WeaponSpellPolymorph"
+   },
+   "OnApplyFunctionName": "CheckPolymorphApply",
+   "Vfx": "SorceryNightCurseStatusFront"
+  },
+  "PolyphemusPlayerGrab": {
+   "EffectData": {
+    "Amount": 5,
+    "CanAffectInvulnerable": true,
+    "Cooldown": 0.5,
+    "Duration": 3.5,
+    "IsVulnerabilityEffect": true,
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "EffectName": "PolyphemusPlayerGrab",
+   "OnApplyFunctionName": "PolyphemusPlayerGrabApply",
+   "OnClearFunctionName": "PolyphemusPlayerGrabClear"
+  },
+  "PolyphemusStomachAche": {
+   "EffectData": {
+    "Amount": 20,
+    "Cooldown": 0.5,
+    "Duration": 5,
+    "RefreshOnExpireWithEffect": "RefreshBurn",
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "InheritFrom": [
+    "NoSlowFrameEffect",
+    "NoShakeEffect"
+   ],
+   "Vfx": "SteamFx"
+  },
+  "PoseidonStun": {
+   "EffectData": {
+    "Duration": 1.7
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "StunAnimationType": "Heavy"
+  },
+  "PotionBuff": {
+   "BackVfx": "PoseidonElementalStatusBackLoop",
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 20,
+    "Modifier": 1
+   },
+   "OnApplyFunctionName": "PotionBuffApply",
+   "OnClearFunctionName": "PotionBuffClear",
+   "StopVfxes": [
+    "PoseidonElementalStatusFrontLoop",
+    "PoseidonElementalStatusBackLoop"
+   ],
+   "Vfx": "PoseidonElementalStatusFrontLoop"
+  },
+  "RavenFamiliarMark": {
+   "CritVulnerability": 0.15,
+   "EffectData": {
+    "Duration": 6,
+    "Modifier": 1,
+    "TimeModifierFraction": 0
+   },
+   "EffectName": "RavenFamiliarMark",
+   "StopVfxesPreventChain": [
+    "RakiCritVulnerabilityStatusIn"
+   ],
+   "Vfx": "RakiCritVulnerabilityStatusIn"
+  },
+  "ReserveManaInvulnerability": {
+   "EffectData": {
+    "CanAffectInvulnerable": true,
+    "Duration": 1000,
+    "Modifier": 1,
+    "OnlyAffectName": "_PlayerUnit"
+   },
+   "OffsetZ": 120,
+   "OnClearFunctionName": "ClearReserveManaInvulnerability",
+   "Vfx": "DemeterHitShieldIn"
+  },
+  "Rooted": {
+   "OnApplyFunctionName": "RootedApply",
+   "OnClearFunctionName": "RootedClear",
+   "Vfx": "DionysusStunnedFx"
+  },
+  "RushSpeed": {
+   "DataProperties": {
+    "Duration": 9,
+    "Modifier": 6,
+    "Type": "SPEED"
+   },
+   "EffectName": "RushSpeed"
+  },
+  "RushWeaponInvulnerable": {
+   "Name": "RushWeaponInvulnerable",
+   "OnApplyFunctionName": "PlayerSprintPhasingApply",
+   "OnClearFunctionName": "PlayerSprintPhasingClear"
+  },
+  "RushWeaponInvulnerableCharge": {
+   "Name": "RushWeaponInvulnerableCharge",
+   "OnApplyFunctionName": "PlayerSprintPhasingApply",
+   "OnClearFunctionName": "PlayerSprintPhasingClear"
+  },
+  "SafeZone": {
+   "InheritFrom": [
+    "InvulnerableEffect"
+   ],
+   "OnApplyFunctionName": "CheckSafeZoneRecharge"
+  },
+  "SatyrEnlarge": {
+   "DamageMultiplier": 5,
+   "HealthMultiplier": 400,
+   "OnApplyFunctionName": "EnlargeApply",
+   "ScaleMultiplier": 1.6
+  },
+  "SelfBuffOutput": {
+   "DefaultVfxName": "GrenadeSelfDamageOutputFx",
+   "OnApplyFunctionName": "SelfBuffOutputApply",
+   "OnClearFunctionName": "SelfBuffOutputClear",
+   "OverrideVfxName": "GrenadeSelfDamageOutputFx"
+  },
+  "SheepSickSlow": {
+   "AttackSpeedMultiplier": 1,
+   "OnApplyFunctionName": "MiasmaSlowApply",
+   "OnClearFunctionName": "MiasmaSlowClear",
+   "SkipPresentation": true,
+   "SprintSpeedMultiplier": 0.5
+  },
+  "ShieldSelfInvulnerableRush": {
+   "InheritFrom": [
+    "BlockEffect"
+   ]
+  },
+  "ShieldSelfReflectRush": {
+   "InheritFrom": [
+    "BlockEffect"
+   ]
+  },
+  "ShivaAttackBoost": {
+   "CustomStackHandling": true,
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "Duration": 7200,
+    "OnlyAffectName": "_PlayerUnit",
+    "Stacks": true,
+    "TimeModifierFraction": 0
+   },
+   "Name": "ShivaAttackBoost",
+   "OnApplyFunctionName": "ShivaAttackBoostApply",
+   "OnClearFunctionName": "ShivaAttackBoostClear",
+   "Vfx": "ShivaAttackBoostFx"
+  },
+  "ShoutSelfSlow": {
+   "EffectData": {
+    "Active": true,
+    "CanAffectInvulnerable": true,
+    "DisableRotate": true,
+    "Duration": 0.4,
+    "Modifier": 0.3,
+    "Type": "SPEED"
+   }
+  },
+  "SlowRotation": {
+   "DataProperties": {
+    "Duration": 9,
+    "Modifier": 1,
+    "RotationMultiplier": 0.5,
+    "Type": "SPEED"
+   },
+   "EffectName": "SlowRotation"
+  },
+  "Special1Disable": {
+   "OnApplyFunctionName": "StaffSpecialTriggerLockApply",
+   "OnClearFunctionName": "StaffSpecialTriggerLockClear"
+  },
+  "Special1DisableMoveHold": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.35
+   }
+  },
+  "SpeedBoostEffect": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "DodgeChance": 0,
+    "Duration": 1.15,
+    "Modifier": 1,
+    "Type": "SPEED"
+   }
+  },
+  "SpellHealDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "SprintStasisEffect": {
+   "DataProperties": {
+    "Duration": 0.315,
+    "ElapsedTimeMultiplier": 0.001,
+    "ExtendDurationOnReapply": false,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "OnApplyFunctionName": "TimeSlowApply",
+   "OnClearFunctionName": "TimeSlowClear"
+  },
+  "StaffSelfBuff": {
+   "DataProperties": {
+    "CanAffectInvulnerable": true,
+    "OnlyAffectName": "_PlayerUnit",
+    "TimeModifierFraction": 0
+   },
+   "Name": "StaffSelfBuff",
+   "OnApplyFunctionName": "StaffSelfBuffApply",
+   "OnClearFunctionName": "StaffSelfBuffClear",
+   "Vfx": "ErisPowerUpFx"
+  },
+  "StalkerBurrowSpeedBoost": {
+   "DataProperties": {
+    "Duration": 9999,
+    "Modifier": 2,
+    "Type": "SPEED"
+   },
+   "EffectName": "SpeedBoost"
+  },
+  "StasisStun": {
+   "IgnoreName": "Chronos",
+   "OnApplyFunctionName": "StasisStunApply",
+   "OnClearFunctionName": "StasisStunClear"
+  },
+  "SteamEffect": {
+   "EffectData": {
+    "Amount": 2,
+    "Cooldown": 0.2,
+    "Duration": 8,
+    "IsVulnerabilityEffect": true,
+    "RefreshOnExpireWithEffect": "RefreshBurn",
+    "Type": "DAMAGE_OVER_TIME"
+   },
+   "InheritFrom": [
+    "NoSlowFrameEffect",
+    "NoShakeEffect"
+   ],
+   "Vfx": "SteamFx"
+  },
+  "StunEffect": {
+   "EffectData": {
+    "Active": true,
+    "CanAffectInvulnerable": false,
+    "DeepInheritance": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 1,
+    "IgnoreName": "_PlayerUnit"
+   }
+  },
+  "Suit2DisableCancellable": {
+   "OnApplyFunctionName": "SuitDisableTriggerLockApply",
+   "OnClearFunctionName": "SuitDisableTriggerLockClear"
+  },
+  "SuitAttackDashDisable": {
+   "OnClearFunctionName": "SuitDashAttackLockApply"
+  },
+  "SuitSpecialLock": {
+   "DataProperties": {
+    "Active": true,
+    "DisableAttack": false,
+    "DisableMove": true,
+    "DisableRotate": false,
+    "Duration": 3600
+   }
+  },
+  "Swing1Disable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "Swing2Disable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "Swing3Disable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "Swing5Disable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "SwingDashDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "SwingDoubleDisable": {
+   "OnApplyFunctionName": "BlinkAndCastTriggerLockApply",
+   "OnClearFunctionName": "BlinkAndCastTriggerLockClear"
+  },
+  "SwingMultiDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "TimeElementalHeal": {
+   "OnApplyFunctionName": "TimeElementalHealApply"
+  },
+  "TimeElementalSpeedBoost": {
+   "DataProperties": {
+    "Duration": 1.3,
+    "Modifier": 1.6,
+    "Type": "SPEED"
+   },
+   "EffectName": "SpeedBoost"
+  },
+  "TorchSpecialDisable": {
+   "OnApplyFunctionName": "TorchSpecialTriggerLockApply",
+   "OnClearFunctionName": "TorchSpecialTriggerLockClear"
+  },
+  "VulnerabilityIndicator": {
+   "AttachIconToHealthbar": true,
+   "DataProperties": {
+    "Active": true,
+    "Duration": 3600
+   },
+   "DisplaySuffix": "VulnerabilityIcon",
+   "HideOnHero": true,
+   "Icon": "HealthbarVulnerability"
+  },
+  "WeakCast": {
+   "InheritFrom": [
+    "WeakEffect"
+   ]
+  },
+  "WeakDamageOutput": {
+   "EffectData": {
+    "Duration": 3,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 0.9,
+    "Type": "DAMAGE_OUTPUT"
+   }
+  },
+  "WeakDamageTaken": {
+   "EffectData": {
+    "Duration": 3,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 1.3,
+    "Type": "DAMAGE_TAKEN"
+   }
+  },
+  "WeakDash": {
+   "InheritFrom": [
+    "WeakEffect"
+   ]
+  },
+  "WeakEffect": {
+   "BackVfx": "AphroditeWeakFxBack_In",
+   "DamageTextColor": [
+    255,
+    126,
+    241,
+    255
+   ],
+   "DamageTextStartColor": [
+    254,
+    179,
+    255,
+    255
+   ],
+   "DisplaySuffix": "Weak",
+   "EffectData": {
+    "Duration": 1,
+    "IgnoreName": "_PlayerUnit",
+    "IsVulnerabilityEffect": true,
+    "Modifier": 0.7,
+    "Type": "DAMAGE_OUTPUT"
+   },
+   "EffectGroup": "Weak",
+   "Vfx": "AphroditeWeakFxFront_In",
+   "VfxPreventChainOnStop": true
+  },
+  "WeakPrimary": {
+   "InheritFrom": [
+    "WeakEffect"
+   ]
+  },
+  "WeakSecondary": {
+   "InheritFrom": [
+    "WeakEffect"
+   ]
+  },
+  "WeaponDaggerMorriganThrowEXDisable": {
+   "EffectData": {
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.23333333333333334,
+    "RequestTriggerLock": true
+   },
+   "OnApplyFunctionName": "DaggerSpecialTriggerLockApply",
+   "OnClearFunctionName": "DaggerSpecialTriggerLockClear"
+  },
+  "WeaponDaggerMorriganThrowEXDisableCancellable": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.35,
+    "RequestTriggerLock": true
+   }
+  },
+  "WeaponDaggerMorriganThrowEXDisableMoveHold": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.5
+   }
+  },
+  "WeaponDaggerThrowEXDisable": {
+   "EffectData": {
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.26666666666666666,
+    "RequestTriggerLock": true
+   },
+   "OnApplyFunctionName": "DaggerSpecialTriggerLockApply",
+   "OnClearFunctionName": "DaggerSpecialTriggerLockClear"
+  },
+  "WeaponDaggerThrowEXDisableCancellable": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.38333333333333336,
+    "RequestTriggerLock": true
+   }
+  },
+  "WeaponDaggerThrowEXDisableMoveHold": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.5
+   }
+  },
+  "WeaponLeapDisable": {
+   "OnApplyFunctionName": "BlinkTriggerLockApply",
+   "OnClearFunctionName": "BlinkTriggerLockClear"
+  },
+  "WeaponLobHelAttackEXDisable": {
+   "EffectData": {
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.3,
+    "RequestTriggerLock": true
+   }
+  },
+  "WeaponLobHelAttackEXDisableCancellable": {
+   "EffectData": {
+    "Cancelable": true,
+    "DisableAttack": true,
+    "DisableMove": true,
+    "DisableRotate": true,
+    "Duration": 0.5,
+    "RequestTriggerLock": true
+   }
+  },
+  "WebSlow": {
+   "DataProperties": {
+    "Duration": 2,
+    "Modifier": 0.7,
+    "Type": "SPEED"
+   },
+   "EffectName": "WebSlow",
+   "Vfx": "DemeterSlowFront"
+  },
+  "ZeusColorProjectile": {
+   "DamageTextColor": [
+    255,
+    243,
+    45,
+    255
+   ],
+   "DamageTextStartColor": [
+    255,
+    250,
+    165,
+    255
+   ]
+  },
+  "ZeusRepeatedStun": {
+   "EffectData": {
+    "Duration": 3,
+    "IgnoreName": "_PlayerUnit"
+   },
+   "Interval": 0.35
+  },
+  "ZeusStun": {
+   "EffectData": {
+    "Duration": 0.3
+   },
+   "InheritFrom": [
+    "StunEffect"
+   ],
+   "StunAnimationType": "Lightning",
+   "Vfx": "ZeusStaticArcEmitter"
+  }
+ }
+}

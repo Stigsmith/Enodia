@@ -1,0 +1,1609 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-08-29",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "WeaponData",
+  "sha256": "249117faa77f251fcd79f88b9b6fe9100a231ea8a18718f0477236b9a76e97bd"
+ },
+ "data": {
+  "BaseCollisionWeapon": {
+   "BlockWrathGain": true,
+   "FireScreenshake": {
+    "Distance": 3,
+    "Duration": 0.15,
+    "FalloffSpeed": 3000,
+    "Speed": 300
+   },
+   "HitSimSlowCooldown": 0.4,
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.1,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.04
+    }
+   ],
+   "KillText": "BodySlamHit",
+   "OutgoingDamageModifiers": [
+    {
+     "Multiplicative": true,
+     "PlayerMultiplier": 0
+    }
+   ],
+   "Sounds": {
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/Leftovers/World Sounds/PhysicalImpactPunch",
+     "Brick": "/Leftovers/World Sounds/PhysicalImpactPunch",
+     "Organic": "/Leftovers/World Sounds/PhysicalImpactPunch",
+     "Stone": "/Leftovers/World Sounds/PhysicalImpactPunch"
+    }
+   },
+   "StartingWeapon": false,
+   "Upgrades": {}
+  },
+  "BaseSpell": {
+   "BlockNotReadyWhenGiftableUseTarget": true,
+   "FailToFireFunctionName": "SpellFailToFirePresentation",
+   "IsModifiedByTraits": true,
+   "ManaSpendCost": 10,
+   "NotReadyText": "Spell_NotReady",
+   "OnChargeCancelFunctionName": "CheckSpellOutOfManaPresentation",
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 1.8,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnChargeFunctionNames": [
+    "StartSpellCharge"
+   ],
+   "SpellWeapon": true
+  },
+  "BaseUnlockableWeapon": {
+   "AspectAvailableAnimation": "WeaponAspectAvailableFront",
+   "InfoBackingAnimation": "WeaponSlotBase",
+   "LockedUseText": "UseWeaponKit_LockedNoKey",
+   "MouseOverSound": "/Leftovers/World Sounds/Caravan Interior/TarotCardSpecialInteract",
+   "StartingWeapon": true,
+   "UnlockUseText": "UseWeaponKit_LockedHasKey",
+   "UsePromptOffsetX": 64,
+   "UsePromptOffsetY": -64
+  },
+  "DefaultWeaponValues": {
+   "DefaultKnockbackForce": 800,
+   "DefaultKnockbackScale": 1,
+   "DefaultSpeedPropertyChanges": [
+    {
+     "WeaponProperty": "ChargeTime"
+    }
+   ],
+   "MinWeaponChargeTime": 0.1
+  },
+  "FlashbackMelBlink": {
+   "SimSlowBlur": {
+    "Distance": 1.6,
+    "FXHoldTime": 0.4,
+    "FXInTime": 0.06,
+    "FXOutTime": 0.4,
+    "Strength": 0.3
+   },
+   "SkipAttackNotReadySounds": true,
+   "Sounds": {
+    "CancelEffectSounds": {},
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalCharge",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelDaggerKnifeSwipe"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/FistImpactMedium",
+     "Brick": "/SFX/FistImpactMedium",
+     "Organic": "/SFX/FistImpactMedium",
+     "Stone": "/SFX/FistImpactMedium"
+    }
+   }
+  },
+  "WeaponAnywhereCast": {
+   "ArmedCastChargeStage": true,
+   "CauseImpactReaction": true,
+   "ChargeWeaponData": {
+    "EmptyChargeFunctionName": "EmptyIndirectCastCharge",
+    "OnStageReachedFunctionName": "IndirectCastChargeStage"
+   },
+   "ChargeWeaponStages": [
+    {
+     "ChannelSlowEventOnStart": true,
+     "ManaCost": 15,
+     "Wait": 0.8
+    }
+   ],
+   "CustomChannelSlowEvent": "WeaponAnywhereCast",
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "HideChargeDuration": 0.15,
+   "HitScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.3,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ImpactReactionHitsOverride": 10,
+   "LinkedTraitNames": [
+    "ArtemisCastCountBoon"
+   ],
+   "OnChargeFunctionNames": [
+    "DoWeaponCharge"
+   ],
+   "OnFiredFunctionNames": [
+    "FireAnywhereCastAtLocation"
+   ],
+   "SelfMultiplier": 0,
+   "ShowManaIndicator": true,
+   "SimSlowDistanceThreshold": 180,
+   "SkipManaIndicatorIfZeroManaCost": true,
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalChargeLoop",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/Leftovers/SFX/WyrmCastAttack"
+     }
+    ],
+    "FireStageSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmotePowerAttackingStaff"
+     },
+     {
+      "Name": "/Leftovers/SFX/AuraThrowSmall"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponBlink": {
+   "CancelWeaponOnFire": "WeaponAxeBlock2",
+   "CompleteObjectivesOnFire": [
+    "RushWeapon"
+   ],
+   "ExpireProjectilesOnFire": [
+    "ProjectileAxeSpin",
+    "ProjectileDagger"
+   ],
+   "IgnoreCancelSimOnEffects": [
+    "RushWeaponDisable",
+    "RushWeaponDisableCancelable"
+   ],
+   "NoExpressiveAnim": true,
+   "OnChargeCancelFunctionName": "ClearBlinkAlpha",
+   "OnChargeFunctionNames": [
+    "WeaponBlinkFunction"
+   ],
+   "SimSlowBlur": {
+    "Distance": 1.6,
+    "FXHoldTime": 0.4,
+    "FXInTime": 0.06,
+    "FXOutTime": 0.4,
+    "Strength": 0.3
+   },
+   "SkipAttackNotReadySounds": true,
+   "Sounds": {
+    "CancelEffectSounds": {},
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalCharge",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteEvading"
+     },
+     {
+      "Name": "/SFX/Player Sounds/MelDash"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/FistImpactMedium",
+     "Brick": "/SFX/FistImpactMedium",
+     "Organic": "/SFX/FistImpactMedium",
+     "Stone": "/SFX/FistImpactMedium"
+    }
+   },
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Rush",
+   "Upgrades": {}
+  },
+  "WeaponCast": {
+   "ArmedParameters": {
+    "HitRumbleParameters": [
+     {
+      "Duration": 0.21,
+      "Fraction": 0.21,
+      "ScreenPreWait": 0.06
+     }
+    ],
+    "HitScreenshake": {
+     "Distance": 3,
+     "Duration": 0.05,
+     "FalloffSpeed": 3000,
+     "Speed": 1000
+    },
+    "HitSimSlowParameters": [
+     {
+      "Fraction": 0.15,
+      "LerpTime": 0,
+      "ScreenPreWait": 0.07
+     },
+     {
+      "Fraction": 1,
+      "LerpTime": 0.1,
+      "ScreenPreWait": 0.25
+     }
+    ],
+    "SimSlowDistanceThreshold": 180,
+    "Sounds": {
+     "ImpactSounds": {
+      "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+      "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+      "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+     }
+    }
+   },
+   "CauseImpactReaction": true,
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "HitScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "ImpactReactionHitsOverride": 10,
+   "OnArmedHitEffect": {
+    "DataProperties": {
+     "CanAffectInvulnerable": false,
+     "DisableAttack": true,
+     "DisableMove": true,
+     "DisableRotate": true,
+     "Duration": 0.7
+    },
+    "EffectName": "OnHitStun"
+   },
+   "OnChargeFunctionNames": [
+    "CheckChargeCastBuffs"
+   ],
+   "OnFiredFunctionArgs": {
+    "ProjectileNames": {}
+   },
+   "OnFiredFunctionNames": [
+    "WeaponCastFired"
+   ],
+   "OnHitFunctionNames": [
+    "RefreshImpactSlow",
+    "CheckOnArmedHitEffect"
+   ],
+   "SelfMultiplier": 0,
+   "SkipManaIndicatorIfZeroManaCost": true,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/Leftovers/SFX/WyrmCastAttack"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UnarmedCastCompleteGraphic": "Melinoe_Cast_Fire_Quick",
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged",
+   "Using": {
+    "EffectNames": [
+     "ImpactSlow",
+     "ImpactGrip"
+    ],
+    "WeaponName": "WeaponCastProjectileHades"
+   }
+  },
+  "WeaponCastArm": {
+   "ChargeWeaponData": {},
+   "ChargeWeaponStages": {},
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "FireScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HideChargeDuration": 0.25,
+   "HideOutOfManaPresentation": true,
+   "IgnoreManaCostIncreasesIfFree": true,
+   "ManaCost": 15,
+   "OnChargeFunctionNames": {},
+   "OnFiredFunctionNames": [
+    "CastArmedFunction"
+   ],
+   "RepeatFailToFireFunction": true,
+   "SelfMultiplier": 0,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmotePowerAttackingStaff"
+     },
+     {
+      "Name": "/Leftovers/SFX/AuraThrowSmall"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "WeaponProperty": "ChargeTime"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponCastLob": {
+   "ArmedCastChargeStage": true,
+   "CauseImpactReaction": true,
+   "ChargeWeaponData": {
+    "EmptyChargeFunctionName": "EmptyIndirectCastCharge",
+    "OnStageReachedFunctionName": "IndirectCastChargeStage"
+   },
+   "ChargeWeaponStages": [
+    {
+     "ChannelSlowEventOnStart": true,
+     "ManaCost": 15,
+     "Wait": 0.8
+    }
+   ],
+   "CustomChannelSlowEvent": "WeaponCastProjectile",
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "HideChargeDuration": 0.15,
+   "HitScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.3,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ImpactReactionHitsOverride": 10,
+   "LinkedTraitNames": [
+    "ArtemisCastCountBoon"
+   ],
+   "OnChargeFunctionNames": [
+    "DoWeaponCharge"
+   ],
+   "OnProjectileDeathFunction": "FireCastAtLocation",
+   "SelfMultiplier": 0,
+   "ShowManaIndicator": true,
+   "SimSlowDistanceThreshold": 180,
+   "SkipManaIndicatorIfZeroManaCost": true,
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalChargeLoop",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/Leftovers/SFX/WyrmCastAttack"
+     }
+    ],
+    "FireStageSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmotePowerAttackingStaff"
+     },
+     {
+      "Name": "/Leftovers/SFX/AuraThrowSmall"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponCastProjectile": {
+   "ArmedCastChargeStage": true,
+   "CauseImpactReaction": true,
+   "ChargeWeaponData": {
+    "EmptyChargeFunctionName": "EmptyIndirectCastCharge",
+    "OnStageReachedFunctionName": "IndirectCastChargeStage"
+   },
+   "ChargeWeaponStages": [
+    {
+     "ChannelSlowEventOnStart": true,
+     "ManaCost": 15,
+     "Wait": 0.8
+    }
+   ],
+   "CustomChannelSlowEvent": "WeaponCastProjectile",
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "HideChargeDuration": 0.15,
+   "HitScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.3,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ImpactReactionHitsOverride": 10,
+   "LinkedTraitNames": [
+    "ArtemisCastCountBoon"
+   ],
+   "OnChargeFunctionNames": [
+    "DoWeaponCharge"
+   ],
+   "OnProjectileDeathFunction": "FireCastAtLocation",
+   "SelfMultiplier": 0,
+   "ShowManaIndicator": true,
+   "SimSlowDistanceThreshold": 180,
+   "SkipManaIndicatorIfZeroManaCost": true,
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalChargeLoop",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/Leftovers/SFX/WyrmCastAttack"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponCastProjectileHades": {
+   "ArmedCastChargeStage": true,
+   "CauseImpactReaction": true,
+   "ChargeWeaponData": {
+    "EmptyChargeFunctionName": "EmptyIndirectCastCharge",
+    "OnStageReachedFunctionName": "IndirectCastChargeStage"
+   },
+   "ChargeWeaponStages": [
+    {
+     "ChannelSlowEventOnStart": true,
+     "ManaCost": 15,
+     "Wait": 0.8
+    }
+   ],
+   "CustomChannelSlowEvent": "WeaponCastProjectileHades",
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "HideChargeDuration": 0.15,
+   "HitScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.3,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ImpactReactionHitsOverride": 10,
+   "LinkedTraitNames": [
+    "ArtemisCastCountBoon"
+   ],
+   "OnChargeFunctionNames": [
+    "DoWeaponCharge"
+   ],
+   "OnProjectileDeathFunction": "AttachCastAtLocation",
+   "SelfMultiplier": 0,
+   "ShowManaIndicator": true,
+   "SimSlowDistanceThreshold": 180,
+   "SkipManaIndicatorIfZeroManaCost": true,
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/MelMagicalChargeLoop",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/SFX/Enemy Sounds/Hades/HadesFireSkullImpact"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponCastVacuum": {
+   "FireRumbleParameters": [
+    {
+     "Duration": 0.21,
+     "Fraction": 0.21,
+     "ScreenPreWait": 0.06
+    }
+   ],
+   "FireScreenshake": {
+    "Distance": 3,
+    "Duration": 0.05,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "ManaCost": 10,
+   "OutOfManaFunctionArgs": {
+    "Cooldown": 0.85
+   },
+   "OutOfManaFunctionName": "WeaponCooldownOutOfMana",
+   "SelfMultiplier": 0,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     },
+     {
+      "Name": "/Leftovers/SFX/WyrmCastAttack"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Brick": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BrickObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "BushObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "MetalObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Organic": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "Stone": "/SFX/Player Sounds/ZagreusBloodshotImpact",
+     "StoneObstacle": "/SFX/Player Sounds/ZagreusBloodshotImpact"
+    }
+   },
+   "SpeedPropertyChanges": [
+    {
+     "EffectName": "WeaponCastAttackDisable",
+     "EffectProperty": "Duration"
+    },
+    {
+     "EffectName": "WeaponCastSelfSlow",
+     "EffectProperty": "Duration"
+    }
+   ],
+   "UpgradeChoiceText": "UpgradeChoiceMenu_Ranged"
+  },
+  "WeaponMorphedAttack": {
+   "OnFiredFunctionArgs": {
+    "VoiceLines": {
+     "1": {
+      "Cue": "/VO/HecateField_0209",
+      "GameStateRequirements": [
+       {
+        "PathFalse": [
+         "CurrentRun",
+         "SpeechRecord",
+         "/VO/Hecate_0152"
+        ]
+       }
+      ],
+      "Text": "If you could see yourself...!"
+     },
+     "2": {
+      "Cue": "/VO/HecateField_0210",
+      "Text": "Not very dignified."
+     },
+     "3": {
+      "Cue": "/VO/HecateField_0211",
+      "Text": "Come on, Melinoë."
+     },
+     "4": {
+      "Cue": "/VO/HecateField_0212",
+      "Text": "Fall back!"
+     },
+     "ChanceToPlay": 0.25,
+     "Cooldowns": [
+      {
+       "Name": "HecateSpokeRecently",
+       "Time": 10
+      }
+     ],
+     "ObjectType": "Hecate",
+     "PlayOnceFromTableThisRun": true,
+     "PreLineWait": 0.4,
+     "RandomRemaining": true,
+     "SuccessiveChanceToPlay": 0.25,
+     "SuccessiveChanceToPlayAll": 0.05
+    }
+   },
+   "OnFiredFunctionNames": [
+    "WeaponFiredGenericPresentation"
+   ],
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteSheepAttacking"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/FistImpactMedium",
+     "Brick": "/SFX/FistImpactMedium",
+     "Organic": "/SFX/FistImpactMedium",
+     "Stone": "/SFX/FistImpactMedium"
+    }
+   }
+  },
+  "WeaponMorphedAttack_Pig": {
+   "InheritFrom": [
+    "WeaponMorphedAttack"
+   ],
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmotePigAttacking"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/FistImpactMedium",
+     "Brick": "/SFX/FistImpactMedium",
+     "Organic": "/SFX/FistImpactMedium",
+     "Stone": "/SFX/FistImpactMedium"
+    }
+   }
+  },
+  "WeaponMorphedAttack_Rat": {
+   "InheritFrom": [
+    "WeaponMorphedAttack"
+   ],
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteRatAttacking"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/FistImpactMedium",
+     "Brick": "/SFX/FistImpactMedium",
+     "Organic": "/SFX/FistImpactMedium",
+     "Stone": "/SFX/FistImpactMedium"
+    }
+   }
+  },
+  "WeaponMorphedBlink_YoungMel": {
+   "OnChargeCancelFunctionName": "ClearBlinkAlpha",
+   "OnChargeFunctionNames": [
+    "WeaponBlinkFunction"
+   ]
+  },
+  "WeaponSpellLaser": {
+   "ChargeCameraMotion": {
+    "Duration": 0.7,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1,
+     "Fraction": 0.22,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1.5,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellLaserPrompt"
+   ],
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.16,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "IgnoreHitInvulnerableExpire": true,
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 30,
+   "MaxDuration": 2,
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 0.7,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnClipEmptyFunctionName": "LaserSpellReload",
+   "OnFiredFunctionNames": [
+    "LaserSpellFire"
+   ],
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/TimeSlowCharge",
+      "StoppedBy": [
+       "TriggerRelease"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteAttackingSpell"
+     }
+    ]
+   }
+  },
+  "WeaponSpellLeap": {
+   "ChargeCameraMotion": {
+    "Duration": 0.7,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellLeapPrompt"
+   ],
+   "ExpireProjectilesOnFire": [
+    "ProjectileAxeSpin"
+   ],
+   "HangTime": 0.1,
+   "HitScreenshake": {
+    "Angle": 90,
+    "Distance": 8,
+    "Duration": 0.24,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.02,
+    "Speed": 800
+   },
+   "HitSimSlowCooldown": 1,
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.25,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.1,
+     "ScreenPreWait": 0.35
+    }
+   ],
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "LandingTime": 0.175,
+   "LeapFlightAnimation": "MelinoeSpellFireHoldFrame",
+   "LeapFlightSound": "/VO/MelinoeEmotes/EmotePoweringUpLeap",
+   "LeapLandingAnimation": "Melinoe_Leap_Landing",
+   "LeapLandingSound": "/SFX/Player Sounds/LeapTraitImpact",
+   "LeapRiseAnimation": "MelinoeCrossCastHold",
+   "LeapRiseSound": "/VO/MelinoeEmotes/EmoteChargingAxe",
+   "ManaSpendCost": 50,
+   "OnChargeCancelFunctionName": "LeapEnableBlink",
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 1,
+    "ManualBlinkReenable": true,
+    "SpellChargePresentationFunction": "SpellChargeTimeSlowPresentationSoftVignette",
+    "TimeSlowModifier": 0.1
+   },
+   "OnFiredFunctionNames": [
+    "SpellFire",
+    "SetupSpellLeap"
+   ],
+   "RiseDistance": 400,
+   "RiseTime": 0.6,
+   "ShowManaIndicator": false,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/LeapTraitCharge"
+     }
+    ]
+   }
+  },
+  "WeaponSpellMeteor": {
+   "CompleteObjectivesOnFire": [
+    "SpellMeteorPrompt"
+   ],
+   "FireSimSlowParameters": [
+    {
+     "Fraction": 0.25,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.1,
+     "ScreenPreWait": 0.12
+    }
+   ],
+   "HitSimSlowCooldown": 1,
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.1,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.15
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.16,
+     "ScreenPreWait": 0.5
+    }
+   ],
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 90,
+   "OnFiredFunctionNames": [
+    "SpellFire",
+    "SpellMeteorPresentation",
+    "SpellMeteorFire"
+   ],
+   "SimSlowDistanceThreshold": 800,
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/TimeSlowChargeLoop",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteAttackingFierce"
+     },
+     {
+      "Name": "/SFX/Player Sounds/TimeSlowStart"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/Player Sounds/ElectricZapSmall",
+     "Brick": "/SFX/Player Sounds/ElectricZapSmall",
+     "BrickObstacle": "/SFX/Player Sounds/ElectricZapSmall",
+     "BushObstacle": "/SFX/Player Sounds/ElectricZapSmall",
+     "Invulnerable": "/SFX/Player Sounds/ElectricZapSmall",
+     "MetalObstacle": "/SFX/Player Sounds/ElectricZapSmall",
+     "Organic": "/SFX/Player Sounds/ElectricZapSmall",
+     "Stone": "/SFX/Player Sounds/ElectricZapSmall",
+     "StoneObstacle": "/SFX/Player Sounds/ElectricZapSmall"
+    }
+   }
+  },
+  "WeaponSpellMoonBeam": {
+   "ChargeCameraMotion": {
+    "Duration": 0.3,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1.5,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1.5,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellPotionPrompt"
+   ],
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.08,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "LinkedTraitManaSpendAdjustment": "SuitHexAspect",
+   "ManaSpendCost": 100,
+   "OnChargeFunctionArgs": {},
+   "OnChargeFunctionNames": {},
+   "OnFiredFunctionArgs": {
+    "Count": 8,
+    "Delay": 0.525,
+    "FollowUpDelay": 0.525,
+    "ProjectileName": "ProjectileMoonBeam",
+    "Range": 450
+   },
+   "OnFiredFunctionNames": [
+    "MoonBeamSpellFire"
+   ],
+   "ShowManaIndicator": false,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/PotionTraitTrigger"
+     },
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     }
+    ]
+   },
+   "Using": {
+    "EffectName": "MoonBeamVulnerability"
+   }
+  },
+  "WeaponSpellPolymorph": {
+   "ChargeCameraMotion": {
+    "Duration": 0.7,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1.4,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1.5,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellPolymorphPrompt"
+   ],
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.16,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "HitRumbleParameters": [
+    {
+     "Duration": 0.18,
+     "RightFraction": 0.3,
+     "ScreenPreWait": 0
+    }
+   ],
+   "HitScreenshake": {
+    "Distance": 4,
+    "Duration": 0.1,
+    "FalloffSpeed": 3000,
+    "Speed": 1000
+   },
+   "HitSimSlowCooldown": 0.3,
+   "HitSimSlowParameters": [
+    {
+     "Fraction": 0.1,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.07,
+     "ScreenPreWait": 0.03
+    }
+   ],
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 40,
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 0.6,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnFiredFunctionNames": [
+    "SpellReloadStarted",
+    "SpellFire",
+    "SpellPolymorphFire"
+   ],
+   "PolymorphExtractModifier": 0.5,
+   "SimSlowDistanceThreshold": 220,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingFierce"
+     }
+    ]
+   }
+  },
+  "WeaponSpellPotion": {
+   "ChargeCameraMotion": {
+    "Duration": 0.3,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1.5,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1.5,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellPotionPrompt"
+   ],
+   "EffectsForPackaging": [
+    "SelfBuffOutput"
+   ],
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.08,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "HealingAmount": 15,
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 70,
+   "OnChargeFunctionArgs": {},
+   "OnChargeFunctionNames": {},
+   "OnFiredFunctionArgs": {
+    "Amount": 15,
+    "HealDelay": 0.35
+   },
+   "OnFiredFunctionNames": [
+    "SpellPotion",
+    "SpellFire"
+   ],
+   "ShowManaIndicator": false,
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/PotionTraitTrigger"
+     },
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingAlt"
+     }
+    ]
+   }
+  },
+  "WeaponSpellSummon": {
+   "ChargeCameraMotion": {
+    "Duration": 0.7,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1.4,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellSummonPrompt"
+   ],
+   "Duration": 12,
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.16,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 60,
+   "MaxSummons": 1,
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 0.6,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnFiredFunctionNames": [
+    "SpellReloadStarted",
+    "SpellFire"
+   ],
+   "Sounds": {
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/SummonFire"
+     },
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingFierce"
+     }
+    ]
+   },
+   "SpawnName": "SwarmerSummon",
+   "SummonMultipliers": {
+    "DamageMultiplier": 1.5,
+    "MaxHealthMultiplier": 100,
+    "ScaleMultiplier": 1.2,
+    "SpeedMultiplier": 1.6
+   }
+  },
+  "WeaponSpellTimeSlow": {
+   "BaseDuration": 4,
+   "ChargeCameraMotion": {
+    "Duration": 0.7,
+    "Fraction": 1.08,
+    "HoldDuration": 0,
+    "RestoreDefaultDuration": 0.4,
+    "ZoomType": "Ease"
+   },
+   "ChargeRumbleParameters": [
+    {
+     "Duration": 1.4,
+     "Fraction": 0.14,
+     "ScreenPreWait": 0.02
+    }
+   ],
+   "ChargeScreenshake": {
+    "Distance": 2,
+    "Duration": 1,
+    "FalloffSpeed": 2000,
+    "Speed": 100
+   },
+   "CompleteObjectivesOnFire": [
+    "SpellTimeSlowPrompt"
+   ],
+   "FireScreenshake": {
+    "Angle": 225,
+    "Distance": 4,
+    "Duration": 0.16,
+    "FalloffSpeed": 1400,
+    "ScreenPreWait": 0.19,
+    "Speed": 400
+   },
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 130,
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 0.8,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnFiredFunctionArgs": {
+    "Duration": 4,
+    "EndSlowMotionFunctionName": "EndTimeSlow",
+    "EndSlowMotionSound": "/VO/MelinoeEmotes/EmoteGasping",
+    "EndWarnNum": 3,
+    "EndWarnPresentationFunction": "SpellSlowWarnPresentation",
+    "LoopingSound": "/SFX/Player Sounds/TimeSlowLoop",
+    "Modifier": 0.5
+   },
+   "OnFiredFunctionNames": [
+    "SpellReloadStarted",
+    "SpellFire",
+    "StartSpellSlow"
+   ],
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/SFX/Player Sounds/TimeSlowCharge",
+      "StoppedBy": [
+       "TriggerRelease"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteCastingFierce"
+     }
+    ]
+   }
+  },
+  "WeaponSpellTransform": {
+   "CompleteObjectivesOnFire": [
+    "SpellTransformPrompt"
+   ],
+   "Duration": 5,
+   "FireSimSlowParameters": [
+    {
+     "Fraction": 0.25,
+     "LerpTime": 0,
+     "ScreenPreWait": 0.02
+    },
+    {
+     "Fraction": 1,
+     "LerpTime": 0.1,
+     "ScreenPreWait": 0.12
+    }
+   ],
+   "InheritFrom": [
+    "BaseSpell"
+   ],
+   "ManaSpendCost": 110,
+   "OnChargeFunctionArgs": {
+    "DisableBlink": true,
+    "Duration": 0.1,
+    "Force": true,
+    "TimeSlowModifier": 0.001
+   },
+   "OnFiredFunctionArgs": {
+    "EndGraphic": "MelinoeEquip",
+    "EndVfx": "SuperStartFlare",
+    "RevertAnimationSwaps": true,
+    "Scale": 1.1,
+    "StartVfx": "SuperStartFlare",
+    "TransformWeapons": [
+     "WeaponTransformAttack",
+     "WeaponTransformSpecial"
+    ],
+    "Vfx": "GrenadeSelfDamageOutputFx"
+   },
+   "OnFiredFunctionNames": [
+    "SpellFire",
+    "SpellTransform"
+   ],
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Key": "SpearWeaponSpin",
+      "Name": "/SFX/Player Sounds/TimeSlowCharge",
+      "SetPitchToPropertyValue": "ChargeTime",
+      "StoppedBy": [
+       "ChargeCancel",
+       "TriggerRelease",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/SFX/Player Sounds/TransformActivate"
+     },
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteAttackingSpell"
+     }
+    ]
+   }
+  },
+  "WeaponSprint": {
+   "ChargeWeaponData": {},
+   "HideChargeDuration": 0.25,
+   "IgnoreObjectives": true,
+   "OnChargeFunctionNames": {}
+  },
+  "WeaponSprintEx": {
+   "IsExWeapon": true
+  },
+  "WeaponTransformAttack": {
+   "Sounds": {
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/BurnDamageTorches",
+     "Brick": "/SFX/BurnDamageTorches",
+     "BrickObstacle": "/SFX/BurnDamageTorches",
+     "BushObstacle": "/SFX/BurnDamage",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "MetalObstacle": "/SFX/BurnDamageTorches",
+     "Organic": "/SFX/BurnDamageTorches",
+     "Stone": "/SFX/BurnDamageTorches",
+     "StoneObstacle": "/SFX/BurnDamageTorches"
+    }
+   }
+  },
+  "WeaponTransformSpecial": {
+   "Sounds": {
+    "ChargeSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteChargingHowl",
+      "StoppedBy": [
+       "ChargeCancel",
+       "Fired"
+      ]
+     }
+    ],
+    "FireSounds": [
+     {
+      "Name": "/VO/MelinoeEmotes/EmoteHowlSlam"
+     }
+    ],
+    "ImpactSounds": {
+     "Armored": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "Bone": "/SFX/BurnDamageTorches",
+     "Brick": "/SFX/BurnDamageTorches",
+     "BrickObstacle": "/SFX/BurnDamageTorches",
+     "BushObstacle": "/SFX/BurnDamage",
+     "Invulnerable": "/SFX/Player Sounds/ZagreusShieldRicochet",
+     "MetalObstacle": "/SFX/BurnDamageTorches",
+     "Organic": "/SFX/BurnDamageTorches",
+     "Stone": "/SFX/BurnDamageTorches",
+     "StoneObstacle": "/SFX/BurnDamageTorches"
+    }
+   }
+  }
+ }
+}
