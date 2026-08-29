@@ -13,11 +13,11 @@ Last updated 27 August 2026, game build `138174`.
 | | |
 |---|---|
 | **Phase** | 1, "The Exit" |
-| **Build order step** | 10 of 11 complete, step 11 next. **Step 8 was the first shippable point and it is done** |
+| **Build order step** | **11 of 11. Phase 1 is complete.** Step 8 was the first shippable point and it was passed three steps ago |
 | **Shippable at** | Step 8, the timeline shell. Useful to a player with no rating engine at all |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4. Scaffolded and building |
 
-**The tool works.** Set up a run, log what each Exit gave, and the timeline records what
+**Phase 1 is complete.** Set up a run, log what each Exit gave, and the timeline records what
 each pick closed at the pick that closed it. Settling the fourth Olympian reads "35 builds
 closed here" against that entry, and the present entry says what is still live and which god
 feeds it. That is the originating complaint answered, and it is the first shippable point.
@@ -48,7 +48,7 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | 8 | **The timeline shell.** First shippable point | **Done.** Deaths recorded at the pick that caused them, verdicts in the present entry |
 | 9 | Verdict snapshotting, `engine/briefing.ts`, re-entry header | **Done.** A trail per run, the diff, the pin, and the card. 16 tests |
 | 10 | `engine/rules.ts`, one rule, then `scripts/health.ts` | **Done.** 5 rules as data, the harness that measures them, 17 tests |
-| 11 | The offer block inside the present entry | Next |
+| 11 | The offer block inside the present entry | **Done.** Ranked, with the reject verdict, and everything shared lifted above the cards |
 
 Later phases are scoped in `REQUIREMENTS.md` 7: **2** before the run, **3** memory,
 **4** automation and community.
@@ -207,6 +207,30 @@ their own set, so an aspect chosen at setup can settle a build before the first 
   `BoostedRandomLoot`, which are a boon from any god and therefore spend an Olympian slot,
   plus `ShopHermesUpgrade`, `SpellDrop` and `WeaponUpgradeDrop`. So picking Charon asks the
   same question the other kinds do, and his Poms and health go under "Something else"
+
+**Step 11, and the thing it turned up**
+
+The offer block ranks what a god can still give you and puts one sentence on each card:
+what it does in the game's words, what it means for this run in ours, and what taking it
+would close. That last is the reject verdict, and it is the half a rating cannot answer.
+
+Then it showed nine Poseidon cards all saying **"36 targets close"** and all saying
+**"spends one of your four Olympian slots"**, because Poseidon was the fourth god and both
+are true of every boon he has. Correct, useless, and it buried the one card that was
+actually different.
+
+**An offer block exists to differentiate, so anything true of every card belongs above
+them, not on them.** `engine/offer.ts differentiate` lifts both the shared cost and the
+shared sentences into one note about the god, and each card keeps only what it alone
+carries. A card left with nothing falls back to silence, which is honest, rather than to a
+repeat, which is not. A rule can supply `sayAll` for how it reads once hoisted, because
+`say` is written for one card and "taking this" refers to nothing above nine of them.
+
+`DESIGN.md` 8's **"unrated sorts last"** also needed correcting, and the correction is in
+`rating.ts`. It was written when every delta was a bonus and it holds perfectly there; with
+a penalty in the pack it put a boon we know shuts a slot *above* one we know nothing about.
+What that rule protects is in its own sentence, "survives every filter floor", and nothing
+here is dropped or hidden: unrated scores zero, sits among the zeroes, and loses the tie.
 
 **Step 10, and what the harness caught**
 

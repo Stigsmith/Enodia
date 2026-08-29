@@ -109,6 +109,16 @@ export type Rule = {
   delta: number
   /** mandatory, and the only thing a player is ever shown */
   say: string
+  /**
+   * How to say it when it is true of every card in an offer.
+   *
+   * `say` is written for one card and reads "taking this". Lifted above nine
+   * cards by `offer.ts differentiate`, "this" no longer refers to anything.
+   * A rule that expects to be hoisted supplies the other phrasing rather than
+   * having its sentence rewritten by string surgery, which would break the
+   * first time somebody wrote one that did not fit the pattern.
+   */
+  sayAll?: string
   source: 'curator' | 'wiki' | 'source'
 }
 
