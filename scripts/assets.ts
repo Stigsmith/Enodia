@@ -66,14 +66,25 @@ const generated = (name: string) => dictOf(dictOf(readJson(join(ROOT, `data/gene
 // Walking
 // ---------------------------------------------------------------------------
 
-/** Every image under assets/, as a path relative to assets/. */
+/**
+ * Every image under assets/, as a path relative to assets/.
+ *
+ * **It recurses.** It used to read exactly one level, which was true of every
+ * shelf until `themes/` arrived holding a directory per theme. A one-level
+ * walk there does not find the images and does list each theme directory as
+ * though it were a file, so the manifest would name four things that are not
+ * images and miss the seventeen that are.
+ */
 function assetFiles(): string[] {
   const out: string[] = []
-  for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
-    if (!dir.isDirectory()) continue
-    for (const file of readdirSync(join(ASSETS, dir.name))) {
-      if (IMAGE.test(file)) out.push(`${dir.name}/${file}`)
+  const walk = (dir: string, prefix: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${prefix}${entry.name}/`)
+      else if (IMAGE.test(entry.name)) out.push(`${prefix}${entry.name}`)
     }
+  }
+  for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
+    if (dir.isDirectory()) walk(join(ASSETS, dir.name), `${dir.name}/`)
   }
   return out.sort()
 }

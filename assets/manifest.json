@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 964,
+ "count": 978,
  "categories": [
   {
    "name": "arcana",
@@ -113,7 +113,7 @@
   },
   {
    "name": "shell",
-   "count": 99,
+   "count": 96,
    "source": "game"
   },
   {
@@ -130,6 +130,13 @@
    "name": "symbols",
    "count": 17,
    "source": "game"
+  },
+  {
+   "name": "themes",
+   "count": 17,
+   "source": "mixed",
+   "wiki": 12,
+   "game": 5
   },
   {
    "name": "ui",
@@ -8323,30 +8330,6 @@
    "source": "game"
   },
   {
-   "id": "splash-dreamrun",
-   "category": "shell",
-   "file": "shell/splash-dreamrun.png",
-   "bytes": 1624269,
-   "sha256": "7f037850de3650ea102d667ee1594fce9abd740e5cf9ec05fff8bdd405587013",
-   "source": "game"
-  },
-  {
-   "id": "splash-surface",
-   "category": "shell",
-   "file": "shell/splash-surface.png",
-   "bytes": 1094739,
-   "sha256": "bd30c71032e5d2a0505a95eec0873bec0c5a466b00adfaec499bc4841b65dded",
-   "source": "game"
-  },
-  {
-   "id": "splash-underworld",
-   "category": "shell",
-   "file": "shell/splash-underworld.png",
-   "bytes": 1214696,
-   "sha256": "1ba1597f04f414eac42447c8b730e1e0e92377a6c44a0701c41676543565d99e",
-   "source": "game"
-  },
-  {
    "id": "subtitle-backing",
    "category": "shell",
    "file": "shell/subtitle-backing.png",
@@ -8675,6 +8658,154 @@
    "bytes": 73913,
    "sha256": "87b009d951090b1378334f579256aa56db46afc4c4c67efbd0078928ba39692c",
    "source": "game"
+  },
+  {
+   "id": "Cthonic/117597572-hades-god-mode-sends-a-powerful",
+   "category": "themes",
+   "file": "themes/Cthonic/117597572-hades-god-mode-sends-a-powerful.jpg",
+   "bytes": 227002,
+   "sha256": "8dac1a0ddeeb742ca8b00f6142e78b2bcda0778349aac6ff40313eca5938a78c",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Cthonic/splash-dreamrun",
+   "category": "themes",
+   "file": "themes/Cthonic/splash-dreamrun.png",
+   "bytes": 1624269,
+   "sha256": "7f037850de3650ea102d667ee1594fce9abd740e5cf9ec05fff8bdd405587013",
+   "source": "game"
+  },
+  {
+   "id": "Cthonic/thumb-1920-1293293",
+   "category": "themes",
+   "file": "themes/Cthonic/thumb-1920-1293293.png",
+   "bytes": 1198224,
+   "sha256": "6e928f4373b29b3955686dc55e0f6623b52953ae36a9bd1288880b7f008f095c",
+   "source": "game"
+  },
+  {
+   "id": "Infernal/117597565-steam-workshophades-audio-responsive",
+   "category": "themes",
+   "file": "themes/Infernal/117597565-steam-workshophades-audio-responsive.jpg",
+   "bytes": 378491,
+   "sha256": "16d2813f3d606e9ec52d24a7ff0f60c91e6e791452d1b5669db6589309d0f3be",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Infernal/340248-Hades-Game",
+   "category": "themes",
+   "file": "themes/Infernal/340248-Hades-Game.jpg",
+   "bytes": 746880,
+   "sha256": "42a61b9c14ab683d13b0a3bfaa6c6df6af669f11d3404af4027ae5ca5f943f18",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Infernal/85970-1920x1080-desktop-full-hd-hades-game-background",
+   "category": "themes",
+   "file": "themes/Infernal/85970-1920x1080-desktop-full-hd-hades-game-background.jpg",
+   "bytes": 391946,
+   "sha256": "54035c4f15739628e71eba40b884f1a8c0ff6cff034f864cfd14f2a1642f4eeb",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Infernal/hades-2-dnd-characters-hades-chained",
+   "category": "themes",
+   "file": "themes/Infernal/hades-2-dnd-characters-hades-chained.jpg",
+   "bytes": 700724,
+   "sha256": "3d13a0b243d8f6cd583643165d5818189eddbeaf01b4dae7c34e3b5b240d0ea4",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Infernal/hades-2018-yz",
+   "category": "themes",
+   "file": "themes/Infernal/hades-2018-yz.jpg",
+   "bytes": 362187,
+   "sha256": "8ae405ca4e0e292e2e81e577188b1acd71ccdb66c794359e936329f1efe73488",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Infernal/hades-e2-2560x1440",
+   "category": "themes",
+   "file": "themes/Infernal/hades-e2-2560x1440.jpg",
+   "bytes": 690118,
+   "sha256": "4d512336028e49c447e8cd0c697912660dc0a842dac28ebcebb952fdb5afd0df",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Olympian/5850523",
+   "category": "themes",
+   "file": "themes/Olympian/5850523.png",
+   "bytes": 753738,
+   "sha256": "531f69fb2bf873aa72303979760217d71d5ed34d7aba67c7cca548e3014112b6",
+   "source": "game"
+  },
+  {
+   "id": "Olympian/hades-game-pantheon-artwork-ol4i9rftpz252w2j",
+   "category": "themes",
+   "file": "themes/Olympian/hades-game-pantheon-artwork-ol4i9rftpz252w2j.jpg",
+   "bytes": 612548,
+   "sha256": "a98944f5625872a5896a73f0e99397afa55c9bcd63c32cf77451542828cf90d2",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Olympian/splash-surface",
+   "category": "themes",
+   "file": "themes/Olympian/splash-surface.png",
+   "bytes": 1094739,
+   "sha256": "bd30c71032e5d2a0505a95eec0873bec0c5a466b00adfaec499bc4841b65dded",
+   "source": "game"
+  },
+  {
+   "id": "Unseen/117597569-supergiant-games-on-x-here-have-some",
+   "category": "themes",
+   "file": "themes/Unseen/117597569-supergiant-games-on-x-here-have-some.jpg",
+   "bytes": 203638,
+   "sha256": "4ed8d4da9f9355a8a855ef28bc8d4aea4388212c379d03fb3dfe909c94f737da",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Unseen/gChwGs",
+   "category": "themes",
+   "file": "themes/Unseen/gChwGs.jpg",
+   "bytes": 494521,
+   "sha256": "e8103bad52744f543b28c257ddaf63a6ae78ddc1fd300b7222174cc9271ea2c8",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Unseen/hades-2-warsong-update-everything-you-need-to-know-about-ares-and-the-new-final-boss-3840x2160-43908c25ade3",
+   "category": "themes",
+   "file": "themes/Unseen/hades-2-warsong-update-everything-you-need-to-know-about-ares-and-the-new-final-boss-3840x2160-43908c25ade3.jpg",
+   "bytes": 436513,
+   "sha256": "0e1e0dcb0112dce7440c9294a74c4092b3a80f4e2355f8491e0a8d374fdc8c36",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "Unseen/splash-underworld",
+   "category": "themes",
+   "file": "themes/Unseen/splash-underworld.png",
+   "bytes": 1214696,
+   "sha256": "1ba1597f04f414eac42447c8b730e1e0e92377a6c44a0701c41676543565d99e",
+   "source": "game"
+  },
+  {
+   "id": "Unseen/wallpapersden.com_hades-2-gaming_2560x1600",
+   "category": "themes",
+   "file": "themes/Unseen/wallpapersden.com_hades-2-gaming_2560x1600.jpg",
+   "bytes": 1722014,
+   "sha256": "ad6a67ea69d8b82b906f809cdf066267fbcc72d3fac91225c9deb17b61938131",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "blooddrop",
