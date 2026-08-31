@@ -22,6 +22,7 @@ import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
 import { Briefing } from './ui/Briefing.tsx'
 import { Hecate } from './ui/Hecate.tsx'
 import { Arcana } from './ui/Arcana.tsx'
+import { Themes } from './ui/Themes.tsx'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
@@ -29,7 +30,7 @@ import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
 import { applyFrame, readFrame } from './ui/frames.ts'
-import { applyWallpaper, readWallpaper } from './ui/wallpaper.ts'
+import { applyTheme, readTheme, readWallpapers, writeTheme, writeWallpapers } from './ui/theme.ts'
 import { applyNav, readNav } from './ui/nav.ts'
 import type { View } from './ui/nav.ts'
 import { useRun } from './state/run.ts'
@@ -42,9 +43,19 @@ export function App() {
   // that; this only makes a reload keep what was chosen.
   useEffect(() => applyFrame(readFrame()), [])
 
-  // The wallpaper, likewise. Here rather than in the menu because a reload
-  // has to keep it whether or not anyone opens a menu.
-  useEffect(() => applyWallpaper(readWallpaper()), [])
+  /**
+    * The theme, and the wallpaper it is wearing.
+    *
+    * Held here rather than in the picker because every screen is painted by
+    * it, and a reload has to keep it whether or not anyone opens the picker.
+    */
+  const [theme, setTheme] = useState(readTheme)
+  const [wallpapers, setWallpapers] = useState(readWallpapers)
+
+  useEffect(() => {
+    applyTheme(theme, wallpapers)
+    writeTheme(theme)
+  }, [theme, wallpapers])
 
   // Pop-out or pinned pane, on a desktop. `nav.ts` explains why the CSS
   // ignores it below 60rem rather than this having to.
@@ -137,6 +148,23 @@ export function App() {
       <div className="app-view">{children}</div>
     </div>
   )
+
+  if (screen === 'themes') {
+    return frame(
+      <div className="shell is-wide">
+        <Themes
+          theme={theme}
+          wallpapers={wallpapers}
+          onTheme={setTheme}
+          onWallpaper={(themeId, wallpaperId) => {
+            const next = { ...wallpapers, [themeId]: wallpaperId }
+            setWallpapers(next)
+            writeWallpapers(next)
+          }}
+        />
+      </div>,
+    )
+  }
 
   if (screen === 'arcana') {
     return frame(

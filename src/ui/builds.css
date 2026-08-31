@@ -86,7 +86,7 @@
   letter-spacing: 0.04em;
   font-size: clamp(1.35rem, 4vw, 1.9rem);
   letter-spacing: 0.05em;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .builds-back {
@@ -101,7 +101,7 @@
 }
 
 .builds-back:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   color: var(--bone);
 }
 
@@ -194,23 +194,23 @@
 }
 
 .bdrop-button:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
 }
 
 .bdrop-button:focus-visible {
-  outline: 2px solid var(--jade);
+  outline: 2px solid var(--lit);
   outline-offset: 1px;
 }
 
 /* A facet holding a value says so without being read: the whole control
  * changes, not a tick somewhere inside it. */
 .bdrop.is-on .bdrop-button {
-  border-color: var(--jade);
-  color: var(--jade-hot);
+  border-color: var(--lit);
+  color: var(--lit-hot);
 }
 
 .bdrop.is-on .bdrop-label {
-  color: var(--jade-dim);
+  color: var(--lit-dim);
 }
 
 .bdrop-caret {
@@ -311,11 +311,11 @@
 }
 
 .bdrop-row.is-chosen {
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .bdrop-row.is-chosen .bdrop-count {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* Phone: a sheet at the bottom of the screen rather than a popup pinned to a
@@ -427,7 +427,7 @@
   min-width: 1.05rem;
   padding: 0 0.25rem;
   border-radius: var(--r-pill);
-  background: var(--jade-dim);
+  background: var(--lit-dim);
   color: var(--ink-950);
   font-family: var(--mono);
   font-size: 0.62rem;
@@ -1441,7 +1441,7 @@ button.mark {
 }
 
 .piececard-body > button:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   color: var(--bone);
 }
 
@@ -1532,7 +1532,7 @@ button.mark {
 .editor-field input:focus,
 .editor-field textarea:focus {
   outline: none;
-  border-color: var(--jade);
+  border-color: var(--lit);
 }
 
 /* -------------------------------------------------------------------------
@@ -1570,10 +1570,10 @@ button.mark {
   gap: 0.35rem;
   max-width: 100%;
   padding: 0.2rem 0.4rem 0.2rem 0.25rem;
-  border: 1px solid var(--jade);
+  border: 1px solid var(--lit);
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--jade-dim) 22%, var(--ink-850));
-  color: var(--jade-hot);
+  background: color-mix(in srgb, var(--lit-dim) 22%, var(--ink-850));
+  color: var(--lit-hot);
   font-family: var(--body);
   font-size: 0.75rem;
   cursor: pointer;
@@ -1620,7 +1620,7 @@ button.mark {
 
 .picklist-search:focus {
   outline: none;
-  border-color: var(--jade);
+  border-color: var(--lit);
 }
 
 .picklist-groups {
@@ -1658,7 +1658,7 @@ button.mark {
 }
 
 .picklist-head.is-open {
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .picklist-caret {
@@ -1759,7 +1759,7 @@ button.mark {
 }
 
 .picklist-row:hover .picklist-add {
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .picklist-none {
@@ -1826,7 +1826,7 @@ button.mark {
 .editor-ok {
   margin: 0;
   font-size: 0.78rem;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .editor-problem {
@@ -2104,7 +2104,7 @@ button.mark {
 }
 
 .arcana-base:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   color: var(--bone);
 }
 
@@ -2132,7 +2132,7 @@ button.mark {
 
 .arcana-grasp-used {
   font-size: 1.45rem;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
   font-variant-numeric: tabular-nums;
 }
 
@@ -2207,7 +2207,7 @@ button.mark {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--jade);
+  color: var(--lit);
   font-family: var(--mono);
   font-size: 0.56rem;
   letter-spacing: 0.1em;
@@ -2216,7 +2216,7 @@ button.mark {
 }
 
 .arcana-copy:hover {
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .arcana-picked {
@@ -2323,7 +2323,7 @@ button.mark {
 }
 
 .playstrip-stars .is-on {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .playstrip-runs {
@@ -2340,7 +2340,7 @@ button.mark {
 }
 
 .playstrip-rate {
-  color: var(--jade-hot) !important;
+  color: var(--lit-hot) !important;
 }
 
 /* A dot between the three numbers, drawn rather than typed, because a
@@ -2363,7 +2363,7 @@ button.mark {
 }
 
 .playstrip-assembles.is-reliably {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .playstrip-assembles.is-needs-luck {
@@ -2512,11 +2512,11 @@ button.mark {
 }
 
 .editor-stars button:hover {
-  color: var(--jade-dim);
+  color: var(--lit-dim);
 }
 
 .editor-stars button.is-on {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* `.editor-field input` is width 100%, so the two integers need a grid of
@@ -2527,3 +2527,221 @@ button.mark {
   gap: 0.6rem;
 }
 
+/* ==========================================================================
+ * THE THEME PICKER
+ *
+ * Four rooms, and you choose by looking. Each card carries `data-theme`, and
+ * `tokens.css` scopes its theme blocks to that attribute rather than to
+ * `:root`, so a card wears the whole palette it is offering: ground, light,
+ * accent, plate. The backdrop inside it is the same three layers `Hecate`
+ * puts behind the app, at the same proportions, reading the same tokens.
+ * Nothing here is a picture of a theme.
+ * ========================================================================= */
+
+.themes {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
+}
+
+@media (min-width: 60rem) {
+  .themes { padding: 1.25rem 2rem 4rem; }
+}
+
+.themes-intro {
+  max-width: 46rem;
+  margin: 0.4rem 0 1.4rem;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--bone-faint);
+}
+
+.theme-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+
+.theme-card {
+  display: grid;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-card);
+  background: var(--ink-900);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-response) var(--e-response);
+}
+
+.theme-card:hover { border-color: var(--lit-dim); }
+
+.theme-card.is-on {
+  border-color: var(--lit);
+  box-shadow: 0 0 0 1px var(--lit-dim);
+}
+
+.theme-card:focus-visible {
+  outline: 2px solid var(--lit-hot);
+  outline-offset: 2px;
+}
+
+/* The room, at card size. */
+.theme-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 8.5rem;
+  border-radius: var(--r-soft);
+  overflow: hidden;
+  background: var(--ink-950);
+}
+
+.theme-glow {
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(38% 30% at 22% 18%, color-mix(in oklab, var(--lit) 62%, transparent), transparent 70%),
+    radial-gradient(46% 34% at 78% 76%, color-mix(in oklab, var(--lit-dim) 70%, transparent), transparent 72%),
+    radial-gradient(26% 20% at 62% 24%, color-mix(in oklab, var(--lit-accent) 34%, transparent), transparent 70%);
+  filter: blur(30px);
+  opacity: 0.9;
+}
+
+.theme-fog {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(var(--fog-at), var(--lit-dim), transparent 72%);
+  mix-blend-mode: screen;
+  opacity: 0.35;
+}
+
+.theme-motes {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 12% 27%, var(--lit-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 31% 69%, var(--bone-dim), transparent 62%),
+    radial-gradient(2.5px 2.5px at 57% 41%, var(--lit-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 74% 76%, var(--lit-hot), transparent 62%),
+    radial-gradient(3px 3px at 88% 35%, var(--lit), transparent 62%),
+    radial-gradient(1.5px 1.5px at 44% 14%, var(--lit-accent), transparent 62%),
+    radial-gradient(2px 2px at 21% 86%, var(--lit), transparent 62%),
+    radial-gradient(1.5px 1.5px at 66% 58%, var(--lit-hot), transparent 62%);
+  opacity: 0.85;
+}
+
+/* The plate, and the only place in the picker where Olympian's stone shows
+ * up as stone. It is the point of the card, so it is the label. */
+.theme-plate {
+  position: relative;
+  padding: 0.4rem 1.1rem;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--metal);
+  border-top-width: 2px;
+  background: var(--plate);
+  color: var(--on-plate);
+  font-family: var(--display);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+}
+
+.theme-meta { display: grid; gap: 0.35rem; }
+
+.theme-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--name);
+  font-weight: 400;
+  font-synthesis-weight: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--lit-hot);
+}
+
+.theme-say {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--bone-dim);
+}
+
+.theme-swatches { display: flex; gap: 0.25rem; margin-top: 0.15rem; }
+
+.theme-swatches i {
+  width: 1.15rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  display: block;
+}
+
+.theme-source {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* ------------------------------------------------------ the wallpapers -- */
+
+.themes-walls { margin-top: 2.2rem; }
+
+.wall-grid {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+}
+
+.wall {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.35rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wall:hover { border-color: var(--lit-dim); }
+.wall.is-on { border-color: var(--lit); }
+.wall.is-on .wall-name { color: var(--lit); }
+
+.wall-swatch {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-hair);
+  background-color: var(--ink-950);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.wall-swatch.is-none {
+  background-image:
+    linear-gradient(135deg, transparent 47%, var(--div-4) 47%, var(--div-4) 53%, transparent 53%);
+}
+
+.wall-name {
+  font-size: 0.76rem;
+  color: var(--bone-dim);
+  padding: 0 0.2rem 0.1rem;
+}
+
+.themes-note {
+  margin: 0.9rem 0 0;
+  max-width: 40rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}

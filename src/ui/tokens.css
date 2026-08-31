@@ -6,7 +6,7 @@
  * Every value is sampled from the game, and project/briefs/visual-language.md
  * names the file each one came from. Do not invent a colour here.
  *
- * Ramps are POSITIONAL, never literal. --jade-hot means "the brightest living
+ * Ramps are POSITIONAL, never literal. --lit-hot means "the brightest living
  * light", not "#8fd4c4". That is what lets a per-god theme swap one ramp
  * without touching anything else.
  */
@@ -14,8 +14,14 @@
 :root {
   /* ---------------------------------------------------------------
    * GROUND. From GUI/HUD/TraitTrayBacking.png and GUI/Tooltip_Backing_01.png.
-   * Near-black leaning teal-green, hue 180 to 210. Fixed under every theme:
-   * the Crossroads does not change colour because you took Ares.
+   * Near-black leaning teal-green, hue 180 to 210.
+   *
+   * **Amended.** This used to read "fixed under every theme: the Crossroads
+   * does not change colour because you took Ares", and for a per-god tint
+   * that was right. A theme the player picks for the whole tool is a
+   * different axis, so the ground rotates hue while every step holds its
+   * luminance to the pixel. It stays near-black, so nothing about
+   * legibility moves: bone measures 15.8 or better on all four grounds.
    * ------------------------------------------------------------- */
   --ink-950: #080d0f;
   --ink-900: #0c1416;
@@ -41,12 +47,47 @@
   --silver-deep: #22232e;
 
   /* ---------------------------------------------------------------
-   * JADE, the living light. From Hecate's portrait.
-   * THE ONLY RAMP A PER-GOD THEME SWAPS. Everything else stays put.
+   * THE LIVING LIGHT. Jade here, because the default theme is Unseen and
+   * jade came out of Hecate's portrait. Every glow, border, highlight,
+   * mote and focus ring in the app reads off these three, which is why
+   * swapping them moves the whole room.
+   *
+   * **Named for the position, not the colour.** The file has always said
+   * ramps are positional; with four themes, `--jade-hot` on an Infernal
+   * screen would have been a lie.
    * ------------------------------------------------------------- */
-  --jade-dim: #3d6b63;
-  --jade: #649c97;
-  --jade-hot: #8fd4c4;
+  --lit-dim: #3d6b63;
+  --lit: #649c97;
+  --lit-hot: #8fd4c4;
+
+  /**
+   * The second bloom in the backdrop, and the theme's own.
+   *
+   * The glow used to borrow `--rim-magenta` and `--rim-cyan` for its
+   * secondary blooms, which contradicted the rule three comments down that
+   * rim is never ambient. This is what it should have been reading, and it
+   * is kept at least 30 degrees of hue from both event colours so a death
+   * never reads as decoration.
+   */
+  --lit-accent: #6495ce;
+
+  /**
+   * A raised thing that carries a word or two: a button, the Exit reward
+   * pill, a chip.
+   *
+   * The game ships its dialogue box twice, once by default and once for
+   * when an Olympian speaks: same panel, same ornament in the same corner,
+   * different plate and different metal. `--plate` is that plate,
+   * `--metal` is that ornament, and `--on-plate` is what can be read on it.
+   *
+   * **Olympian's plate is pale, and it is the only one.** That is what the
+   * game draws, and it is why text on a plate has its own token instead of
+   * assuming `--bone`. Large reading surfaces keep the dark ground under
+   * bone text in every theme.
+   */
+  --plate: #121212;
+  --on-plate: #ede7da;
+  --metal: #a0d0d0;
 
   /* ---------------------------------------------------------------
    * RIM LIGHT, events only. The edge lighting in the character art is
@@ -125,4 +166,108 @@
   --e-response: cubic-bezier(0.2, 0.7, 0.3, 1);
   --t-sheen: 5.5s;
   --t-ambient: 9s;
+}
+
+/* ==========================================================================
+ * THE FOUR THEMES
+ *
+ * `:root` above is Unseen, so a document with no `data-theme` on it still
+ * renders correctly and nothing here is the only definition of anything.
+ * Each block below overrides, and overrides nothing that is not listed.
+ *
+ * **Every ramp is solved, not picked.** Each theme's three light steps hit
+ * the same contrast against its own ground that jade hits against the
+ * shipped one: 3.2, 6.3 and 11.5. That is what lets four themes share one
+ * set of screens without re-testing any of them. The first pass rotated
+ * jade's hue and kept its HSL numbers, which passed a contrast check and
+ * came out beige, and put Cthonic's dim step at 1.9 against its own ground,
+ * which is a border nobody can see. Positional has to mean equal contrast.
+ *
+ * Colours are read off the art in `assets/themes/<theme>/lead-*`, and
+ * `src/ui/theme.test.ts` holds every claim in this comment to a number.
+ *
+ * WHAT NEVER MOVES: `--rim-magenta` and `--rim-cyan`, because an event means
+ * the same thing in every theme; `--silver-*`, which is the game's own metal
+ * and sits under real game art; `--bone-*`, whose contrast is not up for
+ * negotiation; and `--unbuilt`, which is Dora's hard hat.
+ * ========================================================================= */
+
+[data-theme='unseen'] {
+  --ink-950: #080d0f;
+  --ink-900: #0c1416;
+  --ink-850: #111c1f;
+  --ink-800: #182629;
+  --ink-700: #23393d;
+  --div-1: #262d2d;
+  --div-2: #2b3232;
+  --div-3: #2f3738;
+  --div-4: #353e3f;
+  --div-5: #424d4f;
+  --lit-dim: #3d6b63;
+  --lit: #649c97;
+  --lit-hot: #8fd4c4;
+  --lit-accent: #6495ce;
+  --plate: #121212;
+  --on-plate: #ede7da;
+  --metal: #a0d0d0;
+}
+
+[data-theme='olympian'] {
+  --ink-950: #0a0c12;
+  --ink-900: #0f131c;
+  --ink-850: #151a26;
+  --ink-800: #1d2432;
+  --ink-700: #2c354c;
+  --div-1: #26282d;
+  --div-2: #2b2d32;
+  --div-3: #2f3238;
+  --div-4: #35383f;
+  --div-5: #42464f;
+  --lit-dim: #7c5d2f;
+  --lit: #b58b39;
+  --lit-hot: #dfc56f;
+  --lit-accent: #7593c7;
+  --plate: #a2a896;
+  --on-plate: #151810;
+  --metal: #d8c060;
+}
+
+[data-theme='infernal'] {
+  --ink-950: #120b0a;
+  --ink-900: #1b100f;
+  --ink-850: #261715;
+  --ink-800: #311f1d;
+  --ink-700: #4a2f2a;
+  --div-1: #2d2726;
+  --div-2: #322c2b;
+  --div-3: #38302f;
+  --div-4: #3f3635;
+  --div-5: #4f4442;
+  --lit-dim: #a3462f;
+  --lit: #d57b4d;
+  --lit-hot: #ecbf8c;
+  --lit-accent: #9c6ac8;
+  --plate: #1d100e;
+  --on-plate: #ede7da;
+  --metal: #c8834a;
+}
+
+[data-theme='cthonic'] {
+  --ink-950: #0c0b15;
+  --ink-900: #131120;
+  --ink-850: #1a182b;
+  --ink-800: #232139;
+  --ink-700: #353156;
+  --div-1: #27262d;
+  --div-2: #2c2b32;
+  --div-3: #302f38;
+  --div-4: #36353f;
+  --div-5: #43424f;
+  --lit-dim: #7b4ab4;
+  --lit: #ac7fd2;
+  --lit-hot: #ddbbee;
+  --lit-accent: #d3b969;
+  --plate: #171331;
+  --on-plate: #ede7da;
+  --metal: #d3b969;
 }

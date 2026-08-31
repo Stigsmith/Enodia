@@ -23,7 +23,7 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .step-note {
@@ -104,7 +104,7 @@
 .weapon-card.is-chosen,
 .aspect-card.is-chosen,
 .rarity.is-chosen {
-  border-color: var(--jade);
+  border-color: var(--lit);
   background: var(--ink-850);
 }
 
@@ -142,10 +142,10 @@
   margin-top: 2rem;
   width: 100%;
   padding: 0.9rem;
-  border: 1px solid var(--jade-dim);
+  border: 1px solid var(--lit-dim);
   border-radius: var(--r-soft);
   background: var(--ink-850);
-  color: var(--jade-hot);
+  color: var(--lit-hot);
   font-family: var(--display);
   font-size: 1rem;
   letter-spacing: 0.08em;
@@ -153,7 +153,7 @@
 }
 
 .begin:hover {
-  border-color: var(--jade);
+  border-color: var(--lit);
 }
 
 /* ----------------------------------------------------------------- run -- */
@@ -328,7 +328,7 @@
 }
 
 .rail-slot.is-filled .rail-slot-name {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .rail-occupant {
@@ -604,7 +604,7 @@
 .tally strong {
   font-family: var(--mono);
   font-size: 1.3rem;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .tally-dead,
@@ -620,7 +620,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .god-priority ul,
@@ -689,8 +689,8 @@
 }
 
 .band.is-likely {
-  border-color: var(--jade-dim);
-  color: var(--jade);
+  border-color: var(--lit-dim);
+  color: var(--lit);
 }
 
 .nothing-live {
@@ -783,7 +783,7 @@
   margin-left: auto;
   font-family: var(--mono);
   font-size: 0.85rem;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 /* The game's sentence, in the game's voice. */
@@ -944,12 +944,12 @@
 .radial .bubble.is-hovered {
   opacity: 1;
   transform: scale(1.16);
-  border-color: var(--jade);
+  border-color: var(--lit);
 }
 
 .bubble.is-chosen {
-  border-color: var(--jade-hot);
-  box-shadow: 0 0 0 1px var(--jade-dim);
+  border-color: var(--lit-hot);
+  box-shadow: 0 0 0 1px var(--lit-dim);
 }
 
 .radial-centre {
@@ -1114,7 +1114,7 @@
 
 .bubble-slot.is-icon .bubble.is-chosen img,
 .bubble-slot.is-render .bubble.is-chosen img {
-  filter: drop-shadow(0 0 0.5rem var(--jade-dim));
+  filter: drop-shadow(0 0 0.5rem var(--lit-dim));
 }
 
 .rarity-step {
@@ -1259,7 +1259,7 @@
 }
 
 .menu-panel button.is-here .menu-label {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* ================================================================ surface ==
@@ -1389,7 +1389,7 @@
 .topbar-tally strong {
   font-family: var(--mono);
   font-size: 1.05rem;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .topbar-closed {
@@ -1414,7 +1414,7 @@
   gap: 0.55rem;
   flex-wrap: wrap;
   padding: 0.35rem 0.6rem;
-  border-left: 3px solid var(--jade-dim);
+  border-left: 3px solid var(--lit-dim);
   border-radius: 0 var(--r-hair) var(--r-hair) 0;
   background: var(--ink-900);
   font-size: 0.75rem;
@@ -1430,7 +1430,7 @@
 }
 
 .topbar-chasing.is-on_track {
-  border-left-color: var(--jade-hot);
+  border-left-color: var(--lit-hot);
 }
 
 .topbar-chasing-label {
@@ -1469,7 +1469,7 @@
 .topbar-done {
   font-family: var(--mono);
   font-size: 0.7rem;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* The builds still open, at the top of the drawer, because they are the answer
@@ -1490,7 +1490,7 @@
 }
 
 .standing-builds li.is-done {
-  border-left-color: var(--jade);
+  border-left-color: var(--lit);
 }
 
 .standing-build-name {
@@ -1588,7 +1588,7 @@
 }
 
 .rail-slot.is-filled .rail-slot-name {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .scroller {
@@ -1613,7 +1613,7 @@
   padding: 0.55rem 1rem;
   border: 0;
   background: none;
-  color: var(--jade);
+  color: var(--lit);
   font-family: var(--display);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -1653,8 +1653,8 @@
 }
 
 .tray-tabs button.is-active {
-  border-color: var(--jade-dim);
-  color: var(--jade-hot);
+  border-color: var(--lit-dim);
+  color: var(--lit-hot);
 }
 
 .god-priority-list,
@@ -1740,7 +1740,7 @@
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .group-heading span {
@@ -1778,7 +1778,7 @@
 
 .plate:hover,
 .boon:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   filter: brightness(1.25);
 }
 
@@ -1873,7 +1873,7 @@
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: var(--jade-dim);
+  background-color: var(--lit-dim);
 }
 
 *::-webkit-scrollbar-corner {
@@ -1899,7 +1899,7 @@
 }
 
 .menu-button:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
 }
 
 /* Three rules, which is the shape everyone already reads as a menu. */
@@ -1938,7 +1938,7 @@
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .menu-panel ul {
@@ -2028,12 +2028,12 @@
 }
 
 .menu-frames button.is-on {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   background: var(--ink-900);
 }
 
 .menu-frames button.is-on .menu-label {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* The wallpaper options. A swatch each, and **at full strength rather than at
@@ -2062,12 +2062,12 @@
 }
 
 .menu-walls button.is-on {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   background: var(--ink-900);
 }
 
 .menu-walls button.is-on .menu-label {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 /* Unbuilt, and saying so in the one colour reserved for it. */
@@ -2231,10 +2231,10 @@ body::before {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(40% 32% at 20% 16%, color-mix(in oklab, var(--jade) 62%, transparent), transparent 70%),
-    radial-gradient(48% 36% at 80% 74%, color-mix(in oklab, var(--jade-dim) 70%, transparent), transparent 72%),
+    radial-gradient(40% 32% at 20% 16%, color-mix(in oklab, var(--lit) 62%, transparent), transparent 70%),
+    radial-gradient(48% 36% at 80% 74%, color-mix(in oklab, var(--lit-dim) 70%, transparent), transparent 72%),
     radial-gradient(26% 20% at 64% 22%, color-mix(in oklab, var(--rim-magenta) 30%, transparent), transparent 70%),
-    radial-gradient(34% 40% at 48% 46%, color-mix(in oklab, var(--jade-dim) 34%, transparent), transparent 74%),
+    radial-gradient(34% 40% at 48% 46%, color-mix(in oklab, var(--lit-dim) 34%, transparent), transparent 74%),
     radial-gradient(30% 24% at 8% 84%, color-mix(in oklab, var(--rim-cyan) 16%, transparent), transparent 70%);
   filter: blur(58px);
   opacity: 0.85;
@@ -2268,23 +2268,23 @@ body::before {
   background-repeat: repeat;
   background-size: 100% 50%;
   background-image:
-    radial-gradient(2px 2px at 12% 7%, var(--jade-hot), transparent 62%),
+    radial-gradient(2px 2px at 12% 7%, var(--lit-hot), transparent 62%),
     radial-gradient(1.5px 1.5px at 31% 19%, var(--bone-dim), transparent 62%),
-    radial-gradient(2.5px 2.5px at 57% 11%, var(--jade-hot), transparent 62%),
-    radial-gradient(1.5px 1.5px at 74% 26%, var(--jade-hot), transparent 62%),
-    radial-gradient(3px 3px at 88% 15%, var(--jade), transparent 62%),
+    radial-gradient(2.5px 2.5px at 57% 11%, var(--lit-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 74% 26%, var(--lit-hot), transparent 62%),
+    radial-gradient(3px 3px at 88% 15%, var(--lit), transparent 62%),
     radial-gradient(1.5px 1.5px at 6% 34%, var(--bone-dim), transparent 62%),
-    radial-gradient(2.5px 2.5px at 44% 41%, var(--jade-hot), transparent 62%),
-    radial-gradient(1.5px 1.5px at 66% 37%, var(--jade-hot), transparent 62%),
-    radial-gradient(2px 2px at 21% 46%, var(--jade), transparent 62%),
+    radial-gradient(2.5px 2.5px at 44% 41%, var(--lit-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 66% 37%, var(--lit-hot), transparent 62%),
+    radial-gradient(2px 2px at 21% 46%, var(--lit), transparent 62%),
     radial-gradient(2.5px 2.5px at 93% 44%, var(--bone-dim), transparent 62%),
-    radial-gradient(1.5px 1.5px at 38% 3%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 38% 3%, var(--lit-hot), transparent 62%),
     radial-gradient(2px 2px at 82% 33%, var(--rim-cyan), transparent 62%),
-    radial-gradient(1.5px 1.5px at 50% 29%, var(--jade), transparent 62%),
-    radial-gradient(2px 2px at 15% 22%, var(--jade-hot), transparent 62%),
+    radial-gradient(1.5px 1.5px at 50% 29%, var(--lit), transparent 62%),
+    radial-gradient(2px 2px at 15% 22%, var(--lit-hot), transparent 62%),
     radial-gradient(1.5px 1.5px at 69% 48%, var(--bone-dim), transparent 62%);
   opacity: 0.85;
-  animation: hecate-rise 38s linear infinite;
+  animation: var(--mote-anim, hecate-rise 38s linear infinite);
 }
 
 /* A second field, slower, larger and dimmer, so the dust has depth rather
@@ -2293,8 +2293,73 @@ body::before {
   background-size: 100% 50%;
   filter: blur(1.2px);
   opacity: 0.45;
-  animation-duration: 71s;
+  animation-duration: var(--mote-far, 71s);
   animation-delay: -18s;
+}
+
+/* ==================================================================== weather
+ * What the particles do, which differs by more than colour.
+ *
+ * Dust rises in a beam. Pollen falls and takes half again as long, because it
+ * is drifting in sunlight rather than lifting in heat. Embers rise fast and
+ * flicker, and they are the only field that changes opacity. Stars do not
+ * move at all: they are the far field of `lead-chaos`, so they hold still and
+ * vary in brightness, which is why the twinkle is an opacity animation on a
+ * layer with no transform in it.
+ * ========================================================================= */
+
+[data-weather='pollen'] {
+  --mote-anim: hecate-fall 62s linear infinite;
+  --mote-far: 96s;
+}
+
+[data-weather='embers'] {
+  --mote-anim: hecate-rise 21s linear infinite, hecate-flicker 2.6s ease-in-out infinite alternate;
+  /* Two values, because embers carry two animations and `animation-duration`
+   * on the far layer replaces the whole list. One value slowed the far field's
+   * flicker to the rise's own 38 seconds, which is not a flicker. */
+  --mote-far: 38s, 3.6s;
+}
+
+[data-weather='stars'] {
+  --mote-anim: hecate-twinkle 6.5s ease-in-out infinite alternate;
+  --mote-far: 9.5s;
+}
+
+@keyframes hecate-fall {
+  from {
+    transform: translate3d(0, -50%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hecate-flicker {
+  from { opacity: 0.55; }
+  to { opacity: 0.95; }
+}
+
+@keyframes hecate-twinkle {
+  from { opacity: 0.45; }
+  to { opacity: 0.95; }
+}
+
+/* ======================================================================= fog
+ * The weather on the ground, under the light and over the wallpaper.
+ *
+ * One bank of the theme's own dim light, positioned where that theme's art
+ * puts its haze: low for Infernal's smoke, high for Olympian's cloud, through
+ * the middle for Cthonic's nebula. Screen blend so it lifts rather than veils,
+ * which is what keeps it from reading as a grey wash over the picture.
+ */
+.hecate-fog {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(var(--fog-at, 70% 55% at 50% 100%), var(--lit-dim), transparent 72%);
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 @keyframes hecate-rise {
@@ -2317,6 +2382,8 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .hecate-glow,
   .hecate-motes {
+    /* Embers stop flickering and stars stop twinkling. Both stay lit: the
+     * star field is the Cthonic backdrop, not an effect on top of it. */
     animation: none;
   }
 }
@@ -2351,10 +2418,10 @@ body::before {
   border-radius: inherit;
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--jade) 9%, transparent),
+    color-mix(in oklab, var(--lit) 9%, transparent),
     transparent 38%
   );
-  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--jade-hot) 22%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--lit-hot) 22%, transparent);
   pointer-events: none;
 }
 
@@ -2367,10 +2434,10 @@ body::before {
 @keyframes station-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0.6rem var(--jade-dim);
+    box-shadow: 0 0 0.6rem var(--lit-dim);
   }
   50% {
-    box-shadow: 0 0 1.15rem color-mix(in oklab, var(--jade-hot) 60%, transparent);
+    box-shadow: 0 0 1.15rem color-mix(in oklab, var(--lit-hot) 60%, transparent);
   }
 }
 
@@ -2612,8 +2679,8 @@ body::before {
 }
 
 .rail-toggle:hover {
-  border-color: var(--jade-dim);
-  color: var(--jade);
+  border-color: var(--lit-dim);
+  color: var(--lit);
 }
 
 /* Unfolded: everything held, by slot. Covers, never pushes. */
@@ -2657,7 +2724,7 @@ body::before {
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .rail-sheet h3 {
@@ -2826,9 +2893,9 @@ body::before {
 }
 
 .station.is-present .station-mark {
-  border-color: var(--jade);
-  background: var(--jade-dim);
-  box-shadow: 0 0 0.6rem var(--jade-dim);
+  border-color: var(--lit);
+  background: var(--lit-dim);
+  box-shadow: 0 0 0.6rem var(--lit-dim);
 }
 
 .station.has-deaths .station-mark {
@@ -2969,7 +3036,7 @@ body::before {
   letter-spacing: 0.05em;
   text-align: center;
   white-space: nowrap;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .picker-back {
@@ -3040,7 +3107,7 @@ body::before {
   border-bottom: 0;
   border-radius: var(--r-soft) var(--r-soft) 0 0;
   background: var(--ink-850);
-  color: var(--jade);
+  color: var(--lit);
   font-family: var(--mono);
   font-size: 0.7rem;
   cursor: pointer;
@@ -3060,7 +3127,7 @@ body::before {
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .standing-body h2:first-child {
@@ -3094,7 +3161,7 @@ body::before {
   font-family: var(--display);
   font-size: 1.15rem;
   letter-spacing: 0.02em;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .briefing-when {
@@ -3121,7 +3188,7 @@ body::before {
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .briefing ul {
@@ -3136,7 +3203,7 @@ body::before {
   margin-top: 1rem;
   padding: 0.7rem 0.9rem 0.85rem;
   border: 1px solid var(--div-4);
-  border-left: 3px solid var(--jade-dim);
+  border-left: 3px solid var(--lit-dim);
   border-radius: var(--r-soft);
   background: var(--ink-900);
 }
@@ -3237,7 +3304,7 @@ body::before {
 }
 
 .briefing-change.is-on_track .briefing-change-move {
-  color: var(--jade);
+  color: var(--lit);
 }
 
 .briefing-more {
@@ -3338,19 +3405,19 @@ body::before {
 }
 
 .target-pin:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
 }
 
 .target-pin[aria-pressed='true'] {
-  border-color: var(--jade);
+  border-color: var(--lit);
 }
 
 .target-pin[aria-pressed='true']::before {
-  background: var(--jade-hot);
+  background: var(--lit-hot);
 }
 
 .target.is-pinned {
-  border-left: 2px solid var(--jade);
+  border-left: 2px solid var(--lit);
   padding-left: 0.5rem;
 }
 
@@ -3674,11 +3741,11 @@ body::before {
 .offer-say {
   margin-top: 0.2rem;
   padding-left: 0.55rem;
-  border-left: 2px solid var(--jade-dim);
+  border-left: 2px solid var(--lit-dim);
   font-family: var(--body);
   font-size: 0.82rem;
   line-height: 1.4;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .offer-closes {
@@ -3825,12 +3892,12 @@ body::before {
   z-index: 50;
   transform: translate(-50%, -150%);
   padding: 0.5rem 1rem;
-  border: 1px solid var(--jade);
+  border: 1px solid var(--lit);
   border-radius: var(--r-pill);
   background: var(--ink-850);
   font-family: var(--body);
   font-size: 0.85rem;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
   text-decoration: none;
   transition: transform var(--t-response) var(--e-response);
 }
@@ -3847,7 +3914,7 @@ body::before {
 }
 
 .station.is-present:focus-visible .picker-label {
-  outline: 2px solid var(--jade);
+  outline: 2px solid var(--lit);
   outline-offset: 4px;
 }
 
@@ -4055,7 +4122,7 @@ body::before {
 }
 
 .picker-more-gods-list button:hover {
-  border-color: var(--jade-dim);
+  border-color: var(--lit-dim);
   color: var(--bone);
 }
 
@@ -4080,4 +4147,43 @@ body::before {
   font-family: var(--name);
   margin: 0 0.35rem;
   letter-spacing: 0.02em;
+}
+
+/* ===================================================================== plate
+ * A raised thing that carries a word or two.
+ *
+ * The game ships its dialogue box twice, default and Olympian: same panel,
+ * same ornament in the same corner, different plate and different metal. That
+ * is the whole idea, applied where the evidence supports it. Buttons, pills
+ * and chips take the plate; the large surfaces you read against keep the dark
+ * ground under bone text in all four themes, because a paragraph of dark text
+ * on stone is a different product.
+ *
+ * **`--on-plate` is why this is not one line.** Olympian's plate is pale, so a
+ * button in it cannot carry `--bone`, and every plated control has to take its
+ * text from the pair rather than from the text ramp.
+ * ========================================================================= */
+
+.begin,
+.builds-new,
+.bmenu-yes,
+.editor-actions > button:first-child {
+  background: var(--plate);
+  color: var(--on-plate);
+  border-color: var(--metal);
+}
+
+.begin:hover:not(:disabled),
+.builds-new:hover,
+.editor-actions > button:first-child:hover:not(:disabled) {
+  border-color: var(--lit-hot);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--metal) 45%, transparent);
+}
+
+/* The metal is an ornament rather than an outline. On a plate this small there
+ * is no room for a laurel, so it is the hairline above the label: the same
+ * gesture the game makes with its top edge, at the scale that fits. */
+.begin {
+  border-top-color: var(--metal);
+  border-top-width: 2px;
 }
