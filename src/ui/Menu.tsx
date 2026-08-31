@@ -20,6 +20,8 @@ import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import { FRAMES, applyFrame, frameVars, readFrame, writeFrame } from './frames.ts'
 import { WALLPAPERS, applyWallpaper, readWallpaper, writeWallpaper } from './wallpaper.ts'
+import { NAV_MODES, PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
+import type { View } from './nav.ts'
 
 /** The two layouts a single build can open in. */
 const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
@@ -38,28 +40,36 @@ type Entry = {
   icon?: string
   /** absent means it is not built, and it says so */
   action?: () => void
+  /** the screen this entry goes to is the screen you are on */
+  here?: boolean
 }
 
 export function Menu({
-  onStartRun,
+  view,
   hasRun,
+  onGo,
   onEndRun,
   onShowBriefing,
-  onShowBuilds,
-  onShowArcana,
 }: {
-  onStartRun: () => void
+  /** which screen is showing, so the menu can mark where you already are */
+  view: View
   hasRun: boolean
+  onGo: (view: View) => void
   onEndRun: (outcome?: 'died' | 'finished') => void
   /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
   onShowBriefing?: () => void
-  /** the build manager, which is a screen rather than an overlay */
-  onShowBuilds?: () => void
-  /** the Arcana board, likewise */
-  onShowArcana?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
+  const [nav, setNav] = useState(readNav)
+  /**
+   * Whether the screen is wide enough for the pane to be offered at all.
+   *
+   * `nav.ts` puts the same 60rem in the CSS, and this is the half that decides
+   * the panel is pinned open rather than the half that decides where it sits.
+   * A stored `pane` on a phone has to change nothing, in either half.
+   */
+  const [wide, setWide] = useState(() => window.matchMedia(PANE_QUERY).matches)
   const [wall, setWall] = useState(readWallpaper)
   /**
    * Which layout a single build opens in.
@@ -83,11 +93,31 @@ export function Menu({
   }, [wall])
 
   useEffect(() => {
+    applyNav(nav)
+    writeNav(nav)
+  }, [nav])
+
+  useEffect(() => {
+    const query = window.matchMedia(PANE_QUERY)
+    const sync = () => setWide(query.matches)
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  useEffect(() => {
     savePrefs({ ...loadPrefs(), buildDetail })
   }, [buildDetail])
 
+  // Pinned open, so nothing that closes a pop-out applies: not a click
+  // outside it, not Escape, and not choosing something in it.
+  const pinned = wide && nav === 'pane'
+  const showing = pinned || open
+  const leave = () => {
+    if (!pinned) setOpen(false)
+  }
+
   useEffect(() => {
-    if (!open) return
+    if (!open || pinned) return
     const close = (event: MouseEvent) => {
       if (!panel.current?.contains(event.target as Node)) setOpen(false)
     }
@@ -100,88 +130,102 @@ export function Menu({
       document.removeEventListener('mousedown', close)
       document.removeEventListener('keydown', escape)
     }
-  }, [open])
+  }, [open, pinned])
 
+  /**
+   * Builds first, and that is the whole reorganisation.
+   *
+   * The run used to lead, because the run was the front door. Choosing a build
+   * and seeing which builds an aspect can still reach is what the tool is for,
+   * and a run is one thing you might do about it, so the run is a section like
+   * any other and only fills out while one is live.
+   */
   const groups: { title: string; entries: Entry[] }[] = [
-    {
-      title: 'This run',
-      entries: [
-        /**
-         * Dying and stopping are different events, so they are different
-         * entries. Both end the run and both keep it: `run.ts` archives what
-         * was held and how far it got, tagged with which of the two it was.
-         * A run ended before today was simply discarded, and a history is the
-         * one thing that cannot be backfilled later.
-         */
-        ...(hasRun
-          ? [
-              {
-                label: 'Died here',
-                note: 'Ends the run and keeps it, with where it stopped',
-                icon: 'shell/location-zagreus.png',
-                action: () => {
-                  onEndRun('died')
-                  setOpen(false)
-                },
-              },
-              {
-                label: 'Finished the run',
-                note: 'Reached the end. Ends it and keeps it',
-                action: () => {
-                  onEndRun('finished')
-                  setOpen(false)
-                },
-              },
-            ]
-          : [
-              {
-                label: 'Start a run',
-                note: 'Pick an arm, an aspect and a way',
-                action: () => {
-                  onStartRun()
-                  setOpen(false)
-                },
-              },
-            ]),
-        ...(hasRun && onShowBriefing
-          ? [
-              {
-                label: 'Where you left off',
-                note: 'What you hold, what you were chasing, and what moved',
-                action: () => {
-                  onShowBriefing()
-                  setOpen(false)
-                },
-              },
-            ]
-          : []),
-      ],
-    },
     {
       title: 'Builds',
       entries: [
-        onShowBuilds
-          ? {
-              label: 'Build manager',
-              note: 'Five layouts to choose between, on three sample builds',
-              action: () => {
-                onShowBuilds()
-                setOpen(false)
-              },
-            }
-          : { label: 'Build manager', note: 'Define a build and track it. Waiting on the first definition' },
-        onShowArcana
-          ? {
-              label: 'Arcana',
-              note: 'The board, and which of the six free cards your set switches on',
-              action: () => {
-                onShowArcana()
-                setOpen(false)
-              },
-            }
-          : { label: 'Arcana', note: 'The board and the six conditional cards' },
+        {
+          label: 'Build manager',
+          note: 'Every build, by arm and by aspect. Where the tool starts',
+          here: view === 'builds',
+          action: () => {
+            onGo('builds')
+            leave()
+          },
+        },
+        {
+          label: 'Arcana',
+          note: 'The board, and which of the six free cards your set switches on',
+          here: view === 'arcana',
+          action: () => {
+            onGo('arcana')
+            leave()
+          },
+        },
         { label: 'Build exchange', note: 'Share and import builds. Phase 4' },
       ],
+    },
+    {
+      title: 'This run',
+      entries: hasRun
+        ? [
+            {
+              label: 'Back to the run',
+              note: 'The Exits you have taken and the one in front of you',
+              here: view === 'run',
+              action: () => {
+                onGo('run')
+                leave()
+              },
+            },
+            ...(onShowBriefing
+              ? [
+                  {
+                    label: 'Where you left off',
+                    note: 'What you hold, what you were chasing, and what moved',
+                    action: () => {
+                      onShowBriefing()
+                      leave()
+                    },
+                  },
+                ]
+              : []),
+            /**
+             * Dying and stopping are different events, so they are different
+             * entries. Both end the run and both keep it: `run.ts` archives
+             * what was held and how far it got, tagged with which of the two it
+             * was. A run ended before today was simply discarded, and a history
+             * is the one thing that cannot be backfilled later.
+             */
+            {
+              label: 'Died here',
+              note: 'Ends the run and keeps it, with where it stopped',
+              icon: 'shell/location-zagreus.png',
+              action: () => {
+                onEndRun('died')
+                leave()
+              },
+            },
+            {
+              label: 'Finished the run',
+              note: 'Reached the end. Ends it and keeps it',
+              action: () => {
+                onEndRun('finished')
+                leave()
+              },
+            },
+          ]
+        : [
+            {
+              label: 'Start a run',
+              note: 'Pick an arm, an aspect and a way. Or start one from a build',
+              here: view === 'setup',
+              action: () => {
+                onGo('setup')
+                leave()
+              },
+            },
+          ],
     },
     {
       title: 'You',
@@ -202,19 +246,23 @@ export function Menu({
   ]
 
   return (
-    <div className="menu" ref={panel}>
-      <button
-        type="button"
-        className="menu-button"
-        aria-expanded={open}
-        aria-haspopup="menu"
-        onClick={() => setOpen((was) => !was)}
-      >
-        <span className="menu-glyph" aria-hidden="true" />
-        <span className="visually-hidden">Menu</span>
-      </button>
+    <div className={`menu${pinned ? ' is-pinned' : ''}`} ref={panel}>
+      {/* Nothing to toggle when the panel is pinned, and a control that does
+          nothing is worse than no control. */}
+      {pinned ? null : (
+        <button
+          type="button"
+          className="menu-button"
+          aria-expanded={open}
+          aria-haspopup="menu"
+          onClick={() => setOpen((was) => !was)}
+        >
+          <span className="menu-glyph" aria-hidden="true" />
+          <span className="visually-hidden">Menu</span>
+        </button>
+      )}
 
-      {open ? (
+      {showing ? (
         <div className="menu-panel" role="menu">
           {groups.map((group) => (
             <section key={group.title}>
@@ -225,7 +273,10 @@ export function Menu({
                     <button
                       type="button"
                       role="menuitem"
-                      className={entry.action ? '' : 'is-unbuilt'}
+                      /* Where you already are, which a pinned pane has to say
+                         because it is on screen the whole time. */
+                      aria-current={entry.here ? 'page' : undefined}
+                      className={`${entry.action ? '' : 'is-unbuilt'}${entry.here ? ' is-here' : ''}`}
                       onClick={entry.action}
                       disabled={!entry.action}
                     >
@@ -242,6 +293,36 @@ export function Menu({
               </ul>
             </section>
           ))}
+
+          {/* Only on a screen wide enough to hold a pane. Below that the
+              pop-out is the only mode there is, and a setting that changes
+              nothing is a setting that lies. */}
+          {wide ? (
+            <section>
+              <h2>The menu</h2>
+              <ul className="menu-choice">
+                {NAV_MODES.map((option) => (
+                  <li key={option.id}>
+                    <button
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={nav === option.id}
+                      className={nav === option.id ? 'is-on' : ''}
+                      onClick={() => setNav(option.id)}
+                    >
+                      <span className="menu-label">
+                        {option.name}
+                        {nav === option.id ? (
+                          <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
+                        ) : null}
+                      </span>
+                      <span className="menu-note">{option.note}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           {/* How a single build opens in the build manager.
               *

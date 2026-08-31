@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import { gameVersion, iconOf, traits, weapons } from './data/app.ts'
 import { brief, isWorthShowing } from './engine/briefing.ts'
@@ -29,6 +30,8 @@ import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
 import { applyFrame, readFrame } from './ui/frames.ts'
 import { applyWallpaper, readWallpaper } from './ui/wallpaper.ts'
+import { applyNav, readNav } from './ui/nav.ts'
+import type { View } from './ui/nav.ts'
 import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
 
@@ -39,9 +42,13 @@ export function App() {
   // that; this only makes a reload keep what was chosen.
   useEffect(() => applyFrame(readFrame()), [])
 
-  // The wallpaper, likewise, and here rather than in the menu because the
-  // build manager and the Arcana board draw Hecate without drawing a menu.
+  // The wallpaper, likewise. Here rather than in the menu because a reload
+  // has to keep it whether or not anyone opens a menu.
   useEffect(() => applyWallpaper(readWallpaper()), [])
+
+  // Pop-out or pinned pane, on a desktop. `nav.ts` explains why the CSS
+  // ignores it below 60rem rather than this having to.
+  useEffect(() => applyNav(readNav()), [])
 
   /**
    * The re-entry card.
@@ -57,14 +64,12 @@ export function App() {
   const [showBriefing, setShowBriefing] = useState(false)
 
   /**
-   * The build manager, which is a screen rather than an overlay.
+   * Which screen. One value rather than a boolean each, because they are
+   * exclusive and two booleans can say something the app has no answer for.
    *
-   * It replaces the surface entirely while it is open, because it is a place a
-   * player goes between runs and looking at it is the whole activity. Coming
-   * back leaves the run exactly as it was: the run lives in `useRun`, not here.
+   * The run wins on arrival when there is one. Everything else lands on Builds.
    */
-  const [showBuilds, setShowBuilds] = useState(false)
-  const [showArcana, setShowArcana] = useState(false)
+  const [view, setView] = useState<View>(() => (run ? 'run' : 'builds'))
 
   const buildCard = useCallback(
     (ctx: RunContext) => brief(ctx, lastSeen(loadTrail()), traits, { pinned, exit: entries.length }),
@@ -95,44 +100,72 @@ export function App() {
     saveTrail(markSeen(loadTrail(), entries.length))
   }
 
-  if (showArcana) {
-    return (
+  const startRun: typeof start = (weapon, aspect, path) => {
+    start(weapon, aspect, path)
+    setView('run')
+  }
+
+  const endRun: typeof end = (outcome) => {
+    end(outcome)
+    setView('builds')
+  }
+
+  // A run that has just ended leaves the run screen with nothing to draw.
+  const screen: View = view === 'run' && !run ? 'builds' : view
+
+  /**
+   * One shell around every screen.
+   *
+   * The menu used to be a cell inside each screen's own header, which is how
+   * there came to be screens with no menu at all and a Back button whose job
+   * was to reach one. It is drawn once, here, outside the view, so it is on
+   * every screen and every screen is one click from every other.
+   *
+   * `Hecate` moves out for the same reason: four copies of the same fixed
+   * backdrop were four chances for them to drift apart.
+   */
+  const frame = (children: ReactNode) => (
+    <div className="app">
+      <Hecate />
+      <Menu
+        view={screen}
+        hasRun={Boolean(run)}
+        onGo={setView}
+        onEndRun={endRun}
+        onShowBriefing={run ? openBriefing : undefined}
+      />
+      <div className="app-view">{children}</div>
+    </div>
+  )
+
+  if (screen === 'arcana') {
+    return frame(
       <div className="shell is-wide">
-        <Hecate />
-        <Arcana onClose={() => setShowArcana(false)} />
-      </div>
+        <Arcana />
+      </div>,
     )
   }
 
-  if (showBuilds) {
-    return (
+  if (screen === 'builds') {
+    return frame(
       <div className="shell is-wide">
-        <Hecate />
-        <Builds onClose={() => setShowBuilds(false)} />
-      </div>
+        <Builds />
+      </div>,
     )
   }
 
-  if (!run) {
-    return (
+  if (screen === 'setup' || !run) {
+    return frame(
       <main className="shell">
-        <Hecate />
         <header className="masthead">
-          <Menu
-            onStartRun={() => {}}
-            hasRun={false}
-            onEndRun={end}
-            onShowBuilds={() => setShowBuilds(true)}
-            onShowArcana={() => setShowArcana(true)}
-          />
           <div>
             <h1 className="wordmark">Enodia</h1>
             <p className="tagline">A build companion for Hades II, read at an Exit.</p>
           </div>
         </header>
-        <Setup onStart={start} />
+        <Setup onStart={startRun} />
         <Colophon />
-      </main>
+      </main>,
     )
   }
 
@@ -144,9 +177,8 @@ export function App() {
   const open = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK').length
   const closed = verdicts.filter((v) => v.state === 'DEAD').length
 
-  return (
+  return frame(
     <div className="surface">
-      <Hecate />
 
       {/* The picker is the live end of the path, so it is last in the
         * document: everything logged comes first, and each logged station
@@ -170,14 +202,6 @@ export function App() {
       </button>
 
       <header className="topbar">
-        <Menu
-          onStartRun={end}
-          hasRun
-          onEndRun={end}
-          onShowBriefing={openBriefing}
-          onShowBuilds={() => setShowBuilds(true)}
-          onShowArcana={() => setShowArcana(true)}
-        />
 
         {/* The arm, by its own name.
          *
@@ -252,10 +276,9 @@ export function App() {
       </main>
 
       <Standing run={run} pinned={pinned} onPin={pin} />
-    </div>
+    </div>,
   )
 }
-
 
 function Colophon() {
   return (
