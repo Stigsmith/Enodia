@@ -1830,6 +1830,40 @@
   color: var(--jade);
 }
 
+/* The wallpaper options. A swatch each, and **at full strength rather than at
+ * the opacity it lands at**: the swatch is here to answer "which picture", and
+ * what it looks like applied needs no swatch at all, because the menu is an
+ * overlay over the live page and picking one changes the page behind it. */
+.menu-walls button {
+  display: grid;
+  grid-template-columns: 3.6rem 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 0.6rem;
+  row-gap: 0;
+}
+
+.menu-wall-swatch {
+  grid-row: 1 / 3;
+  width: 3.6rem;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background-color: var(--ink-950);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.menu-walls button.is-on {
+  border-color: var(--jade-dim);
+  background: var(--ink-900);
+}
+
+.menu-walls button.is-on .menu-label {
+  color: var(--jade);
+}
+
 /* Unbuilt, and saying so in the one colour reserved for it. */
 .menu-panel button.is-unbuilt {
   cursor: default;
@@ -1942,6 +1976,32 @@ body::before {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+/**
+ * The wallpaper, under everything else Hecate draws.
+ *
+ * **It cannot scroll.** `.hecate` above is already `position: fixed`, so this
+ * is pinned to the viewport and a page scrolling behind it moves past it
+ * rather than dragging it along.
+ *
+ * **`cover` and `center` are the mobile answer.** Covering a 16:9 picture on a
+ * portrait screen scales it to the height and crops the sides evenly, which is
+ * the middle slice: on a 390 wide phone that is the middle 26 percent of the
+ * frame, and on the Crossroads splash the middle is the cauldron.
+ *
+ * How far down it sits is `--wall-opacity`, solved in `wallpaper.ts` against
+ * the ink ramp rather than chosen. Both properties default to off, so a page
+ * whose script has not run yet looks exactly like it did before this existed.
+ */
+.hecate-wall {
+  position: absolute;
+  inset: 0;
+  background-image: var(--wall-src, none);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: var(--wall-opacity, 0);
 }
 
 .hecate-glow {

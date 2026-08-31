@@ -28,6 +28,7 @@ import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
 import { applyFrame, readFrame } from './ui/frames.ts'
+import { applyWallpaper, readWallpaper } from './ui/wallpaper.ts'
 import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
 
@@ -37,6 +38,10 @@ export function App() {
   // The saved frame, before anything draws a ring. The menu owns it after
   // that; this only makes a reload keep what was chosen.
   useEffect(() => applyFrame(readFrame()), [])
+
+  // The wallpaper, likewise, and here rather than in the menu because the
+  // build manager and the Arcana board draw Hecate without drawing a menu.
+  useEffect(() => applyWallpaper(readWallpaper()), [])
 
   /**
    * The re-entry card.
