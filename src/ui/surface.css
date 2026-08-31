@@ -2106,77 +2106,25 @@
 }
 
 /* =============================================================== ornament ==
- * VISUAL.md 1: the game's panels are not empty. They carry smoke and
- * scrollwork at 8 to 12 percent above the ground, anchored to a corner and
- * bleeding off the edge, and that is the entire reason a panel reads as made
- * rather than drawn. The motif is TraitTrayBacking.png, taken directly, which
- * is what the brief says to do.
+ * There is no scrollwork behind the page any more, and this note is here so
+ * nobody puts it back without knowing what happened.
+ *
+ * VISUAL.md 1 says the game's panels are not empty: they carry smoke and
+ * scrollwork above the ground, and that is why a panel reads as made rather
+ * than drawn. Two fixed copies of `tray-panel.png` at nine percent used to
+ * deliver that, mirrored and meeting in the middle.
+ *
+ * It was reported twice. The first fix gated it on the wallpaper being None,
+ * which was the wrong fix twice over: it was never about the wallpaper, and
+ * the attribute it keyed on, `data-wallpaper`, was deleted by the theme work a
+ * few commits later, so the gate matched nothing and the scrollwork was back
+ * on every theme including None.
+ *
+ * **The rule it was serving is about panels, and this was not a panel.** It was
+ * the ground behind everything, where the wallpaper now is. A theme's wallpaper
+ * and its fog do the job the scrollwork was doing, and they do it per theme
+ * rather than in one fixed teal that fought three of the four.
  * ========================================================================= */
-
-/* The scrollwork behind everything.
- *
- * It was `TraitTrayBacking`, twice, at two different sizes and two different
- * bleeds. That panel has a header baked into it, so the two copies could never
- * line up with each other and the overlap read as an accident, which it was.
- *
- * `TraitTrayBacking_NoHeader` is the plain panel. Two of them, the right one
- * mirrored, meeting in the middle: the smoke runs outward from the centre in
- * both directions and the seam is where the two panels' own edges are, which
- * is the quietest place for it.
- *
- * One panel on a narrow screen, because two would each be a sliver. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: url('/shell/tray-panel.png') center / cover no-repeat;
-  opacity: 0.09;
-  pointer-events: none;
-}
-
-@media (min-width: 60rem) {
-  body::before {
-    right: 50%;
-    /* `cover`, not a stretch. The panel is 1280 by 1793 and forcing it to a
-     * half-screen box would squash the smoke visibly even at nine percent. */
-    background: url('/shell/tray-panel.png') right center / cover no-repeat;
-  }
-
-  /* The right half, mirrored. A second element rather than a transform on the
-   * first, because transforming `body::before` would take the left half with
-   * it and there is only one pseudo-element to give each half its own. */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 50%;
-    z-index: 0;
-    background: url('/shell/tray-panel.png') left center / cover no-repeat;
-    transform: scaleX(-1);
-    opacity: 0.09;
-    pointer-events: none;
-  }
-}
-
-/**
- * None has to mean none.
- *
- * The scrollwork above is fixed to the viewport and had nothing to do with the
- * wallpaper setting, so choosing None left two panels of `tray-panel.png`
- * across the screen and the option's own line, "Hecate's light and nothing
- * behind it", was simply false. Reported from Firefox, true everywhere.
- *
- * Gated rather than deleted: it is VISUAL.md rule 1 and it is what keeps a
- * panel reading as made rather than drawn. It stays for the three options that
- * put a picture back there, and goes when the answer is nothing.
- */
-:root[data-wallpaper='none'] body::before,
-:root[data-wallpaper='none'] body::after {
-  display: none;
-}
 
 /* ==========================================================================
  * HECATE'S LIGHT

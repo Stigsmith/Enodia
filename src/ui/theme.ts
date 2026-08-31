@@ -67,7 +67,7 @@ export const THEMES: Theme[] = [
       { id: 'melinoe', name: 'Melinoë', file: 'themes/unseen/lead-melinoe-witchfire.jpg', opacity: 0.12 },
       { id: 'crossroads', name: 'The Crossroads', file: 'themes/unseen/crossroads-cauldron.png', opacity: 0.12 },
       { id: 'thanatos', name: 'Thanatos', file: 'themes/unseen/thanatos.jpg', opacity: 0.11 },
-      { id: 'ruins', name: 'Green ruins', file: 'themes/unseen/green-ruins.jpg', opacity: 0.11 },
+      { id: 'tartarus', name: 'Tartarus', file: 'themes/unseen/tartarus.jpg', opacity: 0.11 },
       { id: 'warsong', name: 'Warsong', file: 'themes/unseen/warsong.jpg', opacity: 0.12 },
     ],
   },
@@ -121,6 +121,9 @@ export const THEMES: Theme[] = [
  */
 export const DEFAULT_THEME = 'unseen'
 
+/** Wearing no picture at all, which is a choice rather than a missing value. */
+export const NONE = 'none'
+
 const THEME_KEY = 'enodia.theme'
 const WALL_KEY = 'enodia.wallpaper'
 
@@ -159,7 +162,11 @@ export function readWallpapers(): Record<string, string> {
     const out: Record<string, string> = {}
     for (const theme of THEMES) {
       const want = (parsed as Record<string, unknown>)[theme.id]
-      if (typeof want === 'string' && theme.wallpapers.some((w) => w.id === want)) out[theme.id] = want
+      if (typeof want !== 'string') continue
+      // `none` is a real answer and is not in the list, so it has to be let
+      // through by name. Validating against the list alone dropped it on every
+      // load, which meant None worked until you reloaded and then did not.
+      if (want === NONE || theme.wallpapers.some((w) => w.id === want)) out[theme.id] = want
     }
     return out
   } catch {
@@ -178,7 +185,7 @@ export function writeWallpapers(map: Record<string, string>) {
 /** The wallpaper a theme is wearing, or its lead. `none` for no picture. */
 export function wallpaperOf(theme: Theme, chosen: Record<string, string>): Wallpaper | null {
   const want = chosen[theme.id]
-  if (want === 'none') return null
+  if (want === NONE) return null
   return theme.wallpapers.find((one) => one.id === want) ?? theme.wallpapers[0] ?? null
 }
 

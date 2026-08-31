@@ -8772,20 +8772,20 @@
    "source": "game"
   },
   {
-   "id": "unseen/green-ruins",
-   "category": "themes",
-   "file": "themes/unseen/green-ruins.jpg",
-   "bytes": 494521,
-   "sha256": "e8103bad52744f543b28c257ddaf63a6ae78ddc1fd300b7222174cc9271ea2c8",
-   "source": "wiki",
-   "needsProvenance": true
-  },
-  {
    "id": "unseen/lead-melinoe-witchfire",
    "category": "themes",
    "file": "themes/unseen/lead-melinoe-witchfire.jpg",
    "bytes": 1722014,
    "sha256": "ad6a67ea69d8b82b906f809cdf066267fbcc72d3fac91225c9deb17b61938131",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "unseen/tartarus",
+   "category": "themes",
+   "file": "themes/unseen/tartarus.jpg",
+   "bytes": 494521,
+   "sha256": "e8103bad52744f543b28c257ddaf63a6ae78ddc1fd300b7222174cc9271ea2c8",
    "source": "wiki",
    "needsProvenance": true
   },

@@ -17,7 +17,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { THEMES, DEFAULT_THEME, themeById, wallpaperOf } from './theme.ts'
+import { NONE, THEMES, DEFAULT_THEME, readWallpapers, themeById, wallpaperOf, writeWallpapers } from './theme.ts'
 
 const CSS = readFileSync(join(import.meta.dirname, 'tokens.css'), 'utf8')
 
@@ -191,6 +191,45 @@ describe('the wallpapers', () => {
     expect(wallpaperOf(unseen, {})?.id).toBe(unseen.wallpapers[0]!.id)
     expect(wallpaperOf(unseen, { unseen: 'nonsense' })?.id).toBe(unseen.wallpapers[0]!.id)
     expect(wallpaperOf(unseen, { unseen: 'none' })).toBeNull()
+  })
+
+  it('keeps None through a save and a load', () => {
+    // It worked until you reloaded and then did not: `readWallpapers` checked
+    // every stored id against the theme's own list, and None is deliberately
+    // not in that list, so it was dropped on the way back in every time.
+    const store: Record<string, string> = {}
+    const shim = {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v
+      },
+    }
+    const had = globalThis.localStorage
+    Object.defineProperty(globalThis, 'localStorage', { value: shim, configurable: true })
+    try {
+      writeWallpapers({ unseen: NONE, infernal: 'titan' })
+      const back = readWallpapers()
+      expect(back['unseen']).toBe(NONE)
+      expect(back['infernal']).toBe('titan')
+      expect(wallpaperOf(themeById('unseen'), back)).toBeNull()
+      expect(wallpaperOf(themeById('infernal'), back)?.id).toBe('titan')
+    } finally {
+      if (had) Object.defineProperty(globalThis, 'localStorage', { value: had, configurable: true })
+      else delete (globalThis as { localStorage?: unknown }).localStorage
+    }
+  })
+
+  it('still drops an id that means nothing', () => {
+    const store: Record<string, string> = { 'enodia.wallpaper': JSON.stringify({ unseen: 'nonsense' }) }
+    const shim = { getItem: (k: string) => store[k] ?? null, setItem: () => {} }
+    const had = globalThis.localStorage
+    Object.defineProperty(globalThis, 'localStorage', { value: shim, configurable: true })
+    try {
+      expect(readWallpapers()['unseen']).toBeUndefined()
+    } finally {
+      if (had) Object.defineProperty(globalThis, 'localStorage', { value: had, configurable: true })
+      else delete (globalThis as { localStorage?: unknown }).localStorage
+    }
   })
 
   it('gives no two wallpapers in a theme the same id', () => {

@@ -12,7 +12,7 @@
  * wallpaper belongs to a theme rather than to the app.
  */
 
-import { THEMES, themeById, wallpaperOf } from './theme.ts'
+import { NONE, THEMES, themeById, wallpaperOf } from './theme.ts'
 import type { Theme } from './theme.ts'
 
 export function Themes({
@@ -56,7 +56,7 @@ export function Themes({
               type="button"
               className={`wall${wearing === null ? ' is-on' : ''}`}
               aria-pressed={wearing === null}
-              onClick={() => onWallpaper(current.id, 'none')}
+              onClick={() => onWallpaper(current.id, NONE)}
             >
               <span className="wall-swatch is-none" aria-hidden="true" />
               <span className="wall-name">None</span>
