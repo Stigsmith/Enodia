@@ -1867,36 +1867,230 @@ button.mark {
  * the six conditional cards read position: The Fates needs every neighbour,
  * The Moon needs one, Divinity needs a whole other row or column. A list would
  * not be able to say any of that.
+ *
+ * **The board takes the height and the writing goes beside it.** Stacking an
+ * intro and three buttons above the grid pushed the bottom row off a 16:9
+ * screen, and a board you have to scroll to see is not a board.
  * ===================================================================== */
 
 .arcana {
   max-width: 100%;
-  padding: 1.25rem 1rem 4rem;
+  padding: 1rem 1rem 3rem;
   margin: 0 auto;
 }
 
 @media (min-width: 60rem) {
   .arcana {
-    padding: 1.75rem 2rem 4rem;
-    max-width: 76rem;
+    padding: 1.25rem 2rem 2rem;
+    max-width: 82rem;
   }
+}
+
+.arcana-stage {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+@media (min-width: 60rem) {
+  .arcana-stage {
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    align-items: start;
+  }
+}
+
+/**
+ * The grid, sized so five rows fit the viewport rather than the width.
+ *
+ * A card is 689 by 1071, so a row of five is `w/5` wide per card and
+ * `w * 1.554 / 5` tall; five rows are `w * 1.554`. **Plus a label and a cost
+ * per row**, which the first cap forgot: at 58dvh the art fitted and the text
+ * under it pushed the board 97 pixels past the fold on 16:9.
+ *
+ * So the cap is the art plus about 110 pixels of label and gap, solved against
+ * the height left after the header. 47dvh lands a 900 tall window at roughly
+ * 766, which fits.
+ */
+.arcana-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, auto);
+  gap: 0.3rem;
+  width: 100%;
+  max-width: min(100%, 52dvh);
+  margin: 0 auto;
+}
+
+@media (min-width: 60rem) {
+  .arcana-grid {
+    max-width: min(100%, 47dvh);
+    margin: 0;
+  }
+}
+
+.arcana-card {
+  position: relative;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  cursor: pointer;
+}
+
+/**
+ * The art, and the box the highlights are measured against.
+ *
+ * The highlights used to sit on the button, which includes the name and the
+ * cost, so an equipped card wore a second box round its label. They belong to
+ * the card picture and nothing else.
+ */
+.arcana-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 689 / 1071;
+}
+
+.arcana-card img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 2px;
+  /* No filter. The off state is the game's own cardNN_inactive.png, swapped in
+   * by the component, because the game redrew those rather than desaturating
+   * and a filter approximating it looked like a filter. */
+}
+
+/**
+ * The game's own equipped highlight.
+ *
+ * GUI/Screens/MetaUpgrade/CardEquippedHighlight, out of ScriptsBase.pkg. It is
+ * the still frame of a 45 frame loop; the loop is not used, for the same
+ * reason the radial's rotating mark was cut.
+ *
+ * **Sized off the art rather than by eye.** The image is 257 by 350 and its
+ * visible part is 181 by 282, a ratio of 0.642 against the card's own 0.643.
+ * The two match, so the whole image scales uniformly: 181 has to cover the
+ * card's width, which is 257/181, or 142 percent, centred.
+ */
+.arcana-art::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 142%;
+  aspect-ratio: 257 / 350;
+  transform: translate(-50%, -50%);
+  background: url('/arcana/equipped-highlight.png') center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.arcana-card.is-on .arcana-art::after {
+  opacity: 1;
+}
+
+/**
+ * The mouseover frame, likewise the game's own.
+ *
+ * 147 by 194 with a visible 133 by 193, so 147/133 is 110.5 percent. Unlike
+ * the equipped highlight its visible ratio is 0.689 against the card's 0.643,
+ * so it sits a little wider than the card rather than flush. That is what the
+ * art is; it is not corrected here, because stretching it to fit would be
+ * inventing a frame the game does not draw.
+ */
+.arcana-art::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 110.5%;
+  aspect-ratio: 147 / 194;
+  transform: translate(-50%, -50%);
+  background: url('/arcana/highlight-frame.png') center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.arcana-card:hover:not(:disabled) .arcana-art::before,
+.arcana-card:focus-visible .arcana-art::before {
+  opacity: 1;
+}
+
+.arcana-card:focus-visible {
+  outline: none;
+}
+
+.arcana-card.is-on {
+  color: var(--bone);
+}
+
+/* The six that cost nothing. They are not controls: clicking one would be
+ * stating an outcome as a cause. */
+.arcana-card.is-free {
+  cursor: default;
+}
+
+.arcana-name {
+  font-size: 0.58rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arcana-cost {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  text-align: center;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.arcana-card.is-free .arcana-cost {
+  color: var(--rim-cyan);
+}
+
+/* ------------------------------------------------------------- the side -- */
+
+.arcana-side {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: 0.85rem 0.95rem 1rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.arcana-intro {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
 }
 
 .arcana-bases {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 1rem;
+  gap: 0.3rem;
 }
 
 .arcana-base {
-  padding: 0.35rem 0.8rem;
+  padding: 0.3rem 0.6rem;
   border: 1px solid var(--div-3);
   border-radius: var(--r-hair);
-  background: var(--ink-900);
+  background: var(--ink-850);
   color: var(--bone-dim);
   font-family: var(--display);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   letter-spacing: 0.03em;
   cursor: pointer;
 }
@@ -1912,189 +2106,24 @@ button.mark {
   border-style: dashed;
   color: var(--bone-faint);
   font-family: var(--body);
+  font-size: 0.68rem;
   font-style: italic;
   cursor: default;
-}
-
-.arcana-base.is-clear {
-  margin-left: auto;
-}
-
-.arcana-stage {
-  display: grid;
-  gap: 1.25rem;
-  margin-top: 1.1rem;
-}
-
-@media (min-width: 60rem) {
-  .arcana-stage {
-    grid-template-columns: minmax(0, 1fr) 20rem;
-    align-items: start;
-  }
-}
-
-.arcana-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, auto);
-  gap: 0.35rem;
-}
-
-.arcana-card {
-  position: relative;
-  display: grid;
-  gap: 0.15rem;
-  padding: 0.3rem 0.25rem 0.35rem;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-hair);
-  background: var(--ink-900);
-  color: var(--bone-faint);
-  font-family: var(--body);
-  cursor: pointer;
-  transition:
-    border-color var(--t-response) var(--e-response),
-    opacity var(--t-response) var(--e-response);
-}
-
-.arcana-card img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 2px;
-  /* No filter. The off state is the game's own `cardNN_inactive.png`, swapped
-   * in by the component, because the game redrew those rather than
-   * desaturating and a filter approximating it looked like a filter. */
-}
-
-.arcana-card:hover {
-  border-color: var(--jade-dim);
-}
-
-.arcana-card.is-on {
-  border-color: transparent;
-  color: var(--bone);
-}
-
-/**
- * The game's own equipped highlight, not a drawn box.
- *
- * `GUI/Screens/MetaUpgrade/CardEquippedHighlight`, out of ScriptsBase.pkg. It
- * is the still frame of a 45 frame loop; the loop is not used, for the same
- * reason the radial's rotating mark was cut.
- *
- * **Sized off the art rather than by eye.** The image is 257 by 350 and its
- * visible part is 181 by 282, a ratio of 0.642 against the card's own 0.643.
- * The two match, so the whole image scales uniformly: 181 has to cover the
- * card's width, which is 257/181, or 142 percent, centred on the card.
- */
-.arcana-card::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 142%;
-  aspect-ratio: 257 / 350;
-  transform: translate(-50%, -50%);
-  background: url('/arcana/equipped-highlight.png') center / contain no-repeat;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-response) var(--e-response);
-}
-
-.arcana-card.is-on::after {
-  opacity: 1;
-}
-
-/**
- * The mouseover frame, likewise the game's own.
- *
- * 147 by 194 with a visible 133 by 193, so 147/133 is 110.5 percent. Unlike
- * the equipped highlight its visible ratio is 0.689 against the card's 0.643,
- * so it sits a little wider than the card rather than flush. That is what the
- * art is; it is not corrected here, because stretching it to fit would be
- * inventing a frame the game does not draw.
- */
-.arcana-card::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 110.5%;
-  aspect-ratio: 147 / 194;
-  transform: translate(-50%, -50%);
-  background: url('/arcana/highlight-frame.png') center / contain no-repeat;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-response) var(--e-response);
-}
-
-.arcana-card:hover:not(:disabled)::before,
-.arcana-card:focus-visible::before {
-  opacity: 1;
-}
-
-/* The six that cost nothing. They are not controls: clicking one would be
- * stating an outcome as a cause, so they take the highlight and nothing else. */
-.arcana-card.is-free {
-  cursor: default;
-  border-style: dashed;
-}
-
-.arcana-card.is-free.is-on {
-  border-style: solid;
-}
-
-.arcana-card img,
-.arcana-name,
-.arcana-cost {
-  position: relative;
-  z-index: 1;
-}
-
-.arcana-name {
-  font-size: 0.6rem;
-  line-height: 1.25;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.arcana-cost {
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  text-align: center;
-  color: var(--bone-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.arcana-card.is-free .arcana-cost {
-  color: var(--rim-cyan);
-}
-
-/* ------------------------------------------------------------- the side -- */
-
-.arcana-side {
-  display: grid;
-  gap: 0.7rem;
-  align-content: start;
-  padding: 0.9rem 1rem 1.1rem;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
 }
 
 .arcana-grasp {
   display: flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--div-1);
   font-family: var(--mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--bone-faint);
 }
 
 .arcana-grasp-used {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   color: var(--jade-hot);
   font-variant-numeric: tabular-nums;
 }
@@ -2111,18 +2140,21 @@ button.mark {
   background: var(--ink-850);
   color: var(--bone);
   font-family: var(--mono);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .arcana-over {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--rim-magenta);
 }
 
 .arcana-counted {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--bone-faint);
 }
 
@@ -2131,14 +2163,76 @@ button.mark {
   color: var(--bone);
 }
 
+.arcana-clear {
+  margin-left: auto;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.arcana-clear:hover {
+  border-color: var(--rim-magenta);
+  color: var(--bone);
+}
+
 .arcana-rule {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
   margin: 0.3rem 0 0;
   font-family: var(--mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 400;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--bone-faint);
+}
+
+/* Copies the ids, which is the form that pastes into arcana-layouts.ts. */
+.arcana-copy {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--jade);
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.arcana-copy:hover {
+  color: var(--jade-hot);
+}
+
+.arcana-picked {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.arcana-picked li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: var(--bone-dim);
+}
+
+.arcana-picked-cost {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
 }
 
 .arcana-six {
@@ -2146,13 +2240,13 @@ button.mark {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .arcana-six li {
   display: grid;
-  gap: 0.1rem;
-  padding-left: 0.6rem;
+  gap: 0.05rem;
+  padding-left: 0.55rem;
   border-left: 2px solid var(--div-3);
 }
 
@@ -2161,7 +2255,7 @@ button.mark {
 }
 
 .arcana-six-name {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--bone-dim);
 }
 
@@ -2171,23 +2265,23 @@ button.mark {
 
 /* The reason it is off, which is the whole point of the panel. */
 .arcana-six-say {
-  font-size: 0.7rem;
-  line-height: 1.45;
+  font-size: 0.68rem;
+  line-height: 1.4;
   color: var(--bone-faint);
 }
 
 .arcana-note {
-  margin: 0.4rem 0 0;
-  padding-top: 0.6rem;
+  margin: 0.3rem 0 0;
+  padding-top: 0.5rem;
   border-top: 1px solid var(--div-1);
-  font-size: 0.68rem;
-  line-height: 1.5;
+  font-size: 0.66rem;
+  line-height: 1.45;
   color: var(--bone-faint);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .arcana-card,
-  .arcana-card img {
+  .arcana-art::before,
+  .arcana-art::after {
     transition: none;
   }
 }

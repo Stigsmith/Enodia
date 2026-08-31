@@ -25,6 +25,25 @@
  * case work: switch on a third paid card at the same cost and The Queen goes
  * dark, because she caps *paid* cards at two per cost.
  *
+ * ## But the positional rules do count them, and that is a different set
+ *
+ * `SurroundAllEquipped`, `SurroundEquipped` and `OtherRowOrColumnEquipped` do
+ * not use that tally. They read `GameState.MetaUpgradeState[name].Equipped`
+ * directly, which is **true for a conditional card that is currently on**. So a
+ * free card sitting in a row still completes that row for Divinity.
+ *
+ * This was wrong here first: the exclusion was applied to both, and Divinity
+ * stayed dark on a row the owner could see was full. Two sets, not one.
+ *
+ * ## Which means it has to settle
+ *
+ * The game runs one pass per click and lets successive clicks settle it. A tool
+ * showing a board has to show where it lands, so this iterates to a fixed
+ * point. That terminates: a conditional switching on can only add to the
+ * equipped set, the positional rules only get easier as it grows, and the
+ * counting rules cannot see conditionals at all. Nothing can turn back off, so
+ * it converges in at most six passes.
+ *
  * ## A fully unlocked board
  *
  * `GetZoomLevel` shrinks the grid while cards are still locked, so Divinity's
@@ -108,12 +127,24 @@ export function tally(equipped: ReadonlySet<string>): {
  */
 export type Unmet = { rule: keyof ArcanaRule; say: string }
 
-export function whyOff(id: string, equipped: ReadonlySet<string>): Unmet[] {
+/**
+ * Why a conditional card is off.
+ *
+ * `paid` is what Grasp was spent on, and is what every counting rule tallies.
+ * `equipped` is that plus the conditionals currently on, and is what the three
+ * positional rules read. They are genuinely different sets and conflating them
+ * is the bug this signature exists to prevent.
+ */
+export function whyOff(
+  id: string,
+  paid: ReadonlySet<string>,
+  equipped: ReadonlySet<string> = paid,
+): Unmet[] {
   const card = arcanaById.get(id)
   const rule = card?.requires
   if (!card || !rule) return []
 
-  const { total, byCost } = tally(equipped)
+  const { total, byCost } = tally(paid)
   const out: Unmet[] = []
 
   if (rule.HasCostsThrough) {
@@ -249,16 +280,33 @@ export type BoardState = {
 
 export function resolveBoard(equipped: ReadonlySet<string>): BoardState {
   const chosen = new Set([...equipped].filter((id) => !isConditional(id)))
-  const live = new Set<string>()
-  const dark = new Map<string, Unmet[]>()
+  const conditionals = arcanaBoard.flat().filter(isConditional)
 
-  for (const row of arcanaBoard) {
-    for (const id of row) {
-      if (!isConditional(id)) continue
-      const unmet = whyOff(id, chosen)
-      if (unmet.length) dark.set(id, unmet)
-      else live.add(id)
+  /**
+   * Settle it.
+   *
+   * A conditional switching on can complete a row for another, so one pass is
+   * not enough: the game gets away with it because the player clicks again.
+   * Monotone, so it converges; the bound is belt and braces.
+   */
+  let live = new Set<string>()
+  for (let pass = 0; pass < conditionals.length + 1; pass += 1) {
+    const on = new Set<string>()
+    const board = new Set([...chosen, ...live])
+    for (const id of conditionals) {
+      if (whyOff(id, chosen, board).length === 0) on.add(id)
     }
+    if (on.size === live.size && [...on].every((id) => live.has(id))) break
+    live = on
+  }
+
+  // Reasons are taken against the settled board, or a card would be told it is
+  // missing a neighbour that is in fact on.
+  const settled = new Set([...chosen, ...live])
+  const dark = new Map<string, Unmet[]>()
+  for (const id of conditionals) {
+    if (live.has(id)) continue
+    dark.set(id, whyOff(id, chosen, settled))
   }
 
   const counts = tally(chosen)
