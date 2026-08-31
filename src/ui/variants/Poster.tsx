@@ -19,6 +19,7 @@
  * because you can only see one at a time.
  */
 
+import { PlayStrip } from '../PlayStrip.tsx'
 import { Mark, Named } from '../BuildMark.tsx'
 import type { Assembled, Piece } from '../build-pieces.ts'
 
@@ -40,6 +41,9 @@ export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: P
           </p>
           <h3>{build.name}</h3>
           <p className="poster-say">{build.say}</p>
+          {/* Under the title and the one line, above everything the build is
+            * made of. It draws nothing when there is nothing to say. */}
+          <PlayStrip build={build} />
         </div>
       </header>
 

@@ -29,7 +29,8 @@
 import { useMemo, useState } from 'react'
 
 import { arcana, aspectsOf, familiars, godPools, sources, traits, weapons } from '../data/app.ts'
-import type { ShownBuild } from '../data/builds.ts'
+import { ASSEMBLES } from '../data/builds.ts'
+import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { checkBuild, blockers } from '../engine/build-check.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
@@ -90,6 +91,24 @@ export function BuildEditor({
 
   const set = <K extends keyof ShownBuild>(key: K, value: ShownBuild[K]) =>
     setBuild((was) => ({ ...was, [key]: value }))
+
+  /**
+   * The play record, patched one field at a time.
+   *
+   * **Clears is clamped to runs here rather than only on the input**, because
+   * lowering runs to below the clears already logged is the other way to make
+   * the pair nonsense, and it happens in a different control. `winRate` clamps
+   * again when it renders, for storage that never came through this form.
+   */
+  const setPlay = (patch: Partial<PlayRecord>) =>
+    setBuild((was) => {
+      const play: PlayRecord = { ...was.play, ...patch }
+      const runs = play.runs ?? 0
+      if ((play.clears ?? 0) > runs) play.clears = runs
+      return { ...was, play }
+    })
+
+  const play = build.play
 
   const problems = checkBuild(build)
   const stopping = blockers(problems)
@@ -370,6 +389,84 @@ export function BuildEditor({
               placeholder="What feeds what, and why the pieces are where they are."
             />
           </label>
+
+          {/* How it has played, for this player, in this browser.
+            *
+            * None of these four is required and none of them is checked: a
+            * build nobody has rated is the normal case, and the Save button's
+            * count must read exactly what it read before this block existed.
+            *
+            * They are personal to this install and do not travel when a build
+            * is shared, which is why they live nested under `play`. */}
+          <div className="editor-plays">
+            <h3 className="editor-rule">How it plays</h3>
+            <p className="editor-hint">Yours alone. None of it travels with a build you send on.</p>
+
+            <div className="editor-field">
+              <span>Rating</span>
+              {/* Clicking the star you are already on clears it, which is the
+                * convention `Setup.tsx` uses for every other clearable pick. */}
+              <div className="editor-stars" role="group" aria-label="Rating, one to five">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    aria-pressed={star <= (play?.rating ?? 0)}
+                    className={star <= (play?.rating ?? 0) ? 'is-on' : ''}
+                    title={star === play?.rating ? 'Clear the rating' : `${star} of 5`}
+                    onClick={() => setPlay({ rating: play?.rating === star ? undefined : star })}
+                  >
+                    <span aria-hidden="true">{star <= (play?.rating ?? 0) ? '★' : '☆'}</span>
+                    <span className="visually-hidden">{star} of 5</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="editor-pair">
+              <label className="editor-field">
+                <span>Runs</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={play?.runs ?? ''}
+                  onChange={(event) =>
+                    setPlay({
+                      runs:
+                        event.target.value === ''
+                          ? undefined
+                          : Math.max(0, Number(event.target.value) || 0),
+                    })
+                  }
+                />
+              </label>
+              <label className="editor-field">
+                <span>Clears</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={play?.runs ?? 0}
+                  value={play?.clears ?? ''}
+                  onChange={(event) =>
+                    setPlay({
+                      clears:
+                        event.target.value === ''
+                          ? undefined
+                          : Math.min(Math.max(0, Number(event.target.value) || 0), play?.runs ?? 0),
+                    })
+                  }
+                />
+              </label>
+            </div>
+
+            <Dropdown
+              label="Assembles"
+              all="Not said"
+              chosen={play?.assembles ?? null}
+              options={ASSEMBLES.map((one) => ({ value: one.id, label: one.name }))}
+              onChoose={(value) => setPlay({ assembles: (value as PlayRecord['assembles']) ?? undefined })}
+            />
+          </div>
 
           {/* The checker, live. Blocking first, because that is the half that
             * decides whether Save does anything. */}

@@ -26,6 +26,7 @@
  * from one god looks like several of the same picture.
  */
 
+import { PlayStrip } from '../PlayStrip.tsx'
 import { Mark } from '../BuildMark.tsx'
 import type { Assembled, Piece } from '../build-pieces.ts'
 
@@ -46,6 +47,11 @@ export function Constellation({ built, onOpen }: { built: Assembled; onOpen?: (p
 
   return (
     <div className="constel">
+      {/* This layout has no title and never shows the build's name at all, so
+        * there is no "under the title" to sit beneath. The top of the wheel is
+        * the nearest true reading of the same placement. */}
+      <PlayStrip build={built.build} />
+
       <div className="constel-wheel">
         <div className="constel-hub">
           {built.render ? <img className="constel-render" src={`/${built.render}`} alt="" /> : null}
