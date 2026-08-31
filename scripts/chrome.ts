@@ -64,6 +64,21 @@ type Pick = {
  * organises a package.
  */
 const PICKS: Pick[] = [
+  // The Arcana board's own selection art. Both live in ScriptsBase.pkg, which
+  // is the third time something turned out not to be in GUI.pkg.
+  {
+    from: 'GUI/Screens/MetaUpgrade/CardEquippedHighlight.png',
+    tree: 'scriptsbase',
+    to: 'arcana/equipped-highlight.png',
+    note: 'what the game draws on an equipped Arcana, 257x350. The still frame of a 45 frame loop',
+  },
+  {
+    from: 'GUI/Screens/MetaUpgrade/CardHighlightFrame.png',
+    tree: 'scriptsbase',
+    to: 'arcana/highlight-frame.png',
+    note: 'the mouseover frame on an Arcana, 147x194',
+  },
+
   // The boon slot plates are already here as frames/plate-*.png, one per
   // rarity. This is the lit overlay the game draws on the hovered one, and it
   // is 1280x320 like the plates, so it lands on them exactly.

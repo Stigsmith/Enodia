@@ -1941,6 +1941,7 @@ button.mark {
 }
 
 .arcana-card {
+  position: relative;
   display: grid;
   gap: 0.15rem;
   padding: 0.3rem 0.25rem 0.35rem;
@@ -1971,7 +1972,7 @@ button.mark {
 }
 
 .arcana-card.is-on {
-  border-color: var(--jade);
+  border-color: transparent;
   color: var(--bone);
 }
 
@@ -1979,8 +1980,66 @@ button.mark {
   filter: none;
 }
 
+/**
+ * The game's own equipped highlight, not a drawn box.
+ *
+ * `GUI/Screens/MetaUpgrade/CardEquippedHighlight`, out of ScriptsBase.pkg. It
+ * is the still frame of a 45 frame loop; the loop is not used, for the same
+ * reason the radial's rotating mark was cut.
+ *
+ * **Sized off the art rather than by eye.** The image is 257 by 350 and its
+ * visible part is 181 by 282, a ratio of 0.642 against the card's own 0.643.
+ * The two match, so the whole image scales uniformly: 181 has to cover the
+ * card's width, which is 257/181, or 142 percent, centred on the card.
+ */
+.arcana-card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 142%;
+  aspect-ratio: 257 / 350;
+  transform: translate(-50%, -50%);
+  background: url('/arcana/equipped-highlight.png') center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.arcana-card.is-on::after {
+  opacity: 1;
+}
+
+/**
+ * The mouseover frame, likewise the game's own.
+ *
+ * 147 by 194 with a visible 133 by 193, so 147/133 is 110.5 percent. Unlike
+ * the equipped highlight its visible ratio is 0.689 against the card's 0.643,
+ * so it sits a little wider than the card rather than flush. That is what the
+ * art is; it is not corrected here, because stretching it to fit would be
+ * inventing a frame the game does not draw.
+ */
+.arcana-card::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 110.5%;
+  aspect-ratio: 147 / 194;
+  transform: translate(-50%, -50%);
+  background: url('/arcana/highlight-frame.png') center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.arcana-card:hover:not(:disabled)::before,
+.arcana-card:focus-visible::before {
+  opacity: 1;
+}
+
 /* The six that cost nothing. They are not controls: clicking one would be
- * stating an outcome as a cause. */
+ * stating an outcome as a cause, so they take the highlight and nothing else. */
 .arcana-card.is-free {
   cursor: default;
   border-style: dashed;
@@ -1988,8 +2047,13 @@ button.mark {
 
 .arcana-card.is-free.is-on {
   border-style: solid;
-  border-color: var(--rim-cyan);
-  box-shadow: 0 0 12px -4px var(--rim-cyan);
+}
+
+.arcana-card img,
+.arcana-name,
+.arcana-cost {
+  position: relative;
+  z-index: 1;
 }
 
 .arcana-name {

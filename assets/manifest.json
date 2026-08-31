@@ -1,14 +1,14 @@
 {
- "generated": "2026-08-30",
+ "generated": "2026-08-31",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 937,
+ "count": 939,
  "categories": [
   {
    "name": "arcana",
-   "count": 25,
+   "count": 27,
    "source": "game"
   },
   {
@@ -197,6 +197,14 @@
    "source": "game"
   },
   {
+   "id": "equipped-highlight",
+   "category": "arcana",
+   "file": "arcana/equipped-highlight.png",
+   "bytes": 8110,
+   "sha256": "7e9f110351289119d82bb510dac8c78d6209c555cc04019b742a89e75bc46cf9",
+   "source": "game"
+  },
+  {
    "id": "eternity",
    "category": "arcana",
    "file": "arcana/eternity.png",
@@ -218,6 +226,14 @@
    "file": "arcana/furies.png",
    "bytes": 927747,
    "sha256": "bcc221f05c520a0a7e669ffd2876626c7cb559e8a7f2585b9bf57a451bfeb629",
+   "source": "game"
+  },
+  {
+   "id": "highlight-frame",
+   "category": "arcana",
+   "file": "arcana/highlight-frame.png",
+   "bytes": 4475,
+   "sha256": "c22fd0342e57d798249907f99132775817e737de961d70530992a8554eb481da",
    "source": "game"
   },
   {
