@@ -917,7 +917,55 @@ export function checkCurated(bundle: Bundle): Finding[] {
 }
 
 // ---------------------------------------------------------------------------
-// 8. The charset meta. A missing one mangled every interpunct on the live site,
+// 8. Control characters in source. Same family as the charset check below: an
+//    encoding fault that every other gate passes.
+// ---------------------------------------------------------------------------
+
+/**
+ * A control character where a character was meant.
+ *
+ * Three of these got into source in one session, all from one mistake: a CSS
+ * unicode escape written inside a non-raw Python string, where a backslash
+ * followed by digits is an octal escape. The file ended up holding a single NUL
+ * byte instead of the five characters of the escape.
+ *
+ * What it cost: a separator rendered as a diamond and the characters "b7" on
+ * a build card, and a React key that was a NUL. Neither was caught by the
+ * typecheck, the tests or the build. The first was found by reading a
+ * screenshot, the second only by sweeping for it afterwards, and the third was
+ * written into the docblock explaining the other two.
+ *
+ * That is the same shape as the charset bug below, which is why this sits
+ * beside it: a fault that renders wrong, passes everything automated, and needs
+ * a human eye or a rule like this one.
+ */
+export function checkControlChars(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  // Tab, newline and carriage return are the legitimate ones.
+  const CONTROL = new RegExp('[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]', 'g')
+
+  for (const file of bundle.sources) {
+    const matches = [...file.text.matchAll(CONTROL)]
+    if (!matches.length) continue
+    const at = matches[0]?.index ?? 0
+    const line = file.text.slice(0, at).split('\n').length
+    const code = file.text.charCodeAt(at).toString(16).toUpperCase().padStart(4, '0')
+    out.push({
+      check: 'control characters',
+      severity: file.legacy ? 'warn' : 'fail',
+      message: `${file.path}:${line} holds U+${code}`,
+      detail: [
+        `${matches.length} control character${matches.length === 1 ? '' : 's'} in this file.`,
+        'A NUL is usually a unicode escape that a generator read as an octal one.',
+      ],
+    })
+  }
+
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 9. The charset meta. A missing one mangled every interpunct on the live site,
 //    and it is invisible to a DOM query. Cheap to check, so check it forever.
 // ---------------------------------------------------------------------------
 
@@ -1106,6 +1154,7 @@ export function runAllChecks(bundle: Bundle): Finding[] {
     ...checkRoster(bundle),
     ...checkCurated(bundle),
     ...checkAssets(bundle),
+    ...checkControlChars(bundle),
     ...checkCharset(bundle),
   ]
 }

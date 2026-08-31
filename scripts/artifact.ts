@@ -122,10 +122,11 @@ function pathsIn(text: string): Set<string> {
 function reachable(): Set<string> {
   type Row = { id: string; icon?: string; render?: string }
   const bundle = JSON.parse(readFileSync(join(ROOT, 'data/app/app-data.json'), 'utf8')) as {
-    traits: Row[]
+    traits: (Row & { kind?: string; name?: string })[]
     arcana: Row[]
     familiars: Row[]
     weapons: Row[]
+    sources: (Row & { kind?: string })[]
   }
 
   const art = new Map<string, string[]>()
@@ -140,6 +141,34 @@ function reachable(): Set<string> {
 
   const source = readFileSync(join(ROOT, 'src/data/builds.ts'), 'utf8')
   const want = new Set(ALWAYS)
+
+  /**
+   * The filter's own art, which no build necessarily names.
+   *
+   * `build-filter.ts` draws an icon beside every dropdown option, and those
+   * come from three places the sample builds do not mention: an arm is drawn as
+   * its **base aspect**, a god as its **reward source** portrait, and a familiar
+   * is offered whether or not a sample uses it. Five of the six arm icons were
+   * missing because no sample names `BaseStaffAspect` and friends.
+   *
+   * **It failed silently in exactly the way that matters.** Served from `dist/`
+   * the icons resolved, because the image library sits beside the page there.
+   * In the Artifact, which has no server and no library, they would have 404ed.
+   * Caught by counting non-data URIs in the rendered page, which is the only
+   * check that actually proves self-containment.
+   */
+  const facetArt = () => {
+    const out: string[] = []
+    for (const row of bundle.traits) {
+      // An arm's mark is its Aspect of Melinoe, the one square icon per weapon.
+      if (row.kind === 'aspect' && /Melino/.test(row.name ?? '') && row.icon) out.push(row.icon)
+    }
+    for (const row of bundle.sources) if (row.kind === 'olympian' && row.icon) out.push(row.icon)
+    for (const row of bundle.familiars) if (row.icon) out.push(row.icon)
+    return out
+  }
+  for (const rel of facetArt()) want.add(rel)
+
   let matched = 0
   for (const match of source.matchAll(/'([A-Za-z][A-Za-z0-9]*)'/g)) {
     const found = match[1] ? art.get(match[1]) : undefined
