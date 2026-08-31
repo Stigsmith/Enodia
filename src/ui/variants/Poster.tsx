@@ -19,12 +19,16 @@
  * because you can only see one at a time.
  */
 
+import { useState } from 'react'
+
 import { PlayStrip } from '../PlayStrip.tsx'
 import { Mark, Named } from '../BuildMark.tsx'
 import type { Assembled, Piece } from '../build-pieces.ts'
 
 export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: Piece) => void }) {
   const { build } = built
+  /** The Arcana card being pointed at, so its own sentence can be read. */
+  const [peek, setPeek] = useState<Piece | null>(null)
   const slotted = built.slots.flatMap((entry) => (entry.piece ? [entry.piece] : []))
   const rest = built.run.pieces.filter((piece) => !piece.slot && !piece.centrepiece)
   const arcana = built.crossroads.pieces.filter((piece) => piece.kind === 'arcana')
@@ -86,12 +90,29 @@ export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: P
         </div>
         <div className="poster-arcana">
           {arcana.map((piece) => (
-            <figure key={piece.key} className="poster-card">
+            <figure
+              key={piece.key}
+              className={`poster-card${peek?.key === piece.key ? ' is-peeked' : ''}`}
+              onMouseEnter={() => setPeek(piece)}
+              onMouseLeave={() => setPeek((was) => (was?.key === piece.key ? null : was))}
+            >
               {piece.icon ? <img src={`/${piece.icon}`} alt="" loading="lazy" /> : null}
               <figcaption>{piece.name}</figcaption>
             </figure>
           ))}
         </div>
+        {/* The hovered card's own sentence, in a strip that keeps its height so
+          * the layout below it does not move as the pointer crosses the row. */}
+        <p className="poster-arcana-say" aria-live="polite">
+          {peek ? (
+            <>
+              <strong>{peek.name}</strong>
+              {peek.text ? <span>{peek.text}</span> : null}
+            </>
+          ) : (
+            <span className="is-idle">Point at a card to read it.</span>
+          )}
+        </p>
       </section>
     </article>
   )

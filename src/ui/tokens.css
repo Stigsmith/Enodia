@@ -89,6 +89,24 @@
   --on-plate: #ede7da;
   --metal: #a0d0d0;
 
+  /**
+   * How far the game's own chrome art turns to meet the theme.
+   *
+   * `button.png` and its four states, the tray, the slot plates and the
+   * Arcana highlights are fixed images, and every one of them is lit teal
+   * because the game drew them for the Underworld. A theme cannot repaint
+   * them, so it turns them.
+   *
+   * It works because of what these images are made of: the plate is
+   * saturated and the label on it is `--bone-dim` at six percent, so a hue
+   * rotation moves the plate a long way and the text almost not at all.
+   *
+   * **This replaced painting a flat plate behind them, which was wrong.**
+   * The nine-slice art already draws its own rounded plate, and a solid
+   * rectangle behind it filled in the corners.
+   */
+  --art-hue: 0deg;
+
   /* ---------------------------------------------------------------
    * RIM LIGHT, events only. The edge lighting in the character art is
    * magenta and cyan, never gold. Never used for anything ambient, and
@@ -210,6 +228,7 @@
   --plate: #121212;
   --on-plate: #ede7da;
   --metal: #a0d0d0;
+  --art-hue: 0deg;
 }
 
 [data-theme='olympian'] {
@@ -230,6 +249,7 @@
   --plate: #a2a896;
   --on-plate: #151810;
   --metal: #d8c060;
+  --art-hue: -140deg;
 }
 
 [data-theme='infernal'] {
@@ -250,6 +270,7 @@
   --plate: #1d100e;
   --on-plate: #ede7da;
   --metal: #c8834a;
+  --art-hue: -162deg;
 }
 
 [data-theme='cthonic'] {
@@ -270,4 +291,5 @@
   --plate: #171331;
   --on-plate: #ede7da;
   --metal: #d3b969;
+  --art-hue: 96deg;
 }
