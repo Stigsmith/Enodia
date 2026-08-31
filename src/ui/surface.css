@@ -838,13 +838,70 @@
   height: var(--size);
 }
 
-/* The space behind the ring stays empty.
+/* Behind the ring: the game's own sorcery decal, breathing.
  *
- * A rotating medallion sat here once and was cut for reading as a spinning
- * logo. `SorceryWolfHowlDecal` replaced it, held still and breathed instead,
- * and read as a loading spinner, which is the same failure wearing a different
- * animation. Twice is enough: the ring is the thing to look at and it does not
- * need a halo. */
+ * `Fx/Sorcery/SorceryWolfHowlDecal`, a lit nonagram. It holds still and its
+ * light rises and falls, which is what a circle drawn on the ground does. The
+ * rotating medallion that used to sit here read as a spinning logo and was cut;
+ * so, separately, was the game's loading symbol, which sat in the hole at the
+ * middle of the ring and read as exactly what it is.
+ *
+ * **Masked, not tinted.** The texture is a full spectrum FX sheet, orange
+ * through cyan through blue, so rotating its hue the way the rest of the
+ * chrome is rotated would give four different rainbows rather than four
+ * themes. Its alpha is a clean silhouette of the sigil, so the theme's own
+ * light is poured through that shape instead and comes out as one colour.
+ *
+ * The halo is a second layer rather than a `drop-shadow`, because a mask is
+ * applied after a filter: the shadow would be generated from the unmasked box
+ * and then clipped away by the very mask it needs to escape. */
+.radial-ring-area::before,
+.radial-ring-area::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: sorcery-breathe 14s ease-in-out infinite;
+}
+
+/* The sigil. */
+.radial-ring-area::before {
+  width: 112%;
+  background: var(--lit-hot);
+  -webkit-mask: url('/shell/sorcery-circle.png') center / contain no-repeat;
+  mask: url('/shell/sorcery-circle.png') center / contain no-repeat;
+  opacity: 0.26;
+}
+
+/* Its light on the ground, wider and softer, so the sigil sits in something
+ * rather than floating on the ink. */
+.radial-ring-area::after {
+  width: 128%;
+  background: radial-gradient(closest-side, var(--lit), transparent 72%);
+  filter: blur(26px);
+  opacity: 0.3;
+}
+
+@keyframes sorcery-breathe {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.36;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radial-ring-area::before,
+  .radial-ring-area::after {
+    animation: none;
+    opacity: 0.26;
+  }
+}
 
 
 .radial-ring {
@@ -946,23 +1003,6 @@
   }
 }
 
-/* The waiting mark. Quieter than a chosen item and it does not animate in,
- * because it was already there rather than having just arrived.
- *
- * **Much smaller than a chosen item, too.** At the centre's full width it came
- * out 176 pixels and competed with the bubbles it sits inside, which is the
- * opposite of the job: it fills the hole, it is not the subject. A chosen
- * weapon at that size is right, because then it *is* the subject. */
-.radial-centre.is-waiting {
-  animation: none;
-  width: calc(var(--size) * 0.21);
-  opacity: 0.32;
-  pointer-events: none;
-}
-
-.radial-centre.is-waiting img {
-  border-radius: 0;
-}
 
 .radial-centre img {
   width: 100%;
