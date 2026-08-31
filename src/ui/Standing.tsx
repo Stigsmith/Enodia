@@ -17,6 +17,7 @@ import { useMemo, useState } from 'react'
 import { godPools, olympians, traits } from '../data/app.ts'
 import { completionOdds, formatOdds } from '../engine/odds.ts'
 import { godPriority, reachable } from '../engine/reachability.ts'
+import { buildStanding, buildTally, sayOf } from '../engine/build-run.ts'
 import type { Verdict } from '../engine/reachability.ts'
 import type { RunContext, TraitId } from '../data/types.ts'
 
@@ -33,6 +34,18 @@ export function Standing({
   onPin: (target: TraitId | null) => void
 }) {
   const [open, setOpen] = useState(false)
+
+  /**
+   * Builds first, and the handle counts them.
+   *
+   * The drawer used to open on a list of duos and legendaries, which is what
+   * the engine has and not what anyone is chasing. Those are still here, below,
+   * because "you are two picks off Killer Current" is worth knowing. They are
+   * the detail under the answer rather than the answer.
+   */
+  const builds = buildStanding(run, traits)
+  const buildsOpen = builds.filter((one) => one.verdict.state !== 'DEAD')
+  const counted = buildTally(builds)
 
   const verdicts = reachable(run, traits)
   const live = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK')
@@ -59,11 +72,30 @@ export function Standing({
   return (
     <aside className={`standing${open ? ' is-open' : ''}`} aria-label="What is still open">
       <button type="button" className="standing-handle" onClick={() => setOpen((was) => !was)} aria-expanded={open}>
-        {open ? 'Close' : `${live.length} still open`}
+        {open ? 'Close' : `${counted.open} builds open`}
       </button>
 
       {open ? (
         <div className="standing-body">
+          {buildsOpen.length ? (
+            <>
+              <h2>Builds still open</h2>
+              <ul className="standing-builds">
+                {buildsOpen.map((one) => (
+                  <li key={one.build.id} className={one.verdict.state === 'ON_TRACK' ? 'is-done' : ''}>
+                    <span className="standing-build-name">{one.build.name}</span>
+                    <span className="standing-build-why">{sayOf(one)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="standing-none">
+              No build in the manager can still be finished this run. What you are holding is its own
+              thing.
+            </p>
+          )}
+
           {gods.length ? (
             <>
               <h2>If you pick a god now</h2>
