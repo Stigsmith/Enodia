@@ -131,6 +131,47 @@ describe('the conflict that shapes every layout', () => {
   })
 })
 
+describe('a free card still counts for the positional rules', () => {
+  /**
+   * The owner watched a full row light up and Divinity stay dark.
+   *
+   * `CheckAutoEquipRequirements` tallies only paid cards, but the three
+   * positional rules read `.Equipped` straight off the card, which is true for
+   * a conditional that is on. Row 1 ends in The Moon, which is free, so the row
+   * can only ever be completed by a card that costs nothing.
+   */
+  it('completes a row with The Moon on it, which is free', () => {
+    const row = arcanaBoard[0] ?? []
+    const moon = id('The Moon')
+    expect(row).toContain(moon)
+
+    // The four paid cards of that row. The Moon cannot be bought.
+    const paid = row.filter((one) => one !== moon)
+    const board = resolveBoard(new Set(paid))
+
+    expect(board.live.has(moon), 'The Moon should be on: it has neighbours').toBe(true)
+    expect(board.live.has(id('Divinity')), 'the row is full once The Moon is on').toBe(true)
+  })
+
+  it('settles rather than taking one pass', () => {
+    // Divinity can only be right after The Moon has been resolved, so a single
+    // pass in the wrong order would miss it. The game gets away with one pass
+    // because the player clicks again; a board has to show where it lands.
+    const row = arcanaBoard[0] ?? []
+    const paid = row.filter((one) => one !== id('The Moon'))
+    expect(resolveBoard(new Set(paid)).live.size).toBeGreaterThanOrEqual(2)
+  })
+
+  it('still refuses to count a free card toward the tallies', () => {
+    // The other half of the same distinction: Judgment caps *paid* cards at
+    // three, and free ones on the board must not push it over.
+    const three = [...paidAtCost(1), ...paidAtCost(2)].slice(0, 3)
+    const board = resolveBoard(new Set(three))
+    expect(board.counted).toBe(3)
+    expect(board.live.has(id('Judgment'))).toBe(true)
+  })
+})
+
 describe('resolveBoard', () => {
   it('derives the conditionals rather than taking them', () => {
     // Passing a conditional card in must change nothing: they are worked out.
