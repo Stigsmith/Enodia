@@ -113,12 +113,14 @@ export function newRun(
   weapon: WeaponId,
   aspect: TraitId | null,
   path: RunPath | null = null,
+  build: string | null = null,
   exits = ESTIMATED_EXITS,
 ): RunContext {
   return {
     weapon,
     aspect,
     path,
+    build,
     exitsLeft: exits,
     held: [],
     godsTaken: [],
@@ -316,7 +318,7 @@ export function clearRun(): void {
 export type RunStore = {
   run: RunContext | null
   entries: RunEntry[]
-  start: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => void
+  start: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null, build?: string | null) => void
 
   end: (outcome?: Outcome) => void
   /** record a pick: the boon, its rarity, the god who offered it, and where */
@@ -350,10 +352,13 @@ export function useRun(): RunStore {
     else clearRun()
   }, [active])
 
-  const start = useCallback((weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => {
-    clearTrail()
-    setActive({ run: newRun(weapon, aspect, path), entries: [], pinned: null, lastPickAt: null })
-  }, [])
+  const start = useCallback(
+    (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null, build: string | null = null) => {
+      clearTrail()
+      setActive({ run: newRun(weapon, aspect, path, build), entries: [], pinned: null, lastPickAt: null })
+    },
+    [],
+  )
 
   const pin = useCallback((target: TraitId | null) => {
     setActive((current) => (current ? { ...current, pinned: target } : current))

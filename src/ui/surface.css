@@ -1398,6 +1398,119 @@
   color: var(--bone-faint);
 }
 
+/**
+ * What the run is going for, when it said so at setup.
+ *
+ * Full width inside a wrapping flex row, so it takes a line of its own under
+ * everything else rather than competing with the arm for the middle of the
+ * bar. Its left edge carries the state in the same three colours the briefing
+ * uses, because a player learning one should not have to learn the other.
+ */
+.topbar-chasing {
+  order: 9;
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  padding: 0.35rem 0.6rem;
+  border-left: 3px solid var(--jade-dim);
+  border-radius: 0 var(--r-hair) var(--r-hair) 0;
+  background: var(--ink-900);
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+.topbar-chasing.is-dead {
+  border-left-color: var(--rim-magenta);
+}
+
+.topbar-chasing.is-at_risk {
+  border-left-color: var(--unbuilt);
+}
+
+.topbar-chasing.is-on_track {
+  border-left-color: var(--jade-hot);
+}
+
+.topbar-chasing-label {
+  font-family: var(--display);
+  font-size: 0.58rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.topbar-chasing strong {
+  font-family: var(--body);
+  font-size: 0.86rem;
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.topbar-chasing.is-dead strong {
+  color: var(--rim-magenta);
+}
+
+.topbar-chasing-why {
+  min-width: 0;
+  line-height: 1.4;
+}
+
+/* An aspect nobody has written a build for. It says so rather than showing an
+ * empty row that reads as a loading state. */
+.step-none {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+.topbar-done {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--jade);
+}
+
+/* The builds still open, at the top of the drawer, because they are the answer
+ * and the duos below them are the detail. */
+.standing-builds {
+  list-style: none;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.standing-builds li {
+  display: grid;
+  gap: 0.1rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-3);
+}
+
+.standing-builds li.is-done {
+  border-left-color: var(--jade);
+}
+
+.standing-build-name {
+  font-size: 0.82rem;
+  color: var(--bone);
+}
+
+.standing-build-why {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--bone-faint);
+}
+
+.standing-none {
+  margin: 0 0 0.9rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
 /* The rail. A column now, and it never scrolls away. */
 .railbar {
   position: relative;

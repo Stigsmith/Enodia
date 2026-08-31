@@ -93,6 +93,15 @@ export type RunContext = {
    * invented fact this project keeps out.
    */
   path: RunPath | null
+  /**
+   * The build this run is going for, when the player named one at setup.
+   *
+   * An id from `data/builds.ts` rather than the build itself, so a run stored
+   * yesterday reads against today's definition of it. Null is the ordinary
+   * case and means the run is not chasing anything in particular, which is a
+   * real way to play and not a missing answer.
+   */
+  build?: string | null
   /** Exits remaining in the run. The engine's only clock. */
   exitsLeft: number
   held: Held

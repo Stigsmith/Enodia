@@ -16,7 +16,7 @@ import type { ReactNode } from 'react'
 import { gameVersion, iconOf, traits, weapons } from './data/app.ts'
 import { brief, isWorthShowing } from './engine/briefing.ts'
 import type { Briefing as Card } from './engine/briefing.ts'
-import { reachable } from './engine/reachability.ts'
+import { buildStanding, buildTally, sayOf } from './engine/build-run.ts'
 import { loadPrefs } from './state/prefs.ts'
 import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
 import { Briefing } from './ui/Briefing.tsx'
@@ -100,8 +100,8 @@ export function App() {
     saveTrail(markSeen(loadTrail(), entries.length))
   }
 
-  const startRun: typeof start = (weapon, aspect, path) => {
-    start(weapon, aspect, path)
+  const startRun: typeof start = (weapon, aspect, path, build) => {
+    start(weapon, aspect, path, build)
     setView('run')
   }
 
@@ -173,9 +173,25 @@ export function App() {
   const aspect = run.aspect ? traits.get(run.aspect) : null
   // The aspect's icon, falling back to the arm's cutout before an aspect is set.
   const aspectIcon = (run.aspect ? iconOf.get(run.aspect) : null) ?? weapon?.icon ?? null
-  const verdicts = reachable(run, traits)
-  const open = verdicts.filter((v) => v.state !== 'DEAD' && v.state !== 'ON_TRACK').length
-  const closed = verdicts.filter((v) => v.state === 'DEAD').length
+  /**
+   * The headline is builds, not targets.
+   *
+   * It counted duos and legendaries, which is the engine's unit and not the
+   * player's: nobody sits at an Exit chasing Ripple Effect, they chase a build
+   * that wants it. `engine/build-run.ts` asks the same question of a whole
+   * build, and an aspect closes most of the field before the first Exit.
+   */
+  const standing = buildStanding(run, traits)
+  const tally = buildTally(standing)
+
+  /**
+   * The build the run said it was going for, and how it is doing.
+   *
+   * This is the half the tally cannot give: a count says the field is still
+   * open, and it does not say that the one thing you came for died two Exits
+   * ago. The verdict carries its own sentence, so this only has to show it.
+   */
+  const chasing = run.build ? (standing.find((one) => one.build.id === run.build) ?? null) : null
 
   return frame(
     <div className="surface">
@@ -251,9 +267,18 @@ export function App() {
           <span>Exits left</span>
         </p>
 
+        {chasing ? (
+          <p className={`topbar-chasing is-${chasing.verdict.state.toLowerCase()}`}>
+            <span className="topbar-chasing-label">Going for</span>
+            <strong>{chasing.build.name}</strong>
+            <span className="topbar-chasing-why">{sayOf(chasing)}</span>
+          </p>
+        ) : null}
+
         <p className="topbar-tally">
-          <strong>{open}</strong> open
-          {closed ? <span className="topbar-closed">{closed} closed</span> : null}
+          <strong>{tally.open}</strong> builds open
+          {tally.done ? <span className="topbar-done">{tally.done} built</span> : null}
+          {tally.closed ? <span className="topbar-closed">{tally.closed} closed</span> : null}
         </p>
 
       </header>
