@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from 'react'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import { FRAMES, applyFrame, frameVars, readFrame, writeFrame } from './frames.ts'
+import { WALLPAPERS, applyWallpaper, readWallpaper, writeWallpaper } from './wallpaper.ts'
 
 /** The two layouts a single build can open in. */
 const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
@@ -59,6 +60,7 @@ export function Menu({
 }) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
+  const [wall, setWall] = useState(readWallpaper)
   /**
    * Which layout a single build opens in.
    *
@@ -74,6 +76,11 @@ export function Menu({
     applyFrame(frame)
     writeFrame(frame)
   }, [frame])
+
+  useEffect(() => {
+    applyWallpaper(wall)
+    writeWallpaper(wall)
+  }, [wall])
 
   useEffect(() => {
     savePrefs({ ...loadPrefs(), buildDetail })
@@ -295,6 +302,39 @@ export function Menu({
                     <span className="menu-label">
                       {option.name}
                       {frame === option.id ? (
+                        <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
+                      ) : null}
+                    </span>
+                    <span className="menu-note">{option.note}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* What is behind the tool. The picture is dimmed to the app's own
+              ink ramp rather than to taste, so the choice here is which room
+              you are standing in and not how loud it is. */}
+          <section>
+            <h2>Behind it</h2>
+            <ul className="menu-walls">
+              {WALLPAPERS.map((option) => (
+                <li key={option.id}>
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={wall === option.id}
+                    className={wall === option.id ? 'is-on' : ''}
+                    onClick={() => setWall(option.id)}
+                  >
+                    <span
+                      className="menu-wall-swatch"
+                      style={{ backgroundImage: option.file ? `url('/${option.file}')` : 'none' }}
+                      aria-hidden="true"
+                    />
+                    <span className="menu-label">
+                      {option.name}
+                      {wall === option.id ? (
                         <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
                       ) : null}
                     </span>
