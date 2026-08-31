@@ -79,6 +79,10 @@
 .builds-top h2 {
   margin: 0;
   font-family: var(--name);
+  /* An h2 is bold by default and this face has one weight, so the browser was
+   * synthesising it. See the note on .wordmark in base.css. */
+  font-weight: 400;
+  font-synthesis-weight: none;
   letter-spacing: 0.04em;
   font-size: clamp(1.35rem, 4vw, 1.9rem);
   letter-spacing: 0.05em;
@@ -1996,13 +2000,17 @@ button.mark {
 }
 
 /**
- * The mouseover frame, likewise the game's own.
+ * The mouseover frame, likewise the game's own, and it lands on the card.
  *
- * 147 by 194 with a visible 133 by 193, so 147/133 is 110.5 percent. Unlike
- * the equipped highlight its visible ratio is 0.689 against the card's 0.643,
- * so it sits a little wider than the card rather than flush. That is what the
- * art is; it is not corrected here, because stretching it to fit would be
- * inventing a frame the game does not draw.
+ * 147 by 194 with a visible 133 by 193, so the transparent margin is 7 pixels
+ * each side and 1 at the top. Sized so that visible part covers the card
+ * exactly: 147/133 wide and 194/193 tall, which is 110.5 and 100.5 percent.
+ *
+ * **Stretched, not contained.** Its visible ratio is 0.689 against the card's
+ * 0.643, so preserving it meant the frame came out shorter than the card and
+ * hung inside it, which is what the owner saw. Filling the box distorts the
+ * art by about 7 percent, and on a thin glow that is invisible where a frame
+ * floating inside the card was not.
  */
 .arcana-art::before {
   content: '';
@@ -2010,9 +2018,9 @@ button.mark {
   left: 50%;
   top: 50%;
   width: 110.5%;
-  aspect-ratio: 147 / 194;
+  height: 100.5%;
   transform: translate(-50%, -50%);
-  background: url('/arcana/highlight-frame.png') center / contain no-repeat;
+  background: url('/arcana/highlight-frame.png') center / 100% 100% no-repeat;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response);
