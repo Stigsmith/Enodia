@@ -14,7 +14,7 @@ Last updated 29 August 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete** |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 306, across 14 files |
+| **Tests** | 343, across 17 files |
 | **Validator** | 8 checks, 0 failures, 3 warnings |
 | **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
@@ -191,6 +191,38 @@ same `--mark-frame-over` the frame does, so they cannot drift apart again.
 an ink-950 ground three of them in a row looked like three broken images. Every one had
 loaded at full size. The game never draws an icon straight onto the background either;
 there is always a lit frame interior behind it, and `.mark` has one now.
+
+### The Arcana board
+
+**Six of the twenty-five cost nothing and switch themselves on**, each by its own rule out of
+`MetaUpgradeLogic.CheckAutoEquipRequirements`. That is the page: a build naming three cards
+leaves unsaid what the other twenty-two do, and one wrong addition turns a free card off.
+
+| Card | Rule |
+|---|---|
+| The Fates | every neighbour equipped |
+| The Moon | at least one neighbour equipped |
+| Judgment | between 1 and 3 cards |
+| The Queen | no cost used more than twice |
+| The Centaur | one card of every cost 1 to 5 |
+| Divinity | a complete row or column other than its own |
+
+**Only paid cards count**, including toward each other, which is what makes a third card at
+one cost turn The Queen off. **Judgment and The Centaur can never both be on**: one caps the
+count at three, the other needs at least five. `arcana.test.ts` proves it rather than
+asserting it, and it is most of why the number of sensible bases is small.
+
+Position is load-bearing, so the board is the game's own 5x5 out of
+`MetaUpgradeDefaultCardLayout`. A fully unlocked board is assumed and the page says so:
+`GetZoomLevel` shrinks the grid while cards are locked, which depends on a save this cannot
+read.
+
+`AdjacencyBonus` is a **second, dormant** system: an 8-neighbour multiplier that no card
+declares. Written down so nobody re-derives it and assumes otherwise.
+
+Three base layouts ship empty in `src/data/arcana-layouts.ts`. They are the owner's, like
+the builds. `arcana-layouts.test.ts` checks a filled one and prints its Grasp, which
+conditionals came on and why each of the rest did not; it fails only on the impossible.
 
 ---
 

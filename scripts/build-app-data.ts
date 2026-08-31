@@ -593,6 +593,15 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
        * that directory order silently decides which wins.
        */
       icon: arcanaIcon(slug) ?? arcanaIcon(bare) ?? null,
+      /**
+       * What has to be true for a conditional card to switch itself on.
+       *
+       * Six of the twenty-five cost nothing and carry an `AutoEquipRequirements`
+       * block instead. It is passed through whole rather than interpreted here:
+       * `engine/arcana.ts` evaluates it, and putting the rules in two places is
+       * how they drift apart.
+       */
+      requires: dictOf(card.AutoEquipRequirements ?? {}),
     }
   })
   .filter((card) => card.name)
@@ -605,6 +614,20 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
  * them, so nothing new needed extracting. The art is one image each in
  * `assets/familiars/`, beside their skins and their stat icons.
  */
+/**
+ * The Arcana board, five by five.
+ *
+ * `MetaUpgradeDefaultCardLayout`. The same twenty-five cards in the same
+ * positions for every player: the layout is copied into game state at the
+ * start of a save and the code path that would let a player rearrange it is
+ * gated behind `LockedRequirement`.
+ *
+ * **Position is load-bearing.** Three of the six conditional cards read it:
+ * The Fates needs every neighbour equipped, The Moon needs one, and Divinity
+ * needs a complete row or column other than its own.
+ */
+const arcanaBoard = (read('arcana-layout').data as unknown as string[][]).map((row) => [...row])
+
 const FAMILIARS = [
   { id: 'CatFamiliar', slug: 'cat' },
   { id: 'FrogFamiliar', slug: 'frog' },
@@ -641,6 +664,7 @@ const bundle = {
   pools,
   sources,
   arcana: arcanaCards,
+  arcanaBoard,
   familiars,
   traits: records,
 }
@@ -654,6 +678,10 @@ const withArt = records.filter((record) => 'icon' in record).length
 console.log(`data/app/app-data.json  ${(bytes / 1024).toFixed(0)} KB`)
 console.log(`  ${records.length} named traits of ${traits.size}, ${withArt} with art`)
 console.log(`  ${bundle.olympians.length} Olympians, ${bundle.weapons.length} weapons, ${pools.length} god pools`)
+console.log(
+  `  ${arcanaBoard.length}x${arcanaBoard[0]?.length ?? 0} Arcana board, ` +
+    `${arcanaCards.filter((c) => Object.keys(c.requires).length).length} cards switch themselves on`,
+)
 console.log(
   `  ${arcanaCards.length} Arcana (${arcanaCards.filter((c) => c.icon).length} with art), ` +
     `${familiars.length} familiars (${familiars.filter((f) => f.icon).length} with art)`,

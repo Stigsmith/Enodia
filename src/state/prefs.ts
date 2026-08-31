@@ -35,9 +35,23 @@ export type Prefs = {
   staleAfterHours: number
   /** Poster or Constellation, for a single build. */
   buildDetail: BuildDetail
+  /**
+   * How much Grasp this save has.
+   *
+   * `MetaUpgradeCostData.StartingMetaUpgradeLimit` is 10 and it rises as you
+   * spend MemPoints, so it is per-save progression this tool cannot read. The
+   * Arcana page needs it to say whether a layout is affordable, so it asks
+   * once and remembers. Ten is where everyone starts.
+   */
+  graspLimit: number
 }
 
-export const DEFAULT_PREFS: Prefs = { version: VERSION, staleAfterHours: 3, buildDetail: 'poster' }
+export const DEFAULT_PREFS: Prefs = {
+  version: VERSION,
+  staleAfterHours: 3,
+  buildDetail: 'poster',
+  graspLimit: 10,
+}
 
 function migrate(stored: unknown): Prefs | null {
   if (typeof stored !== 'object' || stored === null) return null
@@ -56,6 +70,10 @@ function migrate(stored: unknown): Prefs | null {
       record.buildDetail === 'poster' || record.buildDetail === 'constellation'
         ? record.buildDetail
         : DEFAULT_PREFS.buildDetail,
+    graspLimit:
+      typeof record.graspLimit === 'number' && record.graspLimit > 0
+        ? record.graspLimit
+        : DEFAULT_PREFS.graspLimit,
   }
 }
 

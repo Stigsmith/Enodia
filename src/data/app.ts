@@ -116,11 +116,58 @@ export type ArcanaCard = {
   text: string | null
   cost: number | null
   icon: string | null
+  /**
+   * What has to be true for this card to switch itself on.
+   *
+   * Empty for the nineteen you pay Grasp for. The other six cost nothing and
+   * carry a rule instead, straight out of `AutoEquipRequirements`.
+   * `engine/arcana.ts` is the only thing that reads it.
+   */
+  requires: ArcanaRule
+}
+
+/**
+ * `AutoEquipRequirements`, as the game states it.
+ *
+ * Every field is optional and a card states only the ones it uses. The names
+ * are the game's own, so a reader can find the rule in
+ * `MetaUpgradeLogic.CheckAutoEquipRequirements` without a translation step.
+ */
+export type ArcanaRule = {
+  /** at least one equipped card of every cost from 1 to this */
+  HasCostsThrough?: number
+  /** at least one equipped card of each of these costs */
+  HasCosts?: number[]
+  /** no cost value may be used more than this many times */
+  MaxDuplicateCount?: number
+  /** some cost value must be used at least this many times */
+  MinDuplicateCount?: number
+  RequiredMetaUpgradesMin?: number
+  RequiredMetaUpgradesMax?: number
+  /** every neighbour, diagonals included, must be equipped */
+  SurroundAllEquipped?: boolean
+  /** at least one neighbour must be equipped */
+  SurroundEquipped?: boolean
+  /** a complete row or column other than this card's own */
+  OtherRowOrColumnEquipped?: boolean
+  /** stated beside the positional rules, and the evaluator does not read it */
+  MetaUpgradeName?: string
+  CardsRequired?: number
 }
 
 export const arcana: readonly ArcanaCard[] = bundle.arcana as ArcanaCard[]
 
 export const arcanaById: ReadonlyMap<string, ArcanaCard> = new Map(arcana.map((card) => [card.id, card]))
+
+/**
+ * The board, five rows of five card ids.
+ *
+ * `MetaUpgradeDefaultCardLayout`, identical for every player. A fully unlocked
+ * board is assumed throughout: the game's own `GetZoomLevel` shrinks the grid
+ * while cards are still locked, and modelling that would make every answer
+ * depend on a save this tool cannot see.
+ */
+export const arcanaBoard: readonly (readonly string[])[] = bundle.arcanaBoard as string[][]
 
 /** The five familiars, by the id `FamiliarOrderData` lists. */
 export type Familiar = { id: string; name: string; icon: string | null }
