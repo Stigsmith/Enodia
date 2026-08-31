@@ -45,6 +45,7 @@ export function Menu({
   onEndRun,
   onShowBriefing,
   onShowBuilds,
+  onShowArcana,
 }: {
   onStartRun: () => void
   hasRun: boolean
@@ -53,6 +54,8 @@ export function Menu({
   onShowBriefing?: () => void
   /** the build manager, which is a screen rather than an overlay */
   onShowBuilds?: () => void
+  /** the Arcana board, likewise */
+  onShowArcana?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
@@ -160,6 +163,16 @@ export function Menu({
               },
             }
           : { label: 'Build manager', note: 'Define a build and track it. Waiting on the first definition' },
+        onShowArcana
+          ? {
+              label: 'Arcana',
+              note: 'The board, and which of the six free cards your set switches on',
+              action: () => {
+                onShowArcana()
+                setOpen(false)
+              },
+            }
+          : { label: 'Arcana', note: 'The board and the six conditional cards' },
         { label: 'Build exchange', note: 'Share and import builds. Phase 4' },
       ],
     },

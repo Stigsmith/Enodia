@@ -1859,3 +1859,276 @@ button.mark {
 .builds-edit {
   margin-left: auto;
 }
+
+/* =========================================================================
+ * THE ARCANA BOARD.
+ *
+ * The game's own five by five, in the game's own positions, because three of
+ * the six conditional cards read position: The Fates needs every neighbour,
+ * The Moon needs one, Divinity needs a whole other row or column. A list would
+ * not be able to say any of that.
+ * ===================================================================== */
+
+.arcana {
+  max-width: 100%;
+  padding: 1.25rem 1rem 4rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 60rem) {
+  .arcana {
+    padding: 1.75rem 2rem 4rem;
+    max-width: 76rem;
+  }
+}
+
+.arcana-bases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.arcana-base {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone-dim);
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.arcana-base:hover {
+  border-color: var(--jade-dim);
+  color: var(--bone);
+}
+
+/* A slot nobody has written. It says so rather than carrying a placeholder
+ * somebody would read as a recommendation. */
+.arcana-base.is-empty {
+  border-style: dashed;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-style: italic;
+  cursor: default;
+}
+
+.arcana-base.is-clear {
+  margin-left: auto;
+}
+
+.arcana-stage {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.1rem;
+}
+
+@media (min-width: 60rem) {
+  .arcana-stage {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}
+
+.arcana-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, auto);
+  gap: 0.35rem;
+}
+
+.arcana-card {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.3rem 0.25rem 0.35rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone-faint);
+  font-family: var(--body);
+  cursor: pointer;
+  transition:
+    border-color var(--t-response) var(--e-response),
+    opacity var(--t-response) var(--e-response);
+}
+
+.arcana-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+  /* Off is off: the art goes grey and dim rather than merely unhighlighted, so
+   * the board reads at a glance instead of card by card. */
+  filter: grayscale(1) brightness(0.5);
+  transition: filter var(--t-response) var(--e-response);
+}
+
+.arcana-card:hover {
+  border-color: var(--jade-dim);
+}
+
+.arcana-card.is-on {
+  border-color: var(--jade);
+  color: var(--bone);
+}
+
+.arcana-card.is-on img {
+  filter: none;
+}
+
+/* The six that cost nothing. They are not controls: clicking one would be
+ * stating an outcome as a cause. */
+.arcana-card.is-free {
+  cursor: default;
+  border-style: dashed;
+}
+
+.arcana-card.is-free.is-on {
+  border-style: solid;
+  border-color: var(--rim-cyan);
+  box-shadow: 0 0 12px -4px var(--rim-cyan);
+}
+
+.arcana-name {
+  font-size: 0.6rem;
+  line-height: 1.25;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arcana-cost {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  text-align: center;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.arcana-card.is-free .arcana-cost {
+  color: var(--rim-cyan);
+}
+
+/* ------------------------------------------------------------- the side -- */
+
+.arcana-side {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  padding: 0.9rem 1rem 1.1rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.arcana-grasp {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+.arcana-grasp-used {
+  font-size: 1.5rem;
+  color: var(--jade-hot);
+  font-variant-numeric: tabular-nums;
+}
+
+.arcana-grasp.is-over .arcana-grasp-used {
+  color: var(--rim-magenta);
+}
+
+.arcana-grasp input {
+  width: 3rem;
+  padding: 0.15rem 0.3rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}
+
+.arcana-over {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--rim-magenta);
+}
+
+.arcana-counted {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--bone-faint);
+}
+
+.arcana-counted strong {
+  font-family: var(--mono);
+  color: var(--bone);
+}
+
+.arcana-rule {
+  margin: 0.3rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.arcana-six {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.arcana-six li {
+  display: grid;
+  gap: 0.1rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-3);
+}
+
+.arcana-six li.is-on {
+  border-left-color: var(--rim-cyan);
+}
+
+.arcana-six-name {
+  font-size: 0.78rem;
+  color: var(--bone-dim);
+}
+
+.arcana-six li.is-on .arcana-six-name {
+  color: var(--bone);
+}
+
+/* The reason it is off, which is the whole point of the panel. */
+.arcana-six-say {
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+.arcana-note {
+  margin: 0.4rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--div-1);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arcana-card,
+  .arcana-card img {
+    transition: none;
+  }
+}

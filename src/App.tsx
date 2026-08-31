@@ -20,6 +20,7 @@ import { loadPrefs } from './state/prefs.ts'
 import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
 import { Briefing } from './ui/Briefing.tsx'
 import { Hecate } from './ui/Hecate.tsx'
+import { Arcana } from './ui/Arcana.tsx'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
@@ -58,6 +59,7 @@ export function App() {
    * back leaves the run exactly as it was: the run lives in `useRun`, not here.
    */
   const [showBuilds, setShowBuilds] = useState(false)
+  const [showArcana, setShowArcana] = useState(false)
 
   const buildCard = useCallback(
     (ctx: RunContext) => brief(ctx, lastSeen(loadTrail()), traits, { pinned, exit: entries.length }),
@@ -88,6 +90,15 @@ export function App() {
     saveTrail(markSeen(loadTrail(), entries.length))
   }
 
+  if (showArcana) {
+    return (
+      <div className="shell is-wide">
+        <Hecate />
+        <Arcana onClose={() => setShowArcana(false)} />
+      </div>
+    )
+  }
+
   if (showBuilds) {
     return (
       <div className="shell is-wide">
@@ -107,6 +118,7 @@ export function App() {
             hasRun={false}
             onEndRun={end}
             onShowBuilds={() => setShowBuilds(true)}
+            onShowArcana={() => setShowArcana(true)}
           />
           <div>
             <h1 className="wordmark">Enodia</h1>
@@ -159,6 +171,7 @@ export function App() {
           onEndRun={end}
           onShowBriefing={openBriefing}
           onShowBuilds={() => setShowBuilds(true)}
+          onShowArcana={() => setShowArcana(true)}
         />
 
         {/* The arm, by its own name.
