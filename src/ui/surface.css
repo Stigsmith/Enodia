@@ -1169,6 +1169,99 @@
 .rarity-step output.is-epic { color: var(--rim-magenta); }
 .rarity-step output.is-heroic { color: var(--unbuilt); }
 
+/* ==================================================================== app ==
+ * One shell around every screen, with the menu outside the view.
+ *
+ * The menu used to be a cell in each screen's own header. That is how there
+ * came to be screens with no menu at all, reachable only by a Back button
+ * whose real job was to find one. It is drawn once now and it is in the same
+ * place on all four screens.
+ *
+ * **`--nav-inset` is what the pop-out button costs.** It floats over the top
+ * left corner, so whatever a screen puts there has to start clear of it. When
+ * the pane is pinned instead there is no floating button and the inset goes to
+ * nothing, which is one number rather than a padding rule per screen.
+ * ========================================================================= */
+
+:root {
+  --nav-inset: 3.4rem;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+}
+
+.app > .menu {
+  position: fixed;
+  top: 0.7rem;
+  left: 0.8rem;
+  z-index: 30;
+}
+
+.masthead,
+.builds-top {
+  padding-left: var(--nav-inset);
+}
+
+/**
+ * The pinned pane, on a desktop that asked for one.
+ *
+ * The query is the same 60rem `nav.ts` names, and it is the only thing
+ * honouring `data-nav`: below it the attribute is simply inert, so a phone
+ * carrying a stored `pane` gets the pop-out with nothing to defend against.
+ *
+ * The panel itself is unchanged. It stops being absolutely positioned, fills
+ * the column and loses its shadow and its outer corners, and everything inside
+ * it is the same list in the same order as the pop-out's.
+ */
+@media (min-width: 60rem) {
+  :root[data-nav='pane'] {
+    --nav-inset: 0rem;
+  }
+
+  :root[data-nav='pane'] .app {
+    display: grid;
+    grid-template-columns: 17rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  :root[data-nav='pane'] .app > .menu {
+    position: sticky;
+    top: 0;
+    left: auto;
+    height: 100dvh;
+  }
+
+  :root[data-nav='pane'] .menu-panel {
+    position: static;
+    width: auto;
+    height: 100%;
+    max-height: none;
+    border-width: 0 1px 0 0;
+    border-radius: 0;
+    box-shadow: none;
+    /* Translucent, so the wallpaper carries through the pane rather than the
+     * pane cutting a solid stripe out of it. */
+    background: color-mix(in oklab, var(--ink-900) 84%, transparent);
+  }
+
+  :root[data-nav='pane'] .app-view {
+    min-width: 0;
+  }
+}
+
+/* Where you already are. A pinned pane is on screen the whole time, so it has
+ * to say which of its entries is the screen you are looking at. */
+.menu-panel button.is-here {
+  border-color: var(--div-4);
+  background: var(--ink-900);
+}
+
+.menu-panel button.is-here .menu-label {
+  color: var(--jade);
+}
+
 /* ================================================================ surface ==
  * The run surface. Three pinned regions and one that scrolls.
  *
@@ -1197,7 +1290,7 @@
   align-items: center;
   gap: 1.1rem;
   flex-wrap: wrap;
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 1rem 0.7rem calc(1rem + var(--nav-inset));
   border-bottom: 1px solid var(--div-2);
   background: var(--ink-950);
 }
