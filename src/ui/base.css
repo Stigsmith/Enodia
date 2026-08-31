@@ -48,7 +48,16 @@ body {
 .wordmark {
   margin: 0;
   font-family: var(--name);
-  font-weight: 600;
+  /**
+   * 400, because that is the only weight there is.
+   *
+   * Caesar Dressing ships one weight. Asking for 600 did not load a heavier
+   * cut, it made the browser **synthesise** one by fattening the real glyphs,
+   * which is what read as too chubby. `font-synthesis-weight` refuses the
+   * fallback outright so nothing can quietly reintroduce it.
+   */
+  font-weight: 400;
+  font-synthesis-weight: none;
   font-size: clamp(2rem, 8vw, 3rem);
   letter-spacing: 0.06em;
   color: var(--jade-hot);
