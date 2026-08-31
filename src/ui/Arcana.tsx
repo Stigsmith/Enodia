@@ -49,8 +49,11 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
   const [chosen, setChosen] = useState<Set<string>>(new Set())
   const [grasp, setGrasp] = useState(() => loadPrefs().graspLimit)
   const [copied, setCopied] = useState(false)
+  /** The card under the pointer or the focus ring, and nothing else. */
+  const [peek, setPeek] = useState<string | null>(null)
 
   const board = useMemo(() => resolveBoard(chosen), [chosen])
+  const peeked = peek ? (arcanaById.get(peek) ?? null) : null
   const over = board.grasp > grasp
 
   const toggle = (id: string) => {
@@ -105,7 +108,15 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
                   className={`arcana-card${on ? ' is-on' : ''}${conditional ? ' is-free' : ''}`}
                   style={{ gridArea: `${r + 1} / ${c + 1}` }}
                   aria-pressed={conditional ? undefined : on}
-                  disabled={conditional}
+                  /* `aria-disabled` rather than `disabled`, because a disabled
+                     button fires no pointer events and takes no focus, and the
+                     six free cards are the ones whose reason a reader most
+                     wants to read. The click is still refused in `toggle`. */
+                  aria-disabled={conditional || undefined}
+                  onMouseEnter={() => setPeek(id)}
+                  onMouseLeave={() => setPeek((was) => (was === id ? null : was))}
+                  onFocus={() => setPeek(id)}
+                  onBlur={() => setPeek((was) => (was === id ? null : was))}
                   onClick={() => toggle(id)}
                   title={
                     conditional
@@ -130,6 +141,36 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
                 </button>
               )
             }),
+          )}
+        </div>
+
+        {/* What the pointer is on, in the middle.
+          *
+          * The board is 25 pictures and the game's own sentence for each one
+          * is the thing that turns it from a picture into a card. It reserves
+          * its height whether or not anything is hovered, so the board does
+          * not jump when the pointer crosses it. */}
+        <div className="arcana-peek" aria-live="polite">
+          {peeked ? (
+            <>
+              {peeked.icon ? (
+                <img className="arcana-peek-art" src={`/${peeked.icon}`} alt="" />
+              ) : null}
+              <h3 className="arcana-peek-name">{peeked.name}</h3>
+              <p className="arcana-peek-cost">
+                {isConditional(peeked.id) ? 'Costs nothing' : `Costs ${peeked.cost ?? 0} Grasp`}
+              </p>
+              {peeked.text ? <p className="arcana-peek-text">{peeked.text}</p> : null}
+              {isConditional(peeked.id) ? (
+                <p className={`arcana-peek-state${board.live.has(peeked.id) ? ' is-on' : ''}`}>
+                  {board.live.has(peeked.id)
+                    ? 'On, with what you have picked.'
+                    : (board.dark.get(peeked.id) ?? []).map((one) => one.say).join(' ')}
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <p className="arcana-peek-idle">Point at a card to read it.</p>
           )}
         </div>
 

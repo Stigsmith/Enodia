@@ -581,11 +581,26 @@
   container-type: inline-size;
   border: 0;
   border-radius: 0;
-  background: url('/shell/slot-card.png') center / 100% 100% no-repeat;
+  /* The plate is drawn by ::after, not here. A `filter` tints the art to the
+   * theme, and a filter on this element would tint everything standing on it:
+   * every boon icon in the card is real game art and Poseidon does not turn
+   * violet because the theme did. */
+  background: none;
   text-align: left;
   font-family: var(--body);
   cursor: pointer;
   overflow: hidden;
+}
+
+/* The unlit plate, behind everything the card stands on it. */
+.bcard-hit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('/shell/slot-card.png') center / 100% 100% no-repeat;
+  filter: hue-rotate(var(--art-hue, 0deg));
+  pointer-events: none;
 }
 
 /* The lit plate, faded in over the unlit one so the colour underneath stays. */
@@ -594,6 +609,7 @@
   position: absolute;
   inset: 0;
   background: url('/shell/slot-card-highlight.png') center / 100% 100% no-repeat;
+  filter: hue-rotate(var(--art-hue, 0deg));
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response);
@@ -1903,6 +1919,15 @@ button.mark {
   }
 }
 
+/* The reading panel takes a column of its own once there is room for three.
+ * Below that it sits under the board, which is where a phone wants it anyway:
+ * there is no pointer to hover with, so it fills on focus instead. */
+@media (min-width: 78rem) {
+  .arcana-stage {
+    grid-template-columns: minmax(0, 1fr) 15rem 19rem;
+  }
+}
+
 /**
  * The grid, sized so five rows fit the viewport rather than the width.
  *
@@ -1993,6 +2018,8 @@ button.mark {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response);
+  /* Turns with the theme, like the rest of the game's chrome. */
+  filter: hue-rotate(var(--art-hue, 0deg));
 }
 
 .arcana-card.is-on .arcana-art::after {
@@ -2024,6 +2051,8 @@ button.mark {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--t-response) var(--e-response);
+  /* Turns with the theme, like the rest of the game's chrome. */
+  filter: hue-rotate(var(--art-hue, 0deg));
 }
 
 .arcana-card:hover:not(:disabled) .arcana-art::before,
@@ -2744,4 +2773,138 @@ button.mark {
   font-size: 0.72rem;
   line-height: 1.45;
   color: var(--bone-faint);
+}
+
+/* ----------------------------------------------------------- the reading -- */
+
+/**
+ * What the pointer is on.
+ *
+ * The board is 25 pictures, and the game's own sentence is what turns one from
+ * a picture into a card. This holds a minimum height whether or not anything is
+ * hovered, so crossing the board with the pointer does not make the page move.
+ */
+.arcana-peek {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+  min-height: 12rem;
+  padding: 0.85rem 0.95rem 1rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.arcana-peek-art {
+  width: 4.6rem;
+  border-radius: 3px;
+  align-self: start;
+}
+
+.arcana-peek-name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.arcana-peek-cost {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.arcana-peek-text {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+
+/* The reason a free card is off, which is the whole point of the six. */
+.arcana-peek-state {
+  margin: 0.15rem 0 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--div-1);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+.arcana-peek-state.is-on {
+  color: var(--lit);
+}
+
+.arcana-peek-idle {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+/* A card that is off is not a control, but it is still readable and still
+ * focusable. `aria-disabled` says so without taking it out of the tab order. */
+.arcana-card[aria-disabled='true'] {
+  cursor: default;
+}
+
+/* --------------------------------------------- the build's Arcana row -- */
+
+.poster-card {
+  position: relative;
+}
+
+/* The game's own mouseover frame, the same art the board uses, so hovering a
+ * card means the same thing in both places. */
+.poster-card::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 110.5%;
+  height: 100.5%;
+  transform: translateX(-50%);
+  background: url('/arcana/highlight-frame.png') center / 100% 100% no-repeat;
+  filter: hue-rotate(var(--art-hue, 0deg));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.poster-card.is-peeked::before {
+  opacity: 1;
+}
+
+.poster-arcana-say {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-height: 3.1rem;
+  margin: 0.7rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--div-1);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bone-dim);
+}
+
+.poster-arcana-say strong {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--bone);
+}
+
+.poster-arcana-say .is-idle {
+  color: var(--bone-faint);
+  font-size: 0.76rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster-card::before {
+    transition: none;
+  }
 }

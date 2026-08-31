@@ -838,47 +838,14 @@
   height: var(--size);
 }
 
-/* Behind the ring: the game's own sorcery decal, breathing.
+/* The space behind the ring stays empty.
  *
- * `Fx/Sorcery/SorceryWolfHowlDecal`, a lit nonagram. The rotating medallion
- * that used to sit here read as a spinning logo and the owner cut it, and the
- * space has been open since. This does not rotate: it holds still and its
- * light rises and falls, which is what a circle drawn on the ground does.
- *
- * Very quiet on purpose. It is the ambient tier and it is behind the thing a
- * player is actually reading, so it stops entirely under reduced motion. */
-.radial-ring-area::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 96%;
-  aspect-ratio: 1 / 1;
-  transform: translate(-50%, -50%);
-  background: url('/shell/sorcery-circle.png') center / contain no-repeat;
-  opacity: 0.1;
-  pointer-events: none;
-  animation: sorcery-breathe 14s ease-in-out infinite;
-}
+ * A rotating medallion sat here once and was cut for reading as a spinning
+ * logo. `SorceryWolfHowlDecal` replaced it, held still and breathed instead,
+ * and read as a loading spinner, which is the same failure wearing a different
+ * animation. Twice is enough: the ring is the thing to look at and it does not
+ * need a halo. */
 
-@keyframes sorcery-breathe {
-  0%,
-  100% {
-    opacity: 0.075;
-    filter: brightness(0.9);
-  }
-  50% {
-    opacity: 0.16;
-    filter: brightness(1.25);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .radial-ring-area::before {
-    animation: none;
-    opacity: 0.1;
-  }
-}
 
 .radial-ring {
   position: absolute;
@@ -4164,26 +4131,30 @@ body::before {
  * text from the pair rather than from the text ramp.
  * ========================================================================= */
 
-.begin,
-.builds-new,
-.bmenu-yes,
-.editor-actions > button:first-child {
-  background: var(--plate);
-  color: var(--on-plate);
-  border-color: var(--metal);
+/* Everything wearing the game's chrome art turns with the theme.
+ *
+ * The art is `button.png` and its four states, the tray, the slot plates and
+ * the Arcana highlights, all drawn lit teal for the Underworld. A hue rotation
+ * is what a theme can do to a fixed image, and it works here because of what
+ * these images are made of: the plate is saturated and the label on it is
+ * `--bone-dim` at six percent saturation, so the plate travels and the text
+ * stays where it is.
+ *
+ * **This is a correction.** The first version painted `--plate` behind these
+ * buttons, which fought the nine-slice: the art draws its own rounded plate
+ * and a solid rectangle behind it filled the corners in. The art is the plate.
+ * `--plate` still exists, for the picker's own label and for surfaces with no
+ * art on them at all. */
+.quiet,
+.tray-handle,
+.radial-caption,
+.objective-bar {
+  filter: hue-rotate(var(--art-hue, 0deg));
 }
 
-.begin:hover:not(:disabled),
-.builds-new:hover,
-.editor-actions > button:first-child:hover:not(:disabled) {
-  border-color: var(--lit-hot);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--metal) 45%, transparent);
-}
+/* **Only ever on an element whose art is all it draws.** A filter applies to
+ * the whole rendered subtree, so anything with game art standing on it wears
+ * the rotation on its own layer instead: see `.bcard-hit::after`, which is the
+ * build card's plate, held apart from the boon icons sitting on it. */
 
-/* The metal is an ornament rather than an outline. On a plate this small there
- * is no room for a laurel, so it is the hairline above the label: the same
- * gesture the game makes with its top edge, at the scale that fits. */
-.begin {
-  border-top-color: var(--metal);
-  border-top-width: 2px;
-}
+
