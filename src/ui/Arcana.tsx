@@ -119,7 +119,12 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
                       : `${card?.name}. Costs ${card?.cost ?? 0}.`
                   }
                 >
-                  {card?.icon ? <img src={`/${card.icon}`} alt="" loading="lazy" /> : null}
+                  {/* The game's own two states, not one image and a filter.
+                    * `cardNN_inactive.png` is redrawn rather than desaturated,
+                    * so approximating it in CSS looked like a filter. */}
+                  {card?.icon ? (
+                    <img src={`/${(on ? card.icon : card.iconOff) ?? card.icon}`} alt="" loading="lazy" />
+                  ) : null}
                   <span className="arcana-name">{card?.name}</span>
                   <span className="arcana-cost">{conditional ? 'free' : (card?.cost ?? 0)}</span>
                 </button>

@@ -356,8 +356,51 @@ function take(from: string, to: string, note: string, tree: keyof typeof TREES =
   console.log(`  ${to.padEnd(38)} ${String(kb).padStart(5)} KB  ${note}`)
 }
 
+/**
+ * The dimmed twin of every Arcana card.
+ *
+ * The game ships `cardNN.png` and `cardNN_inactive.png` side by side, and our
+ * `assets/arcana/` art is byte for byte the first of those, so the second is
+ * the exact off-state rather than a filter's guess at one. The board draws it
+ * for a card that is not equipped, which is what the game does.
+ *
+ * **Derived rather than listed**, because it is a systematic one to one: the
+ * card's own `Image` field names its number and the display name gives the
+ * slug our library already uses. Twenty-five hand-written picks would be a
+ * list to keep in step with the data instead of a rule read from it.
+ */
+function arcanaInactivePicks(): Pick[] {
+  const cardsFile = join(ROOT, 'data/generated/arcana-cards.json')
+  const textFile = join(ROOT, 'data/app/app-data.json')
+  if (!existsSync(cardsFile) || !existsSync(textFile)) return []
+
+  const cards = JSON.parse(readFileSync(cardsFile, 'utf8').replace(/^﻿/, '')) as {
+    data?: Record<string, { Image?: string }>
+  }
+  const bundle = JSON.parse(readFileSync(textFile, 'utf8')) as {
+    arcana: { id: string; icon: string | null }[]
+  }
+  const iconById = new Map(bundle.arcana.map((one) => [one.id, one.icon]))
+
+  const out: Pick[] = []
+  for (const [id, card] of Object.entries(cards.data ?? {})) {
+    const image = card?.Image
+    const icon = iconById.get(id)
+    if (typeof image !== 'string' || !icon) continue
+    const number = image.replace('CardArt_', '')
+    const to = icon.replace(/\.png$/, '-inactive.png')
+    out.push({
+      from: `Screens/MetaUpgrade/CardArt/card${number}_inactive.png`,
+      to,
+      note: `the dimmed twin of ${icon.replace('arcana/', '').replace('.png', '')}`,
+    })
+  }
+  return out
+}
+
 console.log('picks:')
 for (const pick of PICKS) take(pick.from, pick.to, pick.note, pick.tree ?? 'gui')
+for (const pick of arcanaInactivePicks()) take(pick.from, pick.to, pick.note, 'gui')
 
 for (const sweep of SWEEPS) {
   const dir = join(GUI, sweep.from)

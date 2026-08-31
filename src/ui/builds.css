@@ -1961,10 +1961,9 @@ button.mark {
   height: auto;
   display: block;
   border-radius: 2px;
-  /* Off is off: the art goes grey and dim rather than merely unhighlighted, so
-   * the board reads at a glance instead of card by card. */
-  filter: grayscale(1) brightness(0.5);
-  transition: filter var(--t-response) var(--e-response);
+  /* No filter. The off state is the game's own `cardNN_inactive.png`, swapped
+   * in by the component, because the game redrew those rather than
+   * desaturating and a filter approximating it looked like a filter. */
 }
 
 .arcana-card:hover {
@@ -1974,10 +1973,6 @@ button.mark {
 .arcana-card.is-on {
   border-color: transparent;
   color: var(--bone);
-}
-
-.arcana-card.is-on img {
-  filter: none;
 }
 
 /**

@@ -116,6 +116,8 @@ export type ArcanaCard = {
   text: string | null
   cost: number | null
   icon: string | null
+  /** the game's own dimmed twin, drawn when the card is not equipped */
+  iconOff: string | null
   /**
    * What has to be true for this card to switch itself on.
    *
