@@ -4,11 +4,11 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 939,
+ "count": 964,
  "categories": [
   {
    "name": "arcana",
-   "count": 27,
+   "count": 52,
    "source": "game"
   },
   {
@@ -149,11 +149,27 @@
  ],
  "assets": [
   {
+   "id": "artificer-inactive",
+   "category": "arcana",
+   "file": "arcana/artificer-inactive.png",
+   "bytes": 645697,
+   "sha256": "8b20de2024457603720201a00a092392c3b4cf2ef429ab8f6628d47371d9c125",
+   "source": "game"
+  },
+  {
    "id": "artificer",
    "category": "arcana",
    "file": "arcana/artificer.png",
    "bytes": 815425,
    "sha256": "49d9547f6016ef5d9bf2de3b195e6919cec14e5ab5fd6281ce105fe74ce33d8d",
+   "source": "game"
+  },
+  {
+   "id": "boatman-inactive",
+   "category": "arcana",
+   "file": "arcana/boatman-inactive.png",
+   "bytes": 495193,
+   "sha256": "2b30e80e12596407fa1219710fdbdd1db5f16d70f927d18ef330adb11f6cbe93",
    "source": "game"
   },
   {
@@ -165,11 +181,27 @@
    "source": "game"
   },
   {
+   "id": "centaur-inactive",
+   "category": "arcana",
+   "file": "arcana/centaur-inactive.png",
+   "bytes": 713340,
+   "sha256": "f4760c77f853c8bee4ad18499556603b7525b3070c13fd69f96b29fa953bf0c6",
+   "source": "game"
+  },
+  {
    "id": "centaur",
    "category": "arcana",
    "file": "arcana/centaur.png",
    "bytes": 953135,
    "sha256": "18c136e1600faf1e329562ac024be80a9622b5928367e3c503a4f89f46c164f7",
+   "source": "game"
+  },
+  {
+   "id": "champions-inactive",
+   "category": "arcana",
+   "file": "arcana/champions-inactive.png",
+   "bytes": 777608,
+   "sha256": "7af062e658d487f7a1a7ebf4b40d7790df6d4688fe4ec75336508b1576d5c636",
    "source": "game"
   },
   {
@@ -181,11 +213,27 @@
    "source": "game"
   },
   {
+   "id": "death-inactive",
+   "category": "arcana",
+   "file": "arcana/death-inactive.png",
+   "bytes": 700816,
+   "sha256": "081bc69d088912e383bf26b6326d1e596cfb136058257bece808875f12a08bfa",
+   "source": "game"
+  },
+  {
    "id": "death",
    "category": "arcana",
    "file": "arcana/death.png",
    "bytes": 944409,
    "sha256": "6d6fa151848c4ba6026fceb981c3e251ade6fafc1568db388a081e777109f2b8",
+   "source": "game"
+  },
+  {
+   "id": "divinity-inactive",
+   "category": "arcana",
+   "file": "arcana/divinity-inactive.png",
+   "bytes": 881961,
+   "sha256": "65ff584a4b043fff3deb81b33fcc918e1a4618b1b51a453f34df150faf0bcdff",
    "source": "game"
   },
   {
@@ -205,6 +253,14 @@
    "source": "game"
   },
   {
+   "id": "eternity-inactive",
+   "category": "arcana",
+   "file": "arcana/eternity-inactive.png",
+   "bytes": 622442,
+   "sha256": "63ba759601e0542d86a6065d9bdd943e8548f199826c55a5023359dd7b218ba2",
+   "source": "game"
+  },
+  {
    "id": "eternity",
    "category": "arcana",
    "file": "arcana/eternity.png",
@@ -213,11 +269,27 @@
    "source": "game"
   },
   {
+   "id": "excellence-inactive",
+   "category": "arcana",
+   "file": "arcana/excellence-inactive.png",
+   "bytes": 827139,
+   "sha256": "18e44be2698e48eca7c3a161e79af3b71ce693227641c859fe9e493757226992",
+   "source": "game"
+  },
+  {
    "id": "excellence",
    "category": "arcana",
    "file": "arcana/excellence.png",
    "bytes": 1049264,
    "sha256": "19521ad14fcea171f9f244971676f498108d90b9f22d48530a4ed4d0a643cafc",
+   "source": "game"
+  },
+  {
+   "id": "furies-inactive",
+   "category": "arcana",
+   "file": "arcana/furies-inactive.png",
+   "bytes": 646898,
+   "sha256": "e47a51992e70202c49b20935de460822af6b9cabeb0191f658bc2d3ab1122386",
    "source": "game"
   },
   {
@@ -237,11 +309,27 @@
    "source": "game"
   },
   {
+   "id": "huntress-inactive",
+   "category": "arcana",
+   "file": "arcana/huntress-inactive.png",
+   "bytes": 566602,
+   "sha256": "f8c390b9d4d441f22992695c3e27925b8c3a90720035c58e58e3baafe93fcafe",
+   "source": "game"
+  },
+  {
    "id": "huntress",
    "category": "arcana",
    "file": "arcana/huntress.png",
    "bytes": 745994,
    "sha256": "b69ce12d184d29392448849945472837c02bde229f137e7fdbd0c44949148fb3",
+   "source": "game"
+  },
+  {
+   "id": "judgment-inactive",
+   "category": "arcana",
+   "file": "arcana/judgment-inactive.png",
+   "bytes": 748939,
+   "sha256": "75aab95debba5e9a1424995b1d0fde3e03b39cfb50aba2a0abecbeadd2f889be",
    "source": "game"
   },
   {
@@ -253,11 +341,27 @@
    "source": "game"
   },
   {
+   "id": "lovers-inactive",
+   "category": "arcana",
+   "file": "arcana/lovers-inactive.png",
+   "bytes": 775316,
+   "sha256": "f0d3b3363251562980c3acd6330c07ef8cb5d2cec8829c72a3aa165f4a85727e",
+   "source": "game"
+  },
+  {
    "id": "lovers",
    "category": "arcana",
    "file": "arcana/lovers.png",
    "bytes": 994746,
    "sha256": "22b6aace4017431fc0092ce544577a374505fff2fe8a3a9da496ce7ca6bafb88",
+   "source": "game"
+  },
+  {
+   "id": "messenger-inactive",
+   "category": "arcana",
+   "file": "arcana/messenger-inactive.png",
+   "bytes": 786845,
+   "sha256": "e5054c0a8e3456f82d41c291dcc7ac1ed9b0f8180f6205fc2005c47e0cbbd6bd",
    "source": "game"
   },
   {
@@ -269,11 +373,27 @@
    "source": "game"
   },
   {
+   "id": "moon-inactive",
+   "category": "arcana",
+   "file": "arcana/moon-inactive.png",
+   "bytes": 766757,
+   "sha256": "33875684c11b8850448871787560939142c59072145f93a058f3a58f90a83712",
+   "source": "game"
+  },
+  {
    "id": "moon",
    "category": "arcana",
    "file": "arcana/moon.png",
    "bytes": 1001478,
    "sha256": "8cd9085a66cef34d8ff82a7ca733e7500b2d7796db1c109399c0867026395315",
+   "source": "game"
+  },
+  {
+   "id": "night-inactive",
+   "category": "arcana",
+   "file": "arcana/night-inactive.png",
+   "bytes": 695133,
+   "sha256": "5b586e81cf9ce1a7baf2e33d8075374261f73dcb9c2765d487f991b82184f5e9",
    "source": "game"
   },
   {
@@ -285,11 +405,27 @@
    "source": "game"
   },
   {
+   "id": "origination-inactive",
+   "category": "arcana",
+   "file": "arcana/origination-inactive.png",
+   "bytes": 712179,
+   "sha256": "60db2ff23e1dca4343a9aeba2005e14b3d1caf1480f883e6d46d383d7fc9db8d",
+   "source": "game"
+  },
+  {
    "id": "origination",
    "category": "arcana",
    "file": "arcana/origination.png",
    "bytes": 983041,
    "sha256": "140ba18cf857946a1cbb809578aba93bd3b06e0c85b10157bca9c9a47da87c67",
+   "source": "game"
+  },
+  {
+   "id": "persistence-inactive",
+   "category": "arcana",
+   "file": "arcana/persistence-inactive.png",
+   "bytes": 632046,
+   "sha256": "9da562d0bd3262b42aa04763b7c2a688add6c29124716d4d1f076d6e4745c5ce",
    "source": "game"
   },
   {
@@ -301,11 +437,27 @@
    "source": "game"
   },
   {
+   "id": "queen-inactive",
+   "category": "arcana",
+   "file": "arcana/queen-inactive.png",
+   "bytes": 766686,
+   "sha256": "0fbfbe84df6419621e8a61e9c9fd131382feb7271cff30944ed25238e2073538",
+   "source": "game"
+  },
+  {
    "id": "queen",
    "category": "arcana",
    "file": "arcana/queen.png",
    "bytes": 975936,
    "sha256": "a49b7d70aad032528fa8dc3e6467f7583a7e7d24d7d850b84e8e16dd1a7e028d",
+   "source": "game"
+  },
+  {
+   "id": "sorceress-inactive",
+   "category": "arcana",
+   "file": "arcana/sorceress-inactive.png",
+   "bytes": 609236,
+   "sha256": "e3ee604eb8825b8e8ec9d4fde73d0c6140f151542d109d5ef320204855d4348d",
    "source": "game"
   },
   {
@@ -317,11 +469,27 @@
    "source": "game"
   },
   {
+   "id": "strength-inactive",
+   "category": "arcana",
+   "file": "arcana/strength-inactive.png",
+   "bytes": 602848,
+   "sha256": "7dca1d468945d7762f26cf0a1b2e37da31cb1db34f6e2888b030eaba43a370c8",
+   "source": "game"
+  },
+  {
    "id": "strength",
    "category": "arcana",
    "file": "arcana/strength.png",
    "bytes": 861231,
    "sha256": "3238e35f8c9239d97ddb2507888b691ce6b54d9c463f47709db19b4967dc66f2",
+   "source": "game"
+  },
+  {
+   "id": "swift-runner-inactive",
+   "category": "arcana",
+   "file": "arcana/swift-runner-inactive.png",
+   "bytes": 774344,
+   "sha256": "da58dba7e8fab9d8fda53505ebcc6b38e4fa4bd5b107df28c3cca78496bcc5b0",
    "source": "game"
   },
   {
@@ -333,11 +501,27 @@
    "source": "game"
   },
   {
+   "id": "the-enchantress-inactive",
+   "category": "arcana",
+   "file": "arcana/the-enchantress-inactive.png",
+   "bytes": 772308,
+   "sha256": "7bc4f9333a4fea0b2b134513449e31fc85d95b31e92a4304de1f95fb3cdddbd1",
+   "source": "game"
+  },
+  {
    "id": "the-enchantress",
    "category": "arcana",
    "file": "arcana/the-enchantress.png",
    "bytes": 1024139,
    "sha256": "b0f632a392c588b6d1adbfe82d89d0b2409afc0e9dc41abed8c85f65172b9382",
+   "source": "game"
+  },
+  {
+   "id": "the-fates-inactive",
+   "category": "arcana",
+   "file": "arcana/the-fates-inactive.png",
+   "bytes": 638517,
+   "sha256": "49fad5cb9c4ed94f233290cb2f3a6c83b0c33dbefb4c2577c33187604264cd23",
    "source": "game"
   },
   {
@@ -349,11 +533,27 @@
    "source": "game"
   },
   {
+   "id": "unseen-inactive",
+   "category": "arcana",
+   "file": "arcana/unseen-inactive.png",
+   "bytes": 799591,
+   "sha256": "c80a6e9655efb39c2bb1a7abf824e56d1acd5a2864bd9ff755bc441b71945f76",
+   "source": "game"
+  },
+  {
    "id": "unseen",
    "category": "arcana",
    "file": "arcana/unseen.png",
    "bytes": 993708,
    "sha256": "11f13762ecf98cfc9f055e76ee8ace5e55609544bad3138665d750504a7090d5",
+   "source": "game"
+  },
+  {
+   "id": "wayward-son-inactive",
+   "category": "arcana",
+   "file": "arcana/wayward-son-inactive.png",
+   "bytes": 685794,
+   "sha256": "6efcf643c306c9d0f86ad275451c32cb85b8790322de4c26c85dd48117ae6fd7",
    "source": "game"
   },
   {

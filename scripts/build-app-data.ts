@@ -594,6 +594,14 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
        */
       icon: arcanaIcon(slug) ?? arcanaIcon(bare) ?? null,
       /**
+       * The game's own dimmed twin, for a card that is not equipped.
+       *
+       * `cardNN_inactive.png` beside `cardNN.png`. Better than desaturating the
+       * lit one in CSS, because the game did not desaturate: the inactive art
+       * is redrawn, and a filter approximating it looks like a filter.
+       */
+      iconOff: arcanaIcon(`${slug}-inactive`) ?? arcanaIcon(`${bare}-inactive`) ?? null,
+      /**
        * What has to be true for a conditional card to switch itself on.
        *
        * Six of the twenty-five cost nothing and carry an `AutoEquipRequirements`
