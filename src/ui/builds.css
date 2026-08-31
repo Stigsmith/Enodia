@@ -2293,3 +2293,237 @@ button.mark {
     transition: none;
   }
 }
+
+/* ============================================================== how it plays ==
+ * A build's own record, and the controls that write it.
+ *
+ * Personal to this install. Nothing here is a recommendation and nothing here
+ * travels when a build is shared, so it is deliberately quieter than the build
+ * itself: the pieces are the subject and this is a note in the margin.
+ * ========================================================================= */
+
+.playstrip {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--div-1);
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+.playstrip-stars {
+  display: inline-flex;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--div-4);
+}
+
+.playstrip-stars .is-on {
+  color: var(--jade);
+}
+
+.playstrip-runs {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.playstrip-runs strong {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.playstrip-rate {
+  color: var(--jade-hot) !important;
+}
+
+/* A dot between the three numbers, drawn rather than typed, because a
+ * punctuation character here is exactly what the charset bug mangled twice. */
+.playstrip-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--div-4);
+  align-self: center;
+  margin: 0 0.15rem;
+}
+
+.playstrip-assembles {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+.playstrip-assembles.is-reliably {
+  color: var(--jade);
+}
+
+.playstrip-assembles.is-needs-luck {
+  color: var(--unbuilt);
+}
+
+/* The Constellation has no title to sit under, so the strip is its own row at
+ * the top of the wheel rather than a rule under a heading. */
+.constel > .playstrip {
+  justify-content: center;
+  margin: 0 0 0.4rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* --------------------------------------------------------- the build menu -- */
+
+/* Two controls in the detail header now, so the `margin-left: auto` that
+ * pushed a single one to the right moves onto the pair. */
+.builds-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.builds-tools .builds-edit {
+  margin-left: 0;
+}
+
+.bmenu {
+  position: relative;
+}
+
+.bmenu-panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;
+  width: min(17rem, 80vw);
+  padding: 0.3rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-card);
+  background: var(--ink-850);
+  box-shadow: 0 1.2rem 2.4rem rgb(0 0 0 / 0.55);
+}
+
+.bmenu-panel > button {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-soft);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bmenu-panel > button:hover {
+  border-color: var(--div-4);
+  background: var(--ink-900);
+}
+
+.bmenu-label {
+  font-family: var(--body);
+  font-size: 0.86rem;
+  color: var(--bone);
+}
+
+.bmenu-label.is-danger {
+  color: var(--rim-magenta);
+}
+
+.bmenu-note {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--bone-faint);
+}
+
+/* The question, asked in place. It replaces the row it came from rather than
+ * opening a dialog, so the answer is where the click was. */
+.bmenu-confirm {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.45rem 0.5rem 0.5rem;
+  border: 1px solid var(--rim-magenta);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.bmenu-confirm p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--bone);
+}
+
+.bmenu-confirm div {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.bmenu-confirm button {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.bmenu-confirm button:hover {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+.bmenu-yes {
+  border-color: var(--rim-magenta) !important;
+  color: var(--rim-magenta) !important;
+}
+
+/* ------------------------------------------------ the editor's own block -- */
+
+.editor-plays {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* Five buttons, and clicking the one you are on clears the rating. */
+.editor-stars {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.editor-stars button {
+  padding: 0.1rem 0.15rem;
+  border: 0;
+  background: none;
+  color: var(--div-4);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.editor-stars button:hover {
+  color: var(--jade-dim);
+}
+
+.editor-stars button.is-on {
+  color: var(--jade);
+}
+
+/* `.editor-field input` is width 100%, so the two integers need a grid of
+ * their own to sit beside each other rather than stacking. */
+.editor-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+

@@ -18,10 +18,20 @@
  * `DESIGN.md` 9: localStorage, one key per concern, versioned with a migration.
  */
 
-import type { ShownBuild } from '../data/builds.ts'
+import type { SavedBuild, ShownBuild } from '../data/builds.ts'
 
 const KEY = 'enodia.builds'
 const VERSION = 1
+
+/**
+ * The shape one build is in, carried on the build itself.
+ *
+ * Distinct from `VERSION` above, which versions the whole store. A build sent
+ * to another install arrives on its own with no envelope around it, and has to
+ * be able to say what shape it is in. That is what this is for, and it is why
+ * the number lives on the record as well as around it.
+ */
+export const BUILD_SCHEMA = 1
 
 type Stored = { version: number; builds: ShownBuild[] }
 
@@ -48,13 +58,64 @@ function looksLikeBuild(value: unknown): value is ShownBuild {
   )
 }
 
-export function loadBuilds(): ShownBuild[] {
+/**
+ * Bring stored builds up to the current shape.
+ *
+ * **Pure, and separate from storage on purpose.** `DESIGN.md` 11 is explicit
+ * that a green build proves nothing, so the thing worth testing is this
+ * function rather than a browser session. The localStorage wrapper below is
+ * three lines with nothing in it to get wrong.
+ *
+ * `VERSION` does not go up. `prefs.ts` sets that precedent and states the
+ * reason: a field missing because it did not exist yet is not a reason to throw
+ * the rest of somebody's work away. An envelope this code did not write still
+ * yields nothing, which is the one case where dropping everything is right.
+ *
+ * **An existing id is kept, never reissued.** A build that has already
+ * travelled to another install keeps the identity that install knows it by.
+ * Only a build with no id at all could be given one, and `looksLikeBuild`
+ * already refuses those, so in practice nothing here mints an id.
+ */
+export function migrateBuilds(
+  stored: unknown,
+  now: string = new Date().toISOString(),
+): { builds: SavedBuild[]; migrated: number } {
+  if (typeof stored !== 'object' || stored === null) return { builds: [], migrated: 0 }
+  const record = stored as Partial<Stored>
+  if (record.version !== VERSION || !Array.isArray(record.builds)) return { builds: [], migrated: 0 }
+
+  let migrated = 0
+  const builds = record.builds.filter(looksLikeBuild).map((build) => {
+    const created = typeof build.created === 'string' ? build.created : now
+    const filled: SavedBuild = {
+      ...build,
+      id: build.id,
+      created,
+      modified: typeof build.modified === 'string' ? build.modified : created,
+      schemaVersion: typeof build.schemaVersion === 'number' ? build.schemaVersion : BUILD_SCHEMA,
+    }
+    if (
+      build.created !== filled.created ||
+      build.modified !== filled.modified ||
+      build.schemaVersion !== filled.schemaVersion
+    ) {
+      migrated += 1
+    }
+    return filled
+  })
+
+  return { builds, migrated }
+}
+
+export function loadBuilds(): SavedBuild[] {
   try {
     const raw = window.localStorage.getItem(KEY)
     if (!raw) return []
-    const stored = JSON.parse(raw) as Stored
-    if (stored.version !== VERSION || !Array.isArray(stored.builds)) return []
-    return stored.builds.filter(looksLikeBuild)
+    const { builds, migrated } = migrateBuilds(JSON.parse(raw))
+    // Written straight back, so the migration is paid once rather than on
+    // every load for the rest of the store's life.
+    if (migrated) write(builds)
+    return builds
   } catch {
     return []
   }
@@ -68,15 +129,62 @@ function write(builds: ShownBuild[]): void {
   }
 }
 
-/** Add or replace, keyed on id, newest first. */
-export function saveBuild(build: ShownBuild): ShownBuild[] {
-  const rest = loadBuilds().filter((one) => one.id !== build.id)
-  const next = [build, ...rest]
+/**
+ * Add or replace, keyed on id, newest first.
+ *
+ * **`id` and `created` are never touched here.** An edit is the same build, and
+ * if saving changed either of them every install already holding it would see a
+ * stranger. `modified` moves on every save, and it is the only thing separating
+ * an edit from the original write.
+ */
+export function saveBuild(build: ShownBuild, now: string = new Date().toISOString()): SavedBuild[] {
+  const held = loadBuilds()
+  const existing = held.find((one) => one.id === build.id)
+  const saved: SavedBuild = {
+    ...build,
+    id: build.id,
+    created: existing?.created ?? build.created ?? now,
+    modified: now,
+    schemaVersion: build.schemaVersion ?? BUILD_SCHEMA,
+  }
+  const next = [saved, ...held.filter((one) => one.id !== build.id)]
   write(next)
   return next
 }
 
-export function deleteBuild(id: string): ShownBuild[] {
+/**
+ * Fork a build, including one of the samples.
+ *
+ * The samples were read-only dead ends: you could look at Killer Current and
+ * not start from it. A fork is an ordinary owner build, which is the cheapest
+ * way for a second player to get going.
+ *
+ * **`play` is dropped.** A fork has not been played, and inheriting somebody
+ * else's twelve runs would have the record lying on its first day.
+ * `derivedFrom` keeps the trail instead.
+ */
+export function duplicateBuild(
+  source: ShownBuild,
+  now: string = new Date().toISOString(),
+): { builds: SavedBuild[]; copy: SavedBuild } {
+  const { play: _play, ...rest } = source
+  const copy: SavedBuild = {
+    ...rest,
+    id: newBuildId(),
+    by: 'owner',
+    // The name field caps at 60, and two identical names in a list help nobody.
+    name: `${source.name} copy`.slice(0, 60),
+    derivedFrom: source.id,
+    created: now,
+    modified: now,
+    schemaVersion: BUILD_SCHEMA,
+  }
+  const next = [copy, ...loadBuilds()]
+  write(next)
+  return { builds: next, copy }
+}
+
+export function deleteBuild(id: string): SavedBuild[] {
   const next = loadBuilds().filter((one) => one.id !== id)
   write(next)
   return next
@@ -85,19 +193,38 @@ export function deleteBuild(id: string): ShownBuild[] {
 /**
  * An id that will not collide with a sample or with another of these.
  *
- * `crypto.randomUUID` where it exists, and a timestamp plus randomness where it
- * does not, which is older Safari over plain http. The `mine-` prefix is what
- * keeps it clear of `sample-`.
+ * `crypto.randomUUID` where it exists. It needs a secure context, so it is
+ * absent over plain http, which is exactly how somebody opens this on a phone
+ * against a laptop's LAN address. That fallback matters more than it looks:
+ * several installs across two people generate builds independently and swap
+ * files days apart, with nothing anywhere to arbitrate a collision.
+ *
+ * So the fallback takes real randomness from `getRandomValues` when the rest of
+ * the crypto object is there, and only reaches `Math.random` when there is no
+ * crypto at all. A timestamp leads in both, which keeps two ids minted in the
+ * same session apart even in the worst case.
+ *
+ * The `mine-` prefix is what keeps these clear of `sample-`. It is already in
+ * storage on every build anyone has made, and ids never change, so it stays.
  */
 export function newBuildId(): string {
-  const uuid = globalThis.crypto?.randomUUID?.()
-  return `mine-${uuid ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`}`
+  const crypto = globalThis.crypto
+  const uuid = crypto?.randomUUID?.()
+  if (uuid) return `mine-${uuid}`
+
+  const stamp = Date.now().toString(36)
+  if (crypto?.getRandomValues) {
+    const bytes = crypto.getRandomValues(new Uint8Array(9))
+    return `mine-${stamp}-${[...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('')}`
+  }
+  return `mine-${stamp}-${Math.random().toString(36).slice(2, 10)}`
 }
 
 /** An empty build, ready to be filled in. */
 export function blankBuild(weapon: string, aspect: string): ShownBuild {
   return {
     id: newBuildId(),
+    schemaVersion: BUILD_SCHEMA,
     name: '',
     say: '',
     how: '',

@@ -55,6 +55,56 @@ export type ArcanaId = string
  */
 export type Provenance = 'sample' | 'owner' | 'community'
 
+/** How dependably a build comes together, in the player's own judgement. */
+export type Assembles = 'reliably' | 'situational' | 'needs-luck'
+
+/**
+ * The three, in order, with the words a reader sees.
+ *
+ * One list, so the editor's control and the detail strip cannot drift into
+ * calling the same state two different things.
+ */
+export const ASSEMBLES: { id: Assembles; name: string }[] = [
+  { id: 'reliably', name: 'Reliably' },
+  { id: 'situational', name: 'Situational' },
+  { id: 'needs-luck', name: 'Needs luck' },
+]
+
+/**
+ * How a build has actually gone, for this player.
+ *
+ * **Personal to this install, and not part of what a build is.** Two people can
+ * hold the same build and have played it a different number of times, so when
+ * single build sharing arrives this is the one key the export drops. That is
+ * the whole reason it is nested rather than four loose fields: one `delete`
+ * instead of four, and no chance of missing one.
+ *
+ * Every field is optional. A build nobody has rated is the normal case, and
+ * `engine/build-check.ts` must not find anything to say about it.
+ */
+export type PlayRecord = {
+  /** one to five, absent for none */
+  rating?: number
+  runs?: number
+  clears?: number
+  assembles?: Assembles
+}
+
+/**
+ * Clears over runs, or null when there is nothing to divide.
+ *
+ * **Clamped, not trusted.** The editor already refuses clears above runs, but
+ * storage is a text file a person can edit and a build can arrive from another
+ * install. A rate over 100 percent must be impossible to render, so the clamp
+ * lives here where every caller gets it rather than in the one control.
+ */
+export function winRate(play: PlayRecord | undefined): number | null {
+  const runs = play?.runs ?? 0
+  if (!Number.isFinite(runs) || runs <= 0) return null
+  const clears = Math.max(0, Math.min(play?.clears ?? 0, runs))
+  return clears / runs
+}
+
 export type ShownBuild = {
   id: string
   name: string
@@ -101,6 +151,43 @@ export type ShownBuild = {
   familiar: FamiliarId | null
   /** the Grasp holds five by default, and the order on the board is the player's */
   arcana: ArcanaId[]
+  /**
+   * How it has played here. See `PlayRecord`.
+   *
+   * Optional because the samples have none and because a build is a build
+   * without one.
+   */
+  play?: PlayRecord
+
+  // --- Identity. Written by `state/builds.ts`, never by a form. ------------
+  //
+  // All four are optional on `ShownBuild` because the eight samples carry none
+  // and do not need any. `SavedBuild` below is the type that has been through
+  // the migration, and it requires them.
+
+  /** ISO, when the build was first written. Never changes */
+  created?: string
+  /** ISO, updated on every save */
+  modified?: string
+  /** which shape this build is in, so a build sent to another install can say */
+  schemaVersion?: number
+  /** the id this was duplicated from, or absent. Stored now, displayed later */
+  derivedFrom?: string
+}
+
+/**
+ * A build that has been through the migration.
+ *
+ * The four identity fields are optional on `ShownBuild` so the samples stay
+ * clean, which leaves nothing checking that a stored build has them. This is
+ * what `loadBuilds` returns, so anything reading storage has the guarantee and
+ * anything reading the merged library still only sees a `ShownBuild`.
+ */
+export type SavedBuild = ShownBuild & {
+  id: string
+  created: string
+  modified: string
+  schemaVersion: number
 }
 
 /**

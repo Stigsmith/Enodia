@@ -25,11 +25,11 @@
  * rather than at eighty.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
-import { deleteBuild, loadBuilds, saveBuild } from '../state/builds.ts'
+import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
 import { loadPrefs } from '../state/prefs.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -104,11 +104,28 @@ export function Builds({ onClose }: { onClose?: () => void }) {
             All builds
           </button>
           {open.by === 'sample' ? <SampleTag /> : null}
-          {open.by === 'owner' ? (
-            <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
-              Edit
-            </button>
-          ) : null}
+
+          {/* Two controls now, so the `margin-left: auto` that pushed a single
+            * one right moves onto a wrapper holding both. */}
+          <div className="builds-tools">
+            {open.by === 'owner' ? (
+              <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
+                Edit
+              </button>
+            ) : null}
+            <BuildMenu
+              build={open}
+              onDuplicate={() => {
+                const { builds, copy } = duplicateBuild(open)
+                setMine(builds)
+                setOpenId(copy.id)
+              }}
+              onDelete={() => {
+                setMine(deleteBuild(open.id))
+                setOpenId(null)
+              }}
+            />
+          </div>
         </header>
 
         <div className="builds-stage">
@@ -173,6 +190,111 @@ export function Builds({ onClose }: { onClose?: () => void }) {
       )}
 
       <SampleTag full />
+    </div>
+  )
+}
+
+/**
+ * The build's own menu: fork it, and remove it.
+ *
+ * **Duplicate is offered on every build, samples included.** The eight samples
+ * were read-only dead ends, and forking one is the cheapest way for somebody to
+ * start from a build that already works rather than from blank.
+ *
+ * **Delete asks first.** It used to live inside the editor, two clicks deep,
+ * and fired straight into storage with no confirmation and nothing to undo it
+ * with. Moving it here puts it next to the build it removes, which is the right
+ * place and also a closer place, so the question is what stands between a
+ * misclick and somebody's work.
+ */
+function BuildMenu({
+  build,
+  onDuplicate,
+  onDelete,
+}: {
+  build: ShownBuild
+  onDuplicate: () => void
+  onDelete: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const panel = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const close = (event: MouseEvent) => {
+      if (!panel.current?.contains(event.target as Node)) setOpen(false)
+    }
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', escape)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', escape)
+    }
+  }, [open])
+
+  // Closing the menu drops a half-asked question, so reopening it never lands
+  // on a Delete that is already armed.
+  useEffect(() => {
+    if (!open) setConfirming(false)
+  }, [open])
+
+  return (
+    <div className="bmenu" ref={panel}>
+      <button
+        type="button"
+        className="quiet bmenu-button"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((was) => !was)}
+      >
+        <span aria-hidden="true">More</span>
+        <span className="visually-hidden">More for this build</span>
+      </button>
+
+      {open ? (
+        <div className="bmenu-panel" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              onDuplicate()
+              setOpen(false)
+            }}
+          >
+            <span className="bmenu-label">Duplicate</span>
+            <span className="bmenu-note">
+              {build.by === 'sample'
+                ? 'Fork this sample into a build of your own'
+                : 'A copy you can change, with its own identity'}
+            </span>
+          </button>
+
+          {build.by === 'owner' ? (
+            confirming ? (
+              <div className="bmenu-confirm">
+                <p>Delete this build?</p>
+                <div>
+                  <button type="button" className="bmenu-yes" onClick={onDelete}>
+                    Delete
+                  </button>
+                  <button type="button" onClick={() => setConfirming(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" role="menuitem" onClick={() => setConfirming(true)}>
+                <span className="bmenu-label is-danger">Delete</span>
+                <span className="bmenu-note">Gone from this browser, and not recoverable</span>
+              </button>
+            )
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }
