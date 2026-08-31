@@ -60,7 +60,7 @@ body {
   font-synthesis-weight: none;
   font-size: clamp(2rem, 8vw, 3rem);
   letter-spacing: 0.06em;
-  color: var(--jade-hot);
+  color: var(--lit-hot);
 }
 
 .tagline {

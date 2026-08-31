@@ -22,7 +22,7 @@
  * Here rather than in `App.tsx` because the menu is what moves between them
  * and both need the name.
  */
-export type View = 'builds' | 'arcana' | 'setup' | 'run'
+export type View = 'builds' | 'arcana' | 'themes' | 'setup' | 'run'
 
 export type NavOption = {
   id: string
