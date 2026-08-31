@@ -130,15 +130,25 @@ function loadManifest(): Manifest | null {
   return Array.isArray(raw.assets) ? raw : { ...raw, assets: [] }
 }
 
-/** Every image on disk, as a path under assets/. */
+/**
+ * Every image on disk, as a path under assets/.
+ *
+ * Recurses, and has to: `themes/` holds a directory per theme, so a one-level
+ * walk reports every wallpaper in it as a manifest entry naming a file that is
+ * not there. `scripts/assets.ts` walks the same way, and the two have to agree
+ * or this check is comparing two different questions.
+ */
 function loadAssetFiles(): string[] {
   if (!existsSync(ASSETS)) return []
   const out: string[] = []
-  for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
-    if (!dir.isDirectory()) continue
-    for (const file of readdirSync(join(ASSETS, dir.name))) {
-      if (IMAGE.test(file)) out.push(`${dir.name}/${file}`)
+  const walk = (dir: string, prefix: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${prefix}${entry.name}/`)
+      else if (IMAGE.test(entry.name)) out.push(`${prefix}${entry.name}`)
     }
+  }
+  for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
+    if (dir.isDirectory()) walk(join(ASSETS, dir.name), `${dir.name}/`)
   }
   return out.sort()
 }

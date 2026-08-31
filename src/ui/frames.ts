@@ -158,7 +158,20 @@ export function frameVars(frame: FrameOption): Record<string, string> {
     '--frame-mask': inner
       ? `radial-gradient(closest-side, transparent ${(inner * 100).toFixed(1)}%, #000 ${(inner * 100 + 0.5).toFixed(1)}%)`
       : 'none',
-    '--frame-width': `${((frame.hole ? 1 / frame.hole : (frame.width ?? 1)) * 100).toFixed(1)}%`,
+    /**
+     * A unitless ratio, not a percentage, and that is load bearing.
+     *
+     * It used to be a percentage, and the two swatch rules multiplied it by
+     * another percentage: `calc(62% * var(--frame-width) / 100%)`. A product in
+     * `calc()` may carry a unit on at most one operand, so that is invalid CSS.
+     * Chrome accepted it anyway. **Firefox threw the declaration out**, which
+     * left `width: auto` and drew the frame art at its natural size, so a 2475
+     * pixel ring landed across the menu.
+     *
+     * As a plain number every use is `number * percentage`, which is valid
+     * everywhere.
+     */
+    '--frame-width': (frame.hole ? 1 / frame.hole : (frame.width ?? 1)).toFixed(3),
     '--frame-opacity': String(frame.opacity ?? 0.9),
     '--frame-aspect': frame.aspect ?? '1 / 1',
     '--bubble-radius': frame.square ? '22%' : '50%',

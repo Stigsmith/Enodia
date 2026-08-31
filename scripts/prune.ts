@@ -83,7 +83,11 @@ if (!existsSync(DIST)) {
 // ---------------------------------------------------------------------------
 
 const cats = CATEGORIES.join('|')
-const literal = new RegExp(`(?:${cats})/[A-Za-z0-9_.\\-]+\\.(?:png|webp|jpg|jpeg|gif|svg)`, 'g')
+// A path may carry more than one segment now: `themes/` holds a directory per
+// theme, so `themes/Unseen/splash-underworld.png` has to match as readily as
+// `shell/divider.png` did. Without the slash this saw nothing under themes/ and
+// pruned every wallpaper out of the deployed build.
+const literal = new RegExp(`(?:${cats})/[A-Za-z0-9_.\\-/]+\\.(?:png|webp|jpg|jpeg|gif|svg)`, 'g')
 const dynamic = new RegExp(`(?:${cats})/\\$\\{`, 'g')
 const categoryOf = (path: string) => path.split('/')[0] ?? ''
 

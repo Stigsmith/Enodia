@@ -2009,7 +2009,7 @@
  * width, which is the same sum the ring does. */
 .menu-frame-art {
   position: absolute;
-  width: calc(62% * var(--frame-width, 122%) / 100%);
+  width: calc(62% * var(--frame-width, 1.22));
   object-fit: contain;
   opacity: var(--frame-opacity, 1);
   pointer-events: none;
@@ -2019,7 +2019,7 @@
 .menu-frame-swatch::after {
   content: '';
   position: absolute;
-  width: calc(62% * var(--frame-width, 122%) / 100%);
+  width: calc(62% * var(--frame-width, 1.22));
   aspect-ratio: 1 / 1;
   background: var(--frame-band, none);
   -webkit-mask: var(--frame-mask, none);
@@ -2152,6 +2152,23 @@ body::before {
     opacity: 0.09;
     pointer-events: none;
   }
+}
+
+/**
+ * None has to mean none.
+ *
+ * The scrollwork above is fixed to the viewport and had nothing to do with the
+ * wallpaper setting, so choosing None left two panels of `tray-panel.png`
+ * across the screen and the option's own line, "Hecate's light and nothing
+ * behind it", was simply false. Reported from Firefox, true everywhere.
+ *
+ * Gated rather than deleted: it is VISUAL.md rule 1 and it is what keeps a
+ * panel reading as made rather than drawn. It stays for the three options that
+ * put a picture back there, and goes when the answer is nothing.
+ */
+:root[data-wallpaper='none'] body::before,
+:root[data-wallpaper='none'] body::after {
+  display: none;
 }
 
 /* ==========================================================================
@@ -2447,7 +2464,7 @@ body::before {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: var(--frame-width, 122%);
+  width: calc(var(--frame-width, 1.22) * 100%);
   aspect-ratio: var(--frame-aspect, 1 / 1);
   transform: translate(-50%, -50%);
   background:
