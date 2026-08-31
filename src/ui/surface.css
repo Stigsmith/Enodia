@@ -221,11 +221,47 @@
   transition: color var(--t-response) var(--e-response);
 }
 
+/**
+ * Hover, without the plate getting smaller.
+ *
+ * The block above documented this as a known artefact and the owner read it as
+ * an overdone press: the highlight art is 302 wide against the plain plate's
+ * 284, the glow is that extra 18 pixels, and `border-image` was folding it
+ * back inside the same box. So the lit plate drew ~6 percent smaller than the
+ * unlit one and hovering looked like pushing.
+ *
+ * `border-image-outset` is exactly the fix. It expands the box the image is
+ * painted into **without touching layout**, so the glow goes back outside where
+ * the game draws it and the plate itself holds still.
+ */
 .quiet:hover,
 .quiet:focus-visible {
   border-image-source: url('/shell/button-highlight.png');
+  border-image-outset: 0.1rem 0.32rem;
   color: var(--bone);
   outline: none;
+}
+
+/* A press, now that hover is not pretending to be one. Small and deliberate. */
+.quiet:active {
+  border-image-source: url('/shell/button-press.png');
+  border-image-outset: 0;
+  transform: translateY(1px);
+}
+
+/**
+ * Back, in the game's own cancel plate.
+ *
+ * `Shell/ButtonCancel` is the red one it puts on a way out, and Back is the
+ * only control here that is a way out rather than a choice.
+ */
+.picker-back {
+  border-image-source: url('/shell/button-cancel.png');
+}
+
+.picker-back:hover,
+.picker-back:focus-visible {
+  border-image-source: url('/shell/button-cancel-highlight.png');
 }
 
 /* The rail. Fixed positions, never reordered, empty slots stay dark and stay
@@ -943,6 +979,24 @@
   }
 }
 
+/* The waiting mark. Quieter than a chosen item and it does not animate in,
+ * because it was already there rather than having just arrived.
+ *
+ * **Much smaller than a chosen item, too.** At the centre's full width it came
+ * out 176 pixels and competed with the bubbles it sits inside, which is the
+ * opposite of the job: it fills the hole, it is not the subject. A chosen
+ * weapon at that size is right, because then it *is* the subject. */
+.radial-centre.is-waiting {
+  animation: none;
+  width: calc(var(--size) * 0.21);
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.radial-centre.is-waiting img {
+  border-radius: 0;
+}
+
 .radial-centre img {
   width: 100%;
   max-height: calc(var(--size) * 0.34);
@@ -951,7 +1005,7 @@
 }
 
 .radial-centre span {
-  font-family: var(--display);
+  font-family: var(--name);
   font-size: 0.8rem;
   letter-spacing: 0.06em;
   color: var(--bone);
@@ -1170,9 +1224,11 @@
   flex: none;
 }
 
-/* The arm leads. "Descura", not "Witch's Staff". */
+/* The arm leads. "Descura", not "Witch's Staff", and in the game's own
+ * character-name face: the Nocturnal Arms are characters. */
 .topbar-arm {
-  font-family: var(--display);
+  font-family: var(--name);
+  font-size: 1.05rem;
   font-size: 0.95rem;
   letter-spacing: 0.04em;
   color: var(--bone);
@@ -1437,6 +1493,24 @@
 
   .tray-body {
     max-height: 52dvh;
+  }
+
+  /**
+   * Give the width back.
+   *
+   * Three gutters were stacking on a 375 point screen: the scroller's own
+   * 1rem, the station's 2.5rem timeline column, and the boon plate's caps. It
+   * left a boon name about 250 points wide and wrapped nearly all of them.
+   * These are the two that are only there for the desktop layout.
+   */
+  .scroller {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .station {
+    grid-template-columns: 1.1rem 1fr;
+    padding: 1rem 0;
   }
 }
 
@@ -2586,20 +2660,27 @@ body::before {
   align-items: center;
 }
 
-/* "What did this Exit give", on the tray's own header ribbon.
+/**
+ * "What did this Exit give", on the HUD's own objective bar.
  *
- * `TraitTrayHeader` is 988 by 120 and is what the game puts a section name on.
- * Stretched to the heading's own box rather than nine-sliced: the ribbon is
- * not symmetric, it has a longer tail at one end, so slicing equal caps off
- * each side cut it in the wrong places and let the art run past the text. It
- * is a flat ribbon, so stretching it is the thing that costs nothing. */
+ * `HUD/ObjectiveBG` is 1280 by 88 and is what the game puts a current
+ * objective on, which is what this line is. It replaced `TraitTrayHeader`,
+ * whose asymmetric tail meant it could only be stretched rather than sliced,
+ * so a long title distorted the ribbon.
+ *
+ * This one is symmetric and flat through the middle, so it nine slices
+ * properly: 200 off each end keeps the faded caps and stretches only the
+ * centre, and a title of any length sits on the same bar.
+ */
 .picker-label {
   display: block;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto 0.8rem;
-  padding: 0.55rem 2.4rem 0.7rem;
-  background: url('/shell/tray-header.png') center / 100% 100% no-repeat;
+  padding: 0.5rem 2.4rem 0.55rem;
+  border: 0 solid transparent;
+  border-width: 0 3rem;
+  border-image: url('/shell/objective-bar.png') 0 200 fill / 0 3rem stretch;
   font-family: var(--display);
   font-size: 0.95rem;
   letter-spacing: 0.05em;
@@ -2621,11 +2702,31 @@ body::before {
   margin-top: 0.9rem;
 }
 
-/* Portraits fill their circle, because a face wants to be a face. */
+/**
+ * Portraits are whole figures now, so they fit rather than fill.
+ *
+ * This was `cover`, which is right for the `gods/` headshots it was written
+ * for: a cropped face filling a circle reads as a face. Every portrait is the
+ * max-affection gift art now, and those are whole figures whose silhouette is
+ * the thing that identifies them, so filling is the wrong instinct.
+ *
+ * **It changes nothing today and that is fine.** The gift art is 240 square
+ * and the bubble is square, so `cover` and `contain` agree exactly. This is
+ * here so the rule matches the art's intent rather than by coincidence, and so
+ * a future portrait that is not square is fitted rather than cropped.
+ */
 .bubble-slot.is-portrait .bubble img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  /**
+   * 75 percent, down from filling the bubble edge to edge.
+   *
+   * At 100 the gift portraits were the loudest thing on the ring by a wide
+   * margin: a whole lit figure against neighbours that are 60 percent marks on
+   * empty ground. They are categories on a picker, not the subject, and a
+   * quarter off puts them back in scale with what they sit beside.
+   */
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
 }
 
 .bubble-slot.is-portrait .bubble {
@@ -3047,34 +3148,157 @@ body::before {
   text-align: left;
 }
 
+/**
+ * A boon card wears the game's own slot plate, in its rarity's colour.
+ *
+ * `Screens/BoonSelect/BoonSlot_*.png`, shelved as `frames/plate-*.png`. Each
+ * is 1280 by 320 with lit caps and a flat middle, so 150 off each end nine
+ * slices onto a card of any width. The plate carries the colour, which is the
+ * point: this is the game's own green for a duo and orange for a legendary
+ * rather than a palette guess at them.
+ *
+ * `Offer.tsx` sets `data-plate`. The seven URLs are literals here rather than
+ * built in JavaScript, because `prune.ts` refuses asset paths assembled from
+ * template literals: it cannot see them and would delete the files.
+ */
 .offer-card button {
+  position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.6rem 0.8rem 0.7rem;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
+  align-items: center;
+  min-height: 3.6rem;
+  padding: 0.1rem 0.9rem 0.1rem 0.6rem;
+  border: 0 solid transparent;
+  border-width: 0.7rem 2.2rem;
+  border-image: url('/frames/plate-common.png') 80 150 fill / 0.7rem 2.2rem stretch;
+  border-radius: 0;
+  background: none;
   color: var(--bone);
   text-align: left;
   cursor: pointer;
-  transition:
-    border-color var(--t-response) var(--e-response),
-    background var(--t-response) var(--e-response);
 }
 
-.offer-card button:hover,
+.offer-card[data-plate='rare'] button {
+  border-image-source: url('/frames/plate-rare.png');
+}
+.offer-card[data-plate='epic'] button {
+  border-image-source: url('/frames/plate-epic.png');
+}
+.offer-card[data-plate='heroic'] button {
+  border-image-source: url('/frames/plate-heroic.png');
+}
+.offer-card[data-plate='duo'] button {
+  border-image-source: url('/frames/plate-duo.png');
+}
+.offer-card[data-plate='legendary'] button {
+  border-image-source: url('/frames/plate-legendary.png');
+}
+
+/**
+ * Hover: the game's own lit overlay, laid on top rather than swapped in.
+ *
+ * `BoonHighlightOut0001` is 1280 by 320 like the plates, so it lands on one
+ * exactly. Swapping the source would have thrown the rarity colour away, which
+ * is the one thing the plate is carrying, so this goes over it as a second
+ * layer and the colour stays underneath.
+ */
+.offer-card button::before {
+  content: '';
+  position: absolute;
+  inset: -0.7rem -2.2rem;
+  border: 0 solid transparent;
+  border-width: 0.7rem 2.2rem;
+  border-image: url('/frames/plate-highlight.png') 80 150 fill / 0.7rem 2.2rem stretch;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.offer-card button:hover::before,
+.offer-card button:focus-visible::before {
+  opacity: 1;
+}
+
 .offer-card button:focus-visible {
-  border-color: var(--jade-dim);
-  background: var(--ink-850);
   outline: none;
 }
 
+/**
+ * Narrow: the plate keeps its caps but stops eating the line length.
+ *
+ * The caps are 2.2rem of border on each side, which is nothing on a desktop
+ * card and a third of the width on a phone, where it wrapped every boon name
+ * onto two lines. The art tolerates a smaller cap; the text does not tolerate
+ * the larger one.
+ */
+@media (max-width: 34rem) {
+  .offer-card button {
+    border-width: 0.7rem 1.1rem;
+    border-image-slice: 80 150 fill;
+    border-image-width: 0.7rem 1.1rem;
+    padding-left: 0.4rem;
+    padding-right: 0.5rem;
+  }
+
+  .offer-card button::before {
+    inset: -0.7rem -1.1rem;
+    border-width: 0.7rem 1.1rem;
+    border-image-width: 0.7rem 1.1rem;
+  }
+
+  .offer-card.has-cost button::after {
+    left: -0.85rem;
+  }
+
+  .offer-selector {
+    display: none;
+  }
+}
+
+/* The game's own selector, on the card under the cursor and nowhere else. */
+.offer-selector {
+  position: absolute;
+  left: -1.5rem;
+  top: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  transform: translateY(-50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--t-response) var(--e-response),
+    transform var(--t-response) var(--e-response);
+}
+
+.offer-card button:hover .offer-selector,
+.offer-card button:focus-visible .offer-selector {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-card button::before,
+  .offer-selector {
+    transition: none;
+  }
+}
+
 /* A card that would close something wears the mark a station's deaths wear, so
- * the cost reads the same wherever it appears in the product. */
-.offer-card.has-cost button {
-  border-left: 2px solid var(--rim-magenta);
+ * the cost reads the same wherever it appears in the product. It cannot be a
+ * border any more, because the border is the rarity plate now. */
+.offer-card.has-cost button::after {
+  content: '';
+  position: absolute;
+  left: -1.9rem;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--rim-magenta);
+  pointer-events: none;
 }
 
 .offer-mark {
@@ -3099,18 +3323,34 @@ body::before {
   border-radius: var(--r-soft);
 }
 
+/* One row. The card's whole job collapsed is "which boon is this". */
 .offer-body {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  flex: 1;
   min-width: 0;
 }
 
+/* Name and slot on one line, and the name gives way first: a long name
+ * wrapping is what pushed the card off the plate's proportion. */
 .offer-head {
   display: flex;
   align-items: baseline;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.offer-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.offer-slot {
+  flex: none;
+  margin-left: auto;
 }
 
 .offer-name {
@@ -3331,4 +3571,230 @@ body::before {
 .topbar-run {
   margin: 0;
   font-weight: inherit;
+}
+
+/* -------------------------------------------------------------- completes --
+ * What a "Completes X" line is actually talking about.
+ *
+ * The name and the art are always there, because a hover-only reveal says
+ * nothing on a phone and the card is a button, so nothing inside it can take
+ * focus. The game's own sentence is what unfolds, since it is the long part.
+ * ------------------------------------------------------------------------- */
+
+.offer-completes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.offer-completes-one {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.offer-completes-one img {
+  width: 1.15rem;
+  height: 1.15rem;
+  object-fit: contain;
+  border-radius: 3px;
+  flex: none;
+}
+
+.offer-completes-name {
+  font-size: 0.72rem;
+  color: var(--bone);
+}
+
+.offer-completes-text {
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+/**
+ * The detail panel: everything that is not the name.
+ *
+ * Floated on hover, so the card itself stays near the plate's own 4:1 and the
+ * art is not stretched. Absolutely positioned on purpose: a panel that opens
+ * inline in a scrolling list shoves every card below it down, and the cursor
+ * ends up over a different card than the one that opened.
+ */
+.offer-detail {
+  position: absolute;
+  left: 2.6rem;
+  right: 0.4rem;
+  top: calc(100% - 0.5rem);
+  z-index: 12;
+  display: none;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem 0.7rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-soft);
+  background: var(--ink-850);
+  box-shadow: 0 12px 30px -8px var(--ink-950);
+  text-align: left;
+}
+
+.offer-card button:hover .offer-detail,
+.offer-card button:focus-visible .offer-detail {
+  display: flex;
+}
+
+.offer-completes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.offer-completes-one {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.offer-completes-one img {
+  width: 1.3rem;
+  height: 1.3rem;
+  object-fit: contain;
+  border-radius: 3px;
+  flex: none;
+}
+
+.offer-completes-name {
+  font-size: 0.75rem;
+  color: var(--bone);
+}
+
+.offer-completes-text {
+  flex: 1 1 100%;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+/**
+ * Touch: no hover to open a panel with, so the game's own sentence goes back
+ * on the card and nothing else does.
+ *
+ * That is the "less text" half of the same note. Our judgement, the
+ * completions and the cost are all still computed and all still reachable on a
+ * pointer; on a phone the card is a name, a slot and what the game says.
+ */
+@media (hover: none) {
+  /* The card has to wrap, or the panel becomes a third column in the row and
+   * squeezes the name to nothing. It went out entirely: `text-overflow` had a
+   * few pixels to work with and ellipsed the whole thing away. */
+  .offer-card button {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .offer-detail {
+    position: static;
+    display: flex;
+    flex: 1 1 100%;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .offer-detail .offer-say,
+  .offer-detail .offer-completes,
+  .offer-detail .offer-closes {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------- another god -- */
+
+/**
+ * The gods this run had stopped offering.
+ *
+ * Shut by default because the filtered ring is right nearly always, and a
+ * disclosure rather than a second ring because opening it is the rare case.
+ */
+.picker-more-gods {
+  margin-top: 0.9rem;
+  width: 100%;
+  max-width: 26rem;
+}
+
+.picker-more-gods summary {
+  cursor: pointer;
+  font-family: var(--body);
+  font-size: 0.8rem;
+  color: var(--bone-faint);
+  text-align: center;
+}
+
+.picker-more-gods summary:hover {
+  color: var(--bone-dim);
+}
+
+.picker-more-gods p {
+  margin: 0.5rem 0 0.6rem;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--bone-faint);
+  text-align: center;
+}
+
+.picker-more-gods-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.picker-more-gods-list button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem 0.25rem 0.3rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-850);
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.picker-more-gods-list button:hover {
+  border-color: var(--jade-dim);
+  color: var(--bone);
+}
+
+.picker-more-gods-list img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+}
+
+/* A mark beside a menu entry, for the one or two that read faster as a picture.
+ * `Shell/LocationZagreus` is what the game puts on the death screen. */
+.menu-entry-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  object-fit: contain;
+  margin-right: 0.4rem;
+  vertical-align: -0.2rem;
+}
+
+/* A character's name inside a step title, in the game's own name face. */
+.picker-label-name {
+  font-family: var(--name);
+  margin: 0 0.35rem;
+  letter-spacing: 0.02em;
 }

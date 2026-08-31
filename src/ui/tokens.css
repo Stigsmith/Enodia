@@ -70,10 +70,46 @@
    * ------------------------------------------------------------- */
   --unbuilt: #e5c33c;
 
-  /* TYPE. Cinzel and Spectral are lookalikes, not the game's own fonts. */
-  --display: "Cinzel", "Trajan Pro", Georgia, serif;
-  --body: "Spectral", Georgia, "Times New Roman", serif;
-  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* ---------------------------------------------------------------
+   * TYPE. The game's own, and where each one comes from.
+   *
+   * `Content/Fonts/bin/en` names the compiled faces and
+   * `Content/Game/Fonts.sjson` maps every role to one. Four typefaces carry
+   * the whole game, and three of them are on Google Fonts:
+   *
+   *   Lato                  body text, 66 uses in the Lua
+   *   Spectral SC           presentation titles and subtitles
+   *   Caesar Dressing       character names. THREE uses: the dialogue speaker
+   *                         nameplate and the boss health bar
+   *   Inconsolata Bold      the monospace. Shipped raw at
+   *                         Content/Fonts/ttf/Inconsolata-Bold.ttf, which is
+   *                         how it was identified
+   *
+   *   P22 Underground SC    the bulk of UI headings, 17 uses. COMMERCIAL, and
+   *                         the one face here that cannot be had
+   *
+   * **Cinzel is gone.** It stood in for P22 Underground SC and it was a poor
+   * stand-in: Cinzel is a Trajan Roman capital, P22 Underground SC is a
+   * geometric sans in small caps, and they share nothing but being old. Those
+   * headings use Spectral SC instead, which is a real game font doing a
+   * neighbouring job rather than a lookalike doing this one badly.
+   * ------------------------------------------------------------- */
+  --display: "Spectral SC", "Optima", Georgia, serif;
+  --body: "Lato", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "Inconsolata", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /**
+   * A character's own name, and only that.
+   *
+   * The game is strict with Caesar Dressing: a speaker nameplate and a boss
+   * bar, both proper nouns of people. Used for headings it would be a costume,
+   * which is the gimmick worth avoiding. Used where the game uses it, it is
+   * the game.
+   *
+   * The Nocturnal Arms count. `CLAUDE.md`: they are characters, not equipment,
+   * which is why Descura gets this and "Witch's Staff" does not.
+   */
+  --name: "Caesar Dressing", "Spectral SC", Georgia, serif;
 
   /* RADII. Mixed on purpose: the game pairs hand-drawn circles for boons
    * with heavily rounded card frames and flat text strips. */

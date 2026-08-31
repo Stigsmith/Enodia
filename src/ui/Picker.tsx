@@ -52,7 +52,7 @@ const KINDS: (RadialItem & { id: Kind; note: string })[] = [
   {
     id: 'other',
     name: 'Not an Olympian',
-    icon: 'gods/hermes.webp',
+    icon: 'gifts/hermes-gift.png',
     art: 'portrait',
     note: 'Hermes or Selene. Neither counts against the cap',
   },
@@ -68,14 +68,14 @@ const KINDS: (RadialItem & { id: Kind; note: string })[] = [
   {
     id: 'encounter',
     name: 'An Encounter',
-    icon: 'gods/artemis.webp',
+    icon: 'gifts/artemis-gift.png',
     art: 'portrait',
     note: 'Not an Exit at all, and costs no slot',
   },
   {
     id: 'shop',
     name: "Charon's shop",
-    icon: 'characters/charon.webp',
+    icon: 'gifts/charon-gift.png',
     art: 'portrait',
     note: 'An Exit like any other. What you bought is what counts',
   },
@@ -88,9 +88,10 @@ const KINDS: (RadialItem & { id: Kind; note: string })[] = [
     icon: 'icons/story.png',
     art: 'icon',
     // Its art fills 42 percent of its own canvas, against 90 for the Chaos
-    // gate beside it, so at the same width it renders half the size.
-    scale: 1.5,
-    note: 'Echo, Medea and the rest. Costs an Exit, and what it gives is theirs to decide',
+    // gate beside it, so at the same width it renders half the size. 1.5 was
+    // still reading small next to the marks around it, so it is a notch up.
+    scale: 1.62,
+    note: 'Medea on the Surface, Echo below. Costs an Exit, and what it gives is theirs',
   },
   {
     id: 'artifact',
@@ -119,7 +120,7 @@ export function Picker({
 }: {
   run: RunContext
   onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
-  onSkip: (god: string | null, kind: RunEntry['kind']) => void
+  onSkip: (god: string | null, kind: RunEntry['kind'], note?: string) => void
 }) {
   const [kind, setKind] = useState<Kind | null>(null)
   // An Encounter happens inside a Location the player already reached, so it
@@ -180,20 +181,32 @@ export function Picker({
     return []
   }
 
+  /**
+   * What this source can still hand over, **in the game's own order**.
+   *
+   * This used to sort alphabetically, and a tester read that as no order at
+   * all. It was worse than unordered: a god's list opens with its five core
+   * boons in the game's own Attack, Special, Cast, Sprint, Magick sequence, and
+   * the alphabet shuffled them into the middle of twenty others. The duos went
+   * with them, which is most likely why the same tester reported seeing no duo
+   * boons: they were there, scattered.
+   *
+   * `source.traits` is already right. `build-app-data.ts` writes it as
+   * `[...priority, ...pool]`, which is `LootData`'s own order, so the fix is to
+   * stop reordering it.
+   */
   const offerable = (from: RewardSource) =>
-    from.traits
-      .filter((id) => {
-        const trait = traits.get(id)
-        if (!trait || held.has(id)) return false
-        if (!satisfiesRequirement(trait.requires, held)) return false
-        return canBeOffered(id, run.held, traits).route === 'offer'
-      })
-      .sort((a, b) => (traits.get(a)?.name ?? '').localeCompare(traits.get(b)?.name ?? ''))
+    from.traits.filter((id) => {
+      const trait = traits.get(id)
+      if (!trait || held.has(id)) return false
+      if (!satisfiesRequirement(trait.requires, held)) return false
+      return canBeOffered(id, run.held, traits).route === 'offer'
+    })
 
   // Step 1. What kind of thing did this Exit hand over.
   if (!kind) {
     return (
-      <PickerStep label="What did this Exit give">
+      <PickerStep label="What did this Exit give" bare>
         <Radial
           label="What did this Exit give"
           variant="portraits"
@@ -223,13 +236,19 @@ export function Picker({
    * A Story Exit ends the step where it starts.
    *
    * `ChosenRewardType == "Story"` is its own reward type, and what is behind
-   * one is a scene rather than a loot table: Medea can be worth a great deal
-   * and the files do not say so anywhere this project could read. It costs an
-   * Exit, which is the part that matters to the engine, and the rest is the
-   * player's to remember.
+   * one is a scene rather than a loot table. **They are not interchangeable
+   * and they are not path-agnostic**: the owner reports Medea on the Surface
+   * and Echo in the Underworld, and Medea's upgrades can be significant rather
+   * than flavour, so a Story Exit is not always "nothing that changes what is
+   * reachable".
+   *
+   * It still ends here, because the thing it gives is not in any file this
+   * project reads and guessing at it would put a made-up pick in the run. It
+   * costs an Exit, which is the part the engine needs, and it now says which
+   * Exit it was rather than logging as a blank.
    */
   if (kind === 'story') {
-    onSkip(null, 'exit')
+    onSkip(null, 'exit', run.path === 'surface' ? 'A Story Exit, Medea' : 'A Story Exit, Echo')
     reset()
     return null
   }
@@ -237,14 +256,16 @@ export function Picker({
   // The artifacts end the step early: none of them changes what is reachable.
   if (kind === 'artifact') {
     return (
-      <PickerStep label="Something else" onBack={reset}>
+      <PickerStep label="Something else" bare onBack={reset}>
         <Radial
           label="Something else"
           variant="portraits"
           items={ARTIFACTS}
           chosen={null}
-          onChoose={() => {
-            onSkip(null, 'exit')
+          onChoose={(id) => {
+            // Name it. "Nothing that changes what is reachable" is true and is
+            // not what a player wants to read back a week later.
+            onSkip(null, 'exit', ARTIFACTS.find((one) => one.id === id)?.name)
             reset()
           }}
         />
@@ -255,8 +276,23 @@ export function Picker({
   // Step 2. Who gave it.
   if (!source) {
     const list = sourcesFor(kind)
+    /**
+     * Every Olympian, not just the ones still open.
+     *
+     * `eligibleGods` hides gods a run can no longer be offered, which is right
+     * for planning and wrong for logging: the owner had Hermes hand over a
+     * random Hephaestus boon while three slots were spent and a keepsake was
+     * pointed at Hestia. That happened, the tool has to be able to record it,
+     * and the filtered ring could not.
+     *
+     * So the filtered ring stays the default, because it is right nearly
+     * always, and this opens the rest rather than replacing them.
+     */
+    const everyGod = sources.filter(
+      (entry) => entry.kind === 'olympian' && !list.some((shown) => shown.id === entry.id),
+    )
     return (
-      <PickerStep label="Who gave it" onBack={reset}>
+      <PickerStep label="Who gave it" bare onBack={reset}>
         <Radial
           label="Who gave it"
           variant="portraits"
@@ -270,14 +306,57 @@ export function Picker({
           chosen={null}
           onChoose={(id) => setSource(list.find((entry) => entry.id === id) ?? null)}
         />
+        {/**
+          * Also on Hermes and on the shop, which is where a delivery comes
+          * from. A Hermes delivery hands over another god's boon, and the
+          * owner's example is exactly that: Hephaestus arriving from Hermes
+          * with three Olympian slots already spent. The boon is the boon and it
+          * still spends a slot, so it is logged under the god who owns it, and
+          * this is the way to reach that god when the run had stopped offering
+          * them.
+          */}
+        {(kind === 'boon' || kind === 'other' || kind === 'shop') && everyGod.length ? (
+          <details className="picker-more-gods">
+            <summary>Another god</summary>
+            <p>
+              A reward can name a god this run had stopped offering. Hermes hands out random
+              boons, and a Shop or an Encounter can too.
+            </p>
+            <div className="picker-more-gods-list">
+              {everyGod.map((entry) => (
+                <button key={entry.id} type="button" onClick={() => setSource(entry)}>
+                  {entry.icon ? <img src={`/${entry.icon}`} alt="" loading="lazy" /> : null}
+                  {entry.name}
+                </button>
+              ))}
+            </div>
+          </details>
+        ) : null}
       </PickerStep>
     )
   }
 
   // Step 3. Which one, ranked.
   const options = offerable(source)
+
+  /**
+   * A Daedalus Hammer is always Common, so it is not asked.
+   *
+   * `LootData.WeaponUpgrade` states `ForceCommon = true`, and
+   * `RoomLogic.IsRarityForcedCommon` returns true for `WeaponUpgrade` before it
+   * consults anything else. `StackUpgrade`, the Poms, is the only other one,
+   * and that is logged under "Something else" rather than here.
+   *
+   * So the stepper was asking a question with one answer. **Everything else
+   * keeps it**: the same function falls through to `BoonData`, which is
+   * `ForceCommon = false` with real `RarityChances`, and that covers the gods,
+   * Hermes, Selene and Chaos alike.
+   */
+  const rarityVaries = source.kind !== 'hammer'
+
   return (
-    <PickerStep label={`What ${source.name} gave`} onBack={reset}>
+    <PickerStep name={source.name} onBack={reset}>
+      {rarityVaries ? (
       <div className="rarity-step" role="group" aria-label="Rarity, optional">
         <button
           type="button"
@@ -302,6 +381,7 @@ export function Picker({
           +
         </button>
       </div>
+      ) : null}
 
       {/* Build order step 11. The list is ranked and each card carries one
           sentence about this run, from engine/offer.ts. */}
@@ -316,32 +396,65 @@ export function Picker({
         }}
       />
 
-      <button
-        type="button"
-        className="quiet"
-        onClick={() => {
-          onSkip(source.kind === 'olympian' ? source.id : null, where(kind))
-          reset()
-        }}
-      >
-        Took nothing from {source.name}
-      </button>
+      {/**
+        * "Took nothing from Daedalus Hammer" is not a thing that happens.
+        *
+        * A hammer forces a choice: you interact with it and take one of the
+        * three. The owner reports it is not declinable and nothing in
+        * `LootData.WeaponUpgrade` offers a reject, so the option is not shown
+        * for one. **This rests on the owner's play rather than on a citation**,
+        * which is a weaker footing than the rest of this file and is why it is
+        * written down. A hammer Exit you walked past is a different Exit, not a
+        * hammer you declined.
+        */}
+      {source.kind !== 'hammer' ? (
+        <button
+          type="button"
+          className="quiet"
+          onClick={() => {
+            onSkip(source.kind === 'olympian' ? source.id : null, where(kind))
+            reset()
+          }}
+        >
+          Took nothing from {source.name}
+        </button>
+      ) : null}
     </PickerStep>
   )
 }
 
 function PickerStep({
   label,
+  name,
+  bare = false,
   onBack,
   children,
 }: {
-  label: string
+  label?: string
+  /** a character's own name, which gets the game's name face */
+  name?: string
+  /**
+   * No plate, and the heading only for a screen reader.
+   *
+   * **A radial says its own name.** `Radial` carries a live caption under the
+   * ring that reads the hovered item, or the ring's label when nothing is
+   * hovered, so a bar above it was the same sentence twice. It was also the
+   * sentence that kept overflowing the plate, because "What did this Exit
+   * give" is long and a title bar is a fixed shape.
+   *
+   * The heading stays in the document. Dropping it outright would leave the
+   * step with no accessible name at all.
+   */
+  bare?: boolean
   onBack?: () => void
   children: React.ReactNode
 }) {
+  const heading = name ?? label ?? ''
   return (
     <div className="picker-step">
-      <h2 className="picker-label">{label}</h2>
+      <h2 className={bare ? 'visually-hidden' : 'picker-label'}>
+        {bare || !name ? heading : <span className="picker-label-name">{name}</span>}
+      </h2>
       {children}
       {onBack ? (
         <button type="button" className="quiet picker-back" onClick={onBack}>

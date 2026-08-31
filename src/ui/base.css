@@ -44,9 +44,10 @@ body {
   overscroll-behavior: contain;
 }
 
+/* Enodia is a name, and the game's name face is what names get. */
 .wordmark {
   margin: 0;
-  font-family: var(--display);
+  font-family: var(--name);
   font-weight: 600;
   font-size: clamp(2rem, 8vw, 3rem);
   letter-spacing: 0.06em;

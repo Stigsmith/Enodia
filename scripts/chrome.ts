@@ -64,6 +64,34 @@ type Pick = {
  * organises a package.
  */
 const PICKS: Pick[] = [
+  // The boon slot plates are already here as frames/plate-*.png, one per
+  // rarity. This is the lit overlay the game draws on the hovered one, and it
+  // is 1280x320 like the plates, so it lands on them exactly.
+  {
+    from: 'Screens/BoonSelect/BoonHighlightOut/BoonHighlightOut0001.png',
+    to: 'frames/plate-highlight.png',
+    note: 'the lit overlay on a hovered boon slot, same 1280x320 as the plates',
+  },
+
+  // The HUD's objective bar, for the picker's own step titles.
+  {
+    from: 'HUD/ObjectiveBG.png',
+    to: 'shell/objective-bar.png',
+    note: 'title bar, 1280x88. "What did this Exit give"',
+  },
+
+  // The save slot, which is the game's own card, for the build manager.
+  {
+    from: 'Screens/SaveProfileSlot.png',
+    to: 'shell/slot-card.png',
+    note: 'card backing, 425x630 portrait. One build in the build manager',
+  },
+  {
+    from: 'Screens/SaveProfileSlotHighlight.png',
+    to: 'shell/slot-card-highlight.png',
+    note: 'the same card, lit, for hover',
+  },
+
   // Panels, large enough to hold a paragraph.
   { from: 'Shell/background_confirm.png', to: 'shell/box-confirm.png', note: 'large textbox, 1287x794' },
   { from: 'Shell/Box_Pause.png', to: 'shell/box-pause.png', note: 'large textbox, 1173x1063' },

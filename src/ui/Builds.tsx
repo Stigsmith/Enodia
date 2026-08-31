@@ -1,112 +1,140 @@
 /**
- * The build manager, and five arguments about how to draw one.
+ * The build manager. A library you browse, and one build you open.
  *
- * `ROADMAP.md` had this behind the run companion. It is in front of it now, on
- * the owner's reading: a player with 300 hours does not need to be told what an
- * Exit costs them, they need somewhere to go for "what shall I try this run"
- * and "what am I not playing". Both of those are answered by looking at builds,
- * not by logging one.
+ * The five-layout switcher did its job and is gone. What came out of it:
  *
- * **This screen is a question, not an answer.** The crux the owner named is
- * visual: a full loadout is eighteen items across six categories, and every
- * obvious way to draw it is either cluttered or a spreadsheet. So rather than
- * pick one and defend it, all five are here behind a switcher, each built to
- * its own philosophy and each honest about what it gives up. The switcher goes
- * once a direction is chosen, and four of these files go with it.
+ * - **Overview: the contact sheet**, shrunk. Uniform cards in a grid, the five
+ *   core slots in fixed positions so a column scan compares one slot across
+ *   every build. It lost the Arcana strip and the crossroads band, because a
+ *   card that shows a whole build is a card you can only fit two of.
+ * - **Detail: the Poster or the Constellation**, whichever the reader set in
+ *   Settings. Both were kept because they answer different questions and the
+ *   answer is a habit, not a per-build decision.
+ * - **Loadout and Ribbon are deleted.** Both are in the history. The Ribbon had
+ *   one idea worth stealing later: it marked which picks were actual
+ *   prerequisites of the centrepiece rather than preferences, which nothing
+ *   currently shows.
  *
- * The five, and what each one is for:
+ * ## Built for dozens
  *
- * | Variant | Approach | Answers |
- * |---|---|---|
- * | Loadout | mimic the game's own tray | recognition |
- * | Poster | editorial, one build as a page | what shall I try |
- * | Constellation | fixed positions, shape at a glance | where are my gaps |
- * | Ribbon | an ordered plan, not an inventory | what do I take now |
- * | Contact | uniform tiles, several at once | which is different |
- *
- * Each variant's own file argues its case at the top, including what it is bad
- * at. Read those before choosing.
+ * The library is going to hold tested community builds and then community
+ * submissions. So the overview filters and sorts rather than just listing, the
+ * facets are derived so nothing has to be maintained alongside the data, and a
+ * build carries `by` so a reader can tell a tested build from an uploaded one.
+ * At eight builds most of that is invisible, which is the point of doing it now
+ * rather than at eighty.
  */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import { FIRST_BUILD, SAMPLE_BUILDS } from '../data/builds.ts'
+import { SAMPLE_BUILDS } from '../data/builds.ts'
+import type { ShownBuild } from '../data/builds.ts'
+import { deleteBuild, loadBuilds, saveBuild } from '../state/builds.ts'
+import { loadPrefs } from '../state/prefs.ts'
+import { BuildEditor } from './BuildEditor.tsx'
+import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
 import type { Piece } from './build-pieces.ts'
-import { Contact } from './variants/Contact.tsx'
+import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
+import type { FacetId, SortId } from './build-filter.ts'
+import { Card } from './variants/Card.tsx'
 import { Constellation } from './variants/Constellation.tsx'
-import { Loadout } from './variants/Loadout.tsx'
 import { Poster } from './variants/Poster.tsx'
-import { Ribbon } from './variants/Ribbon.tsx'
-
-type VariantId = 'loadout' | 'poster' | 'constel' | 'ribbon' | 'contact'
-
-type Variant = {
-  id: VariantId
-  name: string
-  approach: string
-  gives: string
-  multi: boolean
-}
-
-/**
- * A non-empty list, stated as one.
- *
- * `noUncheckedIndexedAccess` is on, so `VARIANTS[0]` is `Variant | undefined`
- * and every use of it needs a guard for a case that cannot happen. Naming the
- * first element separately says the same thing to the compiler once.
- */
-const FIRST_VARIANT: Variant = {
-  id: 'loadout',
-  name: 'Loadout',
-  approach: "The game's own tray. Slots down the side, everything else in a labelled drawer.",
-  gives: 'No character. Three builds in it look alike.',
-  multi: false,
-}
-
-const VARIANTS: Variant[] = [
-  FIRST_VARIANT,
-  {
-    id: 'poster',
-    name: 'Poster',
-    approach: 'One build as a page. The art at the size it deserves, everything else demoted.',
-    gives: 'One at a time, and a scroll on a phone.',
-    multi: false,
-  },
-  {
-    id: 'constel',
-    name: 'Constellation',
-    approach: 'Five fixed positions round the arm. A dark spoke is a gap you see before you read anything.',
-    gives: 'Names. It leans on the art to identify things.',
-    multi: false,
-  },
-  {
-    id: 'ribbon',
-    name: 'Ribbon',
-    approach: 'Not an inventory. An order: what is locked in, what to fill first, what it is all for.',
-    gives: "The whole. You cannot see a build's shape in it.",
-    multi: false,
-  },
-  {
-    id: 'contact',
-    name: 'Contact sheet',
-    approach: 'Uniform tiles, same band in the same place. Built so several builds can be compared.',
-    gives: 'Everything else. Nothing in it is emphasised.',
-    multi: true,
-  },
-]
 
 export function Builds({ onClose }: { onClose?: () => void }) {
-  const [variant, setVariant] = useState<VariantId>('poster')
-  const [buildId, setBuildId] = useState(FIRST_BUILD.id)
-  const [open, setOpen] = useState<Piece | null>(null)
+  const [selection, setSelection] = useState(EMPTY_SELECTION)
+  const [sort, setSort] = useState<SortId>('name')
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [piece, setPiece] = useState<Piece | null>(null)
 
-  const chosen = VARIANTS.find((entry) => entry.id === variant) ?? FIRST_VARIANT
-  const build = SAMPLE_BUILDS.find((entry) => entry.id === buildId) ?? FIRST_BUILD
-  const built = assemble(build)
+  /**
+   * The player's own builds, beside the samples.
+   *
+   * Held in state rather than read on every render, so a save shows up
+   * immediately. They keep their `by: 'owner'`, which is what lets the card and
+   * the detail view say which kind of build is being looked at.
+   */
+  const [mine, setMine] = useState<ShownBuild[]>(loadBuilds)
+  const [editing, setEditing] = useState<ShownBuild | 'new' | null>(null)
+
+  const library = useMemo(() => [...mine, ...SAMPLE_BUILDS], [mine])
+
+  /**
+   * The detail layout, read once when the screen mounts.
+   *
+   * Not live: changing it in Settings closes the menu and the reader comes back
+   * to this screen, which remounts. Subscribing to storage for a setting that
+   * cannot change while this is on screen would be machinery for nothing.
+   */
+  const [detail] = useState(() => loadPrefs().buildDetail)
+
+  const bar = useMemo(() => facets(library, selection), [library, selection])
+  const shown = useMemo(
+    () => sortBuilds(apply(library, selection), sort),
+    [library, selection, sort],
+  )
+
+  const open = openId ? library.find((build) => build.id === openId) : null
+
+  if (editing) {
+    return (
+      <BuildEditor
+        {...(editing === 'new' ? {} : { initial: editing })}
+        onSave={(build) => {
+          setMine(saveBuild(build))
+          setEditing(null)
+          setOpenId(build.id)
+        }}
+        onCancel={() => setEditing(null)}
+        onDelete={(id) => {
+          setMine(deleteBuild(id))
+          setEditing(null)
+          setOpenId(null)
+        }}
+      />
+    )
+  }
+
+  if (open) {
+    const built = assemble(open)
+    return (
+      <div className="builds is-detail">
+        <header className="builds-top">
+          <button type="button" className="builds-back" onClick={() => setOpenId(null)}>
+            All builds
+          </button>
+          {open.by === 'sample' ? <SampleTag /> : null}
+          {open.by === 'owner' ? (
+            <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
+              Edit
+            </button>
+          ) : null}
+        </header>
+
+        <div className="builds-stage">
+          {detail === 'constellation' ? (
+            <Constellation built={built} onOpen={setPiece} />
+          ) : (
+            <Poster built={built} onOpen={setPiece} />
+          )}
+
+          {/* How it works, which is the thing a reader opened a build for.
+            * Under the layout rather than over it: the picture says what is in
+            * the build faster than a paragraph can, and the paragraph says the
+            * one thing the picture cannot. */}
+          <section className="builds-how" aria-label="How it works">
+            <h3>How it works</h3>
+            <p>{open.how}</p>
+          </section>
+        </div>
+
+        {piece ? <PieceCard piece={piece} onClose={() => setPiece(null)} /> : null}
+      </div>
+    )
+  }
 
   return (
-    <div className="builds" data-variant={variant}>
+    <div className="builds">
       <header className="builds-top">
         {onClose ? (
           <button type="button" className="builds-back" onClick={onClose}>
@@ -114,82 +142,65 @@ export function Builds({ onClose }: { onClose?: () => void }) {
           </button>
         ) : null}
         <h2>Builds</h2>
-        <p className="builds-note">
-          Five ways of drawing the same build. Pick the one that reads best and the other four go.
-        </p>
+        <p className="builds-note">Pick an arm, or open one to see how it works.</p>
+        <button type="button" className="quiet builds-new" onClick={() => setEditing('new')}>
+          Create a build
+        </button>
       </header>
 
-      <nav className="builds-variants" aria-label="Layout to try">
-        {VARIANTS.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            className={`builds-variant${entry.id === variant ? ' is-on' : ''}`}
-            aria-pressed={entry.id === variant}
-            onClick={() => setVariant(entry.id)}
-          >
-            {entry.name}
-          </button>
-        ))}
-      </nav>
+      <BuildFilters
+        facets={bar}
+        onChoose={(facet: FacetId, value: string | null) =>
+          setSelection((was) => choose(was, facet, value))
+        }
+        onClear={() => setSelection(EMPTY_SELECTION)}
+        sort={sort}
+        onSort={setSort}
+        showing={shown.length}
+        total={library.length}
+      />
 
-      <p className="builds-approach">
-        <span className="builds-approach-for">{chosen.approach}</span>
-        <span className="builds-approach-against">Gives up: {chosen.gives}</span>
-      </p>
-
-      {/* The contact sheet is the one variant whose whole argument is several
-       * builds at once, so it gets all of them and no build picker. */}
-      {chosen.multi ? null : (
-        <nav className="builds-picker" aria-label="Build">
-          {SAMPLE_BUILDS.map((entry) => (
-            <button
-              key={entry.id}
-              type="button"
-              className={`builds-pick${entry.id === buildId ? ' is-on' : ''}`}
-              aria-pressed={entry.id === buildId}
-              onClick={() => setBuildId(entry.id)}
-            >
-              {entry.name}
-            </button>
+      {shown.length ? (
+        <ul className="builds-grid">
+          {shown.map((build) => (
+            <Card key={build.id} built={assemble(build)} onOpen={setOpenId} />
           ))}
-        </nav>
+        </ul>
+      ) : (
+        <p className="builds-none">
+          Nothing matches all of those. Drop a filter, or clear them and start again.
+        </p>
       )}
 
-      <div className="builds-stage">
-        {variant === 'loadout' ? <Loadout built={built} onOpen={setOpen} /> : null}
-        {variant === 'poster' ? <Poster built={built} onOpen={setOpen} /> : null}
-        {variant === 'constel' ? <Constellation built={built} onOpen={setOpen} /> : null}
-        {variant === 'ribbon' ? <Ribbon built={built} onOpen={setOpen} /> : null}
-        {variant === 'contact' ? (
-          <div className="builds-sheet">
-            {SAMPLE_BUILDS.map((entry) => (
-              <Contact key={entry.id} built={assemble(entry)} onOpen={setOpen} compact />
-            ))}
-          </div>
-        ) : null}
-      </div>
-
-      {/* Sample data says so, plainly and every time it is on screen.
-       * `data/curated/builds.json` is the owner's and is still empty; nothing
-       * here is a recommendation and the page must not be mistaken for one. */}
-      <p className="builds-disclaimer">
-        These three are samples, built to test the layouts. Every id in them is real and every duo actually
-        holds its prerequisites, but which build is worth playing is not in any game file and is not claimed
-        here.
-      </p>
-
-      {open ? <PieceCard piece={open} onClose={() => setOpen(null)} /> : null}
+      <SampleTag full />
     </div>
+  )
+}
+
+/**
+ * Sample data says so, plainly, wherever it is on screen.
+ *
+ * `data/curated/builds.json` is the owner's and is still empty. Nothing here is
+ * a recommendation and the page must not be mistaken for one, which matters
+ * more now that there are eight of them and they look like a library.
+ */
+function SampleTag({ full = false }: { full?: boolean }) {
+  if (!full) return <p className="builds-sample">Sample build</p>
+  return (
+    <p className="builds-disclaimer">
+      These eight are samples, built to test the layouts. Every id in them is real, every duo
+      actually holds its prerequisites, and each explanation restates something the game files
+      say. Which build is worth playing is not in any file and is not claimed here.
+    </p>
   )
 }
 
 /**
  * One piece, opened.
  *
- * Every layout hands clicks here rather than growing its own detail view,
- * because what a boon does is the same fact in all five and the layouts are
- * meant to differ only in arrangement.
+ * Both detail layouts hand clicks here rather than growing their own, because
+ * what a boon does is the same fact in both and they are meant to differ only
+ * in arrangement.
  */
 function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
   return (
@@ -205,11 +216,7 @@ function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
             </p>
           </div>
         </header>
-        {piece.text ? (
-          <p className="piececard-text">{piece.text}</p>
-        ) : (
-          <p className="piececard-gap">No text.</p>
-        )}
+        {piece.text ? <p className="piececard-text">{piece.text}</p> : <p className="piececard-gap">No text.</p>}
         <button type="button" onClick={onClose}>
           Close
         </button>

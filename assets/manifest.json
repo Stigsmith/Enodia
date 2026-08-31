@@ -1,10 +1,10 @@
 {
- "generated": "2026-08-29",
+ "generated": "2026-08-30",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 933,
+ "count": 937,
  "categories": [
   {
    "name": "arcana",
@@ -61,7 +61,7 @@
   },
   {
    "name": "frames",
-   "count": 27,
+   "count": 28,
    "source": "game"
   },
   {
@@ -113,7 +113,7 @@
   },
   {
    "name": "shell",
-   "count": 96,
+   "count": 99,
    "source": "game"
   },
   {
@@ -4884,6 +4884,14 @@
    "source": "game"
   },
   {
+   "id": "plate-highlight",
+   "category": "frames",
+   "file": "frames/plate-highlight.png",
+   "bytes": 106690,
+   "sha256": "35d73a1b5dee9aa6d89d2cab5605b1e6b9e814cca6065c460719057b00a42509",
+   "source": "game"
+  },
+  {
    "id": "plate-legendary",
    "category": "frames",
    "file": "frames/plate-legendary.png",
@@ -7851,6 +7859,14 @@
    "source": "game"
   },
   {
+   "id": "objective-bar",
+   "category": "shell",
+   "file": "shell/objective-bar.png",
+   "bytes": 5898,
+   "sha256": "262913fa3c5b6482d5cfc5419049d9b6703afef4752403c53700513696b89bdf",
+   "source": "game"
+  },
+  {
    "id": "optionselectoricon",
    "category": "shell",
    "file": "shell/optionselectoricon.png",
@@ -8048,6 +8064,22 @@
    "file": "shell/sidebars.png",
    "bytes": 49311,
    "sha256": "75b6f072e73caea9c716387bbe106c89fc9ae2943ad56ef22a22fea8ada28b53",
+   "source": "game"
+  },
+  {
+   "id": "slot-card-highlight",
+   "category": "shell",
+   "file": "shell/slot-card-highlight.png",
+   "bytes": 112266,
+   "sha256": "8c2cdff3b0d05c5c5429a3b32a3a84b8bc4523ac6bef7c80d9390f6ef77a66eb",
+   "source": "game"
+  },
+  {
+   "id": "slot-card",
+   "category": "shell",
+   "file": "shell/slot-card.png",
+   "bytes": 41453,
+   "sha256": "cc8b18689874d49ea8ce4e0162785a076314377daf5cf358dc80ba9c11e2aecc",
    "source": "game"
   },
   {

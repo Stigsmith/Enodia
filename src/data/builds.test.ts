@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { arcana, familiars, traits, weapons } from './app.ts'
+import { arcana, familiars, olympians, traits, weapons } from './app.ts'
 import { SAMPLE_BUILDS } from './builds.ts'
 import { CORE_SLOTS } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
@@ -55,13 +55,14 @@ describe('the sample builds', () => {
   })
 
   it.each(SAMPLE_BUILDS)('$name stays inside the four Olympian slots', (build) => {
+    // The roster on a run is the nine that carry GodLoot, which the bundle
+    // states. Naming the ones that do not count meant writing god names as
+    // literals, which is what DESIGN.md 3.1 forbids.
+    const roster = new Set<string>(olympians)
     const olympian = new Set<string>()
     for (const id of build.boons) {
       for (const god of traits.get(id)?.gods ?? []) {
-        // Hermes, Selene and Chaos carry no GodLoot, so they never count. The
-        // roster on a run is the nine Olympians.
-        if (['Hermes', 'Selene', 'Chaos'].includes(god)) continue
-        olympian.add(god)
+        if (roster.has(god)) olympian.add(god)
       }
     }
     expect(olympian.size, `gods: ${[...olympian].join(', ')}`).toBeLessThanOrEqual(4)

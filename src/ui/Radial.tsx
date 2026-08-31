@@ -107,7 +107,25 @@ export function Radial({
             {centre.icon ? <img src={`/${centre.icon}`} alt="" /> : null}
             <span>{centre.name}</span>
           </div>
-        ) : null}
+        ) : (
+          /**
+           * The middle, before anything has been chosen.
+           *
+           * `GUI/Icons/LoadingSymbol_01`, the game's own. The ring is a circle
+           * of things with a hole in it, and the hole read as an oversight
+           * rather than as a space; on the weapon picker it is the largest
+           * empty area on the first screen a player ever sees.
+           *
+           * **It does not spin.** The game uses it as a spinner and the owner
+           * has already cut one rotating mark from this exact spot for reading
+           * as a logo. Here it is a still centrepiece that the chosen item
+           * replaces, which is why it is aria-hidden: it says nothing a screen
+           * reader needs, and the ring's own label already says what this is.
+           */
+          <div className="radial-centre is-waiting" aria-hidden="true">
+            <img src="/icons/loading.png" alt="" />
+          </div>
+        )}
 
         <ul className="radial-ring" style={{ '--count': items.length } as React.CSSProperties}>
         {items.map((item, index) => (

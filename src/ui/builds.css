@@ -58,7 +58,7 @@
 }
 
 /* -------------------------------------------------------------------------
- * The chrome round the five: title, switcher, build picker, the honest note.
+ * The chrome: title, filter bar, the grid, the honest note.
  * ---------------------------------------------------------------------- */
 
 .builds-top {
@@ -68,9 +68,18 @@
   flex-wrap: wrap;
 }
 
+/**
+ * A page header in the game's character-name face.
+ *
+ * The owner's call, made after hearing the argument against it: the game uses
+ * Caesar Dressing for proper nouns of people and nothing else, so a header in
+ * it is a use the game never makes. It is one word at the top of one screen,
+ * which is a long way from the wall of it that would read as costume.
+ */
 .builds-top h2 {
   margin: 0;
-  font-family: var(--display);
+  font-family: var(--name);
+  letter-spacing: 0.04em;
   font-size: clamp(1.35rem, 4vw, 1.9rem);
   letter-spacing: 0.05em;
   color: var(--jade-hot);
@@ -92,6 +101,11 @@
   color: var(--bone);
 }
 
+.builds-back::before {
+  content: '\2190';
+  margin-right: 0.4rem;
+}
+
 .builds-note {
   margin: 0;
   flex: 1 1 16rem;
@@ -99,97 +113,27 @@
   font-size: 0.8rem;
 }
 
-.builds-variants {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  margin: 1rem 0 0;
-}
-
-.builds-variant {
-  padding: 0.4rem 0.85rem;
+.builds-sample {
+  margin: 0;
+  padding: 0.2rem 0.6rem;
   border: 1px solid var(--div-3);
-  border-radius: var(--r-hair);
-  background: var(--ink-900);
-  color: var(--bone-dim);
-  font-family: var(--display);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: color var(--t-response) var(--e-response),
-    border-color var(--t-response) var(--e-response);
-}
-
-.builds-variant:hover {
-  border-color: var(--jade-dim);
-  color: var(--bone);
-}
-
-.builds-variant.is-on {
-  border-color: var(--jade);
-  background: var(--ink-850);
-  color: var(--jade-hot);
-}
-
-/* The case for and against, side by side, because the against is the part
- * that decides. It is not hidden behind a hover. */
-.builds-approach {
-  display: grid;
-  gap: 0.2rem;
-  margin: 0.7rem 0 0;
-  padding: 0.6rem 0.8rem;
-  border-left: 2px solid var(--jade-dim);
-  background: var(--ink-900);
-  font-size: 0.8rem;
-  line-height: 1.5;
-}
-
-.builds-approach-for {
-  color: var(--bone-dim);
-}
-
-.builds-approach-against {
+  border-radius: var(--r-pill);
   color: var(--bone-faint);
-  font-size: 0.75rem;
-}
-
-@media (min-width: 60rem) {
-  .builds-approach {
-    grid-template-columns: 1fr auto;
-    align-items: baseline;
-    gap: 1.5rem;
-  }
-}
-
-.builds-picker {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  margin: 0.9rem 0 0;
-}
-
-.builds-pick {
-  padding: 0.3rem 0.7rem;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: var(--bone-faint);
-  font-family: var(--body);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.builds-pick:hover {
-  color: var(--bone-dim);
-}
-
-.builds-pick.is-on {
-  border-bottom-color: var(--jade);
-  color: var(--bone);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .builds-stage {
   margin-top: 1.25rem;
+}
+
+.builds-none {
+  margin: 3rem 0;
+  text-align: center;
+  color: var(--bone-faint);
+  font-size: 0.9rem;
 }
 
 .builds-disclaimer {
@@ -203,7 +147,604 @@
 }
 
 /* -------------------------------------------------------------------------
- * THE MARK. One piece of a build, and the only thing all five share.
+ * THE DROPDOWN. A listbox, because <option> cannot hold a picture.
+ *
+ * Everything a native select drew is drawn here: the closed face, the caret,
+ * the popup, the highlight. `Dropdown.tsx` has the argument for paying that
+ * price, and the one thing it cannot buy back is the phone's own picker. The
+ * compensation is at the bottom of this block: under 34rem the list opens as a
+ * sheet across the bottom of the screen instead of a popup pinned to a control
+ * halfway up it.
+ * ---------------------------------------------------------------------- */
+
+.bdrop {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.bdrop-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.bdrop-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bdrop-button:hover {
+  border-color: var(--jade-dim);
+}
+
+.bdrop-button:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 1px;
+}
+
+/* A facet holding a value says so without being read: the whole control
+ * changes, not a tick somewhere inside it. */
+.bdrop.is-on .bdrop-button {
+  border-color: var(--jade);
+  color: var(--jade-hot);
+}
+
+.bdrop.is-on .bdrop-label {
+  color: var(--jade-dim);
+}
+
+.bdrop-caret {
+  margin-left: auto;
+  flex: none;
+  width: 0;
+  height: 0;
+  border-top: 4px solid var(--bone-faint);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.bdrop.is-open .bdrop-caret {
+  transform: rotate(180deg);
+}
+
+/* One row's contents, shared by the closed face and the open list, so the two
+ * cannot drift apart. */
+.bdrop-face {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.bdrop-face.is-empty {
+  color: var(--bone-faint);
+}
+
+/* The icon column is kept even when a row has no art, or the labels in a list
+ * of mixed rows would not line up. */
+.bdrop-icon {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: none;
+}
+
+.bdrop-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.bdrop-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bdrop-count {
+  margin-left: auto;
+  padding-left: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.bdrop-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  max-height: 17rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  box-shadow: 0 12px 32px -8px var(--ink-950);
+}
+
+.bdrop-row {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--r-hair);
+  color: var(--bone-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* One highlight, driven by the keyboard and by the pointer alike, so arrowing
+ * and hovering cannot disagree about which row is live. */
+.bdrop-row.is-active {
+  background: var(--ink-800);
+  color: var(--bone);
+}
+
+.bdrop-row.is-chosen {
+  color: var(--jade-hot);
+}
+
+.bdrop-row.is-chosen .bdrop-count {
+  color: var(--jade);
+}
+
+/* Phone: a sheet at the bottom of the screen rather than a popup pinned to a
+ * control the thumb cannot reach. This is what replaces the native picker. */
+@media (max-width: 34rem) {
+  .bdrop-list {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 60dvh;
+    padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: var(--r-soft) var(--r-soft) 0 0;
+  }
+
+  .bdrop-row {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .bdrop-icon {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bdrop-caret {
+    transition: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * THE FILTER BAR. Arm and aspect on the surface, the rest behind a disclosure.
+ *
+ * Five facets over eight builds was 28 chips and about nine rows on a phone,
+ * and the library is meant to grow; five dropdowns are five rows at any size.
+ * ---------------------------------------------------------------------- */
+
+.bfilter {
+  margin-top: 1.1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.bfilter-surface,
+.bfilter-pane {
+  display: grid;
+  gap: 0.6rem;
+}
+
+@media (min-width: 34rem) {
+  .bfilter-surface,
+  .bfilter-pane {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.6rem 0.9rem;
+  }
+}
+
+.bfilter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--div-1);
+}
+
+.bfilter-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem 0.25rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.bfilter-more:hover {
+  border-color: var(--div-3);
+  color: var(--bone);
+}
+
+.bfilter-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid var(--bone-faint);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.bfilter-more.is-open .bfilter-caret {
+  transform: rotate(90deg);
+}
+
+/* A count on the shut disclosure, so a filter left on somewhere out of sight
+ * cannot narrow the list with nothing on screen saying why. */
+.bfilter-badge {
+  min-width: 1.05rem;
+  padding: 0 0.25rem;
+  border-radius: var(--r-pill);
+  background: var(--jade-dim);
+  color: var(--ink-950);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sort stays a real select: three words, no art, nothing to gain by rebuilding
+ * it and a native control to lose. */
+.bfilter-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.bfilter-sort select {
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0.2rem 0.4rem;
+}
+
+.bfilter-count {
+  margin: 0 0 0 auto !important;
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+.bfilter-count strong {
+  font-family: var(--mono);
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.bfilter-clear {
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.bfilter-clear:hover {
+  border-color: var(--rim-magenta);
+  color: var(--bone);
+}
+
+.bfilter-pane {
+  margin-top: 0.85rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--div-1);
+}
+
+/* -------------------------------------------------------------------------
+ * THE OVERVIEW GRID. Several builds at once, which is the whole point.
+ *
+ * The card is deliberately small. The contact sheet won this slot and then had
+ * to shrink: at its old size a wide screen held three and a laptop held two,
+ * which is not "a couple next to each other", it is a list with pictures.
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The grid is sized to the plate, not to the text.
+ *
+ * `Screens/SaveProfileSlot` is 425 by 630, the game's own save slot, and it is
+ * what a build sits on now. That fixes the card's proportion at 2:3 portrait,
+ * so the column width and the row height are the same decision: 15rem wide
+ * gives a 22.5rem tall card, which is what `aspect-ratio` below holds it to.
+ */
+.builds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.9rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 100rem) {
+  .builds-grid {
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.1rem;
+  }
+}
+
+.bcard {
+  display: flex;
+}
+
+/**
+ * One build, on the game's own save slot.
+ *
+ * `SaveProfileSlot` and `SaveProfileSlotHighlight` are the same 425 by 630 art,
+ * lit and unlit, so the hover is a crossfade of one onto the other rather than
+ * a filter: the highlight is a rim glow and brightening the plain plate does
+ * not produce one.
+ *
+ * Stretched rather than nine sliced. The plate has an ornamented head and foot
+ * and is not symmetric top to bottom, so slicing equal caps cuts it in the
+ * wrong places. `aspect-ratio` holds the card to the art's own shape, which is
+ * what keeps the stretch from showing.
+ */
+/**
+ * The padding is measured off the art, not guessed.
+ *
+ * **`SaveProfileSlot` does not fill its own canvas.** The image is 425 by 630
+ * and the plate inside it runs x 35 to 391, y 32 to 606, so there is a
+ * transparent margin of 8.2 percent left, 8.0 right, 5.1 top and 3.8 bottom.
+ * `background-size: 100% 100%` stretches the whole canvas, margin included, so
+ * padding measured from the element's edge starts *outside* the plate. That is
+ * why every band sat on the left rim and the sentence ran off both sides.
+ *
+ * **And the margin is not the whole inset.** Past the transparent edge there is
+ * a lit frame band, brighter than the field it encloses: scanning inward at
+ * mid height the art begins at x=39 and reads luminance 20 until x=55, then
+ * settles to 16. So the frame is x 39 to 55 and the flat interior starts at
+ * **x=57, which is 13.4 percent**. Padding of 11 percent put the content on
+ * the frame rather than inside it, which is what read as sitting on the edge.
+ *
+ * These are the interior edges plus real clearance. **Percentage padding
+ * resolves against width on all four sides**, so the vertical figures are
+ * converted through the card's own 425/630.
+ */
+.bcard-hit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+  aspect-ratio: 425 / 630;
+  /* Sides clear the frame's inner edge at 13.4% by a further 4.6%. Top and
+   * foot are about 10% and 9% of height, written as width percentages. */
+  padding: 15% 18% 13%;
+  /* Five marks plus their gaps have to fit the 78 percent that is left, which
+   * at this grid's column widths means about 2rem rather than the 2.6 the rest
+   * of the build manager uses. */
+  --mark-s: clamp(1.45rem, 15cqi, 2rem);
+  container-type: inline-size;
+  border: 0;
+  border-radius: 0;
+  background: url('/shell/slot-card.png') center / 100% 100% no-repeat;
+  text-align: left;
+  font-family: var(--body);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* The lit plate, faded in over the unlit one so the colour underneath stays. */
+.bcard-hit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/shell/slot-card-highlight.png') center / 100% 100% no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-response) var(--e-response);
+}
+
+.bcard-hit:hover::before,
+.bcard-hit:focus-visible::before {
+  opacity: 1;
+}
+
+.bcard-hit:focus-visible {
+  outline: none;
+}
+
+/* Everything on the card sits above the lit plate. */
+.bcard-hit > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bcard-hit::before {
+    transition: none;
+  }
+}
+
+.bcard-head {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.bcard-name {
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: var(--bone);
+}
+
+.bcard-arm {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--bone-faint);
+}
+
+.bcard-gods::before {
+  content: '\00b7';
+  margin: 0 0.35rem;
+}
+
+/* One band. Same order, same place, every card, which is the contact sheet's
+ * whole argument: a scan down a column is a scan of one slot across the grid. */
+.bcard-band {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.bcard-rule {
+  font-family: var(--mono);
+  font-size: 0.53rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.bcard-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.bcard-tile {
+  display: grid;
+  place-items: center;
+}
+
+.bcard-empty {
+  display: grid;
+  place-items: center;
+  width: var(--mark-s);
+  height: var(--mark-s);
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+}
+
+.bcard-empty img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  opacity: 0.3;
+}
+
+.bcard-arcana {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.bcard-card img {
+  height: 2.4rem;
+  width: auto;
+  display: block;
+  border-radius: 2px;
+  border: 1px solid var(--div-2);
+}
+
+/* Pushed to the foot of the plate, so every card's sentence sits on the same
+ * line however many bands are above it. Clamped, because the plate fixes the
+ * height and a long line cannot be allowed to push the card off its own art. */
+.bcard-say {
+  margin-top: auto;
+  color: var(--bone-faint);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------------------
+ * THE DETAIL VIEW, and the paragraph under it.
+ * ---------------------------------------------------------------------- */
+
+.builds-how {
+  max-width: 42rem;
+  margin: 2.5rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.builds-how h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.builds-how p {
+  margin: 0;
+  color: var(--bone-dim);
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+@media (min-width: 100rem) {
+  .builds-how {
+    max-width: 48rem;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * THE MARK. One piece of a build, and the only thing every layout shares.
  *
  * A rounded square, never a circle: the game's icons are rounded squares and
  * `frames/frame-*.png` are drawn to fit them. A circular crop cuts the corner
@@ -213,6 +754,23 @@
 .mark {
   position: relative;
   display: inline-grid;
+  /**
+   * **The tracks are pinned, and that is the whole fix.**
+   *
+   * Every layer sits in `grid-area: 1 / 1`, and the frame is deliberately
+   * larger than the icon because the game draws it overhanging. With `auto`
+   * tracks that oversized frame *sized the row*: the row grew to 118 percent,
+   * the art's `height: 100%` resolved against the grown row instead of the
+   * box, and every icon in the build manager rendered 18 percent too tall and
+   * hanging below its own container. It was only obvious on the centrepiece,
+   * where the glow ring is centred on the real box and the icon visibly was
+   * not.
+   *
+   * Fixed tracks mean `100%` is the box. Anything bigger overflows the track
+   * and is centred on it by `place-items`, which is what an overhanging frame
+   * is supposed to do.
+   */
+  grid-template: 100% / 100%;
   place-items: center;
   width: var(--mark, 3rem);
   height: var(--mark, 3rem);
@@ -234,12 +792,41 @@ button.mark {
   grid-area: 1 / 1;
 }
 
-/* The frame overhangs the art, which is how the game draws it: the frame's
- * own border sits outside the 90 pixel icon rather than on top of it. */
+/* A ground behind the art, and it is not decoration.
+ *
+ * Boon icons are bright and read fine on the page. **Hammer and Hex art is
+ * not**: it is dark, near-monochrome, and at 42 pixels on an ink-950 ground it
+ * reads as an empty frame. Three of them in a row looked like three broken
+ * images, and they were not, every one had loaded at full size.
+ *
+ * The game does not have this problem because it never draws an icon straight
+ * onto the background; there is always a lit frame interior behind it. This is
+ * that interior, and it is quiet enough that a bright icon does not notice. */
+.mark::before {
+  content: '';
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--mark, 3rem) * 0.18);
+  background: var(--ink-800);
+}
+
+/* Except for an Arcana, which is a painted card with its own ground. */
+.mark.is-arcana::before {
+  display: none;
+}
+
+/* The frame overhangs the art, which is how the game draws it: the frame's own
+ * border sits outside the 90 pixel icon rather than on top of it. The overhang
+ * is named once because the centrepiece ring has to agree with it. */
+.mark {
+  --mark-frame-over: 9%;
+}
+
 .mark-frame {
   grid-area: 1 / 1;
-  width: 118%;
-  height: 118%;
+  width: calc(100% + var(--mark-frame-over) * 2);
+  height: calc(100% + var(--mark-frame-over) * 2);
   object-fit: contain;
   pointer-events: none;
 }
@@ -271,16 +858,27 @@ button.mark {
   pointer-events: none;
 }
 
-/* The thing the build is for. One ring, in the event colour, and nothing
- * else: the centrepiece has to read as different at a glance in every one of
- * the five layouts, and size alone does not survive the contact sheet. */
+/* The thing the build is for. One ring, in the event colour, and nothing else:
+ * the centrepiece has to read as different at a glance in both detail layouts
+ * and in the overview grid, and size alone does not survive a uniform grid.
+ *
+ * **Sized to the frame, not to the box.** The frame overhangs the icon by 18
+ * percent, so a ring drawn on the icon's own box sits inside the art it is
+ * supposed to be ringing. `--mark-frame-over` is that overhang in one place,
+ * and both the frame and this read it, so they cannot drift apart again. */
 .mark.is-centrepiece::after {
   content: '';
   position: absolute;
-  inset: -14%;
-  border-radius: calc(var(--mark, 3rem) * 0.26);
+  inset: calc(var(--mark-frame-over) * -1 - 2%);
+  border-radius: calc(var(--mark, 3rem) * 0.3);
   box-shadow: 0 0 0 1px var(--rim-magenta), 0 0 12px -2px var(--rim-magenta);
   pointer-events: none;
+}
+
+/* An Arcana wears no frame, so its ring hugs the card itself. */
+.mark.is-arcana.is-centrepiece::after {
+  inset: -6%;
+  border-radius: var(--r-hair);
 }
 
 /* An Arcana card is not a square, and forcing it into one drew a sliver with
@@ -343,157 +941,7 @@ button.mark {
 }
 
 /* =========================================================================
- * VARIANT 1: LOADOUT. The game's own tray.
- * ===================================================================== */
-
-.loadout {
-  display: grid;
-  gap: 1.25rem;
-}
-
-@media (min-width: 60rem) {
-  .loadout {
-    grid-template-columns: 17rem 1fr;
-    align-items: start;
-  }
-}
-
-@media (min-width: 100rem) {
-  .loadout {
-    grid-template-columns: 19rem 1fr;
-    gap: 2rem;
-  }
-}
-
-/* The game's own tray header plate, nine-sliced. It has hard vertical ends and
- * a repeatable middle, which is what makes it safe for variable-length copy;
- * `resource-backing-harvest.png` is an oval and is not. */
-.tray-head {
-  margin: 0 0 0.5rem;
-  padding: 0.4rem 1rem 0.5rem;
-  border-image: url('/shell/tray-header.png') 18 40 20 40 fill / 18px 40px 20px 40px;
-  font-family: var(--display);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--bone);
-}
-
-.tray-say {
-  margin: 0 0 0.7rem;
-  color: var(--bone-faint);
-  font-size: 0.75rem;
-}
-
-.loadout-slots ul {
-  display: grid;
-  gap: 0.35rem;
-  margin: 0;
-  padding: 0.6rem;
-  list-style: none;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
-}
-
-/* The game's tray texture, as a surface rather than a picture. At full
- * strength its central motif read as a watermark behind the slot names. */
-.loadout-slots ul::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--r-soft);
-  background: url('/shell/tray-backing.png') center / cover no-repeat;
-  opacity: 0.28;
-  pointer-events: none;
-}
-
-.loadout-slots ul {
-  position: relative;
-  isolation: isolate;
-}
-
-.loadout-slot {
-  position: relative;
-}
-
-.loadout-slot {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.4rem 0.5rem;
-  border-radius: var(--r-hair);
-}
-
-.loadout-slot.is-open {
-  background: color-mix(in srgb, var(--ink-950) 55%, transparent);
-}
-
-.loadout-empty {
-  display: grid;
-  place-items: center;
-  width: var(--mark-l);
-  height: var(--mark-l);
-  flex: none;
-  border: 1px dashed var(--div-4);
-  border-radius: var(--r-hair);
-}
-
-.loadout-empty img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
-  opacity: 0.35;
-}
-
-.loadout-slot-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.loadout-slot-name {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--bone-faint);
-}
-
-.loadout-slot-fill {
-  font-size: 0.85rem;
-  color: var(--bone);
-}
-
-.loadout-slot.is-open .loadout-slot-fill {
-  color: var(--bone-faint);
-  font-style: italic;
-}
-
-.loadout-trays {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.loadout-tray {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  gap: 0.5rem 0.9rem;
-  padding: 0.7rem;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
-}
-
-@media (min-width: 100rem) {
-  .loadout-trays {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
-/* =========================================================================
- * VARIANT 2: POSTER. One build as a page.
+ * DETAIL: POSTER. One build as a page.
  * ===================================================================== */
 
 .poster {
@@ -701,7 +1149,7 @@ button.mark {
 }
 
 /* =========================================================================
- * VARIANT 3: CONSTELLATION. Fixed positions round the arm.
+ * DETAIL: CONSTELLATION. Fixed positions round the arm.
  * ===================================================================== */
 
 .constel {
@@ -853,7 +1301,7 @@ button.mark {
 }
 
 .constel-card img {
-  height: var(--mark-m);
+  height: var(--mark-xl);
   width: auto;
   border-radius: var(--r-hair);
   border: 1px solid var(--div-2);
@@ -901,254 +1349,7 @@ button.mark {
 }
 
 /* =========================================================================
- * VARIANT 4: RIBBON. An order, with a destination.
- * ===================================================================== */
-
-.ribbon {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  max-width: 44rem;
-}
-
-.ribbon-step {
-  position: relative;
-  display: grid;
-  grid-template-columns: 2.2rem 1fr;
-  gap: 0.9rem;
-  padding: 0 0 1.6rem;
-}
-
-/* The thread down the left, which is the only thing making this a sequence
- * rather than four boxes. It stops at the last step. */
-.ribbon-step::before {
-  content: '';
-  position: absolute;
-  left: 1.1rem;
-  top: 2.2rem;
-  bottom: 0;
-  width: 1px;
-  background: var(--div-2);
-}
-
-.ribbon-step:last-child::before {
-  display: none;
-}
-
-.ribbon-num {
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border: 1px solid var(--div-3);
-  border-radius: 50%;
-  background: var(--ink-950);
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--bone-faint);
-}
-
-.ribbon-step.is-end .ribbon-num {
-  border-color: var(--rim-magenta);
-  color: var(--rim-magenta);
-}
-
-.ribbon-body h4 {
-  margin: 0.25rem 0 0.2rem;
-  font-family: var(--display);
-  font-size: 0.95rem;
-  letter-spacing: 0.04em;
-  color: var(--bone);
-}
-
-.ribbon-say {
-  margin: 0 0 0.7rem;
-  color: var(--bone-faint);
-  font-size: 0.78rem;
-  line-height: 1.55;
-  max-width: 34rem;
-}
-
-.ribbon-pieces {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem 0.55rem;
-}
-
-.ribbon-piece {
-  display: grid;
-  justify-items: center;
-  gap: 0.25rem;
-  width: 5.2rem;
-}
-
-.ribbon-piece-name {
-  font-size: 0.63rem;
-  line-height: 1.25;
-  text-align: center;
-  color: var(--bone-faint);
-}
-
-.ribbon-step.is-end .ribbon-piece {
-  width: 7rem;
-}
-
-.ribbon-step.is-end .ribbon-piece-name {
-  font-family: var(--display);
-  font-size: 0.85rem;
-  color: var(--bone);
-}
-
-/* Wide: the step's label moves into its own column so the pieces start at the
- * same x on every row, which is what turns a list into a table you can scan. */
-@media (min-width: 60rem) {
-  .ribbon {
-    max-width: 68rem;
-  }
-
-  .ribbon-step {
-    grid-template-columns: 2.2rem 15rem 1fr;
-    align-items: start;
-    gap: 1.4rem;
-  }
-
-  .ribbon-body {
-    display: contents;
-  }
-
-  .ribbon-body h4 {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .ribbon-say {
-    grid-column: 2;
-    grid-row: 2;
-    margin: 0;
-  }
-
-  .ribbon-pieces {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-  }
-}
-
-@media (min-width: 100rem) {
-  .ribbon {
-    max-width: 96rem;
-  }
-
-  .ribbon-step {
-    grid-template-columns: 2.2rem 20rem 1fr;
-  }
-}
-
-/* =========================================================================
- * VARIANT 5: CONTACT SHEET. Uniform, and several at once.
- * ===================================================================== */
-
-.builds-sheet {
-  display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 60rem) {
-  .builds-sheet {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* This is the variant that most wants a 21:9 screen: three builds abreast is
- * the arrangement it was designed for and the one that makes its bands line
- * up in columns. */
-@media (min-width: 100rem) {
-  .builds-sheet {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-  }
-}
-
-.contact {
-  padding: 0.9rem;
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
-}
-
-.contact-head h3 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 1rem;
-  letter-spacing: 0.03em;
-  color: var(--bone);
-}
-
-.contact-head p {
-  margin: 0.15rem 0 0;
-  font-family: var(--mono);
-  font-size: 0.63rem;
-  letter-spacing: 0.06em;
-  color: var(--bone-faint);
-}
-
-.contact-gods::before {
-  content: '\00b7';
-  margin: 0 0.4rem;
-}
-
-.contact-band {
-  margin-top: 0.8rem;
-}
-
-.contact-rule {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--bone-faint);
-}
-
-.contact-tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.contact-tile {
-  display: grid;
-  place-items: center;
-}
-
-.contact-empty {
-  display: grid;
-  place-items: center;
-  width: var(--mark-s);
-  height: var(--mark-s);
-  border: 1px dashed var(--div-4);
-  border-radius: var(--r-hair);
-}
-
-.contact-empty img {
-  width: 55%;
-  height: 55%;
-  object-fit: contain;
-  opacity: 0.3;
-}
-
-.contact-tile.is-card img {
-  height: var(--mark-s);
-  width: auto;
-  border-radius: 2px;
-  border: 1px solid var(--div-2);
-  display: block;
-}
-
-/* =========================================================================
- * The detail card, shared by all five.
+ * The detail card, shared by both detail layouts.
  * ===================================================================== */
 
 .piececard {
@@ -1238,4 +1439,423 @@ button.mark {
 .piececard-body > button:hover {
   border-color: var(--jade-dim);
   color: var(--bone);
+}
+
+/* =========================================================================
+ * THE BUILDER.
+ *
+ * Three panels: what the arm and the slots are, what is picked from lists,
+ * and what the build is called plus what the checker makes of it. They stack
+ * on a phone and sit side by side once there is room for three.
+ * ===================================================================== */
+
+.editor-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 52rem) {
+  .editor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 82rem) {
+  .editor-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.editor-panel {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  padding: 0.9rem 1rem 1.1rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.editor-rule {
+  margin: 0.4rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.editor-panel > .editor-rule:first-child {
+  margin-top: 0;
+}
+
+.editor-hint {
+  margin: -0.3rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+.editor-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.editor-field > span {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.editor-field input,
+.editor-field textarea {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.editor-field input:focus,
+.editor-field textarea:focus {
+  outline: none;
+  border-color: var(--jade);
+}
+
+/* -------------------------------------------------------------------------
+ * PICKING A FEW THINGS OUT OF A HUNDRED.
+ *
+ * What is chosen sits on top and is removed from there. What is not is behind
+ * a search and, for boons, behind one god at a time. `PickList.tsx` has the
+ * argument; this draws it.
+ * ---------------------------------------------------------------------- */
+
+.picklist {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.picklist-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-height: 1.9rem;
+  align-content: flex-start;
+}
+
+.picklist-empty {
+  margin: 0;
+  align-self: center;
+  font-size: 0.73rem;
+  font-style: italic;
+  color: var(--bone-faint);
+}
+
+.picklist-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.2rem 0.4rem 0.2rem 0.25rem;
+  border: 1px solid var(--jade);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--jade-dim) 22%, var(--ink-850));
+  color: var(--jade-hot);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.picklist-pick:hover {
+  border-color: var(--rim-magenta);
+}
+
+.picklist-pick img {
+  width: 1.3rem;
+  height: 1.3rem;
+  object-fit: contain;
+  border-radius: 3px;
+  flex: none;
+}
+
+.picklist-pick > span:not(.picklist-x) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picklist-x {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--bone-faint);
+}
+
+.picklist-pick:hover .picklist-x {
+  color: var(--rim-magenta);
+}
+
+.picklist-search {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.8rem;
+}
+
+.picklist-search:focus {
+  outline: none;
+  border-color: var(--jade);
+}
+
+.picklist-groups {
+  display: grid;
+  gap: 0.15rem;
+  max-height: 19rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+  padding: 0.25rem;
+}
+
+/* One god. Shut, it is a row; open, it is that god's boons and nothing else. */
+.picklist-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.35rem 0.45rem;
+  border: 0;
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picklist-head:hover {
+  background: var(--ink-850);
+  color: var(--bone);
+}
+
+.picklist-head.is-open {
+  color: var(--jade-hot);
+}
+
+.picklist-caret {
+  width: 0;
+  height: 0;
+  flex: none;
+  border-left: 4px solid var(--bone-faint);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.picklist-head.is-open .picklist-caret {
+  transform: rotate(90deg);
+}
+
+.picklist-count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.picklist-rows {
+  display: grid;
+  gap: 0.1rem;
+  max-height: 19rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.15rem;
+}
+
+/* Inside a group the scroll belongs to the group list, not to the rows. */
+.picklist-groups .picklist-rows {
+  max-height: none;
+  overflow: visible;
+  padding: 0 0 0.3rem 0.9rem;
+}
+
+.picklist:not(.is-cards) > .picklist-rows {
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.picklist-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  border: 0;
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.picklist-row:hover {
+  background: var(--ink-800);
+  color: var(--bone);
+}
+
+.picklist-row img {
+  width: 1.6rem;
+  height: 1.6rem;
+  object-fit: contain;
+  border-radius: 3px;
+  flex: none;
+}
+
+.picklist-row-text {
+  display: grid;
+  min-width: 0;
+}
+
+.picklist-row-name {
+  font-size: 0.78rem;
+}
+
+/* The game's own sentence, one line of it, so a row stays a row. */
+.picklist-row-note {
+  font-size: 0.68rem;
+  color: var(--bone-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picklist-add {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--bone-faint);
+}
+
+.picklist-row:hover .picklist-add {
+  color: var(--jade-hot);
+}
+
+.picklist-none {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
+
+/* Arcana are tall painted cards, so they lay out as art in a row. */
+.picklist.is-cards .picklist-rows {
+  grid-template-columns: repeat(auto-fill, minmax(3.2rem, 1fr));
+  gap: 0.25rem;
+  max-height: 14rem;
+}
+
+.picklist.is-cards .picklist-row {
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.2rem;
+}
+
+.picklist.is-cards .picklist-row img {
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  border: 1px solid var(--div-2);
+}
+
+.picklist.is-cards .picklist-row-name {
+  font-size: 0.6rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.picklist.is-cards .picklist-add {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picklist-caret {
+    transition: none;
+  }
+}
+
+/* What the checker makes of it. Blocking first, since that is the half that
+ * decides whether Save does anything. */
+.editor-check {
+  margin-top: 0.3rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.editor-check ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.editor-ok {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--jade);
+}
+
+.editor-problem {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-4);
+  color: var(--bone-faint);
+}
+
+/* Impossible, not merely unfinished. */
+.editor-problem.is-blocks {
+  border-left-color: var(--rim-magenta);
+  color: var(--bone-dim);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.editor-actions .quiet:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.editor-delete {
+  margin-left: auto;
+}
+
+.builds-new,
+.builds-edit {
+  margin-left: auto;
 }

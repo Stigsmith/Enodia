@@ -66,19 +66,33 @@ export function rate(subject: Subject, rules: readonly Rule[], ctx: RuleContext)
  * scores zero, sits among the other zeroes, and loses the tie to anything we
  * had something to say about.
  *
- * Name breaks the last tie so the order is stable between renders rather than
- * depending on the offer's arrival order.
+ * **The last tie goes to the order it arrived in, not to the alphabet.**
+ *
+ * This used to break it by name, on the reasoning that arrival order was
+ * arbitrary and the alphabet at least did not move between renders. That was
+ * wrong about the input: a source's traits are `[...priority, ...pool]`
+ * straight out of `LootData`, so arrival order *is* the game's order, the one
+ * a player reads in Gods > Offerings, with the five core boons first.
+ *
+ * And the cost was not small. On a fresh run every boon is unrated at score
+ * zero, so **every** comparison fell through to the name and the whole list
+ * came out alphabetical: Attack, Special, Cast, Sprint and Magick scattered
+ * through twenty others, with the duos scattered with them. A tester read it
+ * as no order at all, which it effectively was.
+ *
+ * Index is just as stable as name, because the list handed in is deterministic.
  */
 export function order<T extends { score: number; unrated: boolean; id: TraitId }>(
   rated: readonly T[],
-  ctx: RuleContext,
+  // Kept in the signature: every caller passes it, and the tiebreak needing
+  // the trait index was the only thing that read it.
+  _ctx?: RuleContext,
 ): T[] {
+  const arrived = new Map(rated.map((entry, index) => [entry, index]))
   return [...rated].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score
     if (a.unrated !== b.unrated) return a.unrated ? 1 : -1
-    const nameA = ctx.traits.get(a.id)?.name ?? a.id
-    const nameB = ctx.traits.get(b.id)?.name ?? b.id
-    return nameA.localeCompare(nameB)
+    return (arrived.get(a) ?? 0) - (arrived.get(b) ?? 0)
   })
 }
 

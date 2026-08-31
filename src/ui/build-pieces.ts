@@ -75,6 +75,8 @@ export type Piece = {
   gods: string[]
   /** this is the thing the build is for */
   centrepiece: boolean
+  /** an upgrade rather than part of the build */
+  optional?: boolean
 }
 
 export type Group = {
@@ -102,6 +104,10 @@ export type Assembled = {
   run: Group
   /** every piece in one list, for a layout that does not want the groups */
   all: Piece[]
+  /** boons that would raise the ceiling, and what they would cost */
+  optional: Piece[]
+  /** the Olympians each optional boon would add, and none is free */
+  optionalGods: string[]
   gods: string[]
 }
 
@@ -149,6 +155,18 @@ export function assemble(build: ShownBuild): Assembled {
   const boons = build.boons.flatMap((id) => {
     const piece = fromTrait(id, 'boon', is(id))
     return piece ? [piece] : []
+  })
+
+  /**
+   * Boons that raise the ceiling without being the build.
+   *
+   * Kept out of `boons` on purpose, so nothing downstream counts them as part
+   * of it: not the slot map, not the Olympian tally, not the god filter. A
+   * build that lists Hestia's Slow Cooker as an upgrade is not a Hestia build.
+   */
+  const optional = (build.optional ?? []).flatMap((id) => {
+    const piece = fromTrait(id, 'boon', false)
+    return piece ? [{ ...piece, key: `optional:${id}`, optional: true }] : []
   })
 
   const hex = build.hex ? fromTrait(build.hex, 'hex', is(build.hex)) : null
@@ -229,6 +247,9 @@ export function assemble(build: ShownBuild): Assembled {
   }
 
   const gods = [...new Set(boons.flatMap((piece) => piece.gods))]
+  const optionalGods = [
+    ...new Set(optional.flatMap((piece) => piece.gods).filter((god) => !gods.includes(god))),
+  ]
 
   return {
     build,
@@ -241,6 +262,8 @@ export function assemble(build: ShownBuild): Assembled {
     crossroads,
     run: inRun,
     all: [...crossroads.pieces, ...inRun.pieces],
+    optional,
+    optionalGods,
     gods,
   }
 }

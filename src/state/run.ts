@@ -55,6 +55,19 @@ export type RunEntry = {
   god: GodId | null
   taken: TraitId | null
   rarity: HeldTrait['rarity'] | null
+  /**
+   * What this Exit gave, when it gave something the engine does not track.
+   *
+   * A Story Exit, a Pom, a Centaur Heart: none of them changes what is
+   * reachable, so none of them becomes a `taken`. The timeline used to render
+   * every one of them as "Nothing that changes what is reachable", which is
+   * true and is not what a player wants to read back. **A tester asked for
+   * this in as many words**: show me what I picked, even when it changed
+   * nothing.
+   *
+   * Optional, so a run logged before this existed still loads.
+   */
+  note?: string | null
   /** targets that went DEAD at this pick, and not before */
   died: TraitId[]
 }
@@ -174,6 +187,60 @@ function migrate(stored: unknown): ActiveRun | null {
  * only runs when somebody corrects something. It also makes the stored `died`
  * lists derived rather than authoritative, which is the right way round.
  */
+/**
+ * How a run stopped.
+ *
+ * The owner asked whether a death button made sense. It does, and the reason
+ * is that ending and dying are not the same event: a run that died at Exit 9
+ * with a half-built Killer Current is the exact record the gap-analysis half of
+ * this product needs, and "I keep dying in Oceanus with no Cast" is a pattern
+ * only recorded deaths can show.
+ */
+export type Outcome = 'died' | 'finished' | 'abandoned'
+
+const ARCHIVE_KEY = 'enodia.runs'
+const ARCHIVE_VERSION = 1
+
+/** One finished run, kept. */
+export type ArchivedRun = {
+  outcome: Outcome
+  /** ISO, when it stopped */
+  at: string
+  /** Exits taken before it stopped */
+  exits: number
+  weapon: string | null
+  aspect: TraitId | null
+  held: readonly HeldTrait[]
+  entries: readonly RunEntry[]
+}
+
+export function loadArchive(): ArchivedRun[] {
+  try {
+    const raw = window.localStorage.getItem(ARCHIVE_KEY)
+    if (!raw) return []
+    const stored = JSON.parse(raw) as { version?: number; runs?: ArchivedRun[] }
+    return stored.version === ARCHIVE_VERSION && Array.isArray(stored.runs) ? stored.runs : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Keep a run, oldest dropped past 200.
+ *
+ * **Nothing reads this yet**, and it is written anyway. Every run ended before
+ * today was discarded, and a history cannot be backfilled: the only way to have
+ * one later is to start keeping it now.
+ */
+function archive(run: ArchivedRun): void {
+  try {
+    const runs = [run, ...loadArchive()].slice(0, 200)
+    window.localStorage.setItem(ARCHIVE_KEY, JSON.stringify({ version: ARCHIVE_VERSION, runs }))
+  } catch {
+    // A browser refusing storage still gets to end its run.
+  }
+}
+
 export function replay(base: RunContext, entries: readonly RunEntry[], exits: number): ActiveRun {
   let run: RunContext = { ...base, held: [], godsTaken: [], godsSeen: [], exitsLeft: exits }
   const rebuilt: RunEntry[] = []
@@ -251,11 +318,11 @@ export type RunStore = {
   entries: RunEntry[]
   start: (weapon: WeaponId, aspect: TraitId | null, path: RunPath | null) => void
 
-  end: () => void
+  end: (outcome?: Outcome) => void
   /** record a pick: the boon, its rarity, the god who offered it, and where */
   take: (trait: TraitId, rarity: HeldTrait['rarity'], god: GodId | null, kind?: RunEntry['kind']) => void
   /** a reward passed over without taking anything, which is a real move */
-  skip: (god: GodId | null, kind?: RunEntry['kind']) => void
+  skip: (god: GodId | null, kind?: RunEntry['kind'], note?: string) => void
   /** what the player says they are chasing. Null clears it */
   pinned: TraitId | null
   pin: (target: TraitId | null) => void
@@ -292,7 +359,22 @@ export function useRun(): RunStore {
     setActive((current) => (current ? { ...current, pinned: target } : current))
   }, [])
 
-  const end = useCallback(() => setActive(null), [])
+  const end = useCallback((outcome: Outcome = 'abandoned') => {
+    setActive((current) => {
+      if (current) {
+        archive({
+          outcome,
+          at: new Date().toISOString(),
+          exits: current.entries.filter((entry) => entry.kind === 'exit').length,
+          weapon: current.run.weapon,
+          aspect: current.run.aspect ?? null,
+          held: current.run.held,
+          entries: current.entries,
+        })
+      }
+      return null
+    })
+  }, [])
 
   /**
    * Rebuild after a correction.
@@ -346,7 +428,7 @@ export function useRun(): RunStore {
    * after it, so the entry records what this pick closed rather than what was
    * already closed. That is the difference between a timeline and a list.
    */
-  const advance = useCallback((god: GodId | null, held: HeldTrait | undefined, kind: RunEntry['kind']) => {
+  const advance = useCallback((god: GodId | null, held: HeldTrait | undefined, kind: RunEntry['kind'], note?: string) => {
     setActive((current) => {
       if (!current) return current
       const before = current.run
@@ -379,6 +461,7 @@ export function useRun(): RunStore {
         god,
         taken: held?.id ?? null,
         rarity: held?.rarity ?? null,
+        ...(note ? { note } : {}),
         died,
       }
 
@@ -397,7 +480,8 @@ export function useRun(): RunStore {
   )
 
   const skip = useCallback(
-    (god: GodId | null, kind: RunEntry['kind'] = 'exit') => advance(god, undefined, kind),
+    (god: GodId | null, kind: RunEntry['kind'] = 'exit', note?: string) =>
+      advance(god, undefined, kind, note),
     [advance],
   )
 

@@ -52,7 +52,7 @@ export function Timeline({
   entries: RunEntry[]
   run: RunContext
   onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
-  onSkip: (god: string | null, kind: RunEntry['kind']) => void
+  onSkip: (god: string | null, kind: RunEntry['kind'], note?: string) => void
   /** take a logged entry back out, replaying everything after it */
   onForget: (exit: number, kind: RunEntry['kind']) => void
   scrollToPresent?: boolean
@@ -119,7 +119,9 @@ function Station({ entry, onForget }: { entry: RunEntry; onForget: (exit: number
           </>
         ) : (
           <p className="station-name station-declined">
-            {entry.god ? `Took nothing from ${entry.god}` : 'Nothing that changes what is reachable'}
+            {/* What it was, when it was anything. Declining a god's offer is
+                the one case with nothing to name, and it keeps its sentence. */}
+            {entry.note ?? (entry.god ? `Took nothing from ${entry.god}` : 'Nothing that changes what is reachable')}
           </p>
         )}
 

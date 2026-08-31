@@ -14,7 +14,7 @@ Last updated 29 August 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete** |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 249, across 12 files |
+| **Tests** | 306, across 14 files |
 | **Validator** | 8 checks, 0 failures, 3 warnings |
 | **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
@@ -77,37 +77,68 @@ already true.
 
 ---
 
-### The build manager, and why it is five things
+### The build manager, and what the review settled
 
 **The owner reordered the product.** The run companion is for a newcomer. A player with 300
 hours marks a build in the game and plays; what they need is *inspiration* ("what shall I
 try this run") and *gap analysis* ("what am I defaulting to, and what would break it").
-Both are answered by looking at builds rather than by logging one, so the build manager is
-the core rather than a phase 3 extra.
+Both are answered by looking at builds rather than by logging one.
 
-**The crux is visual and it is unsolved, so it is not being guessed at.** A loadout is
-eighteen items across six categories and every obvious way to draw it is cluttered or a
-spreadsheet. Five layouts are on screen behind a switcher, each built to a different design
-philosophy, each stating what it gives up. One gets chosen and four files get deleted.
+Five layouts went up behind a switcher, each built to a different design philosophy and
+each stating what it gave up. **The review is over and three of the five are gone.**
 
-| Variant | Approach | Good at | Gives up |
-|---|---|---|---|
-| Loadout | mimic the game's own tray | recognition, density | character. Three look alike |
-| Poster | one build as a page, art large | "what shall I try" | comparison. One at a time |
-| Constellation | five fixed clock positions | shape, and gaps at a glance | names. Leans on the art |
-| Ribbon | an order, not an inventory | use at an Exit | the whole. No shape in it |
-| Contact sheet | uniform tiles, several at once | difference | everything else |
+| Layout | Verdict |
+|---|---|
+| Contact sheet | **The overview**, shrunk. It was too big to see a couple side by side |
+| Poster | **A detail view.** One build as a page, the art large |
+| Constellation | **A detail view.** Five fixed clock positions, gaps visible at once |
+| Loadout | Deleted. It looked like the game and no build in it had any character |
+| Ribbon | Deleted. **One idea worth stealing back**: it marked which picks were actual prerequisites of the centrepiece rather than preferences, which nothing shows now |
 
-`src/ui/build-pieces.ts` resolves a build once and all five draw from it, so the comparison
-is between five designs rather than five renderers. The split it imposes is the one the
-owner's two questions fall along: **what is committed at the Crossroads** against **what is
-found in the run**.
+Poster or Constellation is a **setting**, not a control on the page: a reader wants one of
+them and keeps wanting it, and a switcher on every build asks the same question every time.
+
+The frames went the same way. **Fourteen down to three**: the Exit reward marker is the
+default and Hecate's two circles are the alternatives.
+
+### Built for a library, not for eight
+
+The eight samples stand in for dozens of tested community builds, and later for builds the
+community adds itself. So the overview **filters and sorts** rather than listing.
+
+**Five dropdowns, arm first.** It was chips and chips lost on space: five facets over eight
+builds is 28 of them, about nine rows on a phone, and at eighty builds it would have been
+the whole screen before a single build appeared. Five dropdowns are five rows at any size.
+The cost is that a facet now holds one value, so "Zeus or Poseidon" is gone.
+
+Arm leads because that is the order a player thinks in, and aspect alone was the wrong first
+question: 24 of them with no useful grouping until the weapon is in front. **Choosing an arm
+clears the aspect** and drops the now-redundant arm prefix from the aspect labels. Gods,
+keepsake and familiar unfold, and the shut disclosure carries a count so a filter left on
+out of sight cannot narrow the list invisibly.
+
+**Every facet is derived.** Arm, aspect, gods, keepsake and familiar are computed from the
+builds themselves, so adding a build adds its own filter options and there is no list
+anywhere to keep in step.
+
+**The counts are the part that would have lied.** A count beside an option is taken with
+that option's own facet lifted and every other facet still applied, so it answers "how many
+if I pick this as well". Counting against the whole library instead offers a god with 6
+beside it that yields nothing, because the aspect already picked excludes all six.
+`build-filter.test.ts` clicks every option and asserts the result matches the number.
+
+A build now carries `how`, the paragraph explaining what feeds what, and `by`, which will
+tell a tested build from an uploaded one. **`how` describes and does not rate**: every
+sentence restates a boon's own text or a prerequisite the data states.
+
+**Both shapes work.** Every variant is authored narrow first, then given `60rem` and again
+`100rem`. Mark sizes are four rungs on one scale, so a 21:9 screen gets a bigger drawing
+rather than only a wider one.
 
 **There is a shareable copy.** `npm run artifact` builds `artifact/` and folds the
-stylesheet, the module and 59 images into a single 2.2 MB HTML file that runs from anywhere
+stylesheet, the module and 119 images into a single 2.9 MB HTML file that runs from anywhere
 with no server. It is the same components: nothing in `artifact/` reimplements a layout. It
-ships two ways, as an Artifact and as `dist/builds.html`, so the build manager has a direct
-URL rather than living three clicks into a menu.
+ships two ways, as an Artifact and as `dist/builds.html`.
 
 Writing it hit **the charset bug for the third time**, and for the second time in a wrapper
 that hides it. The page was written without a `<meta charset>` because the Artifact wrapper
@@ -115,17 +146,51 @@ injects one; served as `dist/builds.html` from a plain server, which injects not
 browser guessed GBK and every interpunct rendered as a Chinese character. `Descura 路
 Poseidon + Zeus`. `artifact/` is inside the validator's charset check now.
 
-**Both shapes work.** Every variant is authored narrow first, then given `60rem` and again
-`100rem`. Mark sizes are four rungs on one scale, so a 21:9 screen gets a bigger drawing
-rather than only a wider one, which was the actual complaint: at 2560 the sheet went three
-abreast and every icon in it was still 41 pixels.
+**The god-literal check earned its keep twice.** `validate.ts` refused a `gods` field on the
+build shape, correctly: it was a hand-kept copy of what `assemble()` derives. Then it
+refused `NOT_OLYMPIAN = ['Hermes', 'Selene', 'Chaos']` in the filter. Both fixes were the
+same fix, and the second is better than what it replaced: keeping to the `olympians` roster
+says "carries GodLoot and spends a slot" from the data, rather than naming the exceptions.
 
-**The three sample builds are samples and say so on screen.** Every id is real, every duo
-holds its prerequisites, no two boons contend for a slot, and `builds.test.ts` fails the
-build if that stops being true. Writing them caught three errors that would have looked
-plausible on a page. **Which build is worth playing is not claimed anywhere**, because it is
-not in any file. `data/curated/builds.json` is still empty and still the owner's.
+**The dropdowns show the game's art, which meant giving up the native control.**
+`<option>` cannot hold an image in any engine, so `Dropdown.tsx` is a listbox with arrow
+keys, Home and End, Escape, type-ahead, `combobox` and `listbox` roles and
+`aria-activedescendant`, all of which the native one gave for free. What it cannot give back
+is the phone's own picker, so under 34rem the list opens as a sheet across the bottom of the
+screen with 44 pixel rows. Sort stays a real `<select>`: three words, no art, nothing to win.
 
+**The gift portraits, everywhere.** `assets/gifts/` is the max-affection art, one per
+character, and `assets/README.md` had it shelved as "a possible alternate to gods/, unused
+so far". It is the alternate now, for every god and character in the app, filter and run
+surface alike. The `gods/` headshots are crops, and a crop at 22 pixels is a smear of skin
+and hair; the gift art is drawn small and whole, with a silhouette and one dominant colour
+each. One resolver in `build-app-data.ts` feeds both surfaces, so it was one change.
+**Hades is the only fallback**, because its only gift art is the Hades and Persephone pair,
+which is not just Hades.
+
+An arm is drawn as its **base aspect's square icon**, not `Weapon.icon`: that field is the
+large transparent render, which is right on a poster and reduces the Witch's Staff to a thin
+diagonal line at 22 pixels.
+
+**The artifact silently lost five of those icons.** `reachable()` collected art for ids
+named in `builds.ts`, and five of the six arm icons come from base aspects no sample names.
+Served from `dist/` they resolved, because the image library sits beside the page there; in
+the Artifact, which has neither, they would have 404ed. Caught by counting non-data URIs in
+the rendered page, which is the only check that actually proves self-containment, and it is
+in the verification pass now.
+
+**Every icon was 18 percent too tall, and only the centrepiece showed it.** The frame is
+deliberately larger than the icon because the game draws it overhanging, and with `auto`
+grid tracks that oversized frame *sized the row*: `height: 100%` on the art then resolved
+against the grown row rather than the box, so every mark in the build manager hung below its
+own container. Invisible until the centrepiece got a glow ring, which is centred on the real
+box and visibly was not centred on the art. Fixed tracks, and the ring's inset now reads the
+same `--mark-frame-over` the frame does, so they cannot drift apart again.
+
+**Dark art needed a ground.** Hammer and Hex icons are near-monochrome, and at 42 pixels on
+an ink-950 ground three of them in a row looked like three broken images. Every one had
+loaded at full size. The game never draws an icon straight onto the background either;
+there is always a lit frame interior behind it, and `.mark` has one now.
 
 ---
 
@@ -133,9 +198,9 @@ not in any file. `data/curated/builds.json` is still empty and still the owner's
 
 Phase 1 is done and nothing below blocks anything else. In the order I would take them.
 
-**1. Pick a build manager layout.** The owner's call and it blocks the whole feature: the
-next thing to build is real build definitions, and their shape depends on which of the five
-survives. Menu, Builds. Four files get deleted the moment one is chosen.
+**1. Real build definitions.** The shape is settled and the screen is waiting for content:
+`ShownBuild` carries `how` and `by`, the filters derive themselves from whatever is added,
+and the eight samples are placeholders. This is the owner's, and the community's after that.
 
 **2. Point Netlify at `dist/`.** The owner's call, and the only thing between this and
 people using it. The build is 10 MB, it runs from a plain static server, and
@@ -164,8 +229,7 @@ walking `InheritFrom` itself.
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
-| Which build manager layout | The owner | Five are on screen behind a switcher, each stating what it gives up. Real build definitions wait on the answer |
-| Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The three in `src/data/builds.ts` are samples for testing layouts and are labelled as such on the page |
+| Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The eight in `src/data/builds.ts` are samples and are labelled as such on the page. `how` and `by` are ready for them |
 
 ---
 

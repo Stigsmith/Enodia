@@ -61,62 +61,34 @@ export type FrameOption = {
   aspect?: string
 }
 
+/**
+ * The three that survived.
+ *
+ * Fourteen were drawn or extracted so the owner could see the field, and the
+ * owner has now seen it: **the Exit reward marker is the answer**, with
+ * Hecate's two circles kept as the alternatives. The other eleven were an
+ * exploration, the exploration is over, and a settings list of fourteen rings
+ * asks a question nobody has any more.
+ *
+ * They are one `git revert` away if a patch ever breaks the un-warp, and
+ * `scripts/reward-frame.ts` still holds the chain the marker was traced
+ * through. The drawn CSS rings, the starbursts, the stone ring, the filigree
+ * and the bare bubble went with them.
+ */
 export const FRAMES: FrameOption[] = [
+  // The game's own Exit reward marker, which is what it draws on an Exit when
+  // there is something behind it. `scripts/reward-frame.ts` has the chain it
+  // was traced through and why the disc had to be squared up first.
   {
-    id: 'ring',
-    name: 'Ring',
-    note: 'A hairline, a breath of metal, and a second hairline. The default',
-    file: null,
-    width: 1.1,
-    inner: 0.9,
-    opacity: 1,
-    band: [
-      // The inner edge, sitting on the bubble itself.
-      'radial-gradient(closest-side, transparent 90.5%, var(--silver) 91.5%, var(--silver-sh) 94%, transparent 96%)',
-      // The outer edge, dimmer, so the pair reads as one turned edge rather
-      // than as two lines.
-      'radial-gradient(closest-side, transparent 97%, var(--silver-sh) 98%, transparent 100%)',
-    ].join(', '),
-  },
-  {
-    id: 'hairline',
-    name: 'Hairline',
-    note: 'One thin silver circle and nothing else. The quietest it gets',
-    file: null,
-    width: 1.06,
-    inner: 0.93,
-    opacity: 1,
-    band: 'radial-gradient(closest-side, transparent 93%, var(--silver) 95%, transparent 98%)',
-  },
-  {
-    id: 'double',
-    name: 'Engraved',
-    note: 'Two hairlines with the ground showing between them',
-    file: null,
-    width: 1.2,
-    inner: 0.82,
-    opacity: 1,
-    band: [
-      'radial-gradient(closest-side, transparent 82%, var(--silver-sh) 83%, var(--silver) 85%, transparent 86.5%)',
-      'radial-gradient(closest-side, transparent 96%, var(--silver-sh) 97%, transparent 99%)',
-    ].join(', '),
-  },
-  {
-    id: 'banded',
-    name: 'Banded',
-    note: 'The thicker one, with lit metal between the hairlines',
-    file: null,
-    width: 1.22,
-    inner: 0.8,
-    opacity: 1,
-    band: [
-      'radial-gradient(closest-side, transparent 79.5%, var(--silver-sh) 80%, var(--silver) 82%, transparent 83%)',
-      'radial-gradient(closest-side, transparent 95%, var(--silver) 96%, var(--silver-sh) 99%, transparent 100%)',
-      'linear-gradient(155deg, var(--silver-sh), var(--ink-850) 42%, var(--silver-deep) 64%, var(--silver-sh))',
-    ].join(', '),
+    id: 'reward',
+    name: 'Exit reward',
+    note: 'What the game itself puts on an Exit: the disc and its two silver wings',
+    file: 'frames/reward-marker.png',
+    width: 1.34,
+    opacity: 0.95,
   },
 
-  // Hecate's own circles, and the first thing in the whole package that is a
+  // Hecate's own circles, and the only thing in the whole package that is a
   // circle drawn face on rather than a world object squashed onto a floor.
   // `Fx/HeroTouchdownCircles`, which is what the game draws under Melinoe when
   // she lands.
@@ -136,72 +108,6 @@ export const FRAMES: FrameOption[] = [
     hole: 0.76,
     opacity: 0.85,
   },
-
-  // The game's own Exit reward marker, which is what it draws on an Exit when
-  // there is something behind it. `scripts/reward-frame.ts` has the chain it
-  // was traced through and why the disc had to be squared up first.
-  {
-    id: 'reward',
-    name: 'Exit reward',
-    note: 'What the game itself puts on an Exit: the disc and its two silver wings',
-    file: 'frames/reward-marker.png',
-    width: 1.34,
-    opacity: 0.95,
-  },
-  {
-    id: 'wings',
-    name: 'Wings',
-    note: 'The same marker with the disc taken off, so only the wings read',
-    file: 'frames/reward-wings.png',
-    width: 1.5,
-    aspect: '666 / 316',
-    opacity: 0.95,
-  },
-
-  // The game's own, kept for comparison. None of them is a plain circle.
-  {
-    id: 'filigree',
-    name: 'Filigree',
-    note: 'UnlockTextCircleBacking. A filled disc with wings, so it tints what it sits on',
-    file: 'shell/circle-filigree.png',
-    width: 1.75,
-    opacity: 0.42,
-    aspect: '482 / 269',
-  },
-  {
-    id: 'stone',
-    name: 'Stone ring',
-    note: "BoonSelect's carved ring. The one round thing in the package",
-    file: 'frames/circle.png',
-    hole: 0.77,
-    opacity: 0.92,
-  },
-  {
-    id: 'starburst-dark',
-    name: 'Starburst, dark',
-    note: 'The Talent tree, locked. A four pointed star, not a ring',
-    file: 'frames/starburst-dark.png',
-    hole: 0.62,
-    opacity: 0.95,
-  },
-  {
-    id: 'starburst',
-    name: 'Starburst, bright',
-    note: 'The Talent tree, unlocked. The loudest thing in the package',
-    file: 'frames/starburst.png',
-    hole: 0.62,
-    opacity: 0.85,
-  },
-  {
-    id: 'boon-primary',
-    name: 'Boon frame',
-    note: "The game's unrarified boon frame. Square bubbles",
-    file: 'frames/frame-primary.png',
-    width: 1.0,
-    square: true,
-    opacity: 1,
-  },
-  { id: 'none', name: 'None', note: 'Just the bubble', file: null },
 ]
 
 /**

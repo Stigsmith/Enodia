@@ -442,15 +442,30 @@ const olympianList = olympiansFrom(loot)
 const sources: Source[] = []
 
 /**
- * A god's portrait.
+ * A god's portrait: the max-affection gift art, falling back to the headshot.
  *
- * The game's own `BoonSelectSymbols` glyphs were tried here and rejected: they
- * are small glowing marks meant to sit on a door at a distance, and at the size
- * a list shows them they are coloured dots. The portraits are faces, and a face
- * is what a player recognises. `assets/symbols/` keeps the glyphs for wherever
- * a small mark is genuinely the right thing.
+ * Three sets were tried for this and the order they were rejected in matters.
+ *
+ * The game's own `BoonSelectSymbols` glyphs went first: small glowing marks
+ * meant to sit on an Exit at a distance, and at list size they are coloured
+ * dots. `assets/symbols/` keeps them for wherever a small mark is right.
+ *
+ * The `gods/` headshots replaced them, and they are faces, which is what a
+ * player recognises. But they are **cropped portraits**, so at 22 pixels in a
+ * dropdown they reduce to a smear of skin and hair.
+ *
+ * **The gift portraits win.** `assets/gifts/` is the max-affection art, one per
+ * character, and they are drawn small and whole: a full figure, a strong
+ * silhouette and one dominant colour each. `assets/README.md` shelved them as
+ * "a possible alternate to gods/, unused so far". This is that alternate.
+ *
+ * `hades` has no gift art of its own, only the Hades and Persephone pair, so
+ * the fallback is not decoration: it is the one case that needs it.
  */
-const portrait = (name: string): string | null => icons.get(name.toLowerCase())?.file ?? null
+const portrait = (name: string): string | null => {
+  const slug = name.toLowerCase()
+  return icons.get(`${slug}-gift`)?.file ?? icons.get(slug)?.file ?? null
+}
 
 for (const [god, pool] of godPoolsFrom(loot)) {
   sources.push({
@@ -482,7 +497,9 @@ sources.push({
   id: 'Selene',
   name: 'Selene',
   kind: 'hex',
-  icon: icons.get('selene')?.file ?? null,
+  // Through the same resolver as every other character, or Selene is the one
+  // face in the app still wearing the old headshot.
+  icon: portrait('selene'),
   traits: named([...traits.values()].filter((trait) => trait.slot === 'Spell').map((trait) => trait.id)),
 })
 
@@ -541,6 +558,12 @@ for (const [setName, members] of Object.entries(unitSets)) {
  * directly. `The Enchantress` and `The Fates` kept their article in the
  * filename, so both shapes are tried.
  */
+/** An Arcana's own art, and never another category's. */
+const arcanaIcon = (key: string): string | null => {
+  const found = icons.get(key)?.file
+  return found && found.startsWith('arcana/') ? found : null
+}
+
 const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
   .filter(([, record]) => {
     const card = dictOf(record)
@@ -557,7 +580,19 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
       name,
       text: describe(id),
       cost: typeof card.Cost === 'number' ? card.Cost : null,
-      icon: icons.get(bare)?.file ?? icons.get(slug)?.file ?? null,
+      /**
+       * Kept inside `arcana/`, and the full slug tried before the bare one.
+       *
+       * Most cards are filed without their article, so "The Boatman" needs the
+       * bare `boatman`. **Two are not**, and one of those collided: "The Fates"
+       * is `arcana/the-fates.png`, and the bare `fates` matched
+       * `characters/fates.webp` instead, so the card rendered as the
+       * characters' portrait. Full slug first fixes the order, and restricting
+       * the search to this category removes the whole class of collision:
+       * `assets/README.md` already warns that a slug can be claimed twice and
+       * that directory order silently decides which wins.
+       */
+      icon: arcanaIcon(slug) ?? arcanaIcon(bare) ?? null,
     }
   })
   .filter((card) => card.name)

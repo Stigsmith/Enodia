@@ -13,6 +13,16 @@
 const KEY = 'enodia.prefs'
 const VERSION = 1
 
+/**
+ * Which layout the build manager opens a single build in.
+ *
+ * Two of the five survived the design review as detail views. They are a
+ * setting rather than a control on the page because a reader wants one of them
+ * and keeps wanting it, and a switcher on every build asks the question again
+ * every time.
+ */
+export type BuildDetail = 'poster' | 'constellation'
+
 export type Prefs = {
   version: number
   /**
@@ -23,9 +33,11 @@ export type Prefs = {
    * returning player starts having to reconstruct what they were doing.
    */
   staleAfterHours: number
+  /** Poster or Constellation, for a single build. */
+  buildDetail: BuildDetail
 }
 
-export const DEFAULT_PREFS: Prefs = { version: VERSION, staleAfterHours: 3 }
+export const DEFAULT_PREFS: Prefs = { version: VERSION, staleAfterHours: 3, buildDetail: 'poster' }
 
 function migrate(stored: unknown): Prefs | null {
   if (typeof stored !== 'object' || stored === null) return null
@@ -37,6 +49,13 @@ function migrate(stored: unknown): Prefs | null {
       typeof record.staleAfterHours === 'number' && record.staleAfterHours >= 0
         ? record.staleAfterHours
         : DEFAULT_PREFS.staleAfterHours,
+    // Absent in anything stored before the build manager existed, and a missing
+    // field is not a reason to throw the rest of somebody's settings away.
+    // That is why the version did not go up for this.
+    buildDetail:
+      record.buildDetail === 'poster' || record.buildDetail === 'constellation'
+        ? record.buildDetail
+        : DEFAULT_PREFS.buildDetail,
   }
 }
 

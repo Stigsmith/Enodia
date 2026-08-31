@@ -16,11 +16,25 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import type { BuildDetail } from '../state/prefs.ts'
 import { FRAMES, applyFrame, frameVars, readFrame, writeFrame } from './frames.ts'
+
+/** The two layouts a single build can open in. */
+const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
+  { id: 'poster', name: 'Poster', note: 'The art large, everything else demoted. One build as a page' },
+  {
+    id: 'constellation',
+    name: 'Constellation',
+    note: 'Five fixed positions round the arm. A dark spoke is a gap you see at once',
+  },
+]
 
 type Entry = {
   label: string
   note: string
+  /** a mark beside the label, where one says it faster than the words */
+  icon?: string
   /** absent means it is not built, and it says so */
   action?: () => void
 }
@@ -34,7 +48,7 @@ export function Menu({
 }: {
   onStartRun: () => void
   hasRun: boolean
-  onEndRun: () => void
+  onEndRun: (outcome?: 'died' | 'finished') => void
   /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
   onShowBriefing?: () => void
   /** the build manager, which is a screen rather than an overlay */
@@ -42,12 +56,25 @@ export function Menu({
 }) {
   const [open, setOpen] = useState(false)
   const [frame, setFrame] = useState(readFrame)
+  /**
+   * Which layout a single build opens in.
+   *
+   * A setting rather than a control on the build manager itself: a reader wants
+   * one of the two and keeps wanting it, and a switcher on every build asks the
+   * same question every time. Written straight through to `enodia.prefs`, and
+   * the build manager reads it when it mounts.
+   */
+  const [buildDetail, setBuildDetail] = useState<BuildDetail>(() => loadPrefs().buildDetail)
   const panel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     applyFrame(frame)
     writeFrame(frame)
   }, [frame])
+
+  useEffect(() => {
+    savePrefs({ ...loadPrefs(), buildDetail })
+  }, [buildDetail])
 
   useEffect(() => {
     if (!open) return
@@ -69,9 +96,43 @@ export function Menu({
     {
       title: 'This run',
       entries: [
-        hasRun
-          ? { label: 'End this run', note: 'Clears it and returns to setup', action: () => { onEndRun(); setOpen(false) } }
-          : { label: 'Start a run', note: 'Pick an arm, an aspect and a way', action: () => { onStartRun(); setOpen(false) } },
+        /**
+         * Dying and stopping are different events, so they are different
+         * entries. Both end the run and both keep it: `run.ts` archives what
+         * was held and how far it got, tagged with which of the two it was.
+         * A run ended before today was simply discarded, and a history is the
+         * one thing that cannot be backfilled later.
+         */
+        ...(hasRun
+          ? [
+              {
+                label: 'Died here',
+                note: 'Ends the run and keeps it, with where it stopped',
+                icon: 'shell/location-zagreus.png',
+                action: () => {
+                  onEndRun('died')
+                  setOpen(false)
+                },
+              },
+              {
+                label: 'Finished the run',
+                note: 'Reached the end. Ends it and keeps it',
+                action: () => {
+                  onEndRun('finished')
+                  setOpen(false)
+                },
+              },
+            ]
+          : [
+              {
+                label: 'Start a run',
+                note: 'Pick an arm, an aspect and a way',
+                action: () => {
+                  onStartRun()
+                  setOpen(false)
+                },
+              },
+            ]),
         ...(hasRun && onShowBriefing
           ? [
               {
@@ -148,7 +209,12 @@ export function Menu({
                       onClick={entry.action}
                       disabled={!entry.action}
                     >
-                      <span className="menu-label">{entry.label}</span>
+                      <span className="menu-label">
+                        {entry.icon ? (
+                          <img className="menu-entry-icon" src={`/${entry.icon}`} alt="" />
+                        ) : null}
+                        {entry.label}
+                      </span>
                       <span className="menu-note">{entry.note}</span>
                     </button>
                   </li>
@@ -157,9 +223,40 @@ export function Menu({
             </section>
           ))}
 
-          {/* Which frame rings a bubble. It stays a setting until the owner
-              picks one, and the swatch is the whole point of it being here:
-              the answer is what it looks like, not what it is called. */}
+          {/* How a single build opens in the build manager.
+              *
+              * Two of the five layouts survived the review and both were kept,
+              * because they answer different questions: the Poster is "what
+              * shall I try", the Constellation is "where are the gaps". */}
+          <section>
+            <h2>A build opens as</h2>
+            <ul className="menu-choice">
+              {DETAILS.map((option) => (
+                <li key={option.id}>
+                  <button
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={buildDetail === option.id}
+                    className={buildDetail === option.id ? 'is-on' : ''}
+                    onClick={() => setBuildDetail(option.id)}
+                  >
+                    <span className="menu-label">
+                      {option.name}
+                      {buildDetail === option.id ? (
+                        <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
+                      ) : null}
+                    </span>
+                    <span className="menu-note">{option.note}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* Which frame rings a bubble. Three now: the owner picked the Exit
+              reward marker and kept Hecate's two circles as alternatives. The
+              swatch is the whole point of it being here: the answer is what it
+              looks like, not what it is called. */}
           <section>
             <h2>Frame</h2>
             <ul className="menu-frames">
@@ -179,7 +276,7 @@ export function Menu({
                       style={frameVars(option) as React.CSSProperties}
                       aria-hidden="true"
                     >
-                      <img className="menu-frame-face" src="/gods/zeus.webp" alt="" />
+                      <img className="menu-frame-face" src="/gifts/zeus-gift.png" alt="" />
                       {option.file ? <img className="menu-frame-art" src={`/${option.file}`} alt="" /> : null}
                     </span>
                     <span className="menu-label">
