@@ -37,7 +37,16 @@ import type { Fix, FixOption, Problem } from '../engine/build-check.ts'
 import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
-import { FearStepper } from './Fear.tsx'
+import { FearStepper, Stepper } from './Fear.tsx'
+
+/**
+ * The most runs a stepper will count to.
+ *
+ * Not a rule of anything: a ceiling the arrows need so they can be disabled at
+ * the top, and high enough that nobody meets it. Somebody with more than a
+ * thousand runs on one build can type the number.
+ */
+const RUNS_CEILING = 999
 import { Tabs, TabPanel } from './Tabs.tsx'
 import type { Tab } from './Tabs.tsx'
 import { BuildTray } from './BuildTray.tsx'
@@ -238,6 +247,17 @@ export function BuildEditor({
       const boons = was.boons.filter((id) => id !== option.displaces?.id)
       return { ...was, boons: [...boons, option.id] }
     })
+
+  /**
+   * Whether the trash button is asking rather than acting.
+   *
+   * **It used to just fire.** The build menu has had a confirm step since the
+   * comment above it was written, recording that delete "fired straight into
+   * storage with no confirmation and nothing to undo it". The editor's trash
+   * button never got the same treatment, and the owner found it the obvious
+   * way: one press and the build was gone.
+   */
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const [readCaveats, setReadCaveats] = useState<string[]>([])
   const acknowledged =
@@ -708,40 +728,24 @@ export function BuildEditor({
               onChange={(fear) => setPlay({ fear })}
             />
 
+            {/* The same stepper Fear uses. It was built for Fear first and
+              * these two kept plain number fields on the same panel three rows
+              * apart, which the owner noticed immediately. */}
             <div className="editor-pair">
-              <label className="editor-field">
-                <span>Runs</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={play?.runs ?? ''}
-                  onChange={(event) =>
-                    setPlay({
-                      runs:
-                        event.target.value === ''
-                          ? undefined
-                          : Math.max(0, Number(event.target.value) || 0),
-                    })
-                  }
-                />
-              </label>
-              <label className="editor-field">
-                <span>Clears</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={play?.runs ?? 0}
-                  value={play?.clears ?? ''}
-                  onChange={(event) =>
-                    setPlay({
-                      clears:
-                        event.target.value === ''
-                          ? undefined
-                          : Math.min(Math.max(0, Number(event.target.value) || 0), play?.runs ?? 0),
-                    })
-                  }
-                />
-              </label>
+              <Stepper
+                label="Runs"
+                value={play?.runs}
+                max={RUNS_CEILING}
+                onChange={(runs) => setPlay({ runs })}
+              />
+              <Stepper
+                label="Clears"
+                value={play?.clears}
+                /* Clears cannot exceed runs, which `setPlay` also clamps and
+                 * `winRate` clamps again when it draws. */
+                max={play?.runs ?? 0}
+                onChange={(clears) => setPlay({ clears })}
+              />
             </div>
 
             <Dropdown
@@ -826,9 +830,26 @@ export function BuildEditor({
                   : 'Read the caveats first'}
             </button>
             {initial && onDelete ? (
-              <button type="button" className="quiet editor-delete" onClick={() => onDelete(initial.id)}>
-                Delete
-              </button>
+              confirmingDelete ? (
+                <span className="editor-delete-ask">
+                  <span>Delete this build?</span>
+                  <button type="button" className="quiet" onClick={() => onDelete(initial.id)}>
+                    Delete it
+                  </button>
+                  <button type="button" className="quiet" onClick={() => setConfirmingDelete(false)}>
+                    Keep it
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="quiet editor-delete"
+                  title="Delete this build"
+                  onClick={() => setConfirmingDelete(true)}
+                >
+                  Delete
+                </button>
+              )
             ) : null}
           </div>
         </aside>

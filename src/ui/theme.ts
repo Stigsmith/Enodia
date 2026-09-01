@@ -65,7 +65,7 @@ export const THEMES: Theme[] = [
     platedByTheGame: true,
     wallpapers: [
       { id: 'melinoe', name: 'Melinoë', file: 'themes/unseen/lead-melinoe-witchfire.jpg', opacity: 0.12 },
-      { id: 'crossroads', name: 'The Crossroads', file: 'themes/unseen/crossroads-cauldron.png', opacity: 0.12 },
+      { id: 'crossroads', name: 'The Cauldron', file: 'themes/unseen/crossroads-cauldron.png', opacity: 0.12 },
       { id: 'thanatos', name: 'Thanatos', file: 'themes/unseen/thanatos.jpg', opacity: 0.11 },
       { id: 'tartarus', name: 'Tartarus', file: 'themes/unseen/tartarus.jpg', opacity: 0.11 },
       { id: 'warsong', name: 'Warsong', file: 'themes/unseen/warsong.jpg', opacity: 0.12 },
@@ -79,8 +79,8 @@ export const THEMES: Theme[] = [
     fog: '80% 60% at 50% 0%',
     platedByTheGame: true,
     wallpapers: [
-      { id: 'cloud', name: 'Above the cloud', file: 'themes/olympian/lead-above-the-cloud.png', opacity: 0.04 },
-      { id: 'sunburst', name: 'Sunburst', file: 'themes/olympian/sunburst-leap.png', opacity: 0.1 },
+      { id: 'cloud', name: 'Olympos', file: 'themes/olympian/lead-above-the-cloud.png', opacity: 0.04 },
+      { id: 'sunburst', name: 'Hermes', file: 'themes/olympian/sunburst-leap.png', opacity: 0.1 },
       { id: 'pantheon', name: 'The pantheon', file: 'themes/olympian/the-pantheon.jpg', opacity: 0.09 },
     ],
   },
@@ -93,11 +93,11 @@ export const THEMES: Theme[] = [
     platedByTheGame: false,
     wallpapers: [
       { id: 'asphodel', name: 'Asphodel', file: 'themes/infernal/lead-asphodel.jpg', opacity: 0.1 },
-      { id: 'titan', name: 'The titan, chained', file: 'themes/infernal/titan-chained.jpg', opacity: 0.12 },
-      { id: 'gate', name: 'The gate', file: 'themes/infernal/zagreus-gate.jpg', opacity: 0.1 },
+      { id: 'titan', name: 'Hades, chained', file: 'themes/infernal/titan-chained.jpg', opacity: 0.12 },
+      { id: 'gate', name: 'Pact of Punishment', file: 'themes/infernal/zagreus-gate.jpg', opacity: 0.1 },
       { id: 'ridge', name: 'Asphodel ridge', file: 'themes/infernal/asphodel-ridge.jpg', opacity: 0.12 },
       { id: 'lord', name: 'Lord of the dead', file: 'themes/infernal/lord-of-the-dead.jpg', opacity: 0.15 },
-      { id: 'red', name: 'Red blade', file: 'themes/infernal/zagreus-red.jpg', opacity: 0.14 },
+      { id: 'red', name: 'Stygian Blade', file: 'themes/infernal/zagreus-red.jpg', opacity: 0.14 },
     ],
   },
   {
@@ -110,7 +110,7 @@ export const THEMES: Theme[] = [
     wallpapers: [
       { id: 'chaos', name: 'Chaos', file: 'themes/cthonic/lead-chaos.jpg', opacity: 0.09 },
       { id: 'dream', name: 'The dream', file: 'themes/cthonic/dream-poppies.png', opacity: 0.09 },
-      { id: 'blacksun', name: 'Black sun', file: 'themes/cthonic/black-sun.png', opacity: 0.13 },
+      { id: 'blacksun', name: 'Retribution', file: 'themes/cthonic/black-sun.png', opacity: 0.13 },
     ],
   },
 ]

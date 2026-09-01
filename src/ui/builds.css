@@ -1017,10 +1017,15 @@ button.mark {
   border-bottom: 1px solid var(--div-2);
 }
 
+/* **Down fifteen percent, and the reason is the source art.**
+ *
+ * The aspect renders are around 400px on the long edge. At 22rem they were
+ * being drawn past their own resolution and going soft, which is what the owner
+ * saw. 18.7rem is the same picture inside its own pixels. */
 .poster-render {
   width: 100%;
-  max-width: 22rem;
-  max-height: 42vh;
+  max-width: 18.7rem;
+  max-height: 36vh;
   margin: 0 auto;
   display: block;
   object-fit: contain;
@@ -1541,14 +1546,30 @@ button.mark {
   }
 }
 
+/**
+ * The middle pane, on the same surface as the two rails.
+ *
+ * The tray and the rail both wear `sidebars.png`, and the panel between them
+ * was a flat `--ink-900` with a border, so three columns read as two of one
+ * thing and one of another. It takes the same art, mirrored nowhere and dimmed,
+ * with the tone carried by the same token underneath.
+ */
 .editor-panel {
+  position: relative;
   display: grid;
   gap: 0.7rem;
   align-content: start;
   padding: 0.9rem 1rem 1.1rem;
-  border: 1px solid var(--div-2);
   border-radius: var(--r-soft);
-  background: var(--ink-900);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.022), transparent 40%),
+    var(--ink-900);
+  overflow: hidden;
+}
+
+.editor-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .editor-rule {
@@ -5164,4 +5185,112 @@ button.mark {
 
 .fixlist-cost {
   color: var(--unbuilt);
+}
+
+
+/* Delete, once it has been asked. Inline rather than a dialog: the question is
+ * about the button beside it and moving it to the middle of the screen would
+ * make a small irreversible thing feel like a different one. */
+.editor-delete-ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--unbuilt);
+}
+
+.editor-delete-ask button {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: rgb(0 0 0 / 0.4);
+  color: var(--bone-dim);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.editor-delete-ask button:first-of-type:hover {
+  border-color: var(--unbuilt);
+  color: var(--bone);
+}
+
+.editor-delete-ask button:last-of-type:hover {
+  border-color: var(--lit);
+  color: var(--lit-hot);
+}
+
+
+/* -------------------------------------------------------------------------
+ * HOVERING A PIECE
+ *
+ * Nothing happened when you pointed at a boon, anywhere. Clicking one opened
+ * `PieceCard`, which is a dialog and is the right thing for reading; hovering
+ * should say what a thing is without committing you to a screen.
+ *
+ * Two backings, because the game uses two. A boon gets `plate-common.png`, the
+ * bar it draws behind a boon's name. Everything that is not a boon gets
+ * `tooltip-backing.png`, which is what the game puts behind a line of
+ * explanation.
+ * ---------------------------------------------------------------------- */
+
+.peek {
+  position: fixed;
+  z-index: 60;
+  max-width: 20rem;
+  padding: 0.6rem 0.8rem 0.7rem;
+  pointer-events: none;
+  /* Fades in rather than snapping, so sweeping across a grid of twenty marks
+   * does not strobe. */
+  animation: peek-in 0.12s ease-out;
+}
+
+@keyframes peek-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peek {
+    animation: none;
+  }
+}
+
+/* A boon, on the bar the game draws behind a boon's name. Stretched, because
+ * unlike a picker row this box is close to the art's own proportions. */
+.peek.is-boon {
+  background: url('/frames/plate-common.png') center / 100% 100% no-repeat;
+}
+
+/* Everything else, on the game's tooltip backing. */
+.peek.is-other {
+  background: url('/shell/tooltip-backing.png') center / 100% 100% no-repeat;
+}
+
+.peek-name {
+  display: block;
+  font-family: var(--display);
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.peek-kind {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lit-hot);
+}
+
+.peek-text {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--bone-dim);
 }

@@ -13,7 +13,38 @@
  * the traits nothing offers.
  */
 
+import { usePeekBind } from './Peek.tsx'
+import type { Peeked } from './Peek.tsx'
 import type { Piece } from './build-pieces.ts'
+
+/**
+ * A piece, as the hover panel describes it.
+ *
+ * Only a boon wears the boon plate. A keepsake, a familiar, a Hex, an Arcana
+ * card and an aspect are not boons and get the game's tooltip backing instead,
+ * which is the owner's split and is right: a boon plate around an Arcana card
+ * would be saying it is one.
+ */
+const KIND_WORD: Record<string, string> = {
+  aspect: 'Aspect',
+  core: 'Core boon',
+  boon: 'Boon',
+  duo: 'Duo or legendary',
+  hex: 'Hex',
+  hammer: 'Daedalus Hammer',
+  keepsake: 'Keepsake',
+  familiar: 'Familiar',
+  arcana: 'Arcana',
+}
+
+const BOON_KINDS = new Set(['core', 'boon', 'duo'])
+
+const peekOf = (piece: Piece): Peeked => ({
+  name: piece.name,
+  text: piece.text,
+  kind: piece.slotName ?? KIND_WORD[piece.kind] ?? null,
+  boon: BOON_KINDS.has(piece.kind),
+})
 
 export function Mark({
   piece,
@@ -27,6 +58,10 @@ export function Mark({
   showGlyph?: boolean
   onOpen?: (piece: Piece) => void
 }) {
+  // Every mark, everywhere, without any layout having to hand it down. See
+  // `Peek.tsx` for why this is a context.
+  const peek = usePeekBind()(peekOf(piece))
+
   const body = (
     <>
       {piece.icon ? (
@@ -48,14 +83,20 @@ export function Mark({
 
   if (!onOpen) {
     return (
-      <span className={className} style={style}>
+      <span className={className} style={style} {...peek}>
         {body}
       </span>
     )
   }
 
   return (
-    <button type="button" className={className} style={style} onClick={() => onOpen(piece)}>
+    <button
+      type="button"
+      className={className}
+      style={style}
+      onClick={() => onOpen(piece)}
+      {...peek}
+    >
       {body}
       <span className="visually-hidden">{piece.name}</span>
     </button>
