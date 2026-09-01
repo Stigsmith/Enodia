@@ -1520,6 +1520,8 @@ button.mark {
   margin-top: 1.25rem;
 }
 
+/* Tray, panel, rail. The two rails are fixed because both are pictures of
+ * fixed things; the panel takes what is left. */
 @media (min-width: 52rem) {
   .editor-grid {
     grid-template-columns: 15rem minmax(0, 1fr);
@@ -1527,12 +1529,15 @@ button.mark {
   }
 }
 
-/* The three-column rule that used to live here is gone with the three panels.
- * There is one panel now, and widening the tray past what a mark grid needs
- * would only stretch the marks apart. */
+@media (min-width: 76rem) {
+  .editor-grid {
+    grid-template-columns: 15rem minmax(0, 1fr) 15rem;
+  }
+}
+
 @media (min-width: 82rem) {
   .editor-grid {
-    grid-template-columns: 17rem minmax(0, 1fr);
+    grid-template-columns: 17rem minmax(0, 1fr) 17rem;
   }
 }
 
@@ -4508,8 +4513,15 @@ button.mark {
   color: var(--bone-dim);
 }
 
+/* The whole shorthand, not just the image.
+ *
+ * The original `.tab.is-open` further up sets `background:` as a shorthand,
+ * which resets size to `auto` and repeat to `repeat`. Overriding only
+ * `background-image` here left the lit tab tiling at its natural 220 by 110
+ * inside an 82 by 25 button, which is why the selected tab came out as a
+ * diagonal smear. */
 .tab.is-open {
-  background-image: url('/shell/tray-tab-highlight.png');
+  background: url('/shell/tray-tab-highlight.png') center / 100% 100% no-repeat;
   color: var(--lit-hot);
 }
 
@@ -4665,4 +4677,107 @@ button.mark {
   vertical-align: -0.18rem;
   background: url('/icons/boon.png') center / contain no-repeat;
   opacity: 0.5;
+}
+
+
+/* -------------------------------------------------------------------------
+ * THE RIGHT RAIL
+ *
+ * Everything true of the whole build rather than of any one tab: what stops a
+ * save, what has to be read before one, and the buttons themselves. Always on
+ * screen, mirroring the tray on the other side.
+ *
+ * The blockers were a sticky banner over the panel and the caveats were below
+ * it, so the two halves of "can you save this yet" lived in different places
+ * and one of them moved as you scrolled. One column with Save at the bottom
+ * puts the reason a save is refused beside the thing refusing.
+ * ---------------------------------------------------------------------- */
+
+.editor-rail {
+  position: relative;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: 0.75rem 0.8rem 0.9rem;
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+  overflow: hidden;
+}
+
+/* The tray's own backing, flipped, so the lit edge lands on the outside of
+ * this side instead of the inside. A background cannot be mirrored, so it goes
+ * on a layer that can be. */
+.editor-rail::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/shell/sidebars.png') left top / 100% auto no-repeat;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
+/* Everything real sits above the backing. */
+.editor-rail > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 76rem) {
+  .editor-rail {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+/* In the rail the banner is the column rather than a thing stuck over one, so
+ * it gives up the sticky and the shadow it needed for that. */
+.editor-rail .editor-banner {
+  position: static;
+  margin: 0;
+  box-shadow: none;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.editor-rail .editor-caveats,
+.editor-rail .editor-check {
+  margin: 0;
+  background: rgb(0 0 0 / 0.35);
+}
+
+/* A narrow column, so the buttons stack and Save leads. */
+.editor-rail .editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.editor-rail .editor-actions > button:not(.editor-delete) {
+  flex: 1 1 auto;
+}
+
+/* -------------------------------------------------------------------------
+ * THE READING, AS ITS OWN BAR
+ *
+ * Neither a control nor a warning: a paragraph about the build. It wants the
+ * width to put six reasons beside six facts, which a 15rem rail cannot give it,
+ * and under all three columns it stops moving every time a tab changes height.
+ * ---------------------------------------------------------------------- */
+
+.editor-reading {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem 1rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+/* Two columns of charges once there is room, because six of them stacked is a
+ * long scroll for something nobody has to act on in order. */
+@media (min-width: 68rem) {
+  .editor-reading .editor-charges {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.4rem;
+  }
 }
