@@ -13,6 +13,7 @@
  */
 
 import { arcanaById, iconOf, traits, weapons } from '../data/app.ts'
+import { authorWord, readName } from '../state/identity.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 export function Shared({
@@ -38,7 +39,7 @@ export function Shared({
   return (
     <div className="shared" role="dialog" aria-label="A build someone shared with you">
       <div className="shared-card">
-        <p className="shared-eyebrow">Someone shared a build</p>
+        <p className="shared-eyebrow">{authorWord(build.author, readName())} shared a build</p>
         <h2 className="shared-name">{build.name || 'Untitled build'}</h2>
         {build.say ? <p className="shared-say">{build.say}</p> : null}
 

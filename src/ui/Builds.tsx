@@ -32,6 +32,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -42,6 +43,16 @@ import type { FacetId, SortId } from './build-filter.ts'
 import { Card } from './variants/Card.tsx'
 import { Constellation } from './variants/Constellation.tsx'
 import { Poster } from './variants/Poster.tsx'
+
+/** The two layouts a single build can open in. */
+const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
+  { id: 'poster', name: 'Poster', note: 'The art large, everything else demoted. One build as a page' },
+  {
+    id: 'constellation',
+    name: 'Constellation',
+    note: 'Five fixed positions round the arm. A dark spoke is a gap you see at once',
+  },
+]
 
 export function Builds({ onClose }: { onClose?: () => void }) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
@@ -113,6 +124,33 @@ export function Builds({ onClose }: { onClose?: () => void }) {
             All builds
           </button>
           {open.by === 'sample' ? <SampleTag /> : null}
+          {/* Whose it is, when it is not yours. Your own name on your own
+            * builds is noise; somebody else's is the thing worth knowing. */}
+          {open.author && open.author !== readName() ? (
+            <p className="builds-author">by {open.author}</p>
+          ) : null}
+
+          {/* How this build is drawn, on the screen that draws it.
+            *
+            * It was in the overview's filter bar, which was the wrong half of
+            * the same mistake the menu was making: a control for a layout you
+            * cannot see while you set it. Here, pressing it changes the thing
+            * you are looking at. */}
+          <div className="builds-layout" role="radiogroup" aria-label="How this build is drawn">
+            {DETAILS.map((one) => (
+              <button
+                key={one.id}
+                type="button"
+                role="radio"
+                aria-checked={detail === one.id}
+                className={detail === one.id ? 'is-on' : ''}
+                title={one.note}
+                onClick={() => chooseDetail(one.id)}
+              >
+                {one.name}
+              </button>
+            ))}
+          </div>
 
           {/* Two controls now, so the `margin-left: auto` that pushed a single
             * one right moves onto a wrapper holding both. */}
@@ -182,8 +220,6 @@ export function Builds({ onClose }: { onClose?: () => void }) {
         onClear={() => setSelection(EMPTY_SELECTION)}
         sort={sort}
         onSort={setSort}
-        detail={detail}
-        onDetail={chooseDetail}
         showing={shown.length}
         total={library.length}
       />

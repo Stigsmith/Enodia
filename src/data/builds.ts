@@ -173,6 +173,19 @@ export type ShownBuild = {
   schemaVersion?: number
   /** the id this was duplicated from, or absent. Stored now, displayed later */
   derivedFrom?: string
+  /**
+   * Who wrote it, as a name they picked in their own browser.
+   *
+   * **It travels, unlike `play`.** A build somebody sends you should say whose
+   * it is, and that is the only reason this exists. It is not an identity
+   * anybody can verify and nothing in the tool treats it as one: there is no
+   * account behind it, two people can pick the same name, and `state/identity.ts`
+   * says so at more length.
+   *
+   * Stamped when a build is created and when one is forked, never on an
+   * ordinary save. Editing somebody's build does not make it yours.
+   */
+  author?: string
 }
 
 /**

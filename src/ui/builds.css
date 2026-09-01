@@ -3394,9 +3394,9 @@ button.mark {
  * screen is a guess, not a choice.
  * ----------------------------------------------------------------------- */
 
-/* How a build opens. Two options, so a switch: one control, two halves, and
- * the lit half is the answer. */
-.bfilter-layout {
+/* How a build is drawn, on the screen that draws it. Two options, so a switch:
+ * one control, two halves, and the lit half is the answer. */
+.builds-layout {
   display: inline-flex;
   border: 1px solid var(--div-3);
   border-radius: var(--r-pill);
@@ -3404,7 +3404,7 @@ button.mark {
   overflow: hidden;
 }
 
-.bfilter-layout button {
+.builds-layout button {
   padding: 0.25rem 0.7rem;
   border: 0;
   background: none;
@@ -3415,14 +3415,14 @@ button.mark {
   transition: color var(--t-response) var(--e-response);
 }
 
-.bfilter-layout button:hover { color: var(--bone-dim); }
+.builds-layout button:hover { color: var(--bone-dim); }
 
-.bfilter-layout button.is-on {
+.builds-layout button.is-on {
   background: color-mix(in oklab, var(--lit-dim) 40%, transparent);
   color: var(--lit-hot);
 }
 
-.bfilter-layout button:focus-visible {
+.builds-layout button:focus-visible {
   outline: 2px solid var(--lit);
   outline-offset: -2px;
 }
@@ -3459,3 +3459,42 @@ button.mark {
 }
 
 .setting-choice button.is-on .menu-label { color: var(--lit); }
+
+/* Your name, in Settings. */
+.setting-name {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 18rem;
+}
+
+.setting-name > span {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.setting-name input {
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.9rem;
+}
+
+.setting-name input:focus {
+  outline: none;
+  border-color: var(--lit);
+}
+
+/* Whose build this is, when it is not yours. */
+.builds-author {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--lit);
+}

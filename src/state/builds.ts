@@ -19,6 +19,7 @@
  */
 
 import type { SavedBuild, ShownBuild } from '../data/builds.ts'
+import { readName } from './identity.ts'
 
 const KEY = 'enodia.builds'
 const VERSION = 1
@@ -167,11 +168,21 @@ export function duplicateBuild(
   source: ShownBuild,
   now: string = new Date().toISOString(),
 ): { builds: SavedBuild[]; copy: SavedBuild } {
-  const { play: _play, ...rest } = source
+  const { play: _play, author: _author, ...rest } = source
+  const mine = readName()
   const copy: SavedBuild = {
     ...rest,
     id: newBuildId(),
     by: 'owner',
+    /**
+     * A fork is your work built on theirs, so it carries your name and
+     * `derivedFrom` keeps the trail back to whoever wrote the original.
+     *
+     * **The source's author is dropped rather than kept when you have no name
+     * of your own.** Inheriting it would have your fork claiming somebody else
+     * wrote it, which is the one thing this field must never say.
+     */
+    ...(mine ? { author: mine } : {}),
     // The name field caps at 60, and two identical names in a list help nobody.
     name: `${source.name} copy`.slice(0, 60),
     derivedFrom: source.id,
@@ -225,6 +236,7 @@ export function blankBuild(weapon: string, aspect: string): ShownBuild {
   return {
     id: newBuildId(),
     schemaVersion: BUILD_SCHEMA,
+    ...(readName() ? { author: readName() } : {}),
     name: '',
     say: '',
     how: '',

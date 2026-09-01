@@ -22,22 +22,11 @@
  * saying why. That is the failure mode of every collapsed filter pane.
  */
 
-import type { BuildDetail } from '../state/prefs.ts'
 import { useId, useState } from 'react'
 
 import { Dropdown } from './Dropdown.tsx'
 import { SORTS, SURFACE_FACETS, countSelected } from './build-filter.ts'
 import type { Facet, FacetId, SortId } from './build-filter.ts'
-
-/** The two layouts a single build can open in. */
-const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
-  { id: 'poster', name: 'Poster', note: 'The art large, everything else demoted. One build as a page' },
-  {
-    id: 'constellation',
-    name: 'Constellation',
-    note: 'Five fixed positions round the arm. A dark spoke is a gap you see at once',
-  },
-]
 
 export function BuildFilters({
   facets,
@@ -45,8 +34,6 @@ export function BuildFilters({
   onClear,
   sort,
   onSort,
-  detail,
-  onDetail,
   showing,
   total,
 }: {
@@ -55,9 +42,6 @@ export function BuildFilters({
   onClear: () => void
   sort: SortId
   onSort: (sort: SortId) => void
-  /** how a build opens, set here rather than in the menu */
-  detail: BuildDetail
-  onDetail: (detail: BuildDetail) => void
   showing: number
   total: number
 }) {
@@ -91,26 +75,6 @@ export function BuildFilters({
           More filters
           {!open && hiddenPicks ? <span className="bfilter-badge">{hiddenPicks}</span> : null}
         </button>
-
-        {/* How a build opens. Two layouts, so a switch rather than a list:
-            the Poster is "what shall I try", the Constellation is "where are
-            the gaps". It sits with Sort because both are about how the library
-            is presented rather than about which builds are in it. */}
-        <div className="bfilter-layout" role="radiogroup" aria-label="How a build opens">
-          {DETAILS.map((one) => (
-            <button
-              key={one.id}
-              type="button"
-              role="radio"
-              aria-checked={detail === one.id}
-              className={detail === one.id ? 'is-on' : ''}
-              title={one.note}
-              onClick={() => onDetail(one.id)}
-            >
-              {one.name}
-            </button>
-          ))}
-        </div>
 
         <label className="bfilter-sort">
           <span>Sort</span>
