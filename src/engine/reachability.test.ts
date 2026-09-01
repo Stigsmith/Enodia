@@ -12,6 +12,7 @@ import {
   verdictForBuild,
 } from './reachability.ts'
 import { buildTraitIndex, olympiansFrom } from '../data/load.ts'
+import { ESTIMATED_EXITS } from '../state/run.ts'
 import type { Held, RunContext, Trait, TraitId, TraitIndex } from '../data/types.ts'
 
 // ---------------------------------------------------------------------------
@@ -237,6 +238,24 @@ describe('bands', () => {
     expect(bandFor({ minPicks: 1, exitsLeft: 6, needsASwap: false, unseenGods: 1 })).toBe('Possible')
     expect(bandFor({ minPicks: 4, exitsLeft: 3, needsASwap: false, unseenGods: 0 })).toBe('Long shot')
     expect(bandFor({ minPicks: 1, exitsLeft: 9, needsASwap: true, unseenGods: 0 })).toBe('Long shot')
+  })
+
+  it('starts a run long enough that an ordinary target is not already a Long shot', () => {
+    /**
+     * The one assertion that ties the band to the length of a real run.
+     *
+     * `ESTIMATED_EXITS` was 12 for a long time, which is one Region rather than
+     * a run of four, and `minPicks > exitsLeft` reads Long shot. So a build
+     * naming more than twelve boons was written off at the first Exit, and the
+     * tool was pessimistic about builds the game hands out routinely.
+     *
+     * This is deliberately about the shape and not the number: whatever the
+     * estimate becomes, a target wanting a dozen picks has to survive the start
+     * of a run.
+     */
+    expect(bandFor({ minPicks: 12, exitsLeft: ESTIMATED_EXITS, needsASwap: false, unseenGods: 0 })).not.toBe(
+      'Long shot',
+    )
   })
 })
 
