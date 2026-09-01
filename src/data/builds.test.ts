@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { arcana, familiars, olympians, traits, weapons } from './app.ts'
+import { arcana, arcanaById, familiars, olympians, traits, weapons } from './app.ts'
 import { SAMPLE_BUILDS } from './builds.ts'
 import { CORE_SLOTS } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
@@ -68,9 +68,12 @@ describe('the sample builds', () => {
     expect(olympian.size, `gods: ${[...olympian].join(', ')}`).toBeLessThanOrEqual(4)
   })
 
-  it.each(SAMPLE_BUILDS)('$name draws five Arcana, all different', (build) => {
-    expect(build.arcana).toHaveLength(5)
-    expect(new Set(build.arcana).size).toBe(5)
+  it.each(SAMPLE_BUILDS)('$name draws Arcana it could afford, all different', (build) => {
+    // The board is limited by Grasp rather than by how many cards you take:
+    // eighteen paid cards cost between 1 and 5, and a save tops out at 30.
+    const grasp = build.arcana.reduce((total, id) => total + (arcanaById.get(id)?.cost ?? 0), 0)
+    expect(grasp, `${build.arcana.length} cards`).toBeLessThanOrEqual(30)
+    expect(new Set(build.arcana).size).toBe(build.arcana.length)
   })
 
   it('gives every sample a distinct id', () => {

@@ -36,11 +36,12 @@ describe('a build as the engine\'s question', () => {
   it('leaves the optional boons out', () => {
     // They raise the ceiling and they are not the build. A run that never
     // offers one has not failed the build, and requiring them would report
-    // builds dead that are not.
-    const withOptional = SAMPLE_BUILDS.find((one) => (one.optional ?? []).length > 0)
-    expect(withOptional, 'no sample build carries optional boons any more').toBeTruthy()
-    const flat = targetOf(withOptional!).requires.flat()
-    for (const id of withOptional!.optional ?? []) expect(flat).not.toContain(id)
+    // builds dead that are not. The fixture is local because whether the
+    // shipped build happens to carry any is not what is under test.
+    const withOptional = { ...FIRST_BUILD, optional: ['ZeusWeaponBoon', 'HeraWeaponBoon'] }
+    const flat = targetOf(withOptional).requires.flat()
+    for (const id of withOptional.optional) expect(flat).not.toContain(id)
+    expect(flat).toEqual(expect.arrayContaining(FIRST_BUILD.boons))
   })
 
   it('carries the aspect and the hammers as sets of their own', () => {
@@ -52,12 +53,12 @@ describe('a build as the engine\'s question', () => {
 
 describe('the aspect is chosen once and never offered', () => {
   it('kills a build on another aspect, and names both', () => {
-    const other = SAMPLE_BUILDS.find((one) => one.aspect !== FIRST_BUILD.aspect)
-    expect(other).toBeTruthy()
-    const verdict = verdictForShown(FIRST_BUILD, context({ aspect: other!.aspect }), traits)
+    const other = 'StaffRaiseDeadAspect'
+    expect(other).not.toBe(FIRST_BUILD.aspect)
+    const verdict = verdictForShown(FIRST_BUILD, context({ aspect: other }), traits)
     expect(verdict.state).toBe('DEAD')
-    const runAspect = traits.get(other!.aspect)?.name?.replace(/^Aspect of /, '') ?? ''
-    expect(verdict.why).toContain(runAspect)
+    expect(verdict.why).toContain(traits.get(other)?.name?.replace(/^Aspect of /, '') ?? '')
+    expect(verdict.why).toContain(traits.get(FIRST_BUILD.aspect)?.name?.replace(/^Aspect of /, '') ?? '')
   })
 
   it('leaves a build on the run\'s own aspect alive', () => {
@@ -109,11 +110,11 @@ describe('the standing', () => {
     expect(tally.total).toBe(SAMPLE_BUILDS.length)
   })
 
-  it('closes the builds on other aspects the moment one is chosen', () => {
-    // The point of the number: an aspect settles most of the field at setup,
-    // before a single Exit. Nothing else in the tool says that out loud.
-    const chosen = buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits)
-    const others = SAMPLE_BUILDS.filter((one) => one.aspect !== FIRST_BUILD.aspect).length
-    expect(buildTally(chosen).closed).toBeGreaterThanOrEqual(others)
+  it('closes a build the moment another aspect is chosen', () => {
+    // An aspect settles the field at setup, before a single Exit.
+    const onIt = buildTally(buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits))
+    const offIt = buildTally(buildStanding(context({ aspect: 'StaffRaiseDeadAspect' }), traits))
+    expect(onIt.closed).toBe(0)
+    expect(offIt.closed).toBe(SAMPLE_BUILDS.length)
   })
 })

@@ -10,7 +10,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { traits } from '../data/app.ts'
-import { SAMPLE_BUILDS } from '../data/builds.ts'
+import { FIRST_BUILD, SAMPLE_BUILDS } from '../data/builds.ts'
+import type { ShownBuild } from '../data/builds.ts'
 import {
   EMPTY_SELECTION,
   apply,
@@ -23,6 +24,30 @@ import {
   sortBuilds,
 } from './build-filter.ts'
 import type { FacetId, Selection } from './build-filter.ts'
+
+/**
+ * A library of two, built here rather than taken from what ships.
+ *
+ * Three of these tests need two builds on different arms, and the shipped
+ * library is one build long: it is a stress test for the screens, not a fixture
+ * for the filter. Depending on it made the filter's own tests fail the moment
+ * somebody changed what ships, which is the wrong thing to be sensitive to.
+ */
+const PAIR: ShownBuild[] = [
+  FIRST_BUILD,
+  {
+    ...FIRST_BUILD,
+    id: 'fixture-other-arm',
+    name: 'Other arm',
+    weapon: 'WeaponDagger',
+    aspect: 'DaggerTripleAspect',
+    // A god the first build does not touch, so the AND test has something that
+    // genuinely cannot co-occur with the first build's arm.
+    boons: ['ZeusWeaponBoon'],
+    hammers: [],
+    arcana: [],
+  },
+]
 
 const facet = (id: FacetId, selection: Selection = EMPTY_SELECTION) => {
   const found = facets(SAMPLE_BUILDS, selection).find((one) => one.id === id)
@@ -103,30 +128,27 @@ describe('counting, which is the part that lies if you get it wrong', () => {
   it('never drops the chosen option, even if it would count zero', () => {
     // Choose an arm, then a god that arm does not have. The god has to stay in
     // its own list or the control would silently show something else.
-    const arm = SAMPLE_BUILDS[0]
-    const other = SAMPLE_BUILDS.find((build) => arm && build.weapon !== arm.weapon)
+    const [arm, other] = PAIR
     if (!arm || !other) throw new Error('need two arms')
     const godOnlyOther = godsOf(other).find((god) => !godsOf(arm).includes(god))
-    if (!godOnlyOther) return
+    if (!godOnlyOther) throw new Error('the fixture needs a god only the second build has')
 
     let selection = choose(EMPTY_SELECTION, 'god', godOnlyOther)
     selection = choose(selection, 'weapon', arm.weapon)
-    const values = facet('god', selection).options.map((option) => option.value)
-    expect(values).toContain(godOnlyOther)
+    const found = facets(PAIR, selection).find((one) => one.id === 'god')
+    expect(found?.options.map((option) => option.value)).toContain(godOnlyOther)
   })
 })
 
 describe('matching', () => {
   it('is AND across facets', () => {
-    const a = SAMPLE_BUILDS[0]
-    const b = SAMPLE_BUILDS.find((build) => a && build.weapon !== a.weapon)
+    const [a, b] = PAIR
     if (!a || !b) throw new Error('need two arms')
 
     const godOnlyB = godsOf(b).find((god) => !godsOf(a).includes(god))
-    if (godOnlyB) {
-      const both = choose(choose(EMPTY_SELECTION, 'weapon', a.weapon), 'god', godOnlyB)
-      expect(apply(SAMPLE_BUILDS, both)).toHaveLength(0)
-    }
+    if (!godOnlyB) throw new Error('the fixture needs a god only the second build has')
+    const both = choose(choose(EMPTY_SELECTION, 'weapon', a.weapon), 'god', godOnlyB)
+    expect(apply(PAIR, both)).toHaveLength(0)
   })
 
   it('an empty selection matches everything', () => {
@@ -154,8 +176,7 @@ describe('choosing', () => {
   })
 
   it('clears the aspect when the arm changes under it', () => {
-    const build = SAMPLE_BUILDS[0]
-    const other = SAMPLE_BUILDS.find((one) => build && one.weapon !== build.weapon)
+    const [build, other] = PAIR
     if (!build || !other) throw new Error('need two arms')
 
     const picked = choose(choose(EMPTY_SELECTION, 'weapon', build.weapon), 'aspect', build.aspect)
@@ -165,7 +186,7 @@ describe('choosing', () => {
     // list with no visible cause.
     const moved = choose(picked, 'weapon', other.weapon)
     expect(moved.aspect).toBeNull()
-    expect(apply(SAMPLE_BUILDS, moved).length).toBeGreaterThan(0)
+    expect(apply(PAIR, moved).length).toBeGreaterThan(0)
   })
 
   it('keeps the aspect when the arm is the one it belongs to', () => {

@@ -86,7 +86,16 @@
   letter-spacing: 0.04em;
   font-size: clamp(1.35rem, 4vw, 1.9rem);
   letter-spacing: 0.05em;
-  color: var(--lit-hot);
+  /**
+   * White in every theme, deliberately.
+   *
+   * This face is the game's own character-name face and it carries the page
+   * title. It read as jade under Unseen and gold under Olympian, which made a
+   * heading look like a different heading in each theme rather than the same
+   * one. `--bone` is fixed across all four, so the title stays put and the
+   * theme shows in everything around it.
+   */
+  color: var(--bone);
 }
 
 .builds-back {
@@ -2690,7 +2699,16 @@ button.mark {
   font-synthesis-weight: none;
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--lit-hot);
+  /**
+   * White in every theme, deliberately.
+   *
+   * This face is the game's own character-name face and it carries the page
+   * title. It read as jade under Unseen and gold under Olympian, which made a
+   * heading look like a different heading in each theme rather than the same
+   * one. `--bone` is fixed across all four, so the title stays put and the
+   * theme shows in everything around it.
+   */
+  color: var(--bone);
 }
 
 .theme-say {
@@ -3120,6 +3138,19 @@ button.mark {
   margin: 0.2rem 0;
   padding: 0;
   list-style: none;
+}
+
+.shared-more {
+  display: grid;
+  place-items: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--bone-faint);
 }
 
 .shared-marks img {
