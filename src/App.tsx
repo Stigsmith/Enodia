@@ -23,6 +23,11 @@ import { Briefing } from './ui/Briefing.tsx'
 import { Hecate } from './ui/Hecate.tsx'
 import { Arcana } from './ui/Arcana.tsx'
 import { Themes } from './ui/Themes.tsx'
+import { Settings } from './ui/Settings.tsx'
+import { Shared } from './ui/Shared.tsx'
+import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
+import { loadBuilds, saveBuild } from './state/builds.ts'
+import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { Rail } from './ui/Rail.tsx'
@@ -81,6 +86,61 @@ export function App() {
    * The run wins on arrival when there is one. Everything else lands on Builds.
    */
   const [view, setView] = useState<View>(() => (run ? 'run' : 'builds'))
+
+  /**
+   * A build that arrived in a link.
+   *
+   * Read once, on arrival, and the fragment is cleared as soon as it has been
+   * read: leaving it in the address bar means a reload offers the same build
+   * again after it has already been answered.
+   */
+  const [arrived, setArrived] = useState<ShownBuild | null>(null)
+
+  /**
+   * Bumped when storage changes underneath a screen that has already read it.
+   *
+   * `Builds` reads the library once, when it mounts, which is right: it owns
+   * that list while it is open. A build arriving in a link writes to storage
+   * from outside it, and if the build manager happens to be the screen behind
+   * the card it keeps showing the list it read before. Remounting it is the
+   * honest fix; reaching into its state from here would give the same list two
+   * owners.
+   */
+  const [libraryAt, setLibraryAt] = useState(0)
+
+  useEffect(() => {
+    const take = () => {
+      const payload = buildInUrl(window.location.hash)
+      if (!payload) return
+      // Cleared before the unpack rather than after, so a slow decode cannot
+      // leave the link sitting in the address bar to be offered again on the
+      // next reload. `replaceState` does not fire `hashchange`, so this cannot
+      // re-enter.
+      history.replaceState(null, '', window.location.pathname + window.location.search)
+      unpackBuild(payload).then((build) => {
+        if (build) setArrived(build)
+      })
+    }
+
+    take()
+    // Pasting a link into a tab that already has the tool open is a same
+    // document navigation: nothing remounts and nothing reloads, so without
+    // this the link would sit in the address bar doing nothing at all.
+    window.addEventListener('hashchange', take)
+    return () => window.removeEventListener('hashchange', take)
+  }, [])
+
+  /**
+   * There is deliberately no `live` flag around that decode.
+   *
+   * There was one, and under `StrictMode` it swallowed every shared link:
+   * React runs an effect twice in development, so the first run read the hash,
+   * cleared it and started decoding, its cleanup set the flag false, the second
+   * run found an empty hash and did nothing, and the decode then resolved into
+   * a guard that was already closed. Settling state after an unmount is a
+   * no-op in React 18 and later, so the flag was protecting against nothing and
+   * costing the whole feature.
+   */
 
   const buildCard = useCallback(
     (ctx: RunContext) => brief(ctx, lastSeen(loadTrail()), traits, { pinned, exit: entries.length }),
@@ -146,8 +206,32 @@ export function App() {
         onShowBriefing={run ? openBriefing : undefined}
       />
       <div className="app-view">{children}</div>
+
+      {/* A shared build covers whatever screen you were on, because it is a
+        * question that has to be answered before anything else makes sense. */}
+      {arrived ? (
+        <Shared
+          build={arrived}
+          replaces={loadBuilds().find((one) => one.id === arrived.id) ?? null}
+          onKeep={() => {
+            saveBuild(received(arrived))
+            setArrived(null)
+            setLibraryAt((was) => was + 1)
+            setView('builds')
+          }}
+          onDismiss={() => setArrived(null)}
+        />
+      ) : null}
     </div>
   )
+
+  if (screen === 'settings') {
+    return frame(
+      <div className="shell is-wide">
+        <Settings />
+      </div>,
+    )
+  }
 
   if (screen === 'themes') {
     return frame(
@@ -177,7 +261,7 @@ export function App() {
   if (screen === 'builds') {
     return frame(
       <div className="shell is-wide">
-        <Builds />
+        <Builds key={libraryAt} />
       </div>,
     )
   }
