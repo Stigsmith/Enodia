@@ -86,10 +86,21 @@ export const EMPTY_SELECTION: Selection = {
   fear: null,
 }
 
-export const countSelected = (selection: Selection): number =>
-  FACET_ORDER.filter((facet) => selection[facet] !== null).length
+/**
+ * How many facets are narrowing the list.
+ *
+ * **`!= null`, not `!== null`, and the difference is a bug that shipped.**
+ * `facets()` drops a facet with no options, so a caller rebuilding a selection
+ * out of what it returned gets an object missing those keys. `undefined` is not
+ * `null`, so an empty library counted all six facets as chosen and the bar
+ * offered to "Clear 6" with nothing selected.
+ *
+ * The type says every key is present. The type was being satisfied by a cast.
+ */
+export const countSelected = (selection: Partial<Selection>): number =>
+  FACET_ORDER.filter((facet) => selection[facet] != null).length
 
-export const isEmpty = (selection: Selection): boolean => countSelected(selection) === 0
+export const isEmpty = (selection: Partial<Selection>): boolean => countSelected(selection) === 0
 
 /**
  * The gods a build takes, derived from its boons.

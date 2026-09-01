@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { weapons } from '../data/app.ts'
-import { SAMPLE_BUILDS } from '../data/builds.ts'
+import { SAMPLE_BUILDS } from '../data/builds.fixture.ts'
 import { EMPTY_SELECTION, facets } from './build-filter.ts'
 
 const bar = facets(SAMPLE_BUILDS, EMPTY_SELECTION)

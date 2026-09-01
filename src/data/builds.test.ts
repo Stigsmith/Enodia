@@ -13,7 +13,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { arcana, arcanaById, familiars, olympians, traits, weapons } from './app.ts'
-import { SAMPLE_BUILDS } from './builds.ts'
+import { SAMPLE_BUILDS } from './builds.fixture.ts'
 import { CORE_SLOTS } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
 
