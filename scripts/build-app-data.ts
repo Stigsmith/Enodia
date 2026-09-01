@@ -367,6 +367,42 @@ function renderFor(trait: Trait): string | null {
   return icons.get(`${key}-render`)?.file ?? null
 }
 
+/**
+ * The aspect a trait is locked to, when it is locked to one.
+ *
+ * **Four of the sixteen staff hammers cannot be offered on most aspects**, and
+ * nothing in the resolved trait says so. Pharaoh Etchings and Scarab Etchings
+ * want the lone shade; Soulfilled Ankh and Mirrored Ankh want Raise Dead. Every
+ * arm has a pair or two like it. The editor was offering all sixteen whatever
+ * aspect the build was on, which is a hammer a run can never hand you.
+ *
+ * The gate is in `GameStateRequirements`, which `traits.json` keeps and the
+ * resolved index drops:
+ *
+ *     { Path: [ "GameState", "LastWeaponUpgradeName", "WeaponStaffSwing" ],
+ *       IsAny: [ "StaffRaiseDeadAspect" ] }
+ *
+ * So it is read off the raw table rather than the resolved one, which is the
+ * same split `CLAUDE.md` records for `TraitRequirements`: the resolved file is
+ * for what a trait *is*, the raw one for what it *states*.
+ */
+const rawTraits = dictOf(read('traits').data)
+
+function aspectGate(id: string): string[] | null {
+  const rules = (rawTraits[id] as { GameStateRequirements?: unknown[] } | undefined)
+    ?.GameStateRequirements
+  if (!Array.isArray(rules)) return null
+
+  for (const rule of rules) {
+    const one = rule as { Path?: unknown[]; IsAny?: unknown[] }
+    if (!Array.isArray(one.Path) || !Array.isArray(one.IsAny)) continue
+    if (one.Path[0] === 'GameState' && one.Path[1] === 'LastWeaponUpgradeName') {
+      return one.IsAny.map(String)
+    }
+  }
+  return null
+}
+
 const records = [...traits.values()]
   // Templates with no display name are never rendered, and 84 of them would be
   // a third of the payload.
@@ -380,6 +416,7 @@ const records = [...traits.values()]
     ...(trait.gods.length ? { gods: trait.gods } : {}),
     ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
     ...(trait.requires ? { requires: trait.requires } : {}),
+    ...(aspectGate(trait.id) ? { needsAspect: aspectGate(trait.id) } : {}),
     ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
     ...(describe(trait.id) ? { text: describe(trait.id) } : {}),
     ...(renderFor(trait) ? { render: renderFor(trait) } : {}),

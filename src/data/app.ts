@@ -18,6 +18,7 @@ type RawTrait = {
   gods?: string[]
   weapon?: string
   requires?: Requirement
+  needsAspect?: string[]
   icon?: string
   text?: string
   render?: string
@@ -65,6 +66,7 @@ export const traits: TraitIndex = new Map(
       gods: trait.gods ?? [],
       requiredWeapon: trait.weapon ?? null,
       requires: trait.requires ?? null,
+      needsAspect: trait.needsAspect ?? null,
       text: trait.text ?? null,
     } satisfies Trait,
   ]),

@@ -1806,8 +1806,11 @@ button.mark {
    * a table. Stretched to the row because the art has no repeatable middle, and
    * it survives it: the only structure in it is the left colour and the soft
    * right edge, both of which stay where they belong. */
+  /* `cover`, matching `.bsort-row`. See there for why the anchored version was
+   * tried and reverted. */
   background-image: var(--plate, none);
-  background-size: 100% 100%;
+  background-size: cover;
+  background-position: left center;
   background-repeat: no-repeat;
   background-color: transparent;
 }
@@ -1816,6 +1819,8 @@ button.mark {
  * still reads as a legendary. */
 .picklist-row:hover {
   background-image: url('/frames/plate-highlight.png'), var(--plate, none);
+  background-size: 100% 100%, cover;
+  background-position: center, left center;
   color: var(--bone);
 }
 
@@ -1833,7 +1838,7 @@ button.mark {
 }
 
 .picklist-row-name {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
 }
 
 /* The game's own sentence, one line of it, so a row stays a row. */
@@ -3834,12 +3839,11 @@ button.mark {
   object-fit: contain;
 }
 
-/* An empty slot wears the game's glyph, held back so a filled tile reads as the
- * one carrying information. */
+/* An empty slot wears the game's glyph at the size a filled one occupies, held
+ * back so a filled tile still reads as the one carrying information. It used to
+ * be shrunk to 60 percent, which made it a small icon in a large empty box. */
 .slotbar-glyph {
-  opacity: 0.28;
-  width: 60% !important;
-  height: 60% !important;
+  opacity: 0.45;
 }
 
 .slotbar-slot {
@@ -3980,8 +3984,11 @@ button.mark {
  * what an overhanging frame is for.
  * ---------------------------------------------------------------------- */
 
+/* Matched to `.bsort-face`. The hammers sit under the sorter in the same tab,
+ * and a 1.6rem icon beside a 2rem one reads as two lists rather than one
+ * screen. */
 .picklist-face {
-  --face: 1.6rem;
+  --face: 2rem;
   position: relative;
   display: inline-grid;
   grid-template: 100% / 100%;
@@ -4359,20 +4366,22 @@ button.mark {
   filter: brightness(1.25);
 }
 
+/* **No dashed box.** An empty slot was a small glyph floating inside a broken
+ * line square, which reads as a placeholder for a placeholder. The game's own
+ * slot glyph is already the picture of an empty slot, so it is drawn at the
+ * size a filled mark occupies and nothing is drawn around it. */
 .btray-empty {
   display: grid;
   place-items: center;
   width: 2.4rem;
   height: 2.4rem;
-  border: 1px dashed var(--div-4);
-  border-radius: var(--r-hair);
 }
 
 .btray-empty img {
-  width: 55%;
-  height: 55%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  opacity: 0.3;
+  opacity: 0.45;
 }
 
 .btray-card img {
@@ -4830,17 +4839,31 @@ button.mark {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
   padding: 0.35rem 0.45rem;
+  border: 0;
   border-radius: var(--r-hair);
   color: var(--bone-dim);
+  font-family: var(--body);
+  /* The row is a `<button>` now that clicking it is how a boon is taken, and a
+   * button centres its text. Every name sat in the middle of the plate. */
+  text-align: left;
   cursor: grab;
 
-  /* **`cover`, not `100% 100%`.** The plate is 1280 by 320, a 4:1 bar, and a row
-   * is nearer 8:1, so stretching it to fill squashed the art to half height and
-   * every plate came out visibly warped. Cropping keeps the proportions, and
-   * what it crops is the middle: the colour that identifies a duo or a legendary
-   * is on the left under the icon, and the soft dissolve is on the right, so
-   * both survive. */
+  /**
+   * **`cover`, and the third option was worse than both.**
+   *
+   * The plate is 1280 by 320, a 4:1 bar, and a row is nearer 12:1. `100% 100%`
+   * squashed it to a third of its height, which was the original complaint.
+   * Anchoring it at its own proportions kept every pixel honest and looked
+   * terrible: a 172px coloured cap and then flat ground for the rest of the row.
+   *
+   * `cover` it is. It shows a band from the middle of the art, which is dark for
+   * every plate, so the plate is texture rather than identity here. That is
+   * fine, because **the frame around the icon already carries the identity** and
+   * carries it better: `frame-duo` and `frame-legendary` are unmistakable at
+   * 32px and a tinted bar never was.
+   */
   background-image: var(--plate, none);
   background-size: cover;
   background-position: left center;
@@ -4851,8 +4874,14 @@ button.mark {
   cursor: grabbing;
 }
 
+/* The highlight is a full frame with a top and a bottom edge, so it takes the
+ * whole row rather than the plate's anchored sizing. Two layers, two sizes. */
+/* The highlight is a full frame with a top and a bottom edge, so it takes the
+ * whole row while the plate underneath keeps its crop. Two layers, two sizes. */
 .bsort-row:hover {
   background-image: url('/frames/plate-highlight.png'), var(--plate, none);
+  background-size: 100% 100%, cover;
+  background-position: center, left center;
   color: var(--bone);
 }
 
@@ -4867,6 +4896,7 @@ button.mark {
 
 .bsort-row.is-blocked:hover {
   background-image: var(--plate, none);
+  background-size: cover;
 }
 
 .bsort-row-text {
@@ -4898,46 +4928,11 @@ button.mark {
   color: var(--unbuilt);
 }
 
-/* The same move the drag makes, for a phone and for anybody who would rather
- * press a button. Visible on hover and on focus, so it is reachable by keyboard
- * rather than only by pointer. */
-.bsort-row-go {
-  display: flex;
-  gap: 0.2rem;
-  flex: none;
-  opacity: 0;
-  transition: opacity 0.12s ease;
-}
-
-.bsort-row:hover .bsort-row-go,
-.bsort-row:focus-within .bsort-row-go {
-  opacity: 1;
-}
-
-/* Always visible where there is no hover to reveal them. */
-@media (hover: none) {
-  .bsort-row-go {
-    opacity: 1;
-  }
-}
-
-.bsort-row-go button {
-  padding: 0.12rem 0.4rem;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-pill);
-  background: rgb(0 0 0 / 0.5);
-  color: var(--bone-dim);
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.bsort-row-go button:hover {
-  border-color: var(--lit);
-  color: var(--lit-hot);
-}
+/* **No buttons on a row and no arrows on a chip.** Both were added so a phone
+ * had a way in, and both were clutter on every row of a long list. The way in
+ * is the row itself: clicking one sends it into the build, dragging one puts it
+ * wherever you drop it. Nothing is drawn for either.
+ */
 
 /* -- the two trays ------------------------------------------------------ */
 
