@@ -59,6 +59,44 @@ export type Provenance = 'sample' | 'owner' | 'community'
 export type Assembles = 'reliably' | 'situational' | 'needs-luck'
 
 /**
+ * What a build is built to do.
+ *
+ * **The game's own words, from the table in `CLAUDE.md`.** Attack is `Melee`,
+ * Special is `Secondary`, Cast is `Ranged`, Sprint is `Rush`, Magick is `Mana`,
+ * and the Ω forms are `Omega`. Using the player-facing column is the rule that
+ * file states, and the internal names stay in the code.
+ *
+ * **It does nothing on its own yet**, and that is deliberate. The owner wants a
+ * hook for advice later: "you have a god slot open, and Demeter's Weed Killer
+ * suits a build leaning on Ω Attack". The advice is theirs to write and is not
+ * derivable from any file, which is the same line `CLAUDE.md` draws around
+ * every other evaluation. This is the field it will hang off.
+ */
+export type Playstyle =
+  | 'attack'
+  | 'omega-attack'
+  | 'special'
+  | 'omega-special'
+  | 'cast'
+  | 'omega-cast'
+  | 'sprint'
+  | 'magick'
+  | 'hex'
+
+/** The nine, in the order the game lists the moves they name. */
+export const PLAYSTYLES: { id: Playstyle; name: string }[] = [
+  { id: 'attack', name: 'Attack' },
+  { id: 'omega-attack', name: 'Ω Attack' },
+  { id: 'special', name: 'Special' },
+  { id: 'omega-special', name: 'Ω Special' },
+  { id: 'cast', name: 'Cast' },
+  { id: 'omega-cast', name: 'Ω Cast' },
+  { id: 'sprint', name: 'Sprint' },
+  { id: 'magick', name: 'Magick' },
+  { id: 'hex', name: 'Hex' },
+]
+
+/**
  * The three, in order, with the words a reader sees.
  *
  * One list, so the editor's control and the detail strip cannot drift into
@@ -145,6 +183,13 @@ export type ShownBuild = {
   by: Provenance
   weapon: TraitId
   aspect: TraitId
+  /**
+   * What the build leans on, in the game's own words.
+   *
+   * Optional, so every build written before this loads unchanged. See
+   * `Playstyle` for why it does nothing yet.
+   */
+  playstyle?: Playstyle
   /** what the build is for, and what everything else is feeding */
   centrepiece: TraitId
   /**

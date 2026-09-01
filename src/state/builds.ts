@@ -195,9 +195,77 @@ export function duplicateBuild(
   return { builds: next, copy }
 }
 
+/**
+ * Delete moves a build to the bin rather than destroying it.
+ *
+ * **Nothing here has ever been recoverable.** A build is somebody's own work,
+ * kept in one browser with no server behind it, and a mis-click was the end of
+ * it. The confirm step helps and does not help enough: it stops the accident
+ * and not the change of mind an hour later.
+ *
+ * Same store, a second list, so the export carries the bin with everything
+ * else and a restored install still has it.
+ */
 export function deleteBuild(id: string): SavedBuild[] {
-  const next = loadBuilds().filter((one) => one.id !== id)
+  const all = loadBuilds()
+  const going = all.find((one) => one.id === id)
+  const next = all.filter((one) => one.id !== id)
+  if (going) writeBin([{ ...going, binnedAt: new Date().toISOString() }, ...loadBin()])
   write(next)
+  return next
+}
+
+/** A build in the bin, with when it went there. */
+export type BinnedBuild = SavedBuild & { binnedAt: string }
+
+const BIN_KEY = 'enodia.bin'
+
+/**
+ * What is in the bin, newest first.
+ *
+ * Read defensively for the same reason `loadBuilds` is: this is a text file a
+ * person can edit and a file that can arrive from another install. A bin that
+ * cannot be parsed is an empty bin, never a crash on the way to the library.
+ */
+export function loadBin(): BinnedBuild[] {
+  try {
+    const raw = window.localStorage.getItem(BIN_KEY)
+    if (!raw) return []
+    const record = JSON.parse(raw) as { version?: number; builds?: unknown }
+    if (!Array.isArray(record.builds)) return []
+    return record.builds as BinnedBuild[]
+  } catch {
+    return []
+  }
+}
+
+function writeBin(builds: BinnedBuild[]): void {
+  try {
+    window.localStorage.setItem(BIN_KEY, JSON.stringify({ version: VERSION, builds }))
+  } catch {
+    // Storage full or blocked. The delete still happened; the undo is what is
+    // lost, and failing the delete over it would be the worse trade.
+  }
+}
+
+/** Put one back, and take it out of the bin. */
+export function restoreBuild(id: string): { builds: SavedBuild[]; bin: BinnedBuild[] } {
+  const bin = loadBin()
+  const found = bin.find((one) => one.id === id)
+  const rest = bin.filter((one) => one.id !== id)
+  writeBin(rest)
+  if (!found) return { builds: loadBuilds(), bin: rest }
+
+  const { binnedAt: _binnedAt, ...build } = found
+  const builds = [...loadBuilds(), build]
+  write(builds)
+  return { builds, bin: rest }
+}
+
+/** Empty the bin, or one of it. This is the one that really is the end. */
+export function emptyBin(id?: string): BinnedBuild[] {
+  const next = id ? loadBin().filter((one) => one.id !== id) : []
+  writeBin(next)
   return next
 }
 
