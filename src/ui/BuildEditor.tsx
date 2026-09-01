@@ -610,28 +610,23 @@ export function BuildEditor({
             </div>
           ) : null}
 
-          {/* The checker, live. Blocking first, because that is the half that
-            * decides whether Save does anything. */}
-          <div className="editor-check" aria-live="polite">
-            {problems.length === 0 ? (
+          {/* The checker's own panel is gone, and its two halves went to the two
+            * places that were already showing them. Blockers are in the sticky
+            * banner at the top, notes are in the caveats below. Keeping the
+            * panel as well printed every note twice on the same screen.
+            *
+            * What is left is the state neither of those can show, which is that
+            * there is nothing to show. */}
+          {stopping.length === 0 && caveats.length === 0 ? (
+            <div className="editor-check" aria-live="polite">
               <p className="editor-ok">Nothing in the way.</p>
-            ) : (
-              <ul>
-                {[...stopping, ...problems.filter((one) => one.severity === 'notes')].map((one) => (
-                  <li key={one.say} className={`editor-problem is-${one.severity}`}>
-                    {one.say}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+            </div>
+          ) : null}
 
-          {/* Kept apart from the checker above on purpose. That one answers
-            * legality and gates the Save button. This one answers likelihood and
-            * gates nothing: a demanding build is allowed, and somebody who wants
-            * one should be able to write it without being told off. The tips are
-            * only here, because this is the one screen where acting on them is a
-            * control away. */}
+          {/* Kept apart from the caveats below on purpose. This is a reading of
+            * what the build asks for and gates nothing; those are the things a
+            * person has to say they have seen. The tips live here, because this
+            * is the one screen where acting on them is a control away. */}
           <div className="editor-repeat">
             <div className="editor-repeat-head">
               <span className="editor-rule">Putting it together</span>

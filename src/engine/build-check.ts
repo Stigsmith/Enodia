@@ -143,17 +143,23 @@ export function checkBuild(build: ShownBuild): Problem[] {
    * A keepsake overwrites the capped choice. All nine Olympians have one, so a
    * fifth god is a keepsake away and the cap never sees it.
    *
-   * So five is legal and defensible: bring a keepsake for the one boon you want
-   * from a fifth god. Past that you are spending keepsakes fighting the pool for
-   * gods you were not offered, and `engine/repeat.ts` says so in the reading.
-   * Neither is blocked, because neither is illegal.
+   * A run has four keepsakes: one equipped at the start and a swap at the rack
+   * after each of the first three bosses. The racks are in the files, one
+   * `Template = "GiftRack"` gated on `WorldUpgradePostBossGiftRack` per Region
+   * in `RoomDataN/O/P` and `RoomDataF/G/H`.
+   *
+   * So five is legal and defensible: spend one of the four to force the one boon
+   * you want from a fifth god. Past that you are spending keepsakes you wanted
+   * for other things on gods the pool is refusing to offer, and
+   * `engine/repeat.ts` says so in the reading. Neither is blocked, because
+   * neither is illegal.
    */
   const gods = olympiansOf(build)
   if (gods.length > 4) {
     out.push({
       field: 'boons',
       severity: 'notes',
-      say: `${gods.length} Olympians: ${gods.join(', ')}. Past four the pool is frozen to gods you hold, so the rest have to arrive on a keepsake.`,
+      say: `${gods.length} Olympians: ${gods.join(', ')}. Past four the pool is frozen to gods you hold, so ${gods.length - 4} of them have to be forced with keepsakes, out of the four a run gives you.`,
     })
   }
 

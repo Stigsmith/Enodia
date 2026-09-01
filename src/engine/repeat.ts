@@ -152,10 +152,24 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
  */
 const UNSUMMONABLE = new Set<GodId>(['Hermes', 'Chaos'])
 
-/** The Olympian a boon is offered by, when exactly one is. */
-function godOf(trait: Trait | undefined, olympians: ReadonlySet<GodId>): GodId | null {
-  const gods = (trait?.gods ?? []).filter((god) => olympians.has(god))
-  return gods.length === 1 ? (gods[0] ?? null) : null
+/**
+ * Every Olympian a boon needs in the run.
+ *
+ * **This counted only traits offered by exactly one Olympian, and that was a
+ * bug rather than a simplification.** A duo names two gods and needs both of
+ * them, so a build whose only Ares content is one Ares-and-Zeus duo still needs
+ * Ares. Dropping those made a six-god build read as four, and because the hard
+ * stop reads this count, the six-god build sailed past it while
+ * `build-check.ts` was saying six on the same screen.
+ *
+ * It also counts for concentration, and that is right too: a duo is a real
+ * demand on both of its gods, not half a demand on each.
+ *
+ * `build-check.ts olympiansOf` counts the same way, and `repeat.test.ts` holds
+ * the two to each other so they cannot drift apart again.
+ */
+function godsOf(trait: Trait | undefined, olympians: ReadonlySet<GodId>): GodId[] {
+  return (trait?.gods ?? []).filter((god) => olympians.has(god))
 }
 
 /**
@@ -300,8 +314,9 @@ export function readRepeat(
   // four times with the right boon inside each offer. So it starts above two.
   const counts = new Map<GodId, number>()
   for (const id of build.boons) {
-    const god = godOf(traits.get(id), olympians)
-    if (god) counts.set(god, (counts.get(god) ?? 0) + 1)
+    for (const god of godsOf(traits.get(id), olympians)) {
+      counts.set(god, (counts.get(god) ?? 0) + 1)
+    }
   }
   const perGod = [...counts]
     .map(([god, count]) => ({ god, count }))
@@ -321,30 +336,34 @@ export function readRepeat(
   // --- Olympians past the pool --------------------------------------------
   //
   // Four is where the random pool freezes: `ReachedMaxGods` in `RunLogic.lua`
-  // makes `GetEligibleLootNames` return only gods already held. A fifth is still
-  // reachable, because `RewardLogic.lua:242` lets a keepsake overwrite the
-  // capped choice without consulting the cap, and every Olympian has one.
+  // makes `GetEligibleLootNames` return only gods already held. Past that a god
+  // has to arrive on a keepsake, because `RewardLogic.lua:242` overwrites the
+  // capped choice from any held `ForceBoonName` without consulting the cap.
   //
-  // So a fifth god is a keepsake you spent on one boon, and it is defensible:
-  // bring Hestia for the one Attack boon you want and nothing else. A sixth is
-  // spending keepsakes to fight a pool that is actively not offering them.
+  // **A run has four keepsakes, not one.** You equip one at the start and swap
+  // at a rack after each boss, and the racks are there in the files: one
+  // `Template = "GiftRack"` gated on `WorldUpgradePostBossGiftRack` in each of
+  // `RoomDataN/O/P` and `RoomDataF/G/H`. Three racks, no rack after the last
+  // boss, so four keepsakes across a run.
+  //
+  // That is what makes the cost a real one and not a cliff. A fifth god spends
+  // one of the four. A sixth spends two, and the owner's point is that the later
+  // keepsakes are wanted for other things: a random Daedalus out of the Icarus
+  // keepsake is worth more than a third god you may not even be offered.
   const gods = perGod.length
-  //
-  // Costed at six, which is enough that a build wanting a fifth god cannot read
-  // Reliably however small it is otherwise. "Most runs can get there" is the
-  // one thing a keepsake god is not.
-  if (gods === 5) {
+  const keepsakeGods = Math.max(0, gods - 4)
+  if (keepsakeGods > 0 && !(gods > 5)) {
     charges.push({
-      id: 'fifth-god',
-      cost: 6,
-      say: 'Five Olympians, so the fifth has to arrive on a keepsake.',
-      tip: 'Worth it for one boon you really want. The keepsake is spent either way, and it does not always land: you can carry it and still not be offered that god, or be offered them against a hammer you would rather have.',
+      id: 'keepsake-gods',
+      cost: keepsakeGods * 6,
+      say: `${gods} Olympians, so ${keepsakeGods === 1 ? 'one of them has' : `${keepsakeGods} of them have`} to arrive on a keepsake.`,
+      tip: 'A run has four keepsakes: one at the start and a swap at the rack after each of the first three bosses. Spending one to force a god you want a single boon from is a good trade. Spending two means giving up whatever the later slots were for, and carrying a keepsake is still not a promise: you can hold it and never be offered that god, or be offered them against a hammer you would rather have.',
     })
   }
 
   const hardStop =
     gods > 5
-      ? `${gods} Olympians. The pool freezes at four and a keepsake buys one more, so the rest are not arriving.`
+      ? `${gods} Olympians. The pool freezes at four, so ${gods - 4} of them have to be forced with keepsakes, out of the four a run gives you. That is not a build to hand somebody.`
       : null
 
   // --- Hexes --------------------------------------------------------------

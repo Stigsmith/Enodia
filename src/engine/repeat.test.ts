@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 
 import { REACH, bandFor, ratingCeiling, readRepeat, reachName } from './repeat.ts'
 import { olympians, traits } from '../data/app.ts'
+import { olympiansOf } from './build-check.ts'
 import { ASSEMBLES, FIRST_BUILD } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -24,6 +25,9 @@ const modest: Partial<ShownBuild> = {
 }
 
 const charge = (build: Partial<ShownBuild>, id: string) => read(build).charges.find((one) => one.id === id)
+
+/** The Olympians a build already touches, for picking a fixture that adds new ones. */
+const godsIn2 = (build: ShownBuild) => olympiansOf(build)
 
 describe('the words', () => {
   it('shares the first three with what a player answers themselves', () => {
@@ -139,6 +143,33 @@ describe('filler', () => {
 
 describe('Olympians past the pool', () => {
   const godsIn = (build: Partial<ShownBuild>) => read(build).perGod.length
+
+  it('counts the same Olympians the checker counts', () => {
+    /**
+     * The bug this exists to stop coming back.
+     *
+     * `perGod` only counted traits offered by exactly one Olympian, so a god a
+     * build reached only through a duo was invisible to it. The same screen
+     * showed "7 Olympians" from the checker and "6 Olympians" from the reading,
+     * and worse, the hard stop reads this count, so a six-god build walked
+     * straight past it.
+     *
+     * Checked on a build whose sixth god arrives only as half of a duo, which is
+     * the exact shape that broke.
+     */
+    const duo = [...traits.values()].find(
+      (t) =>
+        t.kind === 'duo' &&
+        t.gods.filter((g) => olympians.includes(g)).length === 2 &&
+        t.gods.every((g) => !godsIn2(FIRST_BUILD).includes(g)),
+    )
+    expect(duo).toBeTruthy()
+
+    const build = { ...FIRST_BUILD, boons: [...FIRST_BUILD.boons, duo!.id] }
+    const said = readRepeat(build, traits, olympians)
+    expect(said.perGod.map((one) => one.god).sort()).toEqual(olympiansOf(build).sort())
+    expect(said.hardStop).toBeTruthy()
+  })
 
   it('lets a fifth god through, but never as Reliably', () => {
     // RewardLogic.lua:242 lets a keepsake overwrite the capped choice, so five
