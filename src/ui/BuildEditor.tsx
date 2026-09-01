@@ -759,17 +759,17 @@ export function BuildEditor({
           </div>
 
           </TabPanel>
+        </section>
 
-          {/* Everything below is outside the tabs, deliberately.
-            *
-            * A caveat you have to change tabs to find is a caveat nobody reads,
-            * which is the opposite of what the confirm gate is for. The reading,
-            * the blockers and the actions are true of the whole build rather
-            * than of any one tab, so they sit under all of them. */}
-
-          {/* Sticky, because the thing it is warning about is now on another tab
-            * entirely. A blocker you cannot see is a Save button that does
-            * nothing for no visible reason. */}
+        {/* The right rail: everything true of the whole build rather than of any
+          * one tab, always on screen, mirroring the tray on the other side.
+          *
+          * The blockers used to be a sticky banner over the panel and the
+          * caveats used to be below it, which meant the two halves of "can you
+          * save this yet" were in different places and one of them moved. Here
+          * they are one column with the Save button at the bottom of it, so the
+          * reason a save is refused is beside the thing refusing. */}
+        <aside className="editor-rail" aria-label="Before you save">
           {stopping.length ? (
             <div className="editor-banner is-blocking" role="alert">
               <span className="editor-banner-head">
@@ -782,42 +782,6 @@ export function BuildEditor({
               </ul>
             </div>
           ) : null}
-
-          {/* The checker's own panel is gone, and its two halves went to the two
-            * places that were already showing them. Blockers are in the sticky
-            * banner at the top, notes are in the caveats below. Keeping the
-            * panel as well printed every note twice on the same screen.
-            *
-            * What is left is the state neither of those can show, which is that
-            * there is nothing to show. */}
-          {stopping.length === 0 && caveats.length === 0 ? (
-            <div className="editor-check" aria-live="polite">
-              <p className="editor-ok">
-                <img src="/icons/complete.png" alt="" aria-hidden="true" />
-                Nothing in the way.
-              </p>
-            </div>
-          ) : null}
-
-          {/* Kept apart from the caveats below on purpose. This is a reading of
-            * what the build asks for and gates nothing; those are the things a
-            * person has to say they have seen. The tips live here, because this
-            * is the one screen where acting on them is a control away. */}
-          <div className="editor-repeat">
-            <div className="editor-repeat-head">
-              <span className="editor-rule">Putting it together</span>
-              <Stamp read={repeat} size="medium" showSay />
-            </div>
-
-            <ul className="editor-charges">
-              {repeat.charges.map((charge) => (
-                <li key={charge.id} className={charge.cost === 0 ? 'is-free' : undefined}>
-                  <span className="editor-charge-say">{charge.say}</span>
-                  {charge.tip ? <span className="editor-charge-tip">{charge.tip}</span> : null}
-                </li>
-              ))}
-            </ul>
-          </div>
 
           {caveats.length ? (
             <div className="editor-caveats">
@@ -840,6 +804,16 @@ export function BuildEditor({
             </div>
           ) : null}
 
+          {/* The one state neither of the two above can show. */}
+          {stopping.length === 0 && caveats.length === 0 ? (
+            <div className="editor-check" aria-live="polite">
+              <p className="editor-ok">
+                <img src="/icons/complete.png" alt="" aria-hidden="true" />
+                Nothing in the way.
+              </p>
+            </div>
+          ) : null}
+
           <div className="editor-actions">
             <button
               type="button"
@@ -859,7 +833,29 @@ export function BuildEditor({
               </button>
             ) : null}
           </div>
-        </section>
+        </aside>
+      </div>
+
+      {/* The reading, on its own, under all three columns.
+        *
+        * It is neither a control nor a warning: it is a paragraph about the
+        * build, and it wants the width to say six things with their reasons
+        * beside them. In the rail it would have been a column of wrapped
+        * fragments, and in the panel it moved every time a tab changed height. */}
+      <div className="editor-reading">
+        <div className="editor-repeat-head">
+          <span className="editor-rule">Putting it together</span>
+          <Stamp read={repeat} size="medium" showSay />
+        </div>
+
+        <ul className="editor-charges">
+          {repeat.charges.map((charge) => (
+            <li key={charge.id} className={charge.cost === 0 ? 'is-free' : undefined}>
+              <span className="editor-charge-say">{charge.say}</span>
+              {charge.tip ? <span className="editor-charge-tip">{charge.tip}</span> : null}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )
