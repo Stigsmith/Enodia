@@ -20,7 +20,7 @@ export function Help() {
   return (
     <Page
       title="Help"
-      standfirst="Every word the run surface uses, and what the engine means by it. These are the rules as implemented, not a friendlier version of them."
+      standfirst="What each term on the run screen means. These are the rules as the tool implements them."
     >
       <section className="ref">
         <h3 className="ref-rule">The four states</h3>
@@ -142,7 +142,7 @@ export function About() {
   return (
     <Page
       title="About"
-      standfirst="An in-run build companion for Hades II, made by a player, reading the game’s own files."
+      standfirst="A build companion for Hades II, built by a player, using data read from the game’s own files."
     >
       <section className="ref">
         <h3 className="ref-rule">Where the numbers come from</h3>

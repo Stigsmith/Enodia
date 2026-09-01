@@ -1,13 +1,11 @@
 /**
- * What is coming, what is not, and what is waiting on a person.
+ * What is built, what is planned, and what is not being worked on.
  *
- * `ROADMAP.md` is the version for whoever is working on this. **This is the
- * version for whoever is using it**, which is a different document: it says
- * what a reader would notice, and it is honest about the two things a roadmap
- * usually hides, which are what has been given up on and what is stuck.
+ * `ROADMAP.md` is the version for whoever is developing this. This is the
+ * version for whoever is using it: what a reader would notice, plus the items
+ * that are stalled and the reason.
  *
- * Nothing here carries a date. A date on an unpaid side project is a promise
- * nobody has any business making.
+ * No dates. This is a side project and any date given would be a guess.
  */
 
 export type Stage = 'now' | 'next' | 'later' | 'waiting'
@@ -16,96 +14,96 @@ export type Plan = {
   title: string
   say: string
   stage: Stage
-  /** for `waiting`, the thing it is waiting on, in plain words */
+  /** for `waiting`, what it needs before it can move */
   on?: string
 }
 
 export const STAGES: { id: Stage; name: string; say: string }[] = [
-  { id: 'now', name: 'Working now', say: 'Built, and on the screen today.' },
-  { id: 'next', name: 'Next', say: 'What is being worked on, roughly in order.' },
-  { id: 'later', name: 'Later', say: 'Real plans, with nothing started.' },
-  { id: 'waiting', name: 'Waiting on somebody', say: 'Not blocked by code.' },
+  { id: 'now', name: 'Built', say: 'Available in the app today.' },
+  { id: 'next', name: 'Next', say: 'Being worked on, roughly in this order.' },
+  { id: 'later', name: 'Planned', say: 'Intended, but not started.' },
+  { id: 'waiting', name: 'Stalled', say: 'Not blocked by code.' },
 ]
 
 export const ROADMAP: Plan[] = [
-  // ---- now ---------------------------------------------------------------
+  // ---- built -------------------------------------------------------------
   {
     stage: 'now',
-    title: 'The build manager',
-    say: 'Every build, filtered by arm, aspect, gods, keepsake and familiar. Build your own, duplicate any of them, and keep a record of how each has played.',
+    title: 'Build manager',
+    say: 'Browse builds with filters for arm, aspect, gods, keepsake and familiar. Create your own, duplicate any build, and record how each has performed.',
   },
   {
     stage: 'now',
-    title: 'The run companion',
-    say: 'Log an Exit as you take it. Every duo and legendary judged live, the odds measured rather than asserted, and the builds you could still finish counted at the top.',
+    title: 'Run companion',
+    say: 'Log each Exit as you take it. Duos and legendaries are evaluated live, completion odds are simulated, and the header counts builds you can still complete.',
   },
   {
     stage: 'now',
-    title: 'The Arcana board',
-    say: 'The game’s five by five, with the six free cards worked out from what you paid for and every dark card saying why.',
+    title: 'Arcana board',
+    say: 'The full board. Select what you pay Grasp for and the six free cards resolve from that, with a reason given for each one that stays off.',
   },
   {
     stage: 'now',
     title: 'Themes, export and sharing',
-    say: 'Four themes, a file with everything in it, and one build in a link short enough for a chat.',
+    say: 'Four themes, a single export file for everything, and one build encoded in a shareable link.',
   },
 
   // ---- next --------------------------------------------------------------
   {
     stage: 'next',
-    title: 'Builds worth reading',
-    say: 'The eight in the tool are samples. They are mechanically real and they are not recommendations, and the library needs builds somebody has actually played.',
+    title: 'Real build definitions',
+    say: 'The eight builds included are samples used to test the screens. They are mechanically valid but they are not recommendations. The library needs builds that have actually been played.',
   },
   {
     stage: 'next',
-    title: 'Your own name on a build',
-    say: 'A name you pick, stored here and nowhere else, that travels with a build you share so the person receiving it knows whose it is.',
+    title: 'Builds by aspect',
+    say: 'The filters can answer this now, one selection at a time. A dedicated view would show which builds remain available for a given aspect at a glance.',
   },
   {
     stage: 'next',
-    title: 'Which builds an aspect can still reach',
-    say: 'The overview answers it by hand today. A veteran wants it at a glance: pick an aspect, see what is still open to it.',
+    title: 'Owner builds in the run',
+    say: 'The run currently counts only the sample builds. Builds you have made should count too, and should be selectable as a run target.',
   },
 
-  // ---- later -------------------------------------------------------------
+  // ---- planned -----------------------------------------------------------
   {
     stage: 'later',
-    title: 'What you keep avoiding',
-    say: 'The tool already records which builds you played and how they went. The useful half is the other one: which gods, which arms and which shapes you never take.',
+    title: 'Play history',
+    say: 'Which builds you have played and how they went is already recorded. The next step is summarising it: which gods, arms and build types you tend to avoid.',
   },
   {
     stage: 'later',
-    title: 'Surprise me',
-    say: 'A build you would not have picked, checked for reachability before it is offered, so it is never a plan that is dead on arrival.',
+    title: 'Suggested builds',
+    say: 'A build picked for you, checked against the reachability engine first so it is never a suggestion that cannot be completed.',
   },
   {
     stage: 'later',
-    title: 'What a boon actually does',
-    say: 'The game states its numbers but not what feeds what. Writing that down by hand is the largest job left, and three separate features are waiting on it.',
+    title: 'Boon interaction data',
+    say: 'The game states each boon’s numbers but not how boons feed each other. That has to be written by hand. Three features depend on it, including build archetypes.',
   },
   {
     stage: 'later',
-    title: 'A build exchange',
-    say: 'Sharing works one link at a time. A place to put builds so other people can find them needs somewhere to put them, which means a server, which this has deliberately not had.',
+    title: 'Build exchange',
+    say: 'Sharing works one link at a time. A browsable collection would need somewhere to host builds, which means a server.',
   },
 
-  // ---- waiting -----------------------------------------------------------
+  // ---- stalled -----------------------------------------------------------
   {
     stage: 'waiting',
-    title: 'Live on the web',
-    say: 'The build runs from any plain static host and is ready to go up.',
-    on: 'One deploy, which is the owner’s to run.',
+    title: 'Public deployment',
+    say: 'The app builds to static files and runs on any static host.',
+    on: 'Needs one deployment, which is the owner’s to run.',
   },
   {
     stage: 'waiting',
-    title: 'Which builds are actually good',
-    say: 'Everything mechanical comes out of the game’s files. Whether a build is worth playing is not in any file and this tool will not pretend otherwise.',
-    on: 'Someone who has played enough to say so.',
+    title: 'Build quality ratings',
+    say: 'Everything mechanical comes from the game files. Whether a build is strong is not in any file, so the tool does not claim it.',
+    on: 'Needs someone with enough play time to judge.',
   },
   {
     stage: 'waiting',
-    title: 'Accounts, and builds that follow you',
-    say: 'Everything lives in one browser today. Moving between devices means an account, and an account means a server and somebody paying for it.',
-    on: 'A decision about whether this should cost anything to run.',
+    title: 'Accounts and sync',
+    say: 'All data is stored in one browser. Using the tool across devices requires an account, and an account requires a server.',
+    on: 'Needs a decision on whether to fund hosting.',
   },
 ]

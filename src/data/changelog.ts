@@ -1,19 +1,18 @@
 /**
  * What changed, for the person using it.
  *
- * **Not the commit log.** The history has sixty-odd entries and most of them
- * are about extractors, contrast ratios and CSS that was wrong. A reader
- * wants to know what is different on their screen, so entries are grouped by
- * the day the work landed and written in terms of what it does.
+ * Not the commit log. That has sixty-odd entries and most of them are about
+ * extractors and CSS. Entries here are grouped by the day the work landed and
+ * describe what is different on screen.
  *
- * Newest first, because that is the only order anybody reads a changelog in.
+ * Newest first.
  */
 
 export type Release = {
   /** ISO date, so the page can format it however it likes */
   date: string
   title: string
-  /** one line, what this batch was about */
+  /** one line, what this batch covered */
   say: string
   points: string[]
 }
@@ -21,97 +20,98 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-01',
-    title: 'Sharing, and a way out',
-    say: 'The tool keeps everything in one browser, so this is the release that lets you get it back out again.',
+    title: 'Export, import and sharing',
+    say: 'Ways to get your builds out of this browser and into another one.',
     points: [
-      'Export everything you have made to a file, from Settings. It says how long it has been since the last one, and starts saying it in amber after a week.',
-      'Import a file back, which replaces what is here. It tells you what is in the file and what will go before it writes anything.',
-      'Share one build as a link. Open a build, then Share in its menu. The whole build travels in the link itself, so there is no server and no account, and it is short enough to paste into a chat.',
-      'A shared build carries no rating, runs or clears. Those are how a build has gone for you, and they stay with you.',
+      'Export everything to a file, from Settings. The button says how long it has been since the last export.',
+      'Import a file. It replaces what is in the browser, and it tells you what the file holds before it writes anything.',
+      'Share one build as a link, from the build’s own menu. The build is encoded in the link, so there is no server involved.',
+      'A shared build does not carry the rating, runs or clears you recorded for it.',
+      'Set a name in Settings. It is added to builds you make and travels with a build you share.',
     ],
   },
   {
     date: '2026-09-01',
-    title: 'Four themes',
-    say: 'The tool can stand in one of four places now, and each one is a palette, a light, a weather and a set of pictures.',
+    title: 'Themes',
+    say: 'Four colour schemes, each with its own background, particles and wallpapers.',
     points: [
-      'Unseen, Olympian, Infernal and Cthonic, each with its own colours taken from the game’s own art.',
-      'Particles differ by more than colour: dust rises, pollen falls, embers flicker, and Cthonic’s stars hold still.',
-      'Every theme ships several wallpapers, and each one is dimmed by measurement rather than by eye, so nothing behind the tool is ever brighter than the tool.',
-      'The game draws its own dialogue plate twice, once by default and once for Olympus, and both are where those two themes get their metal.',
+      'Unseen, Olympian, Infernal and Cthonic. Colours are taken from the game’s own art.',
+      'Particle effects differ per theme: rising dust, falling motes, embers, and a static star field.',
+      'Each theme has several wallpapers. Every one is dimmed so it does not compete with the interface.',
+      'Buttons, panels and card frames shift colour with the theme.',
     ],
   },
   {
     date: '2026-08-31',
-    title: 'Builds you own',
-    say: 'A saved build stopped being a note and became a thing with an identity.',
+    title: 'Saved builds',
+    say: 'Builds you make are now editable, forkable and removable.',
     points: [
-      'Duplicate any build, including the eight samples, which were read-only until now.',
-      'Delete from the build’s own menu, and it asks first.',
-      'Record how a build has played: a rating, runs, clears and how dependably it comes together. The win rate is worked out, never typed.',
-      'Every build carries a stable id, so one sent to another install stays the same build.',
+      'Duplicate any build, including the eight samples.',
+      'Delete a build from its own menu. It asks for confirmation.',
+      'Record a rating, runs, clears and how reliably a build comes together. The win rate is calculated.',
+      'Each build has a permanent id, so a build sent to another browser stays the same build.',
     ],
   },
   {
     date: '2026-08-31',
-    title: 'Builds first',
-    say: 'The tool used to open on "pick an arm". It opens on your builds now, because choosing one is the thing it is for.',
+    title: 'Builds as the home screen',
+    say: 'The app opens on your builds instead of on run setup.',
     points: [
-      'The menu is on every screen, and nothing needs a Back button to reach it.',
-      'On a desktop the menu can be a pop-out or a pinned pane down the side.',
-      'The run counts builds you could still finish, rather than counting duos and legendaries you might not care about.',
-      'Pick a build before a run and the tool says how that build is doing while you play.',
+      'The menu is available on every screen.',
+      'On a desktop the menu can be pinned open as a side pane.',
+      'The run header counts builds you can still complete, instead of counting duos and legendaries.',
+      'You can pick a build before starting a run, and the run tracks it.',
     ],
   },
   {
     date: '2026-08-31',
-    title: 'The Arcana board',
-    say: 'The game’s five by five, in the game’s own positions, with the six free cards worked out rather than clicked.',
+    title: 'Arcana board',
+    say: 'The full five by five board, in the game’s own layout.',
     points: [
-      'Pick what you pay Grasp for and the board says which of the six switch themselves on.',
-      'Every card that stays dark says why, in the game’s own terms.',
-      'Point at any card to read what it does.',
+      'Select the cards you pay Grasp for. The six free cards are worked out from that.',
+      'Any free card that stays off explains which condition it fails.',
+      'Hovering a card shows what it does.',
     ],
   },
   {
     date: '2026-08-30',
-    title: 'A build manager, and a builder',
-    say: 'Five layouts went up so the shape of a build could be argued about, and two survived.',
+    title: 'Build manager and editor',
+    say: 'A screen for browsing builds, and a form for making them.',
     points: [
-      'The overview filters and sorts by arm, aspect, gods, keepsake and familiar, and every filter derives itself from the builds themselves.',
-      'A build opens as a Poster or a Constellation, whichever you prefer.',
-      'Build your own, with the checker saying out loud what the game would not allow.',
+      'Filter by arm, aspect, gods, keepsake and familiar. Filter options are derived from the builds themselves.',
+      'A build opens as a Poster or a Constellation layout.',
+      'The editor checks a build as you write it and lists anything the game would not allow.',
     ],
   },
   {
     date: '2026-08-29',
-    title: 'The run, finished',
-    say: 'Everything the run surface was supposed to do by the end of the first phase.',
+    title: 'Run companion completed',
+    say: 'The remaining features for logging a run.',
     points: [
-      'What an Exit offers, ranked, with the reason a pick is worth refusing.',
-      'A re-entry card when you come back to a run you left, saying what moved while you were away.',
-      'Correcting a mis-tap costs one tap rather than the run.',
-      'The whole surface answers to a keyboard and to a screen reader.',
+      'The offers at an Exit, ranked, with a reason to decline where there is one.',
+      'A summary when you return to a run you left, showing what changed while you were away.',
+      'Undo a mistaken entry without restarting the run.',
+      'Keyboard and screen reader support across the run screen.',
     ],
   },
   {
     date: '2026-08-28',
-    title: 'The run on screen',
-    say: 'The first thing that was useful: a path you log as you go, with what each pick closed marked where it happened.',
+    title: 'The run screen',
+    say: 'Log each Exit as you take it and see what is still reachable.',
     points: [
-      'Every duo and legendary judged live against what you hold and how many Exits are left.',
-      'Odds measured by simulating legal runs rather than asserted.',
-      'The Cast-slot lockout that started this whole project, stated where it happens.',
+      'Every duo and legendary evaluated against what you hold and how many Exits remain.',
+      'Completion odds calculated by simulating runs, not estimated.',
+      'Picks that close off a target are marked at the Exit where it happened.',
     ],
   },
   {
     date: '2026-08-27',
-    title: 'Reading the game',
-    say: 'Before any of it, the part nobody sees: the game’s own files, read rather than guessed at.',
+    title: 'Game data extraction',
+    say: 'Reading the game’s own files, which everything else depends on.',
     points: [
-      'Every mechanic comes out of the game’s shipped Lua, checked against its own markers rather than against a wiki.',
-      '37 duos and 10 legendaries, because the game marks both itself and counting prerequisites gets it wrong.',
-      'Every boon, aspect and card matched to the game’s own art.',
+      'All mechanics are read from the game’s shipped Lua rather than from wikis.',
+      '37 duos and 10 legendaries, counted using the game’s own markers.',
+      'Every boon, aspect and Arcana card matched to its art from the game packages.',
     ],
   },
 ]

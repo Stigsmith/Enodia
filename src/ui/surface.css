@@ -4229,3 +4229,65 @@
   outline: 2px solid var(--lit);
   outline-offset: 1px;
 }
+
+/* The pin, top right of the menu panel.
+ *
+ * Where the menu sits was two labelled options in Settings, which meant leaving
+ * the menu to change where the menu is. One button on the panel does the same
+ * job without going anywhere. It only exists above 60rem, because below that
+ * the pop-out is the only mode there is. */
+.menu-panel {
+  position: relative;
+}
+
+.menu-panel .menu-pin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  flex-direction: row;
+  gap: 0;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-soft);
+  background: none;
+  color: var(--bone-faint);
+  cursor: pointer;
+  transition: color var(--t-response) var(--e-response);
+}
+
+.menu-panel .menu-pin svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  /* Tilted while loose, upright once it is holding something. */
+  transform: rotate(38deg);
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.menu-panel .menu-pin:hover {
+  border-color: var(--div-4);
+  color: var(--bone-dim);
+}
+
+.menu-panel .menu-pin.is-on { color: var(--lit); }
+.menu-panel .menu-pin.is-on svg { transform: rotate(0deg); }
+
+.menu-panel .menu-pin:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: 1px;
+}
+
+/* The first heading has to clear the button rather than run under it. */
+.menu-panel > section:first-of-type h2 {
+  padding-right: 1.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel .menu-pin svg { transition: none; }
+}
