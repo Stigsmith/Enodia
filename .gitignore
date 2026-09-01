@@ -18,3 +18,7 @@ dist-artifact/
 *.local
 .DS_Store
 Thumbs.db
+
+# Exports. Somebody's whole library, written by the settings screen. It is
+# personal data and it is never this repository's to carry.
+enodia-*.json

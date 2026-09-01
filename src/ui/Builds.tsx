@@ -30,6 +30,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
+import { linkFor } from '../state/transfer.ts'
 import { loadPrefs } from '../state/prefs.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -218,6 +219,7 @@ function BuildMenu({
 }) {
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [shared, setShared] = useState<'copied' | 'failed' | null>(null)
   const panel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -239,7 +241,10 @@ function BuildMenu({
   // Closing the menu drops a half-asked question, so reopening it never lands
   // on a Delete that is already armed.
   useEffect(() => {
-    if (!open) setConfirming(false)
+    if (!open) {
+      setConfirming(false)
+      setShared(null)
+    }
   }, [open])
 
   return (
@@ -257,6 +262,32 @@ function BuildMenu({
 
       {open ? (
         <div className="bmenu-panel" role="menu">
+          {/* A whole build in a link, with no server behind it. DESIGN.md 9.
+              The menu stays open so the copied line can be read. */}
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              linkFor(build, window.location.href).then(
+                (link) =>
+                  navigator.clipboard?.writeText(link).then(
+                    () => setShared('copied'),
+                    () => setShared('failed'),
+                  ) ?? setShared('failed'),
+                () => setShared('failed'),
+              )
+            }}
+          >
+            <span className="bmenu-label">Share</span>
+            <span className="bmenu-note">
+              {shared === 'copied'
+                ? 'Link copied. Paste it anywhere'
+                : shared === 'failed'
+                  ? 'Could not reach the clipboard'
+                  : 'Copies a link holding the whole build'}
+            </span>
+          </button>
+
           <button
             type="button"
             role="menuitem"

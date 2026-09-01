@@ -240,7 +240,15 @@ export function Menu({
     {
       title: 'The tool',
       entries: [
-        { label: 'Settings', note: 'Theme, spoiler level, display names' },
+        {
+          label: 'Settings',
+          note: 'Export what you have made, and put a file back',
+          here: view === 'settings',
+          action: () => {
+            onGo('settings')
+            leave()
+          },
+        },
         { label: 'Help', note: 'What the states and the percentages mean' },
         { label: 'About', note: 'Where the data comes from, and the disclaimer' },
       ],

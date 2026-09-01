@@ -2908,3 +2908,257 @@ button.mark {
     transition: none;
   }
 }
+
+/* ==========================================================================
+ * SETTINGS
+ *
+ * One job for now, and it is the one that cannot wait: getting your work out
+ * of this browser. Nothing here is on a server, so an export is not a
+ * convenience, it is the only copy that will ever exist, and the screen says
+ * how long it has been since the last one.
+ * ========================================================================= */
+
+.settings {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
+}
+
+@media (min-width: 60rem) {
+  .settings { padding: 1.25rem 2rem 4rem; }
+}
+
+.setting-block {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+  padding: 1.1rem 1.2rem 1.3rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.setting-say {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--bone-dim);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+/* How long since the last export. The whole reason this screen exists. */
+.setting-since {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A week without an export is worth saying in a colour, not just in words. */
+.setting-since.is-stale {
+  color: var(--unbuilt);
+}
+
+.setting-holds,
+.setting-done,
+.setting-bad {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--bone-faint);
+}
+
+.setting-holds strong,
+.setting-confirm strong {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.setting-done { color: var(--lit); }
+.setting-bad { color: var(--rim-magenta); }
+
+/* The question, asked in place, before anything is written. */
+.setting-confirm {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.8rem 0.9rem 0.9rem;
+  border: 1px solid var(--rim-magenta);
+  border-radius: var(--r-soft);
+  background: var(--ink-850);
+}
+
+.setting-confirm p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+
+.setting-warn {
+  color: var(--rim-magenta) !important;
+}
+
+.setting-buttons,
+.shared-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.setting-buttons button,
+.shared-buttons button {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.setting-buttons button:hover,
+.shared-buttons button:hover {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+.setting-go {
+  border-color: var(--rim-magenta) !important;
+  color: var(--rim-magenta) !important;
+}
+
+.shared-go {
+  border-color: var(--lit) !important;
+  color: var(--lit-hot) !important;
+}
+
+/* ==========================================================================
+ * A BUILD THAT ARRIVED IN A LINK
+ *
+ * It covers whatever screen you were on, because it is a question that has to
+ * be answered before anything else on the page makes sense.
+ * ========================================================================= */
+
+.shared {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in oklab, var(--ink-950) 82%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.shared-card {
+  display: grid;
+  gap: 0.6rem;
+  width: min(30rem, 100%);
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 1.3rem 1.4rem 1.4rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-card);
+  background: var(--ink-900);
+  box-shadow: 0 1.8rem 3.4rem rgb(0 0 0 / 0.6);
+}
+
+.shared-eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.shared-name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  text-wrap: balance;
+}
+
+.shared-say {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+
+.shared-arm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.shared-arm span::before {
+  content: '\00b7';
+  margin-right: 0.5rem;
+}
+
+.shared-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shared-marks img {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--r-hair);
+  object-fit: contain;
+}
+
+.shared-centre,
+.shared-arcana,
+.shared-note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+.shared-centre strong {
+  color: var(--lit);
+  font-weight: 400;
+}
+
+.shared-warn {
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--unbuilt);
+  border-radius: 0 var(--r-hair) var(--r-hair) 0;
+  background: var(--ink-850);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bone-dim);
+}
+
+.shared-note {
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--div-1);
+}
+
+.shared-buttons {
+  margin-top: 0.3rem;
+}
