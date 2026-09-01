@@ -25,13 +25,38 @@
  */
 
 import { Mark } from '../BuildMark.tsx'
+import { Stamp } from '../Stamp.tsx'
+import { olympians, traits } from '../../data/app.ts'
+import { readRepeat } from '../../engine/repeat.ts'
 import type { Assembled } from '../build-pieces.ts'
+
+/**
+ * How many marks a band draws before it starts counting instead.
+ *
+ * The plate is a fixed 425 by 630 with `overflow: hidden`, so the interior is
+ * about 177 by 333 at a 277px column. A mark is a flat 32px whatever the count,
+ * which makes five marks and their gaps 172px: exactly one row, which is what
+ * the Slots band was tuned to.
+ *
+ * Everything past that wrapped into rows the fixed height had no room for, so
+ * the Arcana and the sentence were clipped off the bottom of any build big
+ * enough to need them. Every Pair has 16 boons beyond its slots and 10 Arcana.
+ *
+ * The fix is not a taller card. The overview is for scanning a shelf, and a
+ * card that grows to fit its contents stops being comparable to its neighbours,
+ * which was the contact sheet's whole argument. So each band draws what fits and
+ * says how much it is not drawing. The count is the honest part: a reader can
+ * see there is more and click in for it.
+ */
+const BAND_CAP = 5
+const ARCANA_CAP = 4
 
 export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string) => void }) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
   const arcana = built.crossroads.pieces.filter((piece) => piece.kind === 'arcana')
   const kit = built.crossroads.pieces.filter((piece) => piece.kind !== 'arcana')
+  const read = readRepeat(build, traits, olympians)
 
   return (
     <li className="bcard">
@@ -42,6 +67,9 @@ export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string)
             {built.arm}
             {built.gods.length ? <span className="bcard-gods">{built.gods.join(' + ')}</span> : null}
           </span>
+          {/* The word only. The reasons live in the builder, where somebody can
+            * act on them; here it is one more thing to sort a shelf by. */}
+          <Stamp read={read} size="small" />
         </span>
 
         <Band label="Slots">
@@ -60,11 +88,12 @@ export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string)
 
         {rest.length ? (
           <Band label="Beyond the slots">
-            {rest.map((piece) => (
+            {rest.slice(0, BAND_CAP).map((piece) => (
               <span key={piece.key} className="bcard-tile" title={piece.name}>
                 <Mark piece={piece} size="var(--mark-s)" />
               </span>
             ))}
+            <More count={rest.length - BAND_CAP} />
           </Band>
         ) : null}
 
@@ -81,11 +110,12 @@ export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string)
           * on a grid. */}
         {arcana.length ? (
           <span className="bcard-arcana">
-            {arcana.map((piece) => (
+            {arcana.slice(0, ARCANA_CAP).map((piece) => (
               <span key={piece.key} className="bcard-card" title={piece.name}>
                 {piece.icon ? <img src={`/${piece.icon}`} alt="" loading="lazy" /> : null}
               </span>
             ))}
+            <More count={arcana.length - ARCANA_CAP} />
           </span>
         ) : null}
 
@@ -95,6 +125,12 @@ export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string)
       </button>
     </li>
   )
+}
+
+/** What a band is not drawing, or nothing at all when it is drawing all of it. */
+function More({ count }: { count: number }) {
+  if (count <= 0) return null
+  return <span className="bcard-more">+{count}</span>
 }
 
 function Band({ label, children }: { label: string; children: React.ReactNode }) {

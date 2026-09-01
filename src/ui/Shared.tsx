@@ -12,7 +12,9 @@
  * it would replace something, and does nothing until it is told to.
  */
 
-import { arcanaById, iconOf, traits, weapons } from '../data/app.ts'
+import { arcanaById, iconOf, olympians, traits, weapons } from '../data/app.ts'
+import { readRepeat } from '../engine/repeat.ts'
+import { Stamp } from './Stamp.tsx'
 import { readName, sharedLine } from '../state/identity.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -45,6 +47,11 @@ export function Shared({
         <p className="shared-eyebrow">{sharedLine(build.author, readName())}</p>
         <h2 className="shared-name">{build.name || 'Untitled build'}</h2>
         {build.say ? <p className="shared-say">{build.say}</p> : null}
+
+        {/* The reason this reading exists at all. Somebody opening a link has no
+          * idea what they have been handed, and the sender is the last person
+          * who is going to volunteer that it took them forty runs. */}
+        <Stamp read={readRepeat(build, traits, olympians)} size="medium" showSay />
 
         <p className="shared-arm">
           {weapon?.arm ?? 'Unknown arm'}

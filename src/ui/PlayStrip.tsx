@@ -17,6 +17,8 @@
 
 import { ASSEMBLES, winRate } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
+import { olympians, traits } from '../data/app.ts'
+import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 
 const STARS = [1, 2, 3, 4, 5]
 
@@ -26,16 +28,28 @@ export function PlayStrip({ build }: { build: ShownBuild }) {
   const assembles = ASSEMBLES.find((one) => one.id === play?.assembles)
   const runs = play?.runs ?? 0
 
+  /**
+   * Stars a build asking the impossible is allowed to wear.
+   *
+   * **Clamped here rather than trusted from storage**, the same reasoning
+   * `winRate` gives for clamping clears against runs: the builder disables the
+   * higher stars, and storage is a text file a person can edit and a build can
+   * arrive from another install. A five-star build that cannot be assembled
+   * must be impossible to draw, so the clamp lives where the stars are drawn.
+   */
+  const ceiling = ratingCeiling(readRepeat(build, traits, olympians))
+  const rating = ceiling === null ? (play?.rating ?? 0) : Math.min(play?.rating ?? 0, ceiling)
+
   // Nothing rated, nothing played, nothing judged. Draw nothing.
   if (!play?.rating && !runs && !assembles) return null
 
   return (
     <div className="playstrip">
-      {play?.rating ? (
-        <span className="playstrip-stars" aria-label={`Rated ${play.rating} of 5`}>
+      {rating ? (
+        <span className="playstrip-stars" aria-label={`Rated ${rating} of 5`}>
           {STARS.map((star) => (
-            <span key={star} className={star <= (play.rating ?? 0) ? 'is-on' : ''} aria-hidden="true">
-              {star <= (play.rating ?? 0) ? '★' : '☆'}
+            <span key={star} className={star <= rating ? 'is-on' : ''} aria-hidden="true">
+              {star <= rating ? '★' : '☆'}
             </span>
           ))}
         </span>

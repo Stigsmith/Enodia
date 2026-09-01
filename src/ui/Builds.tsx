@@ -27,6 +27,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { olympians, traits } from '../data/app.ts'
+import { readRepeat } from '../engine/repeat.ts'
+import { Stamp } from './Stamp.tsx'
 import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
@@ -189,6 +192,26 @@ export function Builds({ onClose }: { onClose?: () => void }) {
           <section className="builds-how" aria-label="How it works">
             <h3>How it works</h3>
             <p>{open.how}</p>
+          </section>
+
+          {open.luck ? (
+            <section className="builds-how builds-luck" aria-label="If the run goes your way">
+              <h3>If the run goes your way</h3>
+              <p>{open.luck}</p>
+            </section>
+          ) : null}
+
+          {/* The tool's read, next to the player's own. They answer the same
+            * question in the same three words and they are allowed to disagree:
+            * the player has actually played it and the reading has not. */}
+          <section className="builds-repeat" aria-label="Putting it together">
+            <h3>Putting it together</h3>
+            <Stamp read={readRepeat(open, traits, olympians)} size="large" showSay />
+            <ul>
+              {readRepeat(open, traits, olympians).charges.map((charge) => (
+                <li key={charge.id}>{charge.say}</li>
+              ))}
+            </ul>
           </section>
         </div>
 

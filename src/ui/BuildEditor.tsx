@@ -28,11 +28,13 @@
 
 import { useMemo, useState } from 'react'
 
-import { arcana, aspectsOf, familiars, godPools, sources, traits, weapons } from '../data/app.ts'
+import { arcana, aspectsOf, familiars, godPools, olympians, sources, traits, weapons } from '../data/app.ts'
 import { ASSEMBLES } from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { checkBuild, blockers } from '../engine/build-check.ts'
+import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
+import { Stamp } from './Stamp.tsx'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
@@ -112,6 +114,21 @@ export function BuildEditor({
 
   const problems = checkBuild(build)
   const stopping = blockers(problems)
+  // The other question. `checkBuild` says whether the game would allow this;
+  // this says whether anybody is going to end a run holding it.
+  const repeat = readRepeat(build, traits, olympians)
+  /**
+   * The most stars this build is allowed to wear.
+   *
+   * Only a hard stop caps it, and today that is six Olympians or more. Not
+   * taste: a build asking for something a run cannot hand over should not be
+   * able to look like a recommendation, however much fun the one time was.
+   *
+   * Everything short of a hard stop keeps all five. A five-star Needs luck
+   * build is a real and good thing, and the whole reason the rating and the
+   * reading are two separate claims rather than one number.
+   */
+  const stars = ratingCeiling(repeat)
 
   /** Every trait that can occupy one core slot, for that slot's dropdown. */
   const bySlot = useMemo(() => {
@@ -390,6 +407,21 @@ export function BuildEditor({
             />
           </label>
 
+          {/* Kept separate from How it works, and that separation is the point.
+            * A build that lists a Hex and a fifth god among its boons is asking
+            * for them. A build that mentions them here is telling you what to do
+            * if you happen upon them, which costs nothing and helps more. */}
+          <label className="editor-field">
+            <span>If the run goes your way</span>
+            <textarea
+              value={build.luck ?? ''}
+              rows={4}
+              maxLength={700}
+              onChange={(event) => set('luck', event.target.value || undefined)}
+              placeholder="Upside worth taking if you meet it, and what to skip if you do not. A Hex, a fifth god on a keepsake, a boon from somebody who turns up when they feel like it."
+            />
+          </label>
+
           {/* How it has played, for this player, in this browser.
             *
             * None of these four is required and none of them is checked: a
@@ -411,6 +443,7 @@ export function BuildEditor({
                   <button
                     key={star}
                     type="button"
+                    disabled={stars !== null && star > stars}
                     aria-pressed={star <= (play?.rating ?? 0)}
                     className={star <= (play?.rating ?? 0) ? 'is-on' : ''}
                     title={star === play?.rating ? 'Clear the rating' : `${star} of 5`}
@@ -421,6 +454,9 @@ export function BuildEditor({
                   </button>
                 ))}
               </div>
+              {stars !== null ? (
+                <p className="editor-hint">{repeat.hardStop} One star until it can be assembled.</p>
+              ) : null}
             </div>
 
             <div className="editor-pair">
@@ -482,6 +518,28 @@ export function BuildEditor({
                 ))}
               </ul>
             )}
+          </div>
+
+          {/* Kept apart from the checker above on purpose. That one answers
+            * legality and gates the Save button. This one answers likelihood and
+            * gates nothing: a demanding build is allowed, and somebody who wants
+            * one should be able to write it without being told off. The tips are
+            * only here, because this is the one screen where acting on them is a
+            * control away. */}
+          <div className="editor-repeat">
+            <div className="editor-repeat-head">
+              <span className="editor-rule">Putting it together</span>
+              <Stamp read={repeat} size="medium" showSay />
+            </div>
+
+            <ul className="editor-charges">
+              {repeat.charges.map((charge) => (
+                <li key={charge.id} className={charge.cost === 0 ? 'is-free' : undefined}>
+                  <span className="editor-charge-say">{charge.say}</span>
+                  {charge.tip ? <span className="editor-charge-tip">{charge.tip}</span> : null}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="editor-actions">

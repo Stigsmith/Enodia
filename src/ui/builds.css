@@ -37,10 +37,14 @@
   margin: 0 auto;
 }
 
+/* 82rem rather than 76: the cap binds before the column minimum does, so at a
+ * 1400px viewport 76rem gave four columns of 277px and 82 gives five. Worth
+ * doing only now that the card's bands are capped, because five narrower cards
+ * that all clip their sentence would be worse than four that do not. */
 @media (min-width: 60rem) {
   .builds {
     padding: 1.75rem 2rem 4rem;
-    max-width: 76rem;
+    max-width: 82rem;
   }
 }
 
@@ -650,6 +654,12 @@
   gap: 0.1rem;
 }
 
+/* The stamp sits under the arm rather than beside the name: the name is allowed
+ * to be long and the stamp must not be what wraps. */
+.bcard-head .stamp {
+  margin-top: 0.1rem;
+}
+
 .bcard-name {
   font-family: var(--display);
   font-size: 1rem;
@@ -711,9 +721,30 @@
   opacity: 0.3;
 }
 
+/* `flex-wrap` was missing here, which is why ten Arcana overlapped each other
+ * before they clipped. The row is capped at four in `Card.tsx` now, so it never
+ * needs a second line, and the wrap is the guard rather than the layout. */
 .bcard-arcana {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
+  align-items: center;
+}
+
+/* What a band is not drawing. Sized to sit on the mark grid rather than beside
+ * it, so a row of five marks and a count is still one row. */
+.bcard-more {
+  display: grid;
+  place-items: center;
+  min-width: var(--mark-s);
+  height: var(--mark-s);
+  padding: 0 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  color: var(--bone-faint);
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
 }
 
 .bcard-card img {
@@ -3528,4 +3559,185 @@ button.mark {
   font-size: 0.66rem;
   letter-spacing: 0.08em;
   color: var(--lit);
+}
+
+/* -------------------------------------------------------------------------
+ * THE REPEATABILITY STAMP
+ *
+ * How reachable a build is, in one word, from `engine/repeat.ts`.
+ *
+ * It borrows `.playstrip-assembles`'s colours on purpose. That control holds
+ * the player's own answer to the same question in the same three words, and the
+ * detail view puts the two side by side. Two palettes for one claim would read
+ * as two different claims.
+ *
+ * Positional tokens only, so it survives all four themes: `--lit` is whatever
+ * the theme's living colour is and `--unbuilt` is its muted one. No literal red
+ * or green, which would fight Olympian and Infernal both.
+ * ---------------------------------------------------------------------- */
+
+.stamp {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.stamp-word {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+  white-space: nowrap;
+}
+
+.stamp.is-reliably .stamp-word {
+  color: var(--lit);
+}
+
+.stamp.is-needs-luck .stamp-word {
+  color: var(--unbuilt);
+}
+
+/* The one reading that raises its voice, because it is a statement about the
+ * game rather than about the build: this cannot be assembled in one run. */
+.stamp.is-not-in-one-run .stamp-word {
+  color: var(--bone-faint);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.1em;
+}
+
+.stamp-say {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+  white-space: normal;
+}
+
+.stamp.is-small .stamp-word {
+  font-size: 0.53rem;
+  letter-spacing: 0.13em;
+}
+
+.stamp.is-large .stamp-word {
+  font-size: 0.75rem;
+}
+
+/* -------------------------------------------------------------------------
+ * PUTTING IT TOGETHER, in the builder.
+ *
+ * Sits under `.editor-check` and is deliberately not styled like it. The
+ * checker gates the Save button and reads as a list of things wrong. This is a
+ * reading, not a verdict: a build can cost a lot and still be exactly what
+ * somebody meant to write.
+ * ---------------------------------------------------------------------- */
+
+.editor-repeat {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.editor-repeat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.editor-repeat-head .editor-rule {
+  margin: 0;
+}
+
+.editor-repeat-head .stamp {
+  align-items: flex-end;
+  text-align: right;
+  max-width: 22rem;
+}
+
+.editor-charges {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.editor-charges li {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-2);
+}
+
+/* Filler costs nothing and is still the most useful line here, so it is marked
+ * as advice rather than as a charge. */
+.editor-charges li.is-free {
+  border-left-color: var(--lit-dim);
+}
+
+.editor-charge-say {
+  font-size: 0.76rem;
+  color: var(--bone-dim);
+}
+
+.editor-charge-tip {
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+/* Putting it together, on an open build. Mirrors `.builds-how` beside it, so
+ * the two sections under a build read as a pair rather than as a paragraph and
+ * then a widget. */
+.builds-repeat {
+  max-width: 42rem;
+  margin: 1.5rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.builds-repeat h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.builds-repeat ul {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.builds-repeat li {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-2);
+}
+
+/* On a shared card the stamp is doing the most important job on the screen, so
+ * it gets room rather than being tucked beside something. */
+.shared-card .stamp {
+  margin: 0.2rem 0 0.6rem;
+}
+
+/* Sits directly under How it works and belongs to it, so it drops the rule that
+ * would otherwise separate two halves of the same thought. */
+.builds-luck {
+  margin-top: 1.25rem;
+  padding-top: 0;
+  border-top: 0;
 }
