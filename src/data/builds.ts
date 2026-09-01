@@ -145,6 +145,24 @@ export type ShownBuild = {
    * Optional, so every build written before this loads unchanged.
    */
   optional?: TraitId[]
+  /**
+   * What to do if the run goes your way, and what to leave alone if it does not.
+   *
+   * The place for everything that is real, useful and not the build: a Hex worth
+   * taking if you happen to meet Selene, a fifth god worth a keepsake for one
+   * boon, a boon from a god who turns up on their own schedule. All of it is
+   * upside, none of it is a plan, and writing any of it into `boons` would make
+   * the build read as demanding something it does not actually need.
+   *
+   * `optional` is the same idea for things that have a trait id. This is for
+   * the ones that do not, and for the caveats underneath.
+   *
+   * Never shown on an overview card. The card is for scanning a shelf, and this
+   * is the sort of thing you read once you have already picked a build up.
+   *
+   * Optional, so every build written before it loads unchanged.
+   */
+  luck?: string
   hex: TraitId | null
   hammers: TraitId[]
   keepsake: TraitId | null
@@ -288,6 +306,8 @@ export const FIRST_BUILD: ShownBuild = {
     'InstantRootKill',         // Winter Harvest      Demeter
     'RandomStatusBoon',        // Nervous Wreck       Aphrodite
   ],
+  luck:
+    'Hearth of Hestia is written in because this build is a stress test, and it is the clearest thing in it to treat as upside instead. There are nine Hexes, you take one, and which blessings that Hex then offers from Selene is drawn separately, so a build that needs a particular one fails on a draw nobody controls. Meet Selene, take Hearth of Hestia if it is there, and lose nothing if it is not. Same for the second hammer: a run offers two at most out of everything the arm has, so plan for the Special upgrade and treat the area upgrade as a bonus. If a fifth Olympian is going spare, Hestia is the one worth a keepsake, and one boon from her is the whole reason to spend it.',
   hex: 'MeteorHestiaTalent',
   hammers: ['StaffExAoETrait', 'StaffFastSpecialTrait'],
   keepsake: 'ForceHestiaBoonKeepsake',
