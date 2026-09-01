@@ -3741,3 +3741,186 @@ button.mark {
   padding-top: 0;
   border-top: 0;
 }
+
+/* -------------------------------------------------------------------------
+ * THE SLOT BAR, in the builder.
+ *
+ * The five core slots as a row of tiles rather than five stacked dropdowns.
+ * Same glyphs, same order and same reading as the overview card and the Poster,
+ * because it is the same five slots and they should not look like two different
+ * ideas depending on which screen you are on.
+ * ---------------------------------------------------------------------- */
+
+.slotbar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.35rem;
+  margin: 0.1rem 0 0.5rem;
+}
+
+.slotbar-tile {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.5rem 0.25rem 0.45rem;
+  min-width: 0;
+  background: var(--ink-950);
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.slotbar-tile:hover {
+  border-color: var(--div-4);
+}
+
+.slotbar-tile.is-open {
+  border-color: var(--lit-dim);
+  background: var(--ink-900);
+}
+
+/* Fixed, so a filled tile and an empty one are the same size and the row does
+ * not shift as a build fills up. */
+.slotbar-art {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
+.slotbar-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* An empty slot wears the game's glyph, held back so a filled tile reads as the
+ * one carrying information. */
+.slotbar-glyph {
+  opacity: 0.28;
+  width: 60% !important;
+  height: 60% !important;
+}
+
+.slotbar-slot {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* One line, ellipsised. A boon name is longer than a fifth of the panel and the
+ * tiles have to stay the same width. */
+.slotbar-name {
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: var(--bone-dim);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slotbar-tile:not(.is-held) .slotbar-name {
+  color: var(--bone-faint);
+}
+
+/* Five tiles is too many across a phone, so they go two rows of three. */
+@media (max-width: 34rem) {
+  .slotbar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * THE BANNER AND THE CAVEATS
+ *
+ * Two different jobs and two different treatments.
+ *
+ * The banner is blockers, and it sticks to the top of the form because the
+ * control that caused it is usually somewhere you have already scrolled past. A
+ * Save button that does nothing for no visible reason is the thing it exists to
+ * prevent.
+ *
+ * The caveats sit above the actions instead. They are legal, they are easy to
+ * miss, and they are the reason somebody ends up sharing a build nobody can
+ * assemble, so they get read rather than glanced at on the way past.
+ * ---------------------------------------------------------------------- */
+
+.editor-banner {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: 0 0 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  /* Opaque, not translucent: the form scrolls underneath it. */
+  background: var(--ink-900);
+  box-shadow: 0 6px 14px -8px rgb(0 0 0 / 0.7);
+}
+
+.editor-banner.is-blocking {
+  border-color: var(--unbuilt);
+}
+
+.editor-banner-head {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--unbuilt);
+}
+
+.editor-banner ul,
+.editor-caveats ul {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.editor-banner li,
+.editor-caveats li {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-4);
+}
+
+.editor-caveats {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.editor-caveats .editor-banner-head {
+  color: var(--bone-faint);
+}
+
+.editor-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--div-2);
+  font-size: 0.76rem;
+  color: var(--bone-dim);
+  cursor: pointer;
+}
+
+.editor-confirm input {
+  width: 0.9rem;
+  height: 0.9rem;
+  accent-color: var(--lit);
+  cursor: pointer;
+}

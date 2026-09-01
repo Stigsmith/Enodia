@@ -49,7 +49,12 @@ import type { Assembled } from '../build-pieces.ts'
  * see there is more and click in for it.
  */
 const BAND_CAP = 5
-const ARCANA_CAP = 4
+/**
+ * Five, which is what `build-check.ts` allows a build to name, so the row never
+ * truncates. It was four while a build could carry a whole board of ten; now
+ * that Arcana are a couple of suggestions there is nothing to hide.
+ */
+const ARCANA_CAP = 5
 
 export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string) => void }) {
   const { build } = built

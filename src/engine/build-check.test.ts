@@ -75,22 +75,35 @@ describe('what it blocks', () => {
     expect(blockers(checkBuild(bend({ name: '  ' }))).some((p) => p.field === 'name')).toBe(true)
   })
 
-  it('more Arcana than a save has Grasp for', () => {
-    // Every paid card at once is 55 Grasp against a ceiling of 30. The limit is
-    // the cost, not the count: six cheap cards are legal and two expensive ones
-    // plus a third may not be.
+  it('more Arcana than a build should be naming', () => {
+    /**
+     * The limit is the count, and it is about usefulness rather than legality.
+     *
+     * It has been wrong in both directions. It blocked above five on the belief
+     * that the Grasp holds five, which it does not: eighteen paid cards cost 1
+     * to 5 against a ceiling of 30, so six cheap cards are legal. Then it became
+     * a Grasp sum, which was right about the game and wrong about the build.
+     *
+     * A build is not a save file. What belongs on one is the couple of cards
+     * that follow from what it does, so the count is back and it is five.
+     */
     const everyPaidCard = [...arcanaById.values()].filter((c) => (c.cost ?? 0) > 0).map((c) => c.id)
     const said = blockers(checkBuild(bend({ arcana: everyPaidCard })))
-    expect(said.some((p) => /Grasp/.test(p.say))).toBe(true)
+    expect(said.some((p) => /Arcana/.test(p.say))).toBe(true)
   })
 
-  it('lets a long but affordable board through', () => {
-    const cheap = [...arcanaById.values()]
-      .filter((c) => (c.cost ?? 0) > 0 && (c.cost ?? 0) <= 2)
-      .map((c) => c.id)
-    const grasp = cheap.reduce((n, id) => n + (arcanaById.get(id)?.cost ?? 0), 0)
-    expect(grasp).toBeLessThanOrEqual(30)
-    expect(blockers(checkBuild(bend({ arcana: cheap })))).toEqual([])
+  it('lets a couple of suggestions through without comment', () => {
+    const two = [...arcanaById.values()].slice(0, 2).map((c) => c.id)
+    expect(blockers(checkBuild(bend({ arcana: two })))).toEqual([])
+    expect(checkBuild(bend({ arcana: two })).some((p) => p.field === 'arcana')).toBe(false)
+  })
+
+  it('says so above three, without blocking', () => {
+    // Four is legal, cheap and still more than a reader wants handed to them.
+    const four = [...arcanaById.values()].slice(0, 4).map((c) => c.id)
+    const problems = checkBuild(bend({ arcana: four }))
+    expect(blockers(problems)).toEqual([])
+    expect(problems.some((p) => p.field === 'arcana' && p.severity === 'notes')).toBe(true)
   })
 })
 

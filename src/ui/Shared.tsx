@@ -83,7 +83,7 @@ export function Shared({
 
         {build.arcana.length ? (
           <p className="shared-arcana">
-            {build.arcana.length} Arcana:{' '}
+            Bring:{' '}
             {build.arcana
               .map((id) => arcanaById.get(id)?.name ?? id)
               .join(', ')}
