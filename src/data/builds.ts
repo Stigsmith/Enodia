@@ -313,23 +313,20 @@ export const FIRST_BUILD: ShownBuild = {
   keepsake: 'ForceHestiaBoonKeepsake',
   familiar: 'FrogFamiliar',
   /**
-   * Ten cards at 29 Grasp, one under the 30 a save can reach.
+   * Two cards, not a board.
    *
-   * Origination and Excellence are the expensive pair and both earn it here:
-   * this build is made of status effects, and every boon in it wants to arrive
-   * at a better rarity. The rest are cheap cards that fit in the change.
+   * This used to list ten, at 29 of 30 Grasp, which was a save file rather than
+   * a build. Nobody reading a build wants somebody else's whole loadout: they
+   * want the one or two cards that follow from what the build does, so they know
+   * what to bring and can fill the rest of the board themselves.
+   *
+   * These two follow. Origination because the build is made of status effects
+   * and does nothing else. The Furies because the aspect clears with the Cast
+   * and the centrepiece is a Cast duo.
    */
   arcana: [
-    'StatusVulnerability',   // Origination      5
-    'RarityBoost',           // Excellence       5
-    'LastStand',             // Death            4
-    'CastCount',             // Eternity         3
-    'DoorReroll',            // The Enchantress  3
-    'MagicCrit',             // Night            2
-    'CastBuff',              // The Furies       2
-    'LowManaDamageBonus',    // The Huntress     2
-    'BonusHealth',           // Persistence      2
-    'ChanneledCast',         // The Sorceress    1
+    'StatusVulnerability', // Origination
+    'CastBuff',            // The Furies
   ],
 }
 

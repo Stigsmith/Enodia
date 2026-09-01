@@ -46,6 +46,17 @@ const OLYMPIAN = new Set<string>(olympians)
  */
 const MAX_GRASP = 30
 
+/**
+ * The most Arcana a build may name, and the most that still reads as advice.
+ *
+ * Not a rule of the game. A save can hold far more than five cards and usually
+ * does. This is about what a build is for: the cards that follow from what it
+ * does, so a reader knows which two to bring rather than being handed somebody
+ * else's whole loadout.
+ */
+const MAX_CARDS = 5
+const SUGGESTED_CARDS = 3
+
 /** The Olympians a build spends a slot on, which is not every god on it. */
 export function olympiansOf(build: ShownBuild): string[] {
   const found = new Set<string>()
@@ -188,28 +199,44 @@ export function checkBuild(build: ShownBuild): Problem[] {
   }
 
   /**
-   * The Arcana are limited by Grasp, not by how many cards you take.
+   * The Arcana on a build are a couple of suggestions, not a board.
    *
-   * **This used to block above five cards, and that was wrong.** The board has
-   * eighteen paid cards costing between 1 and 5, and six of the cheap ones fit
-   * inside the same Grasp as two expensive ones. `MetaUpgradeCostData` starts a
-   * save at 10 and it rises to 30 as MemPoints are spent, which is the real
-   * ceiling and the one `ui/Arcana.tsx` already counts against.
+   * **This has been wrong twice, in opposite directions.** First it blocked
+   * above five cards, on the assumption the Grasp holds five. It does not: the
+   * board has eighteen paid cards costing between 1 and 5, `MetaUpgradeCostData`
+   * starts a save at 10 and rises to 30, and six cheap cards fit inside the same
+   * Grasp as two expensive ones. So the rule became a Grasp sum.
    *
-   * Six free cards cost nothing and switch themselves on, so they never count.
+   * That was right about the game and wrong about the build. A build is not a
+   * save file. What belongs on one is the one or two cards that follow from what
+   * the build does: The Huntress on an Attack or Special build, The Furies on a
+   * Cast build, the Ω crit card on a Morrigan build. Everything else on a real
+   * board is the player's own loadout and says nothing about this build.
+   *
+   * So the limit is the count again, and it is about usefulness rather than
+   * legality: five is the most that can still read as advice, and past three it
+   * has stopped being advice. The Grasp sum stays underneath as a backstop,
+   * though at five cards it cannot be reached: five of the most expensive card
+   * is 25 against a ceiling of 30.
    */
   const grasp = build.arcana.reduce((total, id) => total + (arcanaById.get(id)?.cost ?? 0), 0)
-  if (grasp > MAX_GRASP) {
+  if (build.arcana.length > MAX_CARDS) {
+    out.push({
+      field: 'arcana',
+      severity: 'blocks',
+      say: `${build.arcana.length} Arcana. Name the ${MAX_CARDS} that follow from the build and leave the rest of the board to whoever is playing it.`,
+    })
+  } else if (grasp > MAX_GRASP) {
     out.push({
       field: 'arcana',
       severity: 'blocks',
       say: `That is ${grasp} Grasp, and a save tops out at ${MAX_GRASP}.`,
     })
-  } else if (build.arcana.length) {
+  } else if (build.arcana.length > SUGGESTED_CARDS) {
     out.push({
       field: 'arcana',
       severity: 'notes',
-      say: `${build.arcana.length} Arcana, ${grasp} of ${MAX_GRASP} Grasp.`,
+      say: `${build.arcana.length} Arcana. Two or three that follow from the build are worth more to a reader than a whole board.`,
     })
   }
 

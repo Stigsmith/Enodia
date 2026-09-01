@@ -36,6 +36,7 @@ import { checkBuild, blockers } from '../engine/build-check.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
+import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
@@ -130,6 +131,39 @@ export function BuildEditor({
    */
   const stars = ratingCeiling(repeat)
 
+  /**
+   * The caveats a person has to say they have read before they can save.
+   *
+   * Not the blockers: those already stop a save on their own and there is
+   * nothing to acknowledge about a thing you cannot do. These are the ones that
+   * are legal, easy to miss, and the reason somebody ends up sharing a build
+   * nobody can assemble. `notes` from the checker, plus the reading when it says
+   * a lot has to land.
+   */
+  const caveats = useMemo(() => {
+    const out = problems.filter((one) => one.severity === 'notes').map((one) => one.say)
+    if (repeat.hardStop) out.push(repeat.hardStop)
+    else if (repeat.reach === 'needs-luck') {
+      out.push(
+        'This reads as Needs luck. It is a real build and somebody opening it should know a lot has to land in one run.',
+      )
+    }
+    return out
+  }, [problems, repeat.hardStop, repeat.reach])
+
+  /**
+   * What was acknowledged, as the caveats themselves rather than a boolean.
+   *
+   * **Keyed to the text on purpose.** A flag would stay ticked while somebody
+   * carried on editing, so a person could confirm they had read two caveats,
+   * add a sixth Olympian, and save past a warning they never saw. Comparing the
+   * list means any change to what is being warned about un-acknowledges it.
+   */
+  const [readCaveats, setReadCaveats] = useState<string[]>([])
+  const acknowledged =
+    caveats.length === 0 ||
+    (readCaveats.length === caveats.length && caveats.every((one) => readCaveats.includes(one)))
+
   /** Every trait that can occupy one core slot, for that slot's dropdown. */
   const bySlot = useMemo(() => {
     const map = new Map<Slot, DropdownOption[]>()
@@ -205,6 +239,15 @@ export function BuildEditor({
     [build.boons, build.hex],
   )
 
+  /**
+   * Which slot's picker is open, or none.
+   *
+   * One at a time on purpose. Five dropdowns stacked was five controls of equal
+   * weight and no shape; the bar is the shape, and it only stops being a bar if
+   * two of them can open at once.
+   */
+  const [openSlot, setOpenSlot] = useState<Slot | null>(null)
+
   const coreAt = (slot: Slot) => build.boons.find((id) => traits.get(id)?.slot === slot) ?? null
 
   const setCore = (slot: Slot, id: string | null) => {
@@ -278,17 +321,61 @@ export function BuildEditor({
             onChoose={(value) => set('aspect', value ?? '')}
           />
 
+          {/* The five slots, drawn the way the game draws them and the way every
+            * other screen here already does: a row of tiles wearing the game's
+            * own slot glyphs when they are empty and the boon's art when they
+            * are not.
+            *
+            * They were five stacked dropdowns, which was five identical wide
+            * controls with nothing to tell them apart but their labels, and
+            * nothing about it looked like the thing it was editing. A row also
+            * shows the one fact the stack could not: how much of the build is
+            * still open, at a glance, which is the same thing the overview card
+            * shows and the reason the card draws them this way.
+            *
+            * Clicking a tile opens that slot's picker underneath. */}
           <h3 className="editor-rule">The five slots</h3>
-          {CORE_SLOTS.map((slot) => (
+          <div className="slotbar" role="group" aria-label="The five core slots">
+            {CORE_SLOTS.map((slot) => {
+              const held = coreAt(slot)
+              const trait = held ? traits.get(held) : null
+              const icon = held ? iconOf.get(held) : null
+              const glyph = SLOT_GLYPH[slot]
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  className={`slotbar-tile${held ? ' is-held' : ''}${openSlot === slot ? ' is-open' : ''}`}
+                  aria-expanded={openSlot === slot}
+                  title={trait?.name ?? `${slotLabel(slot)}, open`}
+                  onClick={() => setOpenSlot(openSlot === slot ? null : slot)}
+                >
+                  <span className="slotbar-art">
+                    {icon ? (
+                      <img src={`/${icon}`} alt="" loading="lazy" />
+                    ) : glyph ? (
+                      <img className="slotbar-glyph" src={`/${glyph}`} alt="" loading="lazy" />
+                    ) : null}
+                  </span>
+                  <span className="slotbar-slot">{slotLabel(slot)}</span>
+                  <span className="slotbar-name">{trait?.name ?? 'Open'}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {openSlot ? (
             <Dropdown
-              key={slot}
-              label={slotLabel(slot)}
+              label={slotLabel(openSlot)}
               all="Open"
-              chosen={coreAt(slot)}
-              options={bySlot.get(slot) ?? []}
-              onChoose={(value) => setCore(slot, value)}
+              chosen={coreAt(openSlot)}
+              options={bySlot.get(openSlot) ?? []}
+              onChoose={(value) => {
+                setCore(openSlot, value)
+                setOpenSlot(null)
+              }}
             />
-          ))}
+          ) : null}
 
           <h3 className="editor-rule">Before you go</h3>
           <Dropdown
@@ -352,8 +439,11 @@ export function BuildEditor({
             emptySays="No hammer upgrades yet."
           />
 
-          <h3 className="editor-rule">Arcana</h3>
-          <p className="editor-hint">The Grasp holds five.</p>
+          <h3 className="editor-rule">Arcana worth bringing</h3>
+          <p className="editor-hint">
+            The one or two that follow from the build, not a board. The Huntress on an Attack or
+            Special build, The Furies on a Cast build. Five at the outside.
+          </p>
           <PickList
             options={arcana.map((card) => ({
               value: card.id,
@@ -504,6 +594,22 @@ export function BuildEditor({
             />
           </div>
 
+          {/* Sticky, because the thing it is warning about is somewhere else on
+            * a form this long. A blocker you have scrolled past is a Save button
+            * that does nothing for no visible reason. */}
+          {stopping.length ? (
+            <div className="editor-banner is-blocking" role="alert">
+              <span className="editor-banner-head">
+                {stopping.length === 1 ? 'One thing to fix' : `${stopping.length} things to fix`}
+              </span>
+              <ul>
+                {stopping.map((one) => (
+                  <li key={one.say}>{one.say}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {/* The checker, live. Blocking first, because that is the half that
             * decides whether Save does anything. */}
           <div className="editor-check" aria-live="polite">
@@ -542,14 +648,39 @@ export function BuildEditor({
             </ul>
           </div>
 
+          {caveats.length ? (
+            <div className="editor-caveats">
+              <span className="editor-banner-head">
+                {caveats.length === 1 ? 'One thing worth knowing' : `${caveats.length} things worth knowing`}
+              </span>
+              <ul>
+                {caveats.map((one) => (
+                  <li key={one}>{one}</li>
+                ))}
+              </ul>
+              <label className="editor-confirm">
+                <input
+                  type="checkbox"
+                  checked={acknowledged}
+                  onChange={(event) => setReadCaveats(event.target.checked ? caveats : [])}
+                />
+                <span>I have read these</span>
+              </label>
+            </div>
+          ) : null}
+
           <div className="editor-actions">
             <button
               type="button"
               className="quiet"
-              disabled={stopping.length > 0}
+              disabled={stopping.length > 0 || !acknowledged}
               onClick={() => onSave(build)}
             >
-              {stopping.length ? `${stopping.length} to fix` : 'Save this build'}
+              {stopping.length
+                ? `${stopping.length} to fix`
+                : acknowledged
+                  ? 'Save this build'
+                  : 'Read the caveats first'}
             </button>
             {initial && onDelete ? (
               <button type="button" className="quiet editor-delete" onClick={() => onDelete(initial.id)}>
