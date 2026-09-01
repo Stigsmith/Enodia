@@ -36,6 +36,11 @@ import { checkBuild, blockers } from '../engine/build-check.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper } from './Fear.tsx'
+import { Tabs, TabPanel } from './Tabs.tsx'
+import type { Tab } from './Tabs.tsx'
+import { BuildTray } from './BuildTray.tsx'
+import type { TrayTarget } from './BuildTray.tsx'
+import { assemble } from './build-pieces.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
@@ -52,6 +57,32 @@ const option = (id: TraitId): DropdownOption => ({
 })
 
 const byName = (a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label)
+
+/**
+ * The five tabs, and what each one is carrying.
+ *
+ * Counts rather than badges: a tab that says 0 tells you the Arcana are empty
+ * without a click, which is the whole reason to put a number there. Loadout
+ * counts filled core slots out of five, because "3/5" is the one number that
+ * says how far from finished a build is.
+ */
+const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => {
+  const filled = CORE_SLOTS.filter((slot) =>
+    build.boons.some((id) => traits.get(id)?.slot === slot),
+  ).length
+  const beyond = build.boons.filter((id) => {
+    const slot = traits.get(id)?.slot
+    return !slot || !CORE_SLOTS.includes(slot)
+  }).length
+
+  return [
+    { id: 'loadout', label: 'Loadout', count: filled },
+    { id: 'boons', label: 'Boons', count: beyond + build.hammers.length },
+    { id: 'arcana', label: 'Arcana', count: build.arcana.length },
+    { id: 'notes', label: 'Notes' },
+    { id: 'play', label: 'Play' },
+  ]
+}
 
 /**
  * Which god offers a boon, for the grouped picker.
@@ -290,6 +321,30 @@ export function BuildEditor({
    */
   const [openSlot, setOpenSlot] = useState<Slot | null>(null)
 
+  /**
+   * Which tab is showing.
+   *
+   * Local state rather than a route. Which tab is open is a detail of one form,
+   * not a place in the app, and a shared link to the builder pointing at the
+   * Arcana tab would be an odd thing to send somebody.
+   */
+  const [tab, setTab] = useState<TrayTarget | 'notes'>('loadout')
+
+  /** The build as the tray draws it, which is the same shape the card uses. */
+  const built = useMemo(() => assemble(build), [build])
+
+  /**
+   * A mark in the tray opens the tab that owns it.
+   *
+   * A core slot goes one step further and opens that slot's own picker, which
+   * is the whole reason the tray is live rather than a preview: it is the
+   * fastest way to reach the thing you want to change.
+   */
+  const goFromTray = (target: TrayTarget | 'notes', piece: { slot?: Slot | null } | null) => {
+    setTab(target)
+    setOpenSlot(piece?.slot ?? null)
+  }
+
   const coreAt = (slot: Slot) => build.boons.find((id) => traits.get(id)?.slot === slot) ?? null
 
   const setCore = (slot: Slot, id: string | null) => {
@@ -332,8 +387,20 @@ export function BuildEditor({
         <h2>{initial ? 'Edit build' : 'New build'}</h2>
       </header>
 
+      {/* Tray on the left, one tabbed panel on the right.
+        *
+        * This was three `.editor-panel` sections in a two-column grid, so a
+        * wide screen wrapped the third and left a column of nothing, with nine
+        * stacked headings inside it. The tabs turn nine headings into five and
+        * put one screenful on screen at a time, which is what frees the other
+        * half of the width for the tray. */}
       <div className="editor-grid">
+        <BuildTray built={built} onGo={goFromTray} />
+
         <section className="editor-panel">
+          <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
+
+          <TabPanel id="loadout" open={tab}>
           <h3 className="editor-rule">The arm</h3>
           <Dropdown
             label="Arm"
@@ -441,9 +508,9 @@ export function BuildEditor({
             options={familiars.map((one) => ({ value: one.id, label: one.name, icon: one.icon }))}
             onChoose={(value) => set('familiar', value)}
           />
-        </section>
+          </TabPanel>
 
-        <section className="editor-panel">
+          <TabPanel id="boons" open={tab}>
           <h3 className="editor-rule">Beyond the slots</h3>
           <p className="editor-hint">
             Duos, legendaries and everything that occupies no slot. This is the build.
@@ -481,6 +548,9 @@ export function BuildEditor({
             emptySays="No hammer upgrades yet."
           />
 
+          </TabPanel>
+
+          <TabPanel id="arcana" open={tab}>
           <h3 className="editor-rule">Arcana worth bringing</h3>
           <p className="editor-hint">
             The one or two that follow from the build, not a board. The Huntress on an Attack or
@@ -499,9 +569,9 @@ export function BuildEditor({
             emptySays="No Arcana chosen."
             cards
           />
-        </section>
+          </TabPanel>
 
-        <section className="editor-panel">
+          <TabPanel id="notes" open={tab}>
           <h3 className="editor-rule">What it is</h3>
           <label className="editor-field">
             <span>Name</span>
@@ -554,6 +624,9 @@ export function BuildEditor({
             />
           </label>
 
+          </TabPanel>
+
+          <TabPanel id="play" open={tab}>
           {/* How it has played, for this player, in this browser.
             *
             * None of these four is required and none of them is checked: a
@@ -641,9 +714,18 @@ export function BuildEditor({
             />
           </div>
 
-          {/* Sticky, because the thing it is warning about is somewhere else on
-            * a form this long. A blocker you have scrolled past is a Save button
-            * that does nothing for no visible reason. */}
+          </TabPanel>
+
+          {/* Everything below is outside the tabs, deliberately.
+            *
+            * A caveat you have to change tabs to find is a caveat nobody reads,
+            * which is the opposite of what the confirm gate is for. The reading,
+            * the blockers and the actions are true of the whole build rather
+            * than of any one tab, so they sit under all of them. */}
+
+          {/* Sticky, because the thing it is warning about is now on another tab
+            * entirely. A blocker you cannot see is a Save button that does
+            * nothing for no visible reason. */}
           {stopping.length ? (
             <div className="editor-banner is-blocking" role="alert">
               <span className="editor-banner-head">
