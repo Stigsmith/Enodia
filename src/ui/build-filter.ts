@@ -54,9 +54,23 @@ import {
 import type { ShownBuild } from '../data/builds.ts'
 
 /** The five things a build can be narrowed by, in the order they are asked. */
-export type FacetId = 'weapon' | 'aspect' | 'god' | 'keepsake' | 'familiar'
+export type FacetId = 'weapon' | 'aspect' | 'god' | 'keepsake' | 'familiar' | 'fear'
 
-export const FACET_ORDER: FacetId[] = ['weapon', 'aspect', 'god', 'keepsake', 'familiar']
+export const FACET_ORDER: FacetId[] = ['weapon', 'aspect', 'god', 'keepsake', 'familiar', 'fear']
+
+/**
+ * The Fear bands a build can be filtered by.
+ *
+ * **A threshold wearing an exact match's clothes.** Every other facet asks
+ * "does this build have exactly this", which for Fear would be useless: nobody
+ * wants the builds cleared at exactly 34. So a build reports every band it
+ * reaches, and a build at 34 answers 10, 20 and 30. Picking 30 then means
+ * "cleared 30 or better" without `matches` needing to know anything new.
+ *
+ * Tens, and stopping at 50 because `MAX_FEAR` is 57 and a band nothing can
+ * reach would be a row that never matches.
+ */
+const FEAR_BANDS = [10, 20, 30, 40, 50] as const
 
 /** Weapon and aspect are on the surface. The rest unfold. */
 export const SURFACE_FACETS: FacetId[] = ['weapon', 'aspect']
@@ -69,6 +83,7 @@ export const EMPTY_SELECTION: Selection = {
   god: null,
   keepsake: null,
   familiar: null,
+  fear: null,
 }
 
 export const countSelected = (selection: Selection): number =>
@@ -113,6 +128,8 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
       return build.keepsake ? [build.keepsake] : []
     case 'familiar':
       return build.familiar ? [build.familiar] : []
+    case 'fear':
+      return FEAR_BANDS.filter((band) => (build.play?.fear ?? 0) >= band).map(String)
   }
 }
 
@@ -147,6 +164,7 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
   god: { name: 'Gods', all: 'Any god' },
   keepsake: { name: 'Keepsake', all: 'Any keepsake' },
   familiar: { name: 'Familiar', all: 'Any familiar' },
+  fear: { name: 'Fear cleared', all: 'Any Fear' },
 }
 
 /**
@@ -159,6 +177,7 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
  */
 function labelFor(facet: FacetId, value: string, armChosen: boolean): string {
   if (facet === 'god') return value
+  if (facet === 'fear') return `Fear ${value} or better`
   if (facet === 'familiar') return familiarById.get(value)?.name ?? value
   if (facet === 'weapon') {
     const weapon = weaponById.get(value)
@@ -208,6 +227,8 @@ function iconFor(facet: FacetId, value: string): string | null {
       return GOD_ICON.get(value) ?? null
     case 'familiar':
       return familiarById.get(value)?.icon ?? null
+    case 'fear':
+      return 'icons/fear.png'
     // An aspect and a keepsake are both traits, so both are in the same index.
     default:
       return iconOf.get(value) ?? null
@@ -259,6 +280,16 @@ export function facets(builds: readonly ShownBuild[], selection: Selection): Fac
 
     return { id: facet, name: NAMES[facet].name, all: NAMES[facet].all, chosen, options }
   })
+    /**
+     * A facet with nothing in it is not drawn.
+     *
+     * This never came up while every facet was something every build has: a
+     * build always carries a weapon, an aspect and at least one god, so the
+     * list was never empty. Fear is the first facet a whole library can be
+     * silent about, and a "Fear cleared" control offering no Fear to filter by
+     * is a row of furniture claiming to be a choice.
+     */
+    .filter((facet) => facet.options.length > 0)
 }
 
 /**
