@@ -38,10 +38,21 @@ export type TrayTarget = 'loadout' | 'boons' | 'arcana' | 'play'
 export function BuildTray({
   built,
   onGo,
+  alert,
 }: {
   built: Assembled
   /** open the tab that owns this piece, and say which piece was asked for */
   onGo: (target: TrayTarget, piece: Piece | null) => void
+  /**
+   * The one thing most worth knowing about this build, or nothing.
+   *
+   * The tray is the only thing on screen from every tab, so it is the only
+   * place a warning can be guaranteed to be seen. A blocker on the Boons tab is
+   * invisible from the Play tab otherwise, and the whole reason the banner was
+   * made sticky was that a warning you have scrolled past may as well not
+   * exist. A tab away is further than scrolled past.
+   */
+  alert: { say: string; blocking: boolean; go: TrayTarget } | null
 }) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
@@ -70,6 +81,22 @@ export function BuildTray({
           <FearMark fear={build.play?.fear} />
         </p>
       </header>
+
+      {/* The worst thing about this build, wherever you are.
+        *
+        * The game's own wants-to-talk marker, which is what it puts on the map
+        * when somebody has something to say to you, and that is exactly the
+        * job: not an error, a thing worth going and looking at. */}
+      {alert ? (
+        <button
+          type="button"
+          className={`btray-alert${alert.blocking ? ' is-blocking' : ''}`}
+          onClick={() => onGo(alert.go, null)}
+        >
+          <img src="/icons/wants-to-talk.png" alt="" aria-hidden="true" />
+          <span>{alert.say}</span>
+        </button>
+      ) : null}
 
       {/* The aspect, at the size the art deserves, exactly as the game leads
         * with it. */}

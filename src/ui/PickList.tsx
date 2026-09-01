@@ -24,7 +24,7 @@
 
 import { useMemo, useState } from 'react'
 
-import { FRAME } from './build-pieces.ts'
+import { FRAME, PLATE } from './build-pieces.ts'
 import type { Rarity } from '../data/types.ts'
 
 export type PickOption = {
@@ -217,6 +217,12 @@ function Rows({
           className="picklist-row"
           onClick={() => onToggle(one.value)}
           title={one.note ?? one.label}
+          /* The game's own backing plate, which is the thing that makes a list
+           * of boons read as boons. It is a 4:1 bar with the colour on the left
+           * where the icon sits, so a legendary row is gold under its icon and
+           * a duo row is green, which is a second reading of the same fact the
+           * frame gives. */
+          style={one.rarity ? ({ '--plate': `url(/${PLATE[one.rarity]})` } as React.CSSProperties) : undefined}
         >
           <Face option={one} />
           <span className="picklist-row-text">

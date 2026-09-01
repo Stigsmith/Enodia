@@ -1764,29 +1764,53 @@ button.mark {
   padding: 0 0 0.3rem 0.9rem;
 }
 
+/* The bordered box the rows used to sit in is gone: each row carries the
+ * game's own plate now, and a box around a grid of plates reads as a table of
+ * pictures rather than as a list of boons. */
 .picklist:not(.is-cards) > .picklist-rows {
-  border: 1px solid var(--div-2);
-  border-radius: var(--r-hair);
-  background: var(--ink-950);
+  border: 0;
+  background: none;
+}
+
+/* Two columns, because one was one boon per row in a 14rem scroller and you
+ * could see two of two hundred. Narrower rows fit more of them and the plate
+ * does the work the width used to. */
+.picklist:not(.is-cards) .picklist-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.15rem;
 }
 
 .picklist-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   width: 100%;
-  padding: 0.3rem 0.4rem;
+  min-width: 0;
+  padding: 0.22rem 0.35rem;
   border: 0;
   border-radius: var(--r-hair);
-  background: none;
   color: var(--bone-dim);
   font-family: var(--body);
   text-align: left;
   cursor: pointer;
+
+  /* The game's backing plate, set per row by `PickList` from the rarity. It is
+   * a 4:1 bar with the colour on the left under the icon and fog dissolving on
+   * the right, which is what makes a list of these read as boons rather than as
+   * a table. Stretched to the row because the art has no repeatable middle, and
+   * it survives it: the only structure in it is the left colour and the soft
+   * right edge, both of which stay where they belong. */
+  background-image: var(--plate, none);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: transparent;
 }
 
+/* The game's own highlight plate rather than a colour, so hovering a legendary
+ * still reads as a legendary. */
 .picklist-row:hover {
-  background: var(--ink-800);
+  background-image: url('/frames/plate-highlight.png'), var(--plate, none);
   color: var(--bone);
 }
 
@@ -4410,4 +4434,235 @@ button.mark {
   .editor-plays > .bdrop {
     grid-column: 1 / -1;
   }
+}
+
+
+/* -------------------------------------------------------------------------
+ * THE GAME'S CHROME
+ *
+ * Buttons, tabs, a sidebar and a checkbox, all from `assets/shell/` and all of
+ * it art that was sitting in the library unused. The rule throughout: the art
+ * is the surface and the token palette does the colour, so a gold Olympian
+ * theme and a violet Cthonic one both work without a second set of pictures.
+ * ---------------------------------------------------------------------- */
+
+/* The game's pill button. 284 by 80, no repeatable middle, so it is stretched:
+ * the only structure is the rounded ends and the filigree, and both survive it
+ * at the widths a label needs. */
+.builds-back {
+  padding: 0.42rem 1.1rem 0.5rem;
+  border: 0;
+  border-radius: 0;
+  background: url('/shell/button.png') center / 100% 100% no-repeat;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.12s ease, filter 0.12s ease;
+}
+
+/* Brightened rather than swapped for `buttonselected-highlight.png`.
+ *
+ * **Three of the button sprites are not button faces.** `buttonselected-`,
+ * `buttonsecondary-` and `buttonpartial-highlight` are all 445 by 212 with a
+ * thin selection outline drawn in the upper left and empty canvas around it:
+ * overlays the game composites on top of a face, not faces themselves.
+ * Stretching one to a button puts the outline through the middle of the label.
+ *
+ * `button.png` and `button-press.png` are the real faces, filled and
+ * filigreed, so those are what the states use, with light doing the rest. */
+.builds-back:hover {
+  filter: brightness(1.4);
+  color: var(--bone);
+}
+
+.builds-back:active {
+  background-image: url('/shell/button-press.png');
+}
+
+/* The arrow is still drawn by the original rule further up: the button art has
+ * no glyph of its own. */
+
+/* -- the tray, on the game's sidebar backing ---------------------------- */
+
+.btray {
+  /* 380 by 1080, a lit left edge and diagonal streaks. Pinned to the left and
+   * covering, so the lit edge stays an edge however tall the tray runs. */
+  background:
+    url('/shell/sidebars.png') left top / 100% auto no-repeat,
+    var(--ink-900);
+  border-color: transparent;
+}
+
+/* -- the tabs ----------------------------------------------------------- */
+
+.tab {
+  border: 0;
+  border-radius: 0;
+  background: url('/shell/tray-tab.png') center / 100% 100% no-repeat;
+  padding: 0.42rem 0.85rem 0.5rem;
+  color: var(--bone-faint);
+}
+
+.tab:hover {
+  color: var(--bone-dim);
+}
+
+.tab.is-open {
+  background-image: url('/shell/tray-tab-highlight.png');
+  color: var(--lit-hot);
+}
+
+/* The count sat on a solid ground that the tab art now supplies. */
+.tab-count {
+  background: rgb(0 0 0 / 0.45);
+}
+
+.tab.is-open .tab-count {
+  background: rgb(0 0 0 / 0.45);
+}
+
+/* -- the actions -------------------------------------------------------- */
+
+/* The same real face as the back button. `buttonsecondary.png` was the first
+ * choice and is a flat black plate with nothing on it: a base the game draws
+ * something else over, which on its own looks like a button that failed to
+ * load. */
+.editor-actions > button:not(.editor-delete) {
+  border: 0;
+  border-radius: 0;
+  background: url('/shell/button.png') center / 100% 100% no-repeat;
+  padding: 0.52rem 1.4rem 0.6rem;
+  color: var(--bone-dim);
+  transition: filter 0.12s ease, color 0.12s ease;
+}
+
+.editor-actions > button:not(.editor-delete):hover:not(:disabled) {
+  filter: brightness(1.4);
+  color: var(--bone);
+}
+
+.editor-actions > button:not(.editor-delete):active:not(:disabled) {
+  background-image: url('/shell/button-press.png');
+  filter: none;
+}
+
+/* Disabled keeps the art and loses the light, so the button still reads as a
+ * button you cannot press yet rather than as a gap. */
+.editor-actions > button:not(.editor-delete):disabled {
+  filter: grayscale(0.7) brightness(0.62);
+  color: var(--bone-faint);
+  cursor: default;
+}
+
+/* Deleting a build gets the game's own bin, which needs no label. */
+.editor-delete {
+  margin-left: auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  background: url('/shell/trash-button.png') center / contain no-repeat;
+  font-size: 0;
+  cursor: pointer;
+}
+
+.editor-delete:hover {
+  background-image: url('/shell/trash-button-highlight.png');
+}
+
+/* -- the confirm box ---------------------------------------------------- */
+
+.editor-confirm input {
+  appearance: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: url('/shell/confirm-button.png') center / contain no-repeat;
+  /* Grey and dim until it is ticked, so an unticked box reads as something
+   * still to do rather than as decoration. */
+  filter: grayscale(1) brightness(0.55);
+  transition: filter 0.14s ease;
+}
+
+.editor-confirm input:checked {
+  background-image: url('/shell/confirm-button-highlight.png');
+  filter: none;
+}
+
+.editor-confirm:hover input:not(:checked) {
+  filter: grayscale(0.6) brightness(0.8);
+}
+
+/* -- the thing you cannot miss ------------------------------------------ */
+
+/* The game's wants-to-talk marker, which is what it puts on the map when
+ * somebody has something to say. Not an error: a thing worth going to look at.
+ *
+ * It lives in the tray because the tray is the only thing on screen from all
+ * five tabs. The banner is sticky for the same reason and it is not enough any
+ * more: a tab away is further than scrolled past. */
+.btray-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: rgb(0 0 0 / 0.35);
+  color: var(--bone-dim);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.btray-alert:hover {
+  border-color: var(--lit);
+  color: var(--bone);
+}
+
+.btray-alert.is-blocking {
+  border-color: var(--unbuilt);
+}
+
+.btray-alert img {
+  width: 1.15rem;
+  height: 1.15rem;
+  object-fit: contain;
+  flex: none;
+  margin-top: 0.05rem;
+}
+
+/* A caveat is worth reading, a blocker is worth reading now. */
+.btray-alert:not(.is-blocking) img {
+  opacity: 0.7;
+}
+
+/* The game's own tick on the all-clear, which is the one state that has earned
+ * a picture rather than a sentence. */
+.editor-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.editor-ok img {
+  width: 1.1rem;
+  height: 1.1rem;
+  object-fit: contain;
+}
+
+
+/* The game's boon marker on an empty list, so a picker with nothing in it still
+ * says what it is for. */
+.picklist-empty::before {
+  content: '';
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.4rem;
+  vertical-align: -0.18rem;
+  background: url('/icons/boon.png') center / contain no-repeat;
+  opacity: 0.5;
 }
