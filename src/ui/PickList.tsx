@@ -24,6 +24,9 @@
 
 import { useMemo, useState } from 'react'
 
+import { FRAME } from './build-pieces.ts'
+import type { Rarity } from '../data/types.ts'
+
 export type PickOption = {
   value: string
   label: string
@@ -32,6 +35,26 @@ export type PickOption = {
   group?: string
   /** shown under the label, where there is something worth saying */
   note?: string | null
+  /**
+   * What the game would frame this as.
+   *
+   * The picker used to draw a bare icon, so Killer Current and Heart Breaker
+   * looked identical in the list you pick them from, while every other screen
+   * in the tool had been drawing duos and legendaries in their own frames since
+   * the beginning. The information was there and the one screen that most
+   * needed it was the one not using it.
+   *
+   * Absent means no frame at all, which is right for an Arcana card and a
+   * familiar: they are not boons and framing them as Common would be a claim
+   * about rarity where rarity does not apply.
+   *
+   * There is no slot glyph here, and that is deliberate rather than an
+   * oversight. Both boon pickers are filtered to slotless boons, and the one
+   * control that does offer core boons is the slot bar's own dropdown, where
+   * which slot you are filling is the thing you clicked to get there. A glyph
+   * would be unreachable in one place and redundant in the other.
+   */
+  rarity?: Rarity
 }
 
 export function PickList({
@@ -109,7 +132,7 @@ export function PickList({
               onClick={() => onToggle(one.value)}
               title={`Remove ${one.label}`}
             >
-              {one.icon ? <img src={`/${one.icon}`} alt="" loading="lazy" /> : null}
+              <Face option={one} />
               <span>{one.label}</span>
               <span className="picklist-x" aria-hidden="true">
                 &times;
@@ -156,6 +179,26 @@ export function PickList({
   )
 }
 
+/**
+ * One option's art, framed the way the game frames it.
+ *
+ * Deliberately not `Mark`. That takes a `Piece`, which is a whole assembled
+ * build's worth of shape, and building one per row for two hundred rows to get
+ * at two image tags would be the tail wagging the dog. It reads the same `FRAME`
+ * map, so a duo here and a duo on the card wear the same art.
+ */
+function Face({ option }: { option: PickOption }) {
+  if (!option.icon) return null
+  const frame = option.rarity ? FRAME[option.rarity] : null
+
+  return (
+    <span className={`picklist-face${frame ? ' is-framed' : ''}`}>
+      <img className="picklist-art" src={`/${option.icon}`} alt="" loading="lazy" />
+      {frame ? <img className="picklist-frame" src={`/${frame}`} alt="" aria-hidden="true" /> : null}
+    </span>
+  )
+}
+
 function Rows({
   list,
   onToggle,
@@ -175,7 +218,7 @@ function Rows({
           onClick={() => onToggle(one.value)}
           title={one.note ?? one.label}
         >
-          {one.icon ? <img src={`/${one.icon}`} alt="" loading="lazy" /> : null}
+          <Face option={one} />
           <span className="picklist-row-text">
             <span className="picklist-row-name">{one.label}</span>
             {one.note && !cards ? <span className="picklist-row-note">{one.note}</span> : null}

@@ -88,7 +88,32 @@ export type PlayRecord = {
   runs?: number
   clears?: number
   assembles?: Assembles
+  /**
+   * The highest Fear this build has cleared, here, for this player.
+   *
+   * A fact about how a build has gone rather than about the build, which is
+   * what this whole record is for and why `shareable()` strips it: a link
+   * carrying "cleared Fear 20" would be claiming something about the recipient's
+   * runs. It also makes the useful question askable on the overview, which a
+   * single profile high-water mark could not: which of my builds have cleared
+   * Fear 20 or better.
+   */
+  fear?: number
 }
+
+/**
+ * The most Fear a run can carry.
+ *
+ * Derived, not picked. `MetaUpgradeData` at `MetaUpgradeData.lua:1615` holds the
+ * 17 vows, with 38 ranks between them, and every rank states a `Points` value.
+ * 57 is the sum of all of them, which is every vow at its highest rank.
+ *
+ * **The vows themselves are deliberately not extracted.** Marking which ones you
+ * took is a screen of its own and nobody has asked for it; a number is enough
+ * for now. If that changes, `MetaUpgradeData` is already loaded in the
+ * extractor's Lua state and only needs writing out.
+ */
+export const MAX_FEAR = 57
 
 /**
  * Clears over runs, or null when there is nothing to divide.
