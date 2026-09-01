@@ -3162,3 +3162,225 @@ button.mark {
 .shared-buttons {
   margin-top: 0.3rem;
 }
+
+/* ==========================================================================
+ * THE READING SCREENS
+ *
+ * Help, About, Roadmap and Changelog. They share a shell because they are the
+ * same kind of thing, and a tool whose text pages each look slightly different
+ * reads as four tools.
+ *
+ * One measure, narrow enough to read: running text sits near 65 characters
+ * whatever the window is doing, which is the one typographic rule worth being
+ * strict about on a page nobody has to interact with.
+ * ========================================================================= */
+
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+}
+
+@media (min-width: 60rem) {
+  .page { padding: 1.25rem 2rem 5rem; }
+}
+
+.page-standfirst {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------- help and about -- */
+
+.ref {
+  margin-top: 2.2rem;
+}
+
+.ref-rule {
+  margin: 0 0 0.6rem;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--lit-hot);
+  text-wrap: balance;
+}
+
+.ref-say {
+  margin: 0 0 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--bone-dim);
+  text-wrap: pretty;
+}
+
+.ref-say strong { color: var(--bone); font-weight: 700; }
+.ref-say em { color: var(--bone); }
+
+.ref-mono {
+  font-family: var(--mono);
+  color: var(--lit);
+  font-variant-numeric: tabular-nums;
+}
+
+.ref-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+/* Each state wears its own edge, in the colours the run surface uses for it,
+ * so the definition and the thing being defined look like each other. */
+.ref-item {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.8rem;
+  border-left: 3px solid var(--div-4);
+}
+
+.ref-item.is-good { border-left-color: var(--lit); }
+.ref-item.is-risk { border-left-color: var(--unbuilt); }
+.ref-item.is-dead { border-left-color: var(--rim-magenta); }
+
+.ref-item dt {
+  font-family: var(--display);
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.ref-item dd {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--bone-faint);
+}
+
+/* ------------------------------------------------------------ changelog -- */
+
+.log {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2rem;
+}
+
+.log-entry {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--div-2);
+}
+
+.log-when {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.log-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: var(--lit-hot);
+  text-wrap: balance;
+}
+
+.log-say {
+  margin: 0 0 0.3rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+
+.log-points {
+  margin: 0;
+  padding-left: 1.05rem;
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--bone-dim);
+}
+
+.log-points li::marker { color: var(--lit-dim); }
+
+/* ------------------------------------------------------------- roadmap -- */
+
+.plan {
+  display: grid;
+  gap: 2.2rem;
+  margin-top: 2rem;
+}
+
+.plan-name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+/* The four stages read as one scale, from the light that is on to the light
+ * that is not lit yet. Waiting is the odd one out on purpose: it is not a
+ * later stage, it is a different kind of answer. */
+.plan-stage.is-now .plan-name { color: var(--lit-hot); }
+.plan-stage.is-next .plan-name { color: var(--lit); }
+.plan-stage.is-later .plan-name { color: var(--bone-dim); }
+.plan-stage.is-waiting .plan-name { color: var(--unbuilt); }
+
+.plan-say {
+  margin: 0.15rem 0 0.9rem;
+  font-size: 0.78rem;
+  color: var(--bone-faint);
+}
+
+.plan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.plan-list > li {
+  display: grid;
+  gap: 0.2rem;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--div-3);
+}
+
+.plan-stage.is-now .plan-list > li { border-left-color: var(--lit-dim); }
+.plan-stage.is-waiting .plan-list > li { border-left-color: color-mix(in oklab, var(--unbuilt) 45%, transparent); }
+
+.plan-list h4 {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--bone);
+}
+
+.plan-list p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--bone-dim);
+  text-wrap: pretty;
+}
+
+/* Who or what it is waiting on, which is the honest half of a roadmap. */
+.plan-on {
+  font-family: var(--mono);
+  font-size: 0.72rem !important;
+  color: var(--unbuilt) !important;
+  margin-top: 0.2rem !important;
+}

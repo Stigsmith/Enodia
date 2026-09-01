@@ -155,15 +155,6 @@ export function Menu({
             leave()
           },
         },
-        {
-          label: 'Themes',
-          note: 'Four of them, each with its own light, weather and pictures',
-          here: view === 'themes',
-          action: () => {
-            onGo('themes')
-            leave()
-          },
-        },
         { label: 'Build exchange', note: 'Share and import builds. Phase 4' },
       ],
     },
@@ -241,16 +232,59 @@ export function Menu({
       title: 'The tool',
       entries: [
         {
+          label: 'Themes',
+          note: 'Four of them, each with its own light, weather and pictures',
+          here: view === 'themes',
+          action: () => {
+            onGo('themes')
+            leave()
+          },
+        },
+        {
           label: 'Settings',
-          note: 'Export what you have made, and put a file back',
+          note: 'Your name, how the menu sits, and getting your things out',
           here: view === 'settings',
           action: () => {
             onGo('settings')
             leave()
           },
         },
-        { label: 'Help', note: 'What the states and the percentages mean' },
-        { label: 'About', note: 'Where the data comes from, and the disclaimer' },
+        {
+          label: 'Help',
+          note: 'What the states, the bands and the percentages mean',
+          here: view === 'help',
+          action: () => {
+            onGo('help')
+            leave()
+          },
+        },
+        {
+          label: 'Roadmap',
+          note: 'What is here, what is coming, and what is stuck',
+          here: view === 'roadmap',
+          action: () => {
+            onGo('roadmap')
+            leave()
+          },
+        },
+        {
+          label: 'Changelog',
+          note: 'What changed, newest first',
+          here: view === 'changelog',
+          action: () => {
+            onGo('changelog')
+            leave()
+          },
+        },
+        {
+          label: 'About',
+          note: 'Where the data comes from, and the disclaimer',
+          here: view === 'about',
+          action: () => {
+            onGo('about')
+            leave()
+          },
+        },
       ],
     },
   ]

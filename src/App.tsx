@@ -24,6 +24,8 @@ import { Hecate } from './ui/Hecate.tsx'
 import { Arcana } from './ui/Arcana.tsx'
 import { Themes } from './ui/Themes.tsx'
 import { Settings } from './ui/Settings.tsx'
+import { Changelog, Roadmap } from './ui/Pages.tsx'
+import { About, Help } from './ui/Reference.tsx'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
@@ -224,6 +226,23 @@ export function App() {
       ) : null}
     </div>
   )
+
+  /* The reading screens. Nothing on them is interactive, so they share one
+   * branch and one shell rather than four of each. */
+  const reading: Partial<Record<View, () => React.JSX.Element>> = {
+    help: Help,
+    about: About,
+    roadmap: Roadmap,
+    changelog: Changelog,
+  }
+  const Reading = reading[screen]
+  if (Reading) {
+    return frame(
+      <div className="shell is-wide">
+        <Reading />
+      </div>,
+    )
+  }
 
   if (screen === 'settings') {
     return frame(
