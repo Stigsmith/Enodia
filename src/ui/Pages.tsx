@@ -67,25 +67,57 @@ export function Changelog() {
 export function Roadmap() {
   const inStage = (stage: Stage) => ROADMAP.filter((one) => one.stage === stage)
 
+  /**
+   * How much of what is planned is built.
+   *
+   * **Counted, not asserted.** A roadmap that says "we are making progress" is
+   * a claim; one that says twelve of nineteen is a fact you can check against
+   * the list underneath it. Stalled is excluded from the denominator, because a
+   * thing that is not blocked by code is not work outstanding: counting it
+   * would make the bar move by giving up on something.
+   */
+  const built = inStage('now').length
+  const outstanding = built + inStage('next').length + inStage('later').length
+  const share = outstanding ? Math.round((built / outstanding) * 100) : 0
+
   return (
     <Page
       title="Roadmap"
       standfirst="What is built, what is planned, and what is stalled. No dates: this is a side project and any date would be a guess."
     >
+      {/* The whole thing at a glance, before any of the detail. */}
+      <div className="plan-progress">
+        <div className="plan-bar" role="img" aria-label={`${built} of ${outstanding} built`}>
+          <span className="plan-bar-fill" style={{ width: `${share}%` }} />
+        </div>
+        <p className="plan-count">
+          <strong>{built}</strong> of {outstanding} built
+          {inStage('waiting').length ? `, ${inStage('waiting').length} stalled` : ''}
+        </p>
+      </div>
+
       <div className="plan">
         {STAGES.map((stage) => {
           const items = inStage(stage.id)
           if (!items.length) return null
           return (
             <section key={stage.id} className={`plan-stage is-${stage.id}`}>
-              <h3 className="plan-name">{stage.name}</h3>
+              <header className="plan-head">
+                <h3 className="plan-name">{stage.name}</h3>
+                <span className="plan-tally">{items.length}</span>
+              </header>
               <p className="plan-say">{stage.say}</p>
               <ul className="plan-list">
                 {items.map((one) => (
                   <li key={one.title}>
-                    <h4>{one.title}</h4>
-                    <p>{one.say}</p>
-                    {one.on ? <p className="plan-on">{one.on}</p> : null}
+                    {/* The marker carries the state, so a reader skimming the
+                      * left edge gets the shape without reading the headings. */}
+                    <span className="plan-dot" aria-hidden="true" />
+                    <div>
+                      <h4>{one.title}</h4>
+                      <p>{one.say}</p>
+                      {one.on ? <p className="plan-on">{one.on}</p> : null}
+                    </div>
                   </li>
                 ))}
               </ul>
