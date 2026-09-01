@@ -28,11 +28,22 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { arcana, aspectsOf, familiars, godPools, olympians, sources, traits, weapons } from '../data/app.ts'
+import {
+  arcana,
+  arcanaById,
+  aspectsOf,
+  familiars,
+  godPools,
+  olympians,
+  sources,
+  traits,
+  weapons,
+} from '../data/app.ts'
+
 import { ASSEMBLES } from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
-import { checkBuild, blockers } from '../engine/build-check.ts'
+import { MAX_CARDS, MAX_GRASP, checkBuild, blockers } from '../engine/build-check.ts'
 import type { Fix, FixOption, Problem } from '../engine/build-check.ts'
 import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
@@ -300,6 +311,31 @@ export function BuildEditor({
       return trait && (!trait.slot || !CORE_SLOTS.includes(trait.slot))
     })
   }, [])
+
+  /**
+   * The Arcana, with the ones this board can no longer afford marked.
+   *
+   * **The editor ignored Grasp entirely** while the Arcana screen enforced it
+   * exactly, so the same rule had two answers depending on which screen you
+   * were on. Both ceilings are imported from `build-check.ts` rather than
+   * restated, so the picker's limit and the checker's failure cannot drift
+   * apart: the whole complaint was two screens giving two answers.
+   */
+  const arcanaOptions = useMemo(() => {
+    const spent = build.arcana.reduce((total, id) => total + (arcanaById.get(id)?.cost ?? 0), 0)
+    const full = build.arcana.length >= MAX_CARDS
+
+    return arcana.map((card) => {
+      const held = build.arcana.includes(card.id)
+      const cost = card.cost ?? 0
+      let blocked: string | null = null
+      if (!held && full) blocked = `Five is as many as a build should name.`
+      else if (!held && spent + cost > MAX_GRASP) {
+        blocked = `${spent + cost} Grasp, and a save tops out at ${MAX_GRASP}.`
+      }
+      return { value: card.id, label: card.name, icon: card.icon, note: card.text, blocked }
+    })
+  }, [build.arcana])
 
   const hexes = useMemo(
     () =>
@@ -615,12 +651,7 @@ export function BuildEditor({
             Special build, The Furies on a Cast build. Five at the outside.
           </p>
           <PickList
-            options={arcana.map((card) => ({
-              value: card.id,
-              label: card.name,
-              icon: card.icon,
-              note: card.text,
-            }))}
+            options={arcanaOptions}
             chosen={build.arcana}
             onToggle={toggleArcana}
             placeholder="Search Arcana"

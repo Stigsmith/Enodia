@@ -55,6 +55,14 @@ export type PickOption = {
    * would be unreachable in one place and redundant in the other.
    */
   rarity?: Rarity
+  /**
+   * Why this cannot be picked, when it cannot.
+   *
+   * The Arcana tab let you keep adding past the Grasp a save holds, while the
+   * Arcana screen three clicks away enforced it exactly. Two screens disagreeing
+   * about the same rule is worse than either answer.
+   */
+  blocked?: string | null
 }
 
 export function PickList({
@@ -214,9 +222,10 @@ function Rows({
         <button
           key={`${one.group ?? ''}:${one.value}`}
           type="button"
-          className="picklist-row"
+          disabled={!!one.blocked}
+          className={`picklist-row${one.blocked ? ' is-blocked' : ''}`}
           onClick={() => onToggle(one.value)}
-          title={one.note ?? one.label}
+          title={one.blocked ?? one.note ?? one.label}
           /* The game's own backing plate, which is the thing that makes a list
            * of boons read as boons. It is a 4:1 bar with the colour on the left
            * where the icon sits, so a legendary row is gold under its icon and
@@ -227,7 +236,11 @@ function Rows({
           <Face option={one} />
           <span className="picklist-row-text">
             <span className="picklist-row-name">{one.label}</span>
-            {one.note && !cards ? <span className="picklist-row-note">{one.note}</span> : null}
+            {one.blocked ? (
+              <span className="picklist-row-blocked">{one.blocked}</span>
+            ) : one.note && !cards ? (
+              <span className="picklist-row-note">{one.note}</span>
+            ) : null}
           </span>
           <span className="picklist-add" aria-hidden="true">
             +
