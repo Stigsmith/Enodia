@@ -11,7 +11,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { FIRST_BUILD } from '../data/builds.ts'
+import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import {
   buildInUrl,

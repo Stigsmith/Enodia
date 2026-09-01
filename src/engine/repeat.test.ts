@@ -11,7 +11,8 @@ import { describe, expect, it } from 'vitest'
 import { REACH, bandFor, ratingCeiling, readRepeat, reachName } from './repeat.ts'
 import { olympians, traits } from '../data/app.ts'
 import { olympiansOf } from './build-check.ts'
-import { ASSEMBLES, FIRST_BUILD } from '../data/builds.ts'
+import { ASSEMBLES } from '../data/builds.ts'
+import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const read = (over: Partial<ShownBuild> = {}) => readRepeat({ ...FIRST_BUILD, ...over }, traits, olympians)

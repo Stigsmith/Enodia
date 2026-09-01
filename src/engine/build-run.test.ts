@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { SAMPLE_BUILDS, FIRST_BUILD } from '../data/builds.ts'
+import { SAMPLE_BUILDS, FIRST_BUILD } from '../data/builds.fixture.ts'
 import { olympians, traits } from '../data/app.ts'
 import type { RunContext } from '../data/types.ts'
 import { buildStanding, buildTally, sayOf, targetOf, verdictForShown } from './build-run.ts'
@@ -89,14 +89,22 @@ describe('the sentence under the name', () => {
 })
 
 describe('the standing', () => {
+  /**
+   * The library is passed in rather than defaulted.
+   *
+   * `buildStanding` falls back to what ships, and what ships is now nothing: an
+   * empty shelf is the honest state until real builds are written. A test of
+   * the standing has no business depending on that, so it brings its own
+   * library and keeps testing the function.
+   */
   it('accounts for every build exactly once', () => {
-    const standing = buildStanding(context(), traits)
+    const standing = buildStanding(context(), traits, SAMPLE_BUILDS)
     expect(standing).toHaveLength(SAMPLE_BUILDS.length)
     expect(new Set(standing.map((one) => one.build.id)).size).toBe(SAMPLE_BUILDS.length)
   })
 
   it('puts the dead first, because that is the news', () => {
-    const standing = buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits)
+    const standing = buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits, SAMPLE_BUILDS)
     const states = standing.map((one) => one.verdict.state)
     const rank = { DEAD: 0, AT_RISK: 1, REACHABLE: 2, ON_TRACK: 3 }
     for (let i = 1; i < states.length; i += 1) {
@@ -105,15 +113,15 @@ describe('the standing', () => {
   })
 
   it('adds up', () => {
-    const tally = buildTally(buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits))
+    const tally = buildTally(buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits, SAMPLE_BUILDS))
     expect(tally.done + tally.open + tally.closed).toBe(tally.total)
     expect(tally.total).toBe(SAMPLE_BUILDS.length)
   })
 
   it('closes a build the moment another aspect is chosen', () => {
     // An aspect settles the field at setup, before a single Exit.
-    const onIt = buildTally(buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits))
-    const offIt = buildTally(buildStanding(context({ aspect: 'StaffRaiseDeadAspect' }), traits))
+    const onIt = buildTally(buildStanding(context({ aspect: FIRST_BUILD.aspect }), traits, SAMPLE_BUILDS))
+    const offIt = buildTally(buildStanding(context({ aspect: 'StaffRaiseDeadAspect' }), traits, SAMPLE_BUILDS))
     expect(onIt.closed).toBe(0)
     expect(offIt.closed).toBe(SAMPLE_BUILDS.length)
   })

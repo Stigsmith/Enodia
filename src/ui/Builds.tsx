@@ -229,12 +229,20 @@ export function Builds({ onClose }: { onClose?: () => void }) {
           </button>
         ) : null}
         <h2>Builds</h2>
-        <p className="builds-note">Pick an arm, or open one to see how it works.</p>
+        <p className="builds-note">
+          {library.length
+            ? 'Pick an arm, or open one to see how it works.'
+            : 'Nothing here yet. What you make is yours and stays in this browser.'}
+        </p>
         <button type="button" className="quiet builds-new" onClick={() => setEditing('new')}>
           Create a build
         </button>
       </header>
 
+      {/* No bar over an empty shelf. Sorting and filtering nothing is furniture,
+        * and it was worse than that: it offered to clear six filters nobody had
+        * set. */}
+      {library.length ? (
       <BuildFilters
         facets={bar}
         onChoose={(facet: FacetId, value: string | null) =>
@@ -246,6 +254,7 @@ export function Builds({ onClose }: { onClose?: () => void }) {
         showing={shown.length}
         total={library.length}
       />
+      ) : null}
 
       {shown.length ? (
         <ul className="builds-grid">
@@ -253,13 +262,20 @@ export function Builds({ onClose }: { onClose?: () => void }) {
             <Card key={build.id} built={assemble(build)} onOpen={setOpenId} />
           ))}
         </ul>
+      ) : library.length === 0 ? (
+        /* An empty library and an empty result are two different things and used
+         * to print the same sentence. Telling somebody to drop a filter when
+         * they have not set one is the tool blaming them for its own state. */
+        <p className="builds-none">
+          No builds yet. Make the first one, or open a link somebody sent you.
+        </p>
       ) : (
         <p className="builds-none">
           Nothing matches all of those. Drop a filter, or clear them and start again.
         </p>
       )}
 
-      <SampleTag full />
+      {library.length ? <SampleTag full /> : null}
     </div>
   )
 }
@@ -402,18 +418,19 @@ function BuildMenu({
 /**
  * Sample data says so, plainly, wherever it is on screen.
  *
- * `data/curated/builds.json` is the owner's and is still empty. Nothing here is
- * a recommendation and the page must not be mistaken for one, which matters
- * more now that there are eight of them and they look like a library.
+ * **Nothing ships as a sample any more**, so this only fires for a build marked
+ * `by: 'sample'` that somebody has kept from a link or written themselves. It
+ * stays because the distinction between a build the owner tested and a build
+ * somebody uploaded is one a reader is owed, and `data/curated/builds.json` is
+ * still where the real ones will go.
  */
 function SampleTag({ full = false }: { full?: boolean }) {
   if (!full) return <p className="builds-sample">Sample build</p>
   return (
     <p className="builds-disclaimer">
-      The library starts empty. The one build here is a sample, kept because it is the hardest
-      case these screens can be handed: four gods, all six duos between them, and three of their
-      four legendaries. Everything in it is real and every prerequisite is actually held. Whether
-      a build is worth playing is not in any file and is not claimed here.
+      Builds here are yours and live in this browser. Nothing in this tool says whether a build
+      is worth playing: that is not in any file and is not claimed here. What it does say is
+      whether a build is legal and how much has to go right to assemble one.
     </p>
   )
 }

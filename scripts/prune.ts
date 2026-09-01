@@ -61,6 +61,14 @@ const DROP_FILES = [
     path: 'manifest.json',
     why: '933 records of build metadata, sha256 and source pages. app-data.json already carries the resolved icon paths',
   },
+  {
+    path: 'README.md',
+    why: 'notes for whoever maintains the asset library. Not for the public site',
+  },
+  {
+    path: 'build-lib.ps1',
+    why: 'the script that rebuilds the wiki half of the library. Not a hole on a public host, but not this page to serve either',
+  },
 ]
 
 function walk(dir: string, out: string[] = []): string[] {

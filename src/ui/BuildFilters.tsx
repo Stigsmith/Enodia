@@ -51,9 +51,10 @@ export function BuildFilters({
   const surface = facets.filter((facet) => SURFACE_FACETS.includes(facet.id))
   const rest = facets.filter((facet) => !SURFACE_FACETS.includes(facet.id))
   const hiddenPicks = rest.filter((facet) => facet.chosen !== null).length
-  const picked = countSelected(
-    Object.fromEntries(facets.map((facet) => [facet.id, facet.chosen])) as never,
-  )
+  // Partial on purpose: `facets()` drops a facet with no options, so this object
+  // is missing those keys and `countSelected` is written to expect that. The
+  // cast that used to be here is what let the gap through.
+  const picked = countSelected(Object.fromEntries(facets.map((facet) => [facet.id, facet.chosen])))
 
   return (
     <div className="bfilter">

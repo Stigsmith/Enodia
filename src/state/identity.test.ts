@@ -10,7 +10,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { FIRST_BUILD } from '../data/builds.ts'
+import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import { NAME_LIMIT, authorWord, readName, tidyName, writeName } from './identity.ts'
 import { blankBuild, duplicateBuild } from './builds.ts'
 import { packBuild, shareable, unpackBuild } from './transfer.ts'

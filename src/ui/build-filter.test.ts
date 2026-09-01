@@ -10,19 +10,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { traits } from '../data/app.ts'
-import { FIRST_BUILD, SAMPLE_BUILDS } from '../data/builds.ts'
+import { FIRST_BUILD, SAMPLE_BUILDS } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
-import {
-  EMPTY_SELECTION,
-  apply,
-  choose,
-  countSelected,
-  facets,
-  godsOf,
-  isEmpty,
-  matches,
-  sortBuilds,
-} from './build-filter.ts'
+import { EMPTY_SELECTION, apply, choose, countSelected, facets, godsOf, isEmpty, matches, sortBuilds } from './build-filter.ts'
 import type { FacetId, Selection } from './build-filter.ts'
 
 /**
@@ -250,5 +240,25 @@ describe('filtering by Fear cleared', () => {
     // with no Fear in it is furniture claiming to be a choice.
     const none = facets([at(undefined), at(undefined)], EMPTY_SELECTION)
     expect(none.find((one) => one.id === 'fear')).toBeUndefined()
+  })
+})
+
+describe('an empty library', () => {
+  /**
+   * The bug that shipped, kept so it does not come back.
+   *
+   * `facets()` drops a facet with no options, so the object a caller rebuilds
+   * from what it returned is missing those keys. `undefined` is not `null`, and
+   * `countSelected` used `!== null`, so an empty library counted all six facets
+   * as chosen and the bar offered to "Clear 6" with nothing selected.
+   */
+  it('offers no facets at all', () => {
+    expect(facets([], EMPTY_SELECTION)).toEqual([])
+  })
+
+  it('counts nothing as chosen when the facets are missing entirely', () => {
+    const rebuilt = Object.fromEntries(facets([], EMPTY_SELECTION).map((one) => [one.id, one.chosen]))
+    expect(countSelected(rebuilt)).toBe(0)
+    expect(isEmpty(rebuilt)).toBe(true)
   })
 })

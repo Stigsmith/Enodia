@@ -13,19 +13,11 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { FIRST_BUILD } from '../data/builds.ts'
+import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { winRate } from '../data/builds.ts'
 import { blockers, checkBuild } from '../engine/build-check.ts'
-import {
-  BUILD_SCHEMA,
-  deleteBuild,
-  duplicateBuild,
-  loadBuilds,
-  migrateBuilds,
-  newBuildId,
-  saveBuild,
-} from './builds.ts'
+import { BUILD_SCHEMA, deleteBuild, duplicateBuild, loadBuilds, migrateBuilds, newBuildId, saveBuild } from './builds.ts'
 
 const KEY = 'enodia.builds'
 

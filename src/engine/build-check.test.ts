@@ -9,7 +9,7 @@
 import { arcanaById, olympians, traits } from '../data/app.ts'
 import { describe, expect, it } from 'vitest'
 
-import { SAMPLE_BUILDS } from '../data/builds.ts'
+import { SAMPLE_BUILDS } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { blockers, checkBuild, olympiansOf, slotMap } from './build-check.ts'
 
