@@ -1509,6 +1509,11 @@ button.mark {
  * on a phone and sit side by side once there is room for three.
  * ===================================================================== */
 
+/* Tray on the left, one tabbed panel on the right.
+ *
+ * This was `repeat(2, 1fr)` over three panels, so a wide screen wrapped the
+ * third and left a column of nothing. The tray is a fixed column because it is
+ * a picture of a fixed thing, and the panel takes the rest. */
 .editor-grid {
   display: grid;
   gap: 1rem;
@@ -1517,13 +1522,17 @@ button.mark {
 
 @media (min-width: 52rem) {
   .editor-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 15rem minmax(0, 1fr);
+    align-items: start;
   }
 }
 
+/* The three-column rule that used to live here is gone with the three panels.
+ * There is one panel now, and widening the tray past what a mark grid needs
+ * would only stretch the marks apart. */
 @media (min-width: 82rem) {
   .editor-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 17rem minmax(0, 1fr);
   }
 }
 
@@ -3976,9 +3985,13 @@ button.mark {
   --face: 1.3rem;
 }
 
-/* An Arcana is a tall painted card and a square crop loses the figure, so the
- * cards variant keeps its own shape and takes no frame. */
-.picklist.is-cards .picklist-face {
+/* An Arcana is a tall painted card and a square crop loses the figure, so in
+ * the cards grid the face gives up its square and takes the card's own shape.
+ *
+ * **Scoped to a row, because the chosen pills are not cards.** Without the
+ * `-row`, this matched the pills above the list too, and `width: 100%` on an
+ * inline pill let one card render eleven hundred pixels tall. */
+.picklist.is-cards .picklist-row .picklist-face {
   --face: auto;
   width: 100%;
   height: auto;
@@ -4089,4 +4102,312 @@ button.mark {
   width: 1rem;
   height: 1rem;
   object-fit: contain;
+}
+
+
+/* -------------------------------------------------------------------------
+ * THE TABS
+ *
+ * The game puts a row of pills across the top of its trays, the live one lit.
+ * `shell/button.png` and `shell/buttonselected-highlight.png` are that art and
+ * both were in the library unused.
+ * ---------------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: -0.15rem 0 0.4rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--div-2);
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.tab:hover {
+  color: var(--bone-dim);
+  border-color: var(--div-4);
+}
+
+.tab.is-open {
+  border-color: var(--lit);
+  background: color-mix(in srgb, var(--lit-dim) 20%, var(--ink-850));
+  color: var(--lit-hot);
+}
+
+/* What the tab is carrying. Zero is drawn on purpose: an empty Arcana tab
+ * should say so from the outside rather than after a click. */
+.tab-count {
+  font-size: 0.55rem;
+  padding: 0 0.28rem;
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  color: var(--bone-faint);
+}
+
+.tab.is-open .tab-count {
+  background: var(--ink-950);
+  color: var(--lit-hot);
+}
+
+/* -------------------------------------------------------------------------
+ * THE BUILD TRAY
+ *
+ * Prefixed `btray` because `.tray` is the run surface's, complete with a
+ * `grid-area: tray` that placed this one in a column the builder's grid does
+ * not have.
+ *
+ * The build being edited, drawn the way the game draws it. Same marks, same
+ * frames and same fixed slot order as the overview card and the Poster, because
+ * it reads the same `assemble()`.
+ * ---------------------------------------------------------------------- */
+
+.btray {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 0.75rem 0.8rem 0.9rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+/* Sticks while the panel beside it scrolls, which is the point of having the
+ * build visible: it should still be there when you are three tabs deep. */
+@media (min-width: 52rem) {
+  .btray {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.btray-head {
+  display: grid;
+  gap: 0.3rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--div-2);
+}
+
+.btray-arm {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  color: var(--bone);
+}
+
+.btray-arm span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* The counters the game runs across the top of its tray. */
+.btray-counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.15rem 0 0;
+}
+
+.btray-count {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--bone-faint);
+}
+
+.btray-count strong {
+  font-weight: 400;
+  color: var(--bone-dim);
+}
+
+.btray-aspect {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: var(--r-hair);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.btray-aspect:hover {
+  background: var(--ink-850);
+}
+
+.btray-aspect-name {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--bone-dim);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btray-open-aspect {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.btray-band {
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* The band label is the way into the control that fills it. Without it an empty
+ * band draws nothing and there is no route to the Arcana picker from the tray
+ * until the build already has an Arcana in it. */
+.btray-rule {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+  cursor: pointer;
+}
+
+.btray-rule:hover {
+  color: var(--lit-hot);
+}
+
+.btray-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.btray-cell,
+.btray-card {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.btray-cell:hover,
+.btray-card:hover {
+  filter: brightness(1.25);
+}
+
+.btray-empty {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+}
+
+.btray-empty img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  opacity: 0.3;
+}
+
+.btray-card img {
+  height: 2.6rem;
+  width: auto;
+  display: block;
+  border-radius: 2px;
+  border: 1px solid var(--div-2);
+}
+
+/* -------------------------------------------------------------------------
+ * INSIDE A TAB
+ *
+ * With the tray taking a fixed 17rem the panel gets everything else, which at
+ * 1400px is about 1100 pixels. One column of that is a dropdown eleven hundred
+ * pixels wide holding the words "Witch's Staff", which is the same wasted space
+ * the three-panel grid had, arriving from the other direction.
+ *
+ * So the fields pair up and anything that genuinely wants the width takes all
+ * of it. A picklist wants it, because more width is more boons visible per row.
+ * A dropdown does not.
+ * ---------------------------------------------------------------------- */
+
+.tabpanel {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+@media (min-width: 68rem) {
+  .tabpanel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.1rem;
+  }
+
+  /* A heading introduces everything under it, so it cannot sit in a column.
+   * The same goes for the hint beneath it, and for the controls that are lists
+   * rather than fields. */
+  .tabpanel > .editor-rule,
+  .tabpanel > .editor-hint,
+  .tabpanel > .picklist,
+  .tabpanel > .slotbar,
+  .tabpanel > .editor-plays,
+  /* The slot picker, which only exists while a tile is open. Reached by
+   * adjacency because `Dropdown` takes no class of its own and it is always the
+   * control immediately after the bar. */
+  .tabpanel > .slotbar + .bdrop,
+  .tabpanel > .editor-field:has(textarea) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The play block keeps its own two columns inside the wider one. */
+@media (min-width: 68rem) {
+  .editor-plays {
+    display: grid;
+    gap: 0.7rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+  }
+
+  .editor-plays > .editor-rule,
+  .editor-plays > .editor-hint,
+  .editor-plays > .bdrop {
+    grid-column: 1 / -1;
+  }
 }
