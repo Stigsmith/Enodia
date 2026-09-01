@@ -52,7 +52,7 @@ export const ROADMAP: Plan[] = [
   {
     stage: 'next',
     title: 'Real build definitions',
-    say: 'The eight builds included are samples used to test the screens. They are mechanically valid but they are not recommendations. The library needs builds that have actually been played.',
+    say: 'The library ships empty. Placeholder builds were cut because a placeholder in a library reads as a recommendation. It needs builds that have actually been played, which is what the owner and the testers are writing now.',
   },
   {
     stage: 'next',
@@ -62,7 +62,7 @@ export const ROADMAP: Plan[] = [
   {
     stage: 'next',
     title: 'Owner builds in the run',
-    say: 'The run currently counts only the sample builds. Builds you have made should count too, and should be selectable as a run target.',
+    say: 'The run counts whatever is in the library, which is now only what you have made. Picking one as the target you are playing towards is the part still missing.',
   },
 
   // ---- planned -----------------------------------------------------------

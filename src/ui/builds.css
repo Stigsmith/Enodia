@@ -5622,3 +5622,100 @@ button.mark {
 .builds-bin-all {
   margin-top: 0.6rem;
 }
+
+/* -------------------------------------------------------------------------
+ * THE ROADMAP, AS PROGRESS
+ *
+ * It was four lists under four headings. The material was already there to say
+ * how far along it is; it just never said it.
+ * ---------------------------------------------------------------------- */
+
+.plan-progress {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 1.6rem;
+}
+
+.plan-bar {
+  height: 0.4rem;
+  border-radius: var(--r-pill);
+  background: var(--ink-850);
+  overflow: hidden;
+}
+
+.plan-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--lit-dim), var(--lit-hot));
+}
+
+.plan-count {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.plan-count strong {
+  font-weight: 400;
+  color: var(--lit-hot);
+}
+
+.plan-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.plan-tally {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: var(--r-pill);
+  background: var(--ink-850);
+  color: var(--bone-faint);
+}
+
+/* A rail down the left of each stage, so the four read as one run of work
+ * rather than four unrelated lists. */
+.plan-list {
+  position: relative;
+  padding-left: 1.1rem;
+  border-left: 1px solid var(--div-2);
+}
+
+.plan-list li {
+  position: relative;
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* The state, on the rail. Filled for built, hollow for everything ahead, so
+ * skimming the left edge gives the shape without reading a word. */
+.plan-dot {
+  position: absolute;
+  left: -1.45rem;
+  top: 0.4rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1px solid var(--div-4);
+  background: var(--ink-950);
+}
+
+.plan-stage.is-now .plan-dot {
+  border-color: var(--lit);
+  background: var(--lit);
+}
+
+.plan-stage.is-next .plan-dot {
+  border-color: var(--lit);
+  background: color-mix(in srgb, var(--lit) 35%, var(--ink-950));
+}
+
+.plan-stage.is-waiting .plan-dot {
+  border-style: dashed;
+}

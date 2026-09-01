@@ -34,6 +34,7 @@ import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
+import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
@@ -392,6 +393,7 @@ function BuildMenu({
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [shared, setShared] = useState<'copied' | 'failed' | null>(null)
+  const [picture, setPicture] = useState<'working' | 'copied' | 'saved' | 'failed' | null>(null)
   const panel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -416,6 +418,7 @@ function BuildMenu({
     if (!open) {
       setConfirming(false)
       setShared(null)
+      setPicture(null)
     }
   }, [open])
 
@@ -457,6 +460,61 @@ function BuildMenu({
                 : shared === 'failed'
                   ? 'Could not reach the clipboard'
                   : 'Copies a link holding the whole build'}
+            </span>
+          </button>
+
+          {/* The picture, separately.
+            *
+            * **A link cannot carry one.** A preview in WhatsApp or Discord comes
+            * from OpenGraph tags on the page the link points at, which needs a
+            * server rendering per-build tags, and this is a static site whose
+            * shared build lives in a fragment that never reaches one. So the
+            * card goes on the clipboard beside the link and you paste both.
+            *
+            * Two buttons rather than one that does both, because copying an
+            * image replaces whatever the link copy just put there. */}
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setPicture('working')
+              cardImage(build).then(
+                async (blob) => {
+                  if (!blob) return setPicture('failed')
+                  try {
+                    // Not every browser will write an image, and Firefox needs
+                    // it enabled. The download is the honest fallback rather
+                    // than a failure message on something that did render.
+                    if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
+                      throw new Error('no image clipboard')
+                    }
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+                    setPicture('copied')
+                  } catch {
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `${build.name || 'build'}.png`
+                    a.click()
+                    URL.revokeObjectURL(url)
+                    setPicture('saved')
+                  }
+                },
+                () => setPicture('failed'),
+              )
+            }}
+          >
+            <span className="bmenu-label">Copy the card</span>
+            <span className="bmenu-note">
+              {picture === 'working'
+                ? 'Drawing it'
+                : picture === 'copied'
+                  ? 'Card copied. Paste it beside the link'
+                  : picture === 'saved'
+                    ? 'Saved as a file: this browser will not copy images'
+                    : picture === 'failed'
+                      ? 'Could not draw it'
+                      : 'A picture of the build, to paste with the link'}
             </span>
           </button>
 
