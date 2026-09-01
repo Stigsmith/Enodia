@@ -36,7 +36,7 @@ import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
-import { applyFrame, readFrame } from './ui/frames.ts'
+import { FRAMES, applyFrame, readFrame, writeFrame } from './ui/frames.ts'
 import { applyTheme, readTheme, readWallpapers, writeTheme, writeWallpapers } from './ui/theme.ts'
 import { applyNav, readNav } from './ui/nav.ts'
 import type { View } from './ui/nav.ts'
@@ -46,9 +46,20 @@ import type { RunContext } from './data/types.ts'
 export function App() {
   const { run, entries, pinned, lastPickAt, start, end, take, skip, pin, forget } = useRun()
 
-  // The saved frame, before anything draws a ring. The menu owns it after
-  // that; this only makes a reload keep what was chosen.
-  useEffect(() => applyFrame(readFrame()), [])
+  /**
+   * Which frame rings a bubble.
+   *
+   * It used to be a list in the menu, which meant choosing between three rings
+   * with none of them on screen. It is a small control in the run view now,
+   * beside the ring it changes: pick one and the bubbles in front of you
+   * change while you are looking at them.
+   */
+  const [ring, setRing] = useState(readFrame)
+
+  useEffect(() => {
+    applyFrame(ring)
+    writeFrame(ring)
+  }, [ring])
 
   /**
     * The theme, and the wallpaper it is wearing.
@@ -405,6 +416,20 @@ export function App() {
             <span className="topbar-chasing-why">{sayOf(chasing)}</span>
           </p>
         ) : null}
+
+        {/* Small, and next to the thing it changes. Three options is a select's
+          * job; the swatches it had in the menu were only there because the
+          * ring was on another screen entirely. */}
+        <label className="topbar-frame">
+          <span className="visually-hidden">Which frame rings a bubble</span>
+          <select value={ring} onChange={(event) => setRing(event.target.value)}>
+            {FRAMES.map((one) => (
+              <option key={one.id} value={one.id}>
+                {one.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <p className="topbar-tally">
           <strong>{tally.open}</strong> builds open

@@ -4198,4 +4198,34 @@
  * the rotation on its own layer instead: see `.bcard-hit::after`, which is the
  * build card's plate, held apart from the boon icons sitting on it. */
 
+/* Which ring goes round a bubble, beside the bubbles it changes.
+ *
+ * It was a list of swatches in the menu, and the swatches were only there
+ * because the ring was on a different screen: each one had to draw the ring it
+ * was offering. Next to the real thing, three names in a select is the whole
+ * control. */
+.topbar-frame {
+  display: inline-flex;
+  align-items: center;
+}
 
+.topbar-frame select {
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.topbar-frame select:hover {
+  border-color: var(--lit-dim);
+  color: var(--bone-dim);
+}
+
+.topbar-frame select:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: 1px;
+}
