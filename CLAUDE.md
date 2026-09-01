@@ -86,7 +86,7 @@ Do not restate these without the citation. Do not extend them without checking.
 |---|---|
 | Duo and legendary prerequisites are `OneOf` / `OneFromEachSet`. **The set count does not classify them.** A duo is a duo because it inherits `SynergyTrait`, a legendary because it inherits `LegendaryTrait` | `TraitData.lua`, `LinkedTraitData`, `SynergyTrait.IsDuoBoon` |
 | **37 duos, 10 legendaries, 9 Hex duos.** 33 duos state two prerequisite sets and 4 state three. 9 legendaries state three sets and 1, Hermes' Paid Dues, states `OneOf`. The Hex duos carry `IsDuoBoon` themselves and are gated by `GameStateRequirements` with `SeleneDuosUnlocked`, not by `TraitRequirements` | `InheritFrom` closure over `TraitData`, checked by `scripts/validate.ts` |
-| A run allows **four Olympians**. At the cap the Exit pool freezes to those held | `HeroData.MaxGodsPerRun`, `ReachedMaxGods` |
+| **The four-Olympian cap is on the random pool, not on the run.** At the cap `GetEligibleLootNames` returns only gods already held, and then a keepsake overwrites that choice outright without the cap being consulted again. All nine Olympians have such a keepsake, so a fifth god is a keepsake away and the tool must not block one | `ReachedMaxGods`, and `RewardLogic.lua:238` beside `:242` |
 | Hermes, Chaos, Selene and the Encounter gods do **not** count toward the cap | `GodLoot = false`, and no `LootData` entry at all for Artemis, Athena, Dionysus, Hades |
 | **`GodLoot` is inherited.** Poseidon and Zeus never state it and pick up `true` from `BaseLoot`. Selene's `SpellDrop` inherits from nothing, so it has no flag to pick up. Reading the field without following `InheritFrom` drops two Olympians | `LootData.BaseLoot`, read at `RunLogic.lua:1823` inside `GetInteractedGodsThisRun` |
 | Ordinary Exit rewards are **uniform random**. No weighting toward held gods | `RewardLogic.ChooseLoot` |
@@ -122,6 +122,11 @@ the play experience cannot see.
 1. Claimed the Codex cannot track a chosen duo. It can
 2. Described an Exit as offering three boons. You pick an Exit, then the god behind it offers three
 3. Claimed a cap of four gods. It is four Olympians
+6. Then claimed a run *allows* four Olympians, and blocked a fifth in the builder.
+   `ReachedMaxGods` is real and only governs `ChooseLoot`. Eight lines later
+   `RewardLogic.lua:242` replaces its answer from any held `ForceBoonName` with
+   `Uses > 0`, cap unread. Read one line of a function and stopped, which is
+   error 3 again one layer down
 4. Used "door" throughout for something the game calls an Exit
 5. Counted 33 duos and 13 legendaries by counting prerequisite sets. The game marks both
    itself and the real split is 37 and 10. Same shape as error 3: a proxy for the property,
