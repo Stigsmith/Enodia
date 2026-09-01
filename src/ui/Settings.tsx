@@ -26,6 +26,7 @@ import {
 } from '../state/transfer.ts'
 import type { Manifest } from '../state/transfer.ts'
 import { NAV_MODES, PANE_QUERY, applyNav, readNav, writeNav } from '../ui/nav.ts'
+import { NAME_LIMIT, readName, writeName } from '../state/identity.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -43,6 +44,7 @@ export function Settings() {
    * pop-out is the only mode there is, and a setting that changes nothing is a
    * setting that lies.
    */
+  const [name, setName] = useState(readName)
   const [nav, setNav] = useState(readNav)
   const [wide, setWide] = useState(() => window.matchMedia(PANE_QUERY).matches)
 
@@ -106,6 +108,34 @@ export function Settings() {
       <header className="builds-top">
         <h2>Settings</h2>
       </header>
+
+      <section className="setting-block">
+        <h3 className="arcana-rule">Your name</h3>
+        <p className="setting-say">
+          Put on the builds you make, and it travels with one you share so the person opening it
+          knows whose it is. <strong>There is no account behind it.</strong> It is stored in this
+          browser, nobody checks it, and two people can pick the same one.
+        </p>
+        <label className="setting-name">
+          <span>Name</span>
+          <input
+            type="text"
+            value={name}
+            maxLength={NAME_LIMIT}
+            placeholder="Nobody"
+            /* Written on every keystroke rather than on blur. The pinned menu
+               means you can leave this screen without the field ever losing
+               focus, and a name typed and then lost is worse than no field. */
+            onChange={(event) => {
+              setName(event.target.value)
+              writeName(event.target.value)
+            }}
+            /* Tidied when you leave it, so the field shows what was stored
+               rather than the spaces you happened to type. */
+            onBlur={() => setName(readName())}
+          />
+        </label>
+      </section>
 
       {wide ? (
         <section className="setting-block">
