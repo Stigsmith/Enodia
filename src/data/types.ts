@@ -62,6 +62,16 @@ export type Trait = {
   requiredWeapon: WeaponId | null
   requires: Requirement | null
   /**
+   * Aspects this can only be offered on, or null when any will do.
+   *
+   * Twenty hammer upgrades across the six arms are locked to one aspect: the
+   * lone shade etchings want Seth, the ankhs want Raise Dead, and every arm has
+   * a pair or two like it. `GameStateRequirements` states it as
+   * `LastWeaponUpgradeName` and `scripts/build-app-data.ts` reads it off the raw
+   * table, because the resolved index drops it.
+   */
+  needsAspect?: string[] | null
+  /**
    * The game's own sentence about what this does, with the Keywords resolved
    * and the formatting codes stripped. A player who has never seen a boon can
    * find out what it is without leaving the tool.

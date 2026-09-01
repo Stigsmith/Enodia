@@ -299,10 +299,22 @@ export function BuildEditor({
     [],
   )
 
-  // A hammer's arm lives in `sources`, not on the trait. See build-check.ts.
+  /**
+   * The hammer upgrades this build could actually be offered.
+   *
+   * A hammer's arm lives in `sources`, not on the trait, which is what
+   * `build-check.ts` records. **The aspect is a second gate and was missing.**
+   * Twenty upgrades across the six arms only appear on one aspect, so a Circe
+   * build was being offered Seth's etchings: a hammer no run on that aspect can
+   * ever hand you.
+   */
   const hammers = useMemo(() => {
     const entry = sources.find((one) => one.kind === 'hammer' && one.weapon === build.weapon)
     return (entry?.traits ?? [])
+      .filter((id) => {
+        const needs = traits.get(id)?.needsAspect
+        return !needs || needs.includes(build.aspect)
+      })
       .flatMap((id) => {
         const trait = traits.get(id)
         return trait
@@ -321,7 +333,7 @@ export function BuildEditor({
           : []
       })
       .sort(byName)
-  }, [build.weapon])
+  }, [build.weapon, build.aspect])
 
   const aspects = useMemo(
     () => aspectsOf(build.weapon).map((trait) => option(trait.id)),

@@ -12,13 +12,15 @@
  * fix is one list with a destination**, because then the bad state cannot be
  * described rather than being described and then reported.
  *
- * ## Drag, and click as well
+ * ## Drag, and click
  *
  * Dragging is the ask and it is the better gesture on a desktop. It is also
- * unusable on a phone, and this tool has mobile breakpoints on every screen.
- * So every tray is reachable two ways: drag a boon into it, or press the button
- * on the boon that sends it there. Neither is the fallback; they are the same
- * action from two inputs, which is why `onMove` is what both of them call.
+ * unusable on a phone, so the row itself is the other way in: clicking a boon
+ * sends it into the build, dragging it puts it in whichever tray you drop it on.
+ *
+ * **Neither adds any furniture to the row.** The first version put a pair of
+ * buttons on every row and a swap arrow on every chip, and at two hundred rows
+ * that is four hundred controls nobody asked for. The row is the control.
  *
  * ## The picker knows what a run can give you
  *
@@ -266,10 +268,14 @@ function Rows({
   return (
     <div className="bsort-rows">
       {list.map((row) => (
-        <div
+        <button
           key={row.id}
+          type="button"
+          disabled={!!row.blocked}
           className={`bsort-row${row.blocked ? ' is-blocked' : ''}`}
           style={{ '--plate': `url(/${PLATE[row.rarity]})` } as React.CSSProperties}
+          title={row.blocked ?? `Add ${row.name} to the build, or drag it to either tray`}
+          onClick={() => onMove(row.id, 'build')}
           draggable={!row.blocked}
           onDragStart={(event) => {
             event.dataTransfer.setData('text/plain', row.id)
@@ -287,23 +293,7 @@ function Rows({
             ) : null}
           </span>
 
-          {/* The same move the drag makes, for a phone and for anybody who
-            * would rather press a button. Not a fallback: the same call. */}
-          {row.blocked ? null : (
-            <span className="bsort-row-go">
-              <button type="button" title="Into the build" onClick={() => onMove(row.id, 'build')}>
-                Build
-              </button>
-              <button
-                type="button"
-                title="Worth adding"
-                onClick={() => onMove(row.id, 'optional')}
-              >
-                Extra
-              </button>
-            </span>
-          )}
-        </div>
+        </button>
       ))}
     </div>
   )
@@ -330,8 +320,6 @@ function TrayBox({
   onOver: (tray: Tray | null) => void
   onDrop: (event: React.DragEvent) => void
 }) {
-  const other: Tray = tray === 'build' ? 'optional' : 'build'
-
   return (
     <section
       className={`bsort-tray${over ? ' is-over' : ''}`}
@@ -347,7 +335,7 @@ function TrayBox({
 
       <div className="bsort-held">
         {ids.length === 0 ? (
-          <p className="bsort-empty">Drag a boon here, or use the buttons.</p>
+          <p className="bsort-empty">Drag a boon here, or click one in the list.</p>
         ) : (
           ids.map((id) => {
             const trait = traits.get(id)
@@ -366,14 +354,6 @@ function TrayBox({
               >
                 <Face row={{ icon: iconOf.get(id) ?? null, rarity, name: trait?.name ?? id }} />
                 <span className="bsort-chip-name">{trait?.name ?? id}</span>
-                <button
-                  type="button"
-                  className="bsort-swap"
-                  title={tray === 'build' ? 'Move to Worth adding' : 'Move into the build'}
-                  onClick={() => onMove(id, other)}
-                >
-                  {tray === 'build' ? '↓' : '↑'}
-                </button>
                 <button
                   type="button"
                   className="bsort-drop"
