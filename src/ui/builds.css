@@ -5057,3 +5057,116 @@ button.mark {
   object-fit: contain;
   pointer-events: none;
 }
+
+/* -------------------------------------------------------------------------
+ * WHAT WOULD FIX IT
+ *
+ * The options under a caveat that names missing boons. It replaced "needs
+ * prerequisites this build does not hold yet", which named a problem and left
+ * a player to find two boons in a list of two hundred.
+ * ---------------------------------------------------------------------- */
+
+.fixlist {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.fixlist-set {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fixlist-lead {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.fixlist-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.fixlist-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem 0.2rem 0.25rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: rgb(0 0 0 / 0.4);
+  color: var(--bone-dim);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fixlist-option:hover {
+  border-color: var(--lit);
+  color: var(--bone);
+}
+
+/* An option that would push something out is marked before it is pressed. Three
+ * names is a puzzle; three names where one is free is a choice. */
+.fixlist-option.is-costly {
+  border-color: var(--div-3);
+}
+
+.fixlist-option.is-costly:hover {
+  border-color: var(--unbuilt);
+}
+
+.fixlist-face {
+  position: relative;
+  display: inline-grid;
+  grid-template: 100% / 100%;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.fixlist-art {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.fixlist-frame {
+  grid-area: 1 / 1;
+  width: 118%;
+  height: 118%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.fixlist-text {
+  display: grid;
+  min-width: 0;
+}
+
+.fixlist-name {
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.fixlist-free,
+.fixlist-cost {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fixlist-free {
+  color: var(--lit);
+}
+
+.fixlist-cost {
+  color: var(--unbuilt);
+}

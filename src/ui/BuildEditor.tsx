@@ -26,14 +26,15 @@
  * not exist.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { arcana, aspectsOf, familiars, godPools, olympians, sources, traits, weapons } from '../data/app.ts'
 import { ASSEMBLES } from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { checkBuild, blockers } from '../engine/build-check.ts'
-import type { Problem } from '../engine/build-check.ts'
+import type { Fix, FixOption, Problem } from '../engine/build-check.ts'
+import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper } from './Fear.tsx'
@@ -84,13 +85,16 @@ const TAB_FOR: Record<Problem['field'], TrayTarget | 'notes'> = {
   arcana: 'arcana',
 }
 
-const tabFor = (field: Problem['field']): TrayTarget => {
-  const tab = TAB_FOR[field]
-  // The tray only knows the four it can draw. Notes has nothing in the tray to
-  // click, so a Notes problem sends you to the Loadout tab's neighbour rather
-  // than nowhere.
-  return tab === 'notes' ? 'loadout' : tab
-}
+/**
+ * Which tab a problem lives on.
+ *
+ * **This used to rewrite Notes to Loadout and that was the bug the owner hit.**
+ * A build missing its name would send you to Loadout, where there is no name
+ * field, because the tray alert's type only allowed the four tabs the tray can
+ * draw marks for. The alert is not a mark: it can open any of the five, so it
+ * does.
+ */
+const tabFor = (field: Problem['field']): TrayTarget | 'notes' => TAB_FOR[field]
 
 const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => {
   const filled = CORE_SLOTS.filter((slot) =>
@@ -176,16 +180,22 @@ export function BuildEditor({
    * nobody can assemble. `notes` from the checker, plus the reading when it says
    * a lot has to land.
    */
-  const caveats = useMemo(() => {
-    const out = problems.filter((one) => one.severity === 'notes').map((one) => one.say)
-    if (repeat.hardStop) out.push(repeat.hardStop)
+  const caveats = useMemo((): { say: string; fix?: Fix }[] => {
+    const out = problems
+      .filter((one) => one.severity === 'notes')
+      .map((one) => ({ say: one.say, fix: one.fix }))
+    if (repeat.hardStop) out.push({ say: repeat.hardStop, fix: undefined })
     else if (repeat.reach === 'needs-luck') {
-      out.push(
-        'This reads as Needs luck. It is a real build and somebody opening it should know a lot has to land in one run.',
-      )
+      out.push({
+        say: 'This reads as Needs luck. It is a real build and somebody opening it should know a lot has to land in one run.',
+        fix: undefined,
+      })
     }
     return out
   }, [problems, repeat.hardStop, repeat.reach])
+
+  /** The sentences alone, which is what the acknowledgement is keyed on. */
+  const caveatSays = useMemo(() => caveats.map((one) => one.say), [caveats])
 
   /**
    * What was acknowledged, as the caveats themselves rather than a boolean.
@@ -209,15 +219,30 @@ export function BuildEditor({
    */
   const alert = useMemo(() => {
     const worst = stopping[0]
-    if (worst) return { say: worst.say, blocking: true, go: tabFor(worst.field) }
+    if (worst) return { say: worst.say, blocking: true, go: tabFor(worst.field), field: worst.field }
     const caveat = caveats[0]
-    return caveat ? { say: caveat, blocking: false, go: 'play' as const } : null
+    return caveat ? { say: caveat.say, blocking: false, go: 'play' as const, field: null } : null
   }, [stopping, caveats])
+
+  /**
+   * Take one of the options a `Fix` offers.
+   *
+   * **The displacement happens here rather than being left to the player.** A
+   * core boon can only be taken by pushing out whatever holds that slot, and
+   * doing half of it would leave the build with two boons in one slot, which is
+   * a blocker. The button says what it will replace before it is pressed, so
+   * this is carrying out a decision rather than making one.
+   */
+  const takeFix = (option: FixOption) =>
+    setBuild((was) => {
+      const boons = was.boons.filter((id) => id !== option.displaces?.id)
+      return { ...was, boons: [...boons, option.id] }
+    })
 
   const [readCaveats, setReadCaveats] = useState<string[]>([])
   const acknowledged =
     caveats.length === 0 ||
-    (readCaveats.length === caveats.length && caveats.every((one) => readCaveats.includes(one)))
+    (readCaveats.length === caveats.length && caveatSays.every((one) => readCaveats.includes(one)))
 
   /** Every trait that can occupy one core slot, for that slot's dropdown. */
   const bySlot = useMemo(() => {
@@ -327,6 +352,23 @@ export function BuildEditor({
    */
   const [tab, setTab] = useState<TrayTarget | 'notes'>('loadout')
 
+  /**
+   * The control to put the cursor in once the tab has switched.
+   *
+   * Opening the right tab is half the job. A build missing its name lands you
+   * on Notes with the field somewhere on it, and the thing you came to do still
+   * needs finding. Focus finishes the move.
+   */
+  const [focusField, setFocusField] = useState<Problem['field'] | null>(null)
+  const panelRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!focusField) return
+    const found = panelRef.current?.querySelector<HTMLElement>(`[data-field="${focusField}"]`)
+    found?.focus()
+    setFocusField(null)
+  }, [focusField, tab])
+
   /** The build as the tray draws it, which is the same shape the card uses. */
   const built = useMemo(() => assemble(build), [build])
 
@@ -337,9 +379,16 @@ export function BuildEditor({
    * is the whole reason the tray is live rather than a preview: it is the
    * fastest way to reach the thing you want to change.
    */
-  const goFromTray = (target: TrayTarget | 'notes', piece: { slot?: Slot | null } | null) => {
+  const goFromTray = (
+    target: TrayTarget | 'notes',
+    piece: { slot?: Slot | null } | null,
+    field?: string | null,
+  ) => {
     setTab(target)
     setOpenSlot(piece?.slot ?? null)
+    // `BuildTray` has no business knowing the field union, so it hands back a
+    // string and the narrowing happens here, where the union lives.
+    if (field) setFocusField(field as Problem['field'])
   }
 
   const coreAt = (slot: Slot) => build.boons.find((id) => traits.get(id)?.slot === slot) ?? null
@@ -400,7 +449,7 @@ export function BuildEditor({
       <div className="editor-grid">
         <BuildTray built={built} onGo={goFromTray} alert={alert} />
 
-        <section className="editor-panel">
+        <section className="editor-panel" ref={panelRef}>
           <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
 
           <TabPanel id="loadout" open={tab}>
@@ -553,6 +602,7 @@ export function BuildEditor({
           <label className="editor-field">
             <span>Name</span>
             <input
+              data-field="name"
               value={build.name}
               maxLength={60}
               onChange={(event) => set('name', event.target.value)}
@@ -723,14 +773,17 @@ export function BuildEditor({
               </span>
               <ul>
                 {caveats.map((one) => (
-                  <li key={one}>{one}</li>
+                  <li key={one.say}>
+                    {one.say}
+                    {one.fix ? <FixList fix={one.fix} onTake={takeFix} /> : null}
+                  </li>
                 ))}
               </ul>
               <label className="editor-confirm">
                 <input
                   type="checkbox"
                   checked={acknowledged}
-                  onChange={(event) => setReadCaveats(event.target.checked ? caveats : [])}
+                  onChange={(event) => setReadCaveats(event.target.checked ? caveatSays : [])}
                 />
                 <span>I have read these</span>
               </label>
