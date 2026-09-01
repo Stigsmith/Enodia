@@ -206,12 +206,22 @@ export function Builds({ onClose }: { onClose?: () => void }) {
             * the player has actually played it and the reading has not. */}
           <section className="builds-repeat" aria-label="Putting it together">
             <h3>Putting it together</h3>
-            <Stamp read={readRepeat(open, traits, olympians)} size="large" showSay />
-            <ul>
-              {readRepeat(open, traits, olympians).charges.map((charge) => (
-                <li key={charge.id}>{charge.say}</li>
-              ))}
-            </ul>
+            {/* One reading. This called `readRepeat` twice, once for the stamp
+              * and once for the charges, which is the same work done twice and
+              * two objects that could in principle disagree. */}
+            {(() => {
+              const read = readRepeat(open, traits, olympians)
+              return (
+                <>
+                  <Stamp read={read} size="large" showSay />
+                  <ul>
+                    {read.charges.map((charge) => (
+                      <li key={charge.id}>{charge.say}</li>
+                    ))}
+                  </ul>
+                </>
+              )
+            })()}
           </section>
         </div>
 

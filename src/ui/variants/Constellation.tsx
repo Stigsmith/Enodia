@@ -47,9 +47,20 @@ export function Constellation({ built, onOpen }: { built: Assembled; onOpen?: (p
 
   return (
     <div className="constel">
-      {/* This layout has no title and never shows the build's name at all, so
-        * there is no "under the title" to sit beneath. The top of the wheel is
-        * the nearest true reading of the same placement. */}
+      {/* **It has a title now, and it did not before.**
+        *
+        * The argument for leaving it out was that a wheel needs no heading. The
+        * argument against is that this is one of two ways to look at a build and
+        * the other one names it: switching between them meant the name appearing
+        * and disappearing, which reads as a bug rather than as a choice.
+        *
+        * Kept small and above the wheel, so it introduces the picture rather
+        * than competing with it. */}
+      <header className="constel-head">
+        <h3>{built.build.name}</h3>
+        {built.build.say ? <p className="constel-say">{built.build.say}</p> : null}
+      </header>
+
       <PlayStrip build={built.build} />
 
       <div className="constel-wheel">
@@ -86,6 +97,21 @@ export function Constellation({ built, onOpen }: { built: Assembled; onOpen?: (p
           </span>
         ))}
       </div>
+
+      {/* Worth adding, outside the field of boons that are the build. Dimmer,
+        * because the difference between "this is the build" and "this would
+        * help" is the only thing this band exists to say. */}
+      {built.optional.length ? (
+        <div className="constel-field is-optional" aria-label="Worth adding">
+          <span className="constel-band">Worth adding</span>
+          {built.optional.map((piece) => (
+            <span key={piece.key} className="constel-loose">
+              <Mark piece={piece} size="var(--mark-m)" onOpen={onOpen} />
+              <span className="constel-loose-name">{piece.name}</span>
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       <div className="constel-rim" aria-label="Before you go">
         {kit.map((piece) => (
