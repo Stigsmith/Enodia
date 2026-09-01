@@ -682,7 +682,7 @@ export function BuildEditor({
             />
           </label>
           <Dropdown
-            label="What it is for"
+            label="Built around"
             all="Nothing in particular"
             chosen={build.centrepiece || null}
             options={centrepieces}

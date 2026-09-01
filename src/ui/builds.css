@@ -1376,14 +1376,35 @@ button.mark {
 /* Wide: the wheel grows and the loose field moves beside it rather than under,
  * so the whole build is one figure instead of a figure and a list. */
 @media (min-width: 60rem) {
+  /**
+   * **Every child needs an area here, and two new ones did not have them.**
+   *
+   * Adding a title and a Worth adding band left both auto-placed into whatever
+   * cell was free, which scattered the whole figure: the name landed under the
+   * wheel and the Arcana ended up beside it. Named rows for all five, so a
+   * sixth child cannot quietly do the same thing again.
+   */
   .constel {
     grid-template-columns: auto 1fr;
     grid-template-areas:
+      'head head'
+      'play play'
       'wheel field'
+      'extra extra'
       'rim rim';
     justify-items: start;
     align-items: center;
-    gap: 2rem;
+    gap: 1.2rem 2rem;
+  }
+
+  .constel-head {
+    grid-area: head;
+    justify-self: center;
+  }
+
+  .constel > .playstrip {
+    grid-area: play;
+    justify-self: center;
   }
 
   .constel-wheel {
@@ -1394,6 +1415,11 @@ button.mark {
   .constel-field {
     grid-area: field;
     justify-content: flex-start;
+  }
+
+  .constel-field.is-optional {
+    grid-area: extra;
+    width: 100%;
   }
 
   .constel-rim {
@@ -5351,4 +5377,58 @@ button.mark {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* What taking the optional boons would cost in Olympians, which is the thing a
+ * reader weighs. One boon from a god you take for nothing else still spends a
+ * slot. */
+.poster-optional-cost {
+  margin: 0.4rem 0 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+/* The Constellation's title. Small and above the wheel: it introduces the
+ * picture rather than competing with it. */
+.constel-head {
+  display: grid;
+  gap: 0.15rem;
+  justify-items: center;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+
+.constel-head h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.constel-say {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+/* Worth adding, dimmer than the build itself. That difference is the only thing
+ * this band exists to say. */
+.constel-field.is-optional {
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--div-2);
+  opacity: 0.78;
+}
+
+.constel-band {
+  flex-basis: 100%;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+  text-align: center;
 }

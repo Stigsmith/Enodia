@@ -52,7 +52,7 @@ export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: P
       </header>
 
       {built.centrepiece ? (
-        <section className="poster-centre" aria-label="What the build is for">
+        <section className="poster-centre" aria-label="Built around">
           <Mark piece={built.centrepiece} size="var(--mark-xl)" onOpen={onOpen} />
           <div>
             <h4>{built.centrepiece.name}</h4>
@@ -80,6 +80,34 @@ export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: P
           </>
         ) : null}
       </section>
+
+      {/* Boons that raise the ceiling without being the build.
+        *
+        * **A field the build has carried since it was added and neither layout
+        * ever drew.** It is a separate list for a reason, so it gets a separate
+        * band rather than being folded in beside the boons that are the build:
+        * the whole point of `optional` is the difference between the two.
+        *
+        * The Olympians it would add are named with it, because one boon from a
+        * god you take for nothing else still spends a slot, and that cost is
+        * the thing a reader needs to weigh. */}
+      {built.optional.length ? (
+        <section className="poster-run" aria-label="Worth adding">
+          <h4 className="poster-rule">Worth adding</h4>
+          <div className="poster-row">
+            {built.optional.map((piece) => (
+              <Named key={piece.key} piece={piece} size="var(--mark-l)" onOpen={onOpen} />
+            ))}
+          </div>
+          {built.optionalGods.length ? (
+            <p className="poster-optional-cost">
+              {built.optionalGods.length === 1
+                ? `Taking these adds ${built.optionalGods[0]} to the build.`
+                : `Taking these adds ${built.optionalGods.join(' and ')} to the build.`}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       <section className="poster-crossroads" aria-label="Before you go">
         <h4 className="poster-rule">{built.crossroads.name}</h4>
