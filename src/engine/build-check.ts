@@ -83,7 +83,7 @@ const OLYMPIAN = new Set<string>(olympians)
  * `CostIncrease` steps as MemPoints are spent. The owner reports it stops at
  * 30, which is the same number `ui/Arcana.tsx` counts against.
  */
-const MAX_GRASP = 30
+export const MAX_GRASP = 30
 
 /**
  * The most Arcana a build may name, and the most that still reads as advice.
@@ -93,7 +93,7 @@ const MAX_GRASP = 30
  * does, so a reader knows which two to bring rather than being handed somebody
  * else's whole loadout.
  */
-const MAX_CARDS = 5
+export const MAX_CARDS = 5
 const SUGGESTED_CARDS = 3
 
 /** The Olympians a build spends a slot on, which is not every god on it. */

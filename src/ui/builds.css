@@ -2016,6 +2016,13 @@ button.mark {
   margin-top: 0.8rem;
 }
 
+/**
+ * Board, card, side.
+ *
+ * The preview was a third child in a two-column grid, so it wrapped into a thin
+ * strip between the board and the Grasp column and the card in it was 4.6rem
+ * wide. It gets a column of its own, and the card gets the column.
+ */
 @media (min-width: 60rem) {
   .arcana-stage {
     grid-template-columns: minmax(0, 1fr) 19rem;
@@ -2900,24 +2907,46 @@ button.mark {
 .arcana-peek {
   display: grid;
   align-content: start;
-  gap: 0.4rem;
+  justify-items: center;
+  gap: 0.5rem;
   min-height: 12rem;
   padding: 0.85rem 0.95rem 1rem;
   border: 1px solid var(--div-2);
   border-radius: var(--r-soft);
   background: var(--ink-900);
+  text-align: center;
 }
 
+/* Its own column once there is room for one, between the board and the Grasp
+ * side. Below that it stays under the board, full width. */
+@media (min-width: 78rem) {
+  .arcana-stage {
+    grid-template-columns: minmax(0, 1fr) 17rem 18rem;
+  }
+
+  .arcana-peek {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-content: start;
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+/* The card at a size worth looking at. It is painted art with a figure in it
+ * and 4.6rem was a thumbnail of a thumbnail. */
 .arcana-peek-art {
-  width: 4.6rem;
-  border-radius: 3px;
+  width: 100%;
+  max-width: 13rem;
+  border-radius: 4px;
+  border: 1px solid var(--div-2);
   align-self: start;
 }
 
 .arcana-peek-name {
   margin: 0;
   font-family: var(--display);
-  font-size: 1rem;
+  font-size: 1.1rem;
   letter-spacing: 0.02em;
   color: var(--bone);
 }
@@ -2933,14 +2962,17 @@ button.mark {
 
 .arcana-peek-text {
   margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.5;
+  font-size: 0.8rem;
+  line-height: 1.55;
   color: var(--bone-dim);
+  text-align: left;
 }
 
 /* The reason a free card is off, which is the whole point of the six. */
 .arcana-peek-state {
   margin: 0.15rem 0 0;
+  width: 100%;
+  text-align: left;
   padding-top: 0.45rem;
   border-top: 1px solid var(--div-1);
   font-size: 0.74rem;
@@ -5293,4 +5325,25 @@ button.mark {
   font-size: 0.74rem;
   line-height: 1.45;
   color: var(--bone-dim);
+}
+
+/* An Arcana the board can no longer afford. Shown and greyed rather than
+ * hidden: hiding it answers "why is this not in the list" with nothing. */
+.picklist-row.is-blocked {
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  opacity: 0.55;
+}
+
+.picklist-row.is-blocked:hover {
+  background-image: var(--plate, none);
+}
+
+.picklist-row-blocked {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--unbuilt);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
