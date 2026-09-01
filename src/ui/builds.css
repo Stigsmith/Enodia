@@ -4921,6 +4921,11 @@ button.mark {
   background-size: cover;
   background-position: left center;
   background-repeat: no-repeat;
+  /* **The row is a `<button>`, so it starts with the UA's `buttonface`**, which
+   * is near-white. The plate's right end is a fog dissolve on transparency, so
+   * that grey came straight through and every row had a white blob on it. The
+   * border was cleared when this became a button and the background was not. */
+  background-color: transparent;
 }
 
 .bsort-row:active {
