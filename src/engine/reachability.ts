@@ -203,16 +203,82 @@ export function requirementSets(requires: NonNullable<Trait['requires']>): Trait
  * overstates the cost, which would report AT_RISK on builds that are
  * comfortably reachable. With at most three sets the search is trivial.
  */
+/**
+ * How many new traits it takes to satisfy every set, at least.
+ *
+ * This is set cover, which is NP-hard, and the exhaustive search that used to
+ * be the whole function is fine for a duo with two sets of five and catastrophic
+ * for anything larger. A build hands it one set per boon: at 21 boons it walked
+ * two million combinations and took eighteen seconds, which on the run surface
+ * is the page hanging rather than a slow number.
+ *
+ * Two things fix it, in this order.
+ *
+ * **Forced picks first.** A set with one live option leaves no choice, so take
+ * it, count it, and drop every set it covers. A build is nothing but singletons,
+ * so this alone reduces it to a linear pass and the exact answer.
+ *
+ * **Then the exhaustive search, on what is left.** After the reduction that is
+ * a handful of overlapping sets, which is the case it was always good at.
+ *
+ * The one guard is the last resort: if a genuinely large tangle ever arrives,
+ * fall back to the greedy cover rather than hanging. Greedy can overestimate,
+ * never underestimate, so a wrong answer reads as *more* picks needed than
+ * there really are. That is the safe direction for a number that drives AT_RISK.
+ */
 export function minimumPicks(sets: TraitId[][]): number {
   if (!sets.length) return 0
-  const candidates = [...new Set(sets.flat())]
-  const covers = (chosen: TraitId[]) => sets.every((set) => set.some((id) => chosen.includes(id)))
 
-  for (let size = 1; size <= sets.length; size += 1) {
-    const found = combinations(candidates, size).some(covers)
-    if (found) return size
+  let rest = sets.map((set) => [...new Set(set)])
+  // A set with nothing live in it can never be covered. The caller reads that
+  // as dead; this keeps the old answer rather than inventing a smaller one.
+  if (rest.some((set) => !set.length)) return sets.length
+
+  let forced = 0
+  for (;;) {
+    const only = rest.find((set) => set.length === 1)
+    if (!only) break
+    const id = only[0]!
+    forced += 1
+    rest = rest.filter((set) => !set.includes(id))
   }
-  return sets.length
+  if (!rest.length) return forced
+
+  const candidates = [...new Set(rest.flat())]
+  const covers = (chosen: TraitId[]) => rest.every((set) => set.some((id) => chosen.includes(id)))
+
+  // 2^18 is about a quarter of a million and runs in milliseconds. Past that,
+  // greedy.
+  if (candidates.length > 18) return forced + greedyCover(rest)
+
+  for (let size = 1; size <= rest.length; size += 1) {
+    if (combinations(candidates, size).some(covers)) return forced + size
+  }
+  return forced + rest.length
+}
+
+/** Take whichever option covers the most still-uncovered sets, and repeat. */
+function greedyCover(sets: TraitId[][]): number {
+  let left = sets
+  let taken = 0
+  while (left.length) {
+    const counts = new Map<TraitId, number>()
+    for (const set of left) {
+      for (const id of set) counts.set(id, (counts.get(id) ?? 0) + 1)
+    }
+    let best: TraitId | null = null
+    let most = 0
+    for (const [id, n] of counts) {
+      if (n > most) {
+        most = n
+        best = id
+      }
+    }
+    if (!best) return taken + left.length
+    taken += 1
+    left = left.filter((set) => !set.includes(best))
+  }
+  return taken
 }
 
 function combinations<T>(items: T[], size: number): T[][] {

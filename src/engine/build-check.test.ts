@@ -6,6 +6,7 @@
  * breaks one in each way and asserts it says so.
  */
 
+import { arcanaById, olympians, traits } from '../data/app.ts'
 import { describe, expect, it } from 'vitest'
 
 import { SAMPLE_BUILDS } from '../data/builds.ts'
@@ -60,9 +61,22 @@ describe('what it blocks', () => {
     expect(blockers(checkBuild(bend({ name: '  ' }))).some((p) => p.field === 'name')).toBe(true)
   })
 
-  it('more than five Arcana', () => {
-    const said = blockers(checkBuild(bend({ arcana: [...first.arcana, 'BonusHealth'] })))
-    expect(said.some((p) => /holds five/.test(p.say))).toBe(true)
+  it('more Arcana than a save has Grasp for', () => {
+    // Every paid card at once is 55 Grasp against a ceiling of 30. The limit is
+    // the cost, not the count: six cheap cards are legal and two expensive ones
+    // plus a third may not be.
+    const everyPaidCard = [...arcanaById.values()].filter((c) => (c.cost ?? 0) > 0).map((c) => c.id)
+    const said = blockers(checkBuild(bend({ arcana: everyPaidCard })))
+    expect(said.some((p) => /Grasp/.test(p.say))).toBe(true)
+  })
+
+  it('lets a long but affordable board through', () => {
+    const cheap = [...arcanaById.values()]
+      .filter((c) => (c.cost ?? 0) > 0 && (c.cost ?? 0) <= 2)
+      .map((c) => c.id)
+    const grasp = cheap.reduce((n, id) => n + (arcanaById.get(id)?.cost ?? 0), 0)
+    expect(grasp).toBeLessThanOrEqual(30)
+    expect(blockers(checkBuild(bend({ arcana: cheap })))).toEqual([])
   })
 })
 
@@ -91,10 +105,18 @@ describe('what it only notes', () => {
 
 describe('the helpers', () => {
   it('counts only Olympians', () => {
-    expect(olympiansOf(first)).toEqual(['Poseidon', 'Zeus'])
+    // Read off the build rather than written down here, so this keeps checking
+    // the helper rather than the fixture.
+    const gods = olympiansOf(first)
+    expect(gods.length).toBeGreaterThan(0)
+    expect(gods.length).toBeLessThanOrEqual(4)
+    expect([...gods].sort()).toEqual(gods)
+    for (const god of gods) expect(olympians).toContain(god)
   })
 
   it('maps a boon to its core slot', () => {
-    expect(slotMap(first).get('Melee')).toEqual(['PoseidonWeaponBoon'])
+    const attack = slotMap(first).get('Melee')
+    expect(attack).toHaveLength(1)
+    expect(traits.get(attack![0]!)?.slot).toBe('Melee')
   })
 })

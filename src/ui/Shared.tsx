@@ -16,6 +16,9 @@ import { arcanaById, iconOf, traits, weapons } from '../data/app.ts'
 import { readName, sharedLine } from '../state/identity.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
+/** How many boons the card draws before it starts counting instead. */
+const SHOWN = 10
+
 export function Shared({
   build,
   replaces,
@@ -51,11 +54,17 @@ export function Shared({
 
         {marks.length ? (
           <ul className="shared-marks">
-            {marks.slice(0, 10).map((one) => (
+            {marks.slice(0, SHOWN).map((one) => (
               <li key={one.id}>
                 <img src={`/${one.icon}`} alt="" loading="lazy" title={one.name} />
               </li>
             ))}
+            {/* Twenty-one boons is a real build and a wall of icons. The rest
+              * are counted rather than drawn, because a row that quietly stops
+              * at ten is a card that lies about what it is offering. */}
+            {marks.length > SHOWN ? (
+              <li className="shared-more">+{marks.length - SHOWN}</li>
+            ) : null}
           </ul>
         ) : null}
 

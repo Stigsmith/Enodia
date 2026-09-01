@@ -387,9 +387,10 @@ function SampleTag({ full = false }: { full?: boolean }) {
   if (!full) return <p className="builds-sample">Sample build</p>
   return (
     <p className="builds-disclaimer">
-      These eight are samples, built to test the layouts. Every id in them is real, every duo
-      actually holds its prerequisites, and each explanation restates something the game files
-      say. Which build is worth playing is not in any file and is not claimed here.
+      The library starts empty. The one build here is a sample, kept because it is the hardest
+      case these screens can be handed: four gods, all six duos between them, and three of their
+      four legendaries. Everything in it is real and every prerequisite is actually held. Whether
+      a build is worth playing is not in any file and is not claimed here.
     </p>
   )
 }

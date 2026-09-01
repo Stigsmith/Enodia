@@ -218,210 +218,106 @@ export type SavedBuild = ShownBuild & {
  */
 
 /**
- * The first sample, named on its own.
+ * The one build that ships, and it is a stress test rather than a suggestion.
  *
- * `noUncheckedIndexedAccess` makes `SAMPLE_BUILDS[0]` optional, and the screen
- * needs a build that certainly exists to fall back to. Naming it says the list
- * is non-empty once rather than guarding for it at every use.
+ * **The library starts empty on purpose.** Eight placeholder builds used to
+ * ship here to prove the screens worked. They did that, and then they sat in
+ * everybody's library looking like recommendations. Real builds are being
+ * written by people who play the game; this is the only one left, and it is
+ * here because something has to be the hardest case the screens can be handed.
+ *
+ * ## What makes it the hardest case
+ *
+ * Aphrodite, Apollo, Demeter and Hestia are four Olympians, which is the cap a
+ * run allows, and they are unusual in having a duo for **all six** of their
+ * pairs plus a legendary each. That is ten targets between four gods.
+ *
+ * Nine of the ten fit. The tenth provably does not, and the reason is the
+ * lockout this whole tool exists to show:
+ *
+ *   Exceptional Talent needs two Apollo core boons, one from Attack or Special
+ *   and one from Cast, Sprint or Magick. Freezer Burn, Burning Desire and Fire
+ *   Away all need Hestia in Attack, Special or Cast. Nervous Wreck needs
+ *   Aphrodite in Attack or Special. Attack and Special are two slots and three
+ *   gods want them, so Apollo loses, and Apollo's legendary goes with it.
+ *
+ * Checked by searching every one of the 1024 ways the five core slots can be
+ * handed out among the four gods. Nine is the maximum, and this is one of the
+ * assignments that reaches it.
+ *
+ * So: 21 boons, 6 duos, 3 legendaries, 10 Arcana at 29 of 30 Grasp, a Hex, two
+ * hammers, a keepsake and a familiar. If a screen can draw this, it can draw
+ * anything a real run produces.
  */
 export const FIRST_BUILD: ShownBuild = {
-  id: 'sample-killer-current',
-  name: 'Killer Current',
-  say: 'Poseidon on the swing, Zeus in the ring, and the duo that makes the lightning stick.',
-  how: 'Poseidon holds the Attack and the Special, so ordinary swings apply Froth. Storm Ring puts Zeus in the Cast, which is the one core slot Poseidon gives up. Killer Current is what joins them: it makes lightning deal more damage to anything already Frothed, so the Attack sets a target up and the Cast collects. Slippery Slope is not a preference, it is one of the two prerequisites. Aspect of Circe matters because it clears the Cast on cue rather than leaving it planted.',
+  id: 'sample-four-gods',
+  name: 'Every Pair',
+  say: 'Four gods, all six duos between them, and three of their four legendaries.',
+  how: 'The five core slots are handed out to make as many pairs as possible rather than to make any one of them strong. Hestia takes the Attack and Aphrodite the Special, which is what Freezer Burn, Burning Desire, Fire Away and Nervous Wreck all need. Demeter takes the Cast, Apollo the Sprint, and Aphrodite takes the Magick as well, which is the second Aphrodite core Nervous Wreck asks for. Everything else is a slotless boon taken purely to satisfy a prerequisite: Heart Breaker for Sunny Disposition, Arctic Gale for Tropical Cyclone, Flash Fry and Glowing Coal for Fire Away, Plentiful Forage and Weed Killer for Winter Harvest, Broken Resolve for Nervous Wreck. Apollo is the god who loses out. Exceptional Talent wants two Apollo core boons and Apollo only gets the Sprint, because Attack and Special are spoken for by gods that three other targets depend on.',
   by: 'sample',
   weapon: 'WeaponStaffSwing',
   aspect: 'StaffClearCastAspect',
-  centrepiece: 'LightningVulnerabilityBoon',
+  centrepiece: 'BurnConsumeBoon',
   boons: [
-    'PoseidonWeaponBoon',
-    'PoseidonSpecialBoon',
-    'ZeusCastBoon',
-    'PoseidonSprintBoon',
-    'ZeusManaBoon',
-    'PoseidonStatusBoon',
-    'LightningVulnerabilityBoon',
-    'RoomRewardBonusBoon',
+    // The five core slots. Two go to Aphrodite, which is what makes it fit.
+    'HestiaWeaponBoon',        // Flame Strike        Attack
+    'AphroditeSpecialBoon',    // Flutter Flourish    Special
+    'DemeterCastBoon',         // Arctic Ring         Cast
+    'ApolloSprintBoon',        // Blinding Rush       Sprint
+    'AphroditeManaBoon',       // Glamour Gain        Magick
+
+    // Slotless, and every one of them is a prerequisite rather than a choice.
+    'ManaBurstBoon',           // Heart Breaker       Sunny Disposition
+    'CastNovaBoon',            // Arctic Gale         Tropical Cyclone
+    'BurnExplodeBoon',         // Flash Fry           Fire Away
+    'CastProjectileBoon',      // Glowing Coal        Fire Away
+    'PlantHealthBoon',         // Plentiful Forage    Winter Harvest
+    'SlowExAttackBoon',        // Weed Killer         Winter Harvest
+    'WeakPotencyBoon',         // Broken Resolve      Nervous Wreck
+
+    // All six duos the four gods can make between them.
+    'MaxHealthDamageBoon',     // Hearty Appetite     Aphrodite + Demeter
+    'ManaBurstCountBoon',      // Sunny Disposition   Aphrodite + Apollo
+    'BurnConsumeBoon',         // Freezer Burn        Demeter + Hestia
+    'CoverRegenerationBoon',   // Warm Breeze         Apollo + Hestia
+    'BurnRefreshBoon',         // Burning Desire      Aphrodite + Hestia
+    'StormSpawnBoon',          // Tropical Cyclone    Apollo + Demeter
+
+    // Three of the four legendaries. Apollo's is the one that cannot fit.
+    'BurnSprintBoon',          // Fire Away           Hestia
+    'InstantRootKill',         // Winter Harvest      Demeter
+    'RandomStatusBoon',        // Nervous Wreck       Aphrodite
   ],
-  hex: 'PolymorphZeusTalent',
-  hammers: ['StaffDoubleAttackTrait', 'StaffFastSpecialTrait'],
-  keepsake: 'BonusMoneyKeepsake',
+  hex: 'MeteorHestiaTalent',
+  hammers: ['StaffExAoETrait', 'StaffFastSpecialTrait'],
+  keepsake: 'ForceHestiaBoonKeepsake',
   familiar: 'FrogFamiliar',
-  arcana: ['CastCount', 'RarityBoost', 'LastStand', 'MagicCrit', 'CardDraw'],
+  /**
+   * Ten cards at 29 Grasp, one under the 30 a save can reach.
+   *
+   * Origination and Excellence are the expensive pair and both earn it here:
+   * this build is made of status effects, and every boon in it wants to arrive
+   * at a better rarity. The rest are cheap cards that fit in the change.
+   */
+  arcana: [
+    'StatusVulnerability',   // Origination      5
+    'RarityBoost',           // Excellence       5
+    'LastStand',             // Death            4
+    'CastCount',             // Eternity         3
+    'DoorReroll',            // The Enchantress  3
+    'MagicCrit',             // Night            2
+    'CastBuff',              // The Furies       2
+    'LowManaDamageBonus',    // The Huntress     2
+    'BonusHealth',           // Persistence      2
+    'ChanneledCast',         // The Sorceress    1
+  ],
 }
 
-export const SAMPLE_BUILDS: ShownBuild[] = [
-  FIRST_BUILD,
-  {
-    id: 'sample-glorious-disaster',
-    name: 'Glorious Disaster',
-    say: 'Everything into the Cast. Apollo builds it, Zeus rings it, and the Hex keeps it fed.',
-    how: 'Apollo takes four of the five core slots and Zeus takes only the Cast. Prominence Flare is a prerequisite rather than a preference: Glorious Disaster states it as an entire set on its own, so this is not the build without it. Lucid Gain in the Magick slot is what pays for a Cast this expensive, and Shine of Apollo puts the Hex on the god the rest of the loadout is already committed to.',
-    by: 'sample',
-    weapon: 'WeaponStaffSwing',
-    aspect: 'StaffClearCastAspect',
-    centrepiece: 'ApolloSecondStageCastBoon',
-    boons: [
-      'ApolloWeaponBoon',
-      'ApolloSpecialBoon',
-      'ZeusCastBoon',
-      'ApolloSprintBoon',
-      'ApolloManaBoon',
-      'ApolloExCastBoon',
-      'ApolloSecondStageCastBoon',
-      'BoltRetaliateBoon',
-    ],
-    hex: 'LaserApolloTalent',
-    hammers: ['StaffSecondStageTrait', 'StaffPowershotTrait'],
-    keepsake: 'ArmorGainKeepsake',
-    familiar: 'CatFamiliar',
-    arcana: ['CastCount', 'EpicRarityBoost', 'LastStand', 'CardDraw', 'MagicCrit'],
-  },
-  {
-    id: 'sample-thermal-dynamics',
-    name: 'Thermal Dynamics',
-    say: 'Hestia burns on the Attack, Zeus jumps off the Special, and the duo turns one into the other.',
-    how: 'The two prerequisite sets contend for the same two slots, and that decides the whole layout: Thermal Dynamics wants a Zeus Attack or Special and a Hestia Attack or Special, and only one boon fits a slot. So Hestia takes the Attack, Zeus takes the Special, and there is no third arrangement. Zeus then keeps the Cast and the Sprint because nothing is competing for them, and Cardio Gain puts Hestia back in the Magick slot.',
-    by: 'sample',
-    weapon: 'WeaponDagger',
-    aspect: 'DaggerBackstabAspect',
-    centrepiece: 'EchoBurnBoon',
-    boons: [
-      'HestiaWeaponBoon',
-      'ZeusSpecialBoon',
-      'ZeusCastBoon',
-      'ZeusSprintBoon',
-      'HestiaManaBoon',
-      'EchoBurnBoon',
-      'BoltRetaliateBoon',
-    ],
-    hex: 'MeteorHestiaTalent',
-    hammers: ['DaggerRapidAttackTrait', 'DaggerSpecialFanTrait'],
-    keepsake: 'BlockDeathKeepsake',
-    familiar: 'RavenFamiliar',
-    arcana: ['LastStand', 'RarityBoost', 'MagicCrit', 'CastCount', 'EpicRarityBoost'],
-  },
-  {
-    id: 'sample-freezer-burn',
-    name: 'Freezer Burn',
-    say: 'Demeter freezes, Hestia burns, and the duo spends one to pay for the other.',
-    how: 'Two status gods in one build, and the duo is the reason they are not fighting for the same job. Freezer Burn asks for a Demeter Attack, Special or Cast and a Hestia one, so the Attack goes to Ice Strike and the Special to Flame Flourish. Demeter then keeps the Cast and the Sprint, Hestia keeps the Magick slot, and Squall of Demeter puts the Hex on the side holding three of the five core slots.',
-    by: 'sample',
-    weapon: 'WeaponTorch',
-    aspect: 'TorchDetonateAspect',
-    centrepiece: 'BurnConsumeBoon',
-    boons: [
-      'DemeterWeaponBoon',
-      'HestiaSpecialBoon',
-      'DemeterCastBoon',
-      'DemeterSprintBoon',
-      'HestiaManaBoon',
-      'BurnConsumeBoon',
-    ],
-    hex: 'TimeSlowDemeterTalent',
-    hammers: ['TorchAttackSpeedTrait', 'TorchEnhancedAttackTrait'],
-    keepsake: 'ForceDemeterBoonKeepsake',
-    familiar: 'HoundFamiliar',
-    arcana: ['LastStand', 'StatusVulnerability', 'RarityBoost', 'CastCount', 'BonusHealth'],
-  },
-  {
-    id: 'sample-cutting-edge',
-    name: 'Cutting Edge',
-    say: 'Ares in the ring, Apollo around it, and a duo that names the Sword Ring specifically.',
-    how: 'Cutting Edge names Sword Ring in its first prerequisite set, so Ares has to hold the Cast and no other arrangement satisfies it. Ares also takes the Attack and the Magick slot. Apollo takes the Special and the Sprint, and either one of those satisfies the second set on its own. Lance of Ares is the Hex, and Aspect of Thanatos asks for the same repeated precise hits the Ares boons are already about.',
-    by: 'sample',
-    weapon: 'WeaponAxe',
-    aspect: 'AxePerfectCriticalAspect',
-    centrepiece: 'DoubleSwordBoon',
-    boons: [
-      'AresWeaponBoon',
-      'ApolloSpecialBoon',
-      'AresCastBoon',
-      'ApolloSprintBoon',
-      'AresManaBoon',
-      'DoubleSwordBoon',
-    ],
-    hex: 'MoonBeamAresTalent',
-    hammers: ['AxeArmorTrait', 'AxeChargedSpecialTrait'],
-    keepsake: 'LowHealthCritKeepsake',
-    familiar: 'PolecatFamiliar',
-    arcana: ['LastStand', 'MagicCrit', 'LowHealthBonus', 'RarityBoost', 'BonusHealth'],
-  },
-  {
-    id: 'sample-ecstatic-obsession',
-    name: 'Ecstatic Obsession',
-    say: 'Hera on the weapon, Aphrodite everywhere else, and the Hex aspect to carry it.',
-    how: 'Hera holds the Attack and the Special, which satisfies the first prerequisite set twice over. Aphrodite holds the Cast, the Sprint and the Magick slot, and Rapture Ring alone satisfies the second. That split leaves nothing contested, which is unusual: most duos put their two sets in competition for the same slots. Aspect of Selene is why the Hex is worth building around here, and Allure of Aphrodite keeps it on the god holding three slots.',
-    by: 'sample',
-    weapon: 'WeaponSuit',
-    aspect: 'SuitHexAspect',
-    centrepiece: 'CharmCrowdBoon',
-    boons: [
-      'HeraWeaponBoon',
-      'HeraSpecialBoon',
-      'AphroditeCastBoon',
-      'AphroditeSprintBoon',
-      'AphroditeManaBoon',
-      'CharmCrowdBoon',
-    ],
-    hex: 'TransformAphroditeTalent',
-    hammers: ['SuitArmorTrait', 'SuitAttackSizeTrait'],
-    keepsake: 'SpellTalentKeepsake',
-    familiar: 'CatFamiliar',
-    arcana: ['LastStand', 'CastCount', 'MagicCrit', 'RarityBoost', 'ManaOverTime'],
-  },
-  {
-    id: 'sample-chain-reaction',
-    name: 'Chain Reaction',
-    say: 'Hephaestus on the Attack, Hestia on the Special, and a duo that repeats the big hit.',
-    how: 'Chain Reaction wants a Hephaestus Attack, Special or Sprint and any of five Hestia boons, so the Attack goes to Volcanic Strike and Hestia takes the Special. Hephaestus keeps the Cast and the Sprint, which satisfies its set a second time, and that leaves the Magick slot for Cardio Gain. Hand of Hephaestus is the Hex. Aspect of Hel is here because the Attack it changes is the slot the duo cares about.',
-    by: 'sample',
-    weapon: 'WeaponLob',
-    aspect: 'LobGunAspect',
-    centrepiece: 'DoubleMassiveAttackBoon',
-    boons: [
-      'HephaestusWeaponBoon',
-      'HestiaSpecialBoon',
-      'HephaestusCastBoon',
-      'HephaestusSprintBoon',
-      'HestiaManaBoon',
-      'DoubleMassiveAttackBoon',
-    ],
-    hex: 'LeapHephaestusTalent',
-    hammers: ['LobAmmoTrait', 'LobGrowthTrait'],
-    keepsake: 'ForceHephaestusBoonKeepsake',
-    familiar: 'FrogFamiliar',
-    arcana: ['LastStand', 'RarityBoost', 'BonusHealth', 'MagicCrit', 'EpicRarityBoost'],
-  },
-  {
-    id: 'sample-arterial-spray',
-    name: 'Arterial Spray',
-    say: 'Poseidon knocks them into each other, Ares makes the landing hurt.',
-    how: 'Arterial Spray needs a Poseidon Attack or Special specifically, and any one of five Ares boons for the other set, which is the loosest gate of the eight here. So Poseidon takes the Attack, Ares takes the Special, the Cast and the Magick slot, and Poseidon keeps the Sprint. Aspect of the Morrigan multiplies the Special, which is the slot Ares is holding, and Pride of Poseidon puts the Hex on the god holding the Attack.',
-    by: 'sample',
-    weapon: 'WeaponDagger',
-    aspect: 'DaggerTripleAspect',
-    centrepiece: 'DoubleSplashBoon',
-    boons: [
-      'PoseidonWeaponBoon',
-      'AresSpecialBoon',
-      'AresCastBoon',
-      'PoseidonSprintBoon',
-      'AresManaBoon',
-      'DoubleSplashBoon',
-    ],
-    /**
-     * The owner's own example of what this field is for.
-     *
-     * Slow Cooker gains Power on Attacks and Specials the more Fire is held,
-     * and this is a fast Attack and Special build. It is not part of the build:
-     * take it and you spend a third Olympian slot on Hestia for one boon.
-     */
-    optional: ['ElementalBaseDamageBoon'],
-    hex: 'PotionPoseidonTalent',
-    hammers: ['DaggerSpecialFanTrait', 'DaggerTripleBuffTrait'],
-    keepsake: 'ForceAresBoonKeepsake',
-    familiar: 'RavenFamiliar',
-    arcana: ['LastStand', 'MagicCrit', 'RarityBoost', 'CastCount', 'LowHealthBonus'],
-  },
-]
+/**
+ * The shipped library, which is one build long.
+ *
+ * `noUncheckedIndexedAccess` makes `SAMPLE_BUILDS[0]` optional, so `FIRST_BUILD`
+ * is named separately and the screens fall back to it rather than guarding for
+ * an empty list at every use.
+ */
+export const SAMPLE_BUILDS: ShownBuild[] = [FIRST_BUILD]

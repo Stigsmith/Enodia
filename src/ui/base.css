@@ -60,7 +60,16 @@ body {
   font-synthesis-weight: none;
   font-size: clamp(2rem, 8vw, 3rem);
   letter-spacing: 0.06em;
-  color: var(--lit-hot);
+  /**
+   * White in every theme, deliberately.
+   *
+   * This face is the game's own character-name face and it carries the page
+   * title. It read as jade under Unseen and gold under Olympian, which made a
+   * heading look like a different heading in each theme rather than the same
+   * one. `--bone` is fixed across all four, so the title stays put and the
+   * theme shows in everything around it.
+   */
+  color: var(--bone);
 }
 
 .tagline {

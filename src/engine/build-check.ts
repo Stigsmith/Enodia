@@ -22,7 +22,7 @@
  * tool telling a player they are using it wrong.
  */
 
-import { olympians, sources, traits } from '../data/app.ts'
+import { arcanaById, olympians, sources, traits } from '../data/app.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from './slots.ts'
 import { satisfiesRequirement } from './reachability.ts'
@@ -36,6 +36,15 @@ export type Problem = {
 }
 
 const OLYMPIAN = new Set<string>(olympians)
+
+/**
+ * The most Grasp a save can reach.
+ *
+ * `MetaUpgradeCostData.StartingMetaUpgradeLimit` is 10 and rises in
+ * `CostIncrease` steps as MemPoints are spent. The owner reports it stops at
+ * 30, which is the same number `ui/Arcana.tsx` counts against.
+ */
+const MAX_GRASP = 30
 
 /** The Olympians a build spends a slot on, which is not every god on it. */
 export function olympiansOf(build: ShownBuild): string[] {
@@ -156,14 +165,29 @@ export function checkBuild(build: ShownBuild): Problem[] {
     }
   }
 
-  // The Grasp holds five. Fewer is legal and is usually just unfinished.
-  if (build.arcana.length > 5) {
-    out.push({ field: 'arcana', severity: 'blocks', say: 'The Grasp holds five Arcana.' })
-  } else if (build.arcana.length && build.arcana.length < 5) {
+  /**
+   * The Arcana are limited by Grasp, not by how many cards you take.
+   *
+   * **This used to block above five cards, and that was wrong.** The board has
+   * eighteen paid cards costing between 1 and 5, and six of the cheap ones fit
+   * inside the same Grasp as two expensive ones. `MetaUpgradeCostData` starts a
+   * save at 10 and it rises to 30 as MemPoints are spent, which is the real
+   * ceiling and the one `ui/Arcana.tsx` already counts against.
+   *
+   * Six free cards cost nothing and switch themselves on, so they never count.
+   */
+  const grasp = build.arcana.reduce((total, id) => total + (arcanaById.get(id)?.cost ?? 0), 0)
+  if (grasp > MAX_GRASP) {
+    out.push({
+      field: 'arcana',
+      severity: 'blocks',
+      say: `That is ${grasp} Grasp, and a save tops out at ${MAX_GRASP}.`,
+    })
+  } else if (build.arcana.length) {
     out.push({
       field: 'arcana',
       severity: 'notes',
-      say: `${build.arcana.length} of five Arcana chosen.`,
+      say: `${build.arcana.length} Arcana, ${grasp} of ${MAX_GRASP} Grasp.`,
     })
   }
 
