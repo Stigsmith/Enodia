@@ -14,12 +14,32 @@
 
 import { MAX_FEAR } from '../data/builds.ts'
 
-export function FearStepper({
+/**
+ * A number with the game's own arrows, and optionally an icon beside it.
+ *
+ * **Generalised out of the Fear control**, because the owner asked the obvious
+ * question: Fear got the game's stepper and runs and clears kept plain number
+ * fields, on the same panel, three rows apart. There was no reason beyond Fear
+ * having been built first.
+ */
+export function Stepper({
+  label,
   value,
   onChange,
+  max,
+  icon,
+  ofLabel,
+  hint,
 }: {
+  label: string
   value: number | undefined
-  onChange: (fear: number | undefined) => void
+  onChange: (next: number | undefined) => void
+  max: number
+  /** shown left of the field, where the number has a symbol of its own */
+  icon?: { src: string; alt?: string } | null
+  /** the "of 57" after the arrows, where a ceiling is worth stating */
+  ofLabel?: string
+  hint?: string
 }) {
   const held = value ?? 0
 
@@ -27,33 +47,33 @@ export function FearStepper({
    * Clamped here as well as at the edges of the range.
    *
    * The arrows cannot leave the range on their own, but the field can be typed
-   * into, and `PlayStrip` clamps again when it draws. Same reasoning `winRate`
+   * into, and the readers clamp again when they draw. Same reasoning `winRate`
    * gives for clamping clears against runs: storage is a text file a person can
    * edit and a build can arrive from another install.
    */
   const step = (by: number) => {
-    const next = Math.max(0, Math.min(MAX_FEAR, held + by))
+    const next = Math.max(0, Math.min(max, held + by))
     onChange(next === 0 ? undefined : next)
   }
 
   return (
     <div className="editor-field">
-      <span>Fear cleared</span>
+      <span>{label}</span>
       <div className="fear">
-        <img className="fear-skull" src="/icons/fear.png" alt="" aria-hidden="true" />
+        {icon ? <img className="fear-skull" src={icon.src} alt={icon.alt ?? ''} aria-hidden="true" /> : null}
 
         <input
           className="fear-value"
           type="number"
           min={0}
-          max={MAX_FEAR}
+          max={max}
           value={value ?? ''}
           placeholder="0"
-          aria-label={`Fear cleared, 0 to ${MAX_FEAR}`}
+          aria-label={`${label}, 0 to ${max}`}
           onChange={(event) => {
             const read = Number.parseInt(event.target.value, 10)
             if (!Number.isFinite(read)) return onChange(undefined)
-            onChange(Math.max(0, Math.min(MAX_FEAR, read)) || undefined)
+            onChange(Math.max(0, Math.min(max, read)) || undefined)
           }}
         />
 
@@ -61,8 +81,8 @@ export function FearStepper({
           <button
             type="button"
             className="fear-arrow"
-            disabled={held >= MAX_FEAR}
-            aria-label="More Fear"
+            disabled={held >= max}
+            aria-label={`More ${label}`}
             onClick={() => step(1)}
           >
             <img src="/shell/settings-arrow-up.png" alt="" aria-hidden="true" />
@@ -71,16 +91,37 @@ export function FearStepper({
             type="button"
             className="fear-arrow"
             disabled={held <= 0}
-            aria-label="Less Fear"
+            aria-label={`Less ${label}`}
             onClick={() => step(-1)}
           >
             <img src="/shell/settings-arrow-down.png" alt="" aria-hidden="true" />
           </button>
         </span>
 
-        <span className="fear-of">of {MAX_FEAR}</span>
+        {ofLabel ? <span className="fear-of">{ofLabel}</span> : null}
       </div>
+      {hint ? <p className="editor-hint">{hint}</p> : null}
     </div>
+  )
+}
+
+/** Fear, which is the stepper with the game's skull and a derived ceiling. */
+export function FearStepper({
+  value,
+  onChange,
+}: {
+  value: number | undefined
+  onChange: (fear: number | undefined) => void
+}) {
+  return (
+    <Stepper
+      label="Fear cleared"
+      value={value}
+      onChange={onChange}
+      max={MAX_FEAR}
+      icon={{ src: '/icons/fear.png' }}
+      ofLabel={`of ${MAX_FEAR}`}
+    />
   )
 }
 

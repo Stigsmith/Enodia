@@ -32,6 +32,7 @@ import { loadBuilds, saveBuild } from './state/builds.ts'
 import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
+import { PeekProvider } from './ui/Peek.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
@@ -209,6 +210,9 @@ export function App() {
    * backdrop were four chances for them to drift apart.
    */
   const frame = (children: ReactNode) => (
+    /* Every `Mark` on every screen reads its hover handlers out of here, so
+     * this wraps the whole app rather than any one layout. */
+    <PeekProvider>
     <div className="app">
       <Hecate />
       <Menu
@@ -236,6 +240,7 @@ export function App() {
         />
       ) : null}
     </div>
+    </PeekProvider>
   )
 
   /* The reading screens. Nothing on them is interactive, so they share one

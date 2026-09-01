@@ -141,6 +141,20 @@ function fromTrait(id: TraitId, kind: PieceKind, centrepiece: boolean): Piece | 
   // A duo declares itself in the data, so the frame follows the trait's own
   // kind rather than the caller's guess about where it belongs.
   const rarity = RARITY_BY_KIND[trait.kind] ?? 'Common'
+
+  /**
+   * A boon in a core slot wears the game's primary frame.
+   *
+   * `frame-primary.png` has been in the library and in `FRAME` since the
+   * beginning as a value nothing ever selected, so every core boon was drawn in
+   * the Common frame like everything else. The five slots are the thing this
+   * whole tool is about and they now look like it.
+   *
+   * A duo or legendary keeps its own frame even in a slot: what it is outranks
+   * where it sits, and those two are the rarer fact.
+   */
+  const frame =
+    slot && rarity === 'Common' ? 'frames/frame-primary.png' : FRAME[rarity]
   return {
     key: `${kind}:${id}`,
     kind: trait.kind === 'duo' || trait.kind === 'legendary' ? 'duo' : kind,
@@ -151,7 +165,7 @@ function fromTrait(id: TraitId, kind: PieceKind, centrepiece: boolean): Piece | 
     slot,
     slotName: slot ? slotLabel(slot) : null,
     glyph: slot ? (SLOT_GLYPH[slot] ?? null) : null,
-    frame: FRAME[rarity],
+    frame,
     gods: trait.gods ?? [],
     centrepiece,
   }
