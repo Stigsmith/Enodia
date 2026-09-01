@@ -1,0 +1,58 @@
+# How this site is built and served.
+#
+# It is a static site with no server: `DESIGN.md` 1, one page, no network call
+# at runtime, everything a person makes kept in their own browser. So there is
+# nothing here about functions, environment or a database, and there is not
+# meant to be.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Matches what the toolchain is developed against. Pinned rather than left to
+  # drift, because `scripts/extract.mjs` and the prebuild run under it too.
+  NODE_VERSION = "22"
+
+# One page, and the only routing is a `#build=` fragment, which never reaches
+# the server. This is here so a mistyped path lands on the app rather than on a
+# host's 404, and so it keeps working if a real route is ever added.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Vite fingerprints what it emits, so those can never go stale.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The art is not fingerprinted: paths are stable because `icons.ts` derives them
+# from a display name and the validator holds them to it. A day, then revalidate,
+# so a corrected image reaches people without re-fetching 900 files every visit.
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+# The page itself names the fingerprinted bundle, so it must never be the stale
+# thing that pins everything else to an old build.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # No third-party anything: no fonts, no analytics, no CDN. The one thing the
+    # page fetches is itself, so the policy can say exactly that.
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
