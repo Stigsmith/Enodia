@@ -31,7 +31,8 @@ import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
-import { loadPrefs } from '../state/prefs.ts'
+import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import type { BuildDetail } from '../state/prefs.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
@@ -61,13 +62,20 @@ export function Builds({ onClose }: { onClose?: () => void }) {
   const library = useMemo(() => [...mine, ...SAMPLE_BUILDS], [mine])
 
   /**
-   * The detail layout, read once when the screen mounts.
+   * How a single build opens, and it is set from here now.
    *
-   * Not live: changing it in Settings closes the menu and the reader comes back
-   * to this screen, which remounts. Subscribing to storage for a setting that
-   * cannot change while this is on screen would be machinery for nothing.
+   * It used to live in the menu, which meant choosing between two layouts
+   * without either of them on screen. It is a control on the overview instead:
+   * pick one, open a build, and that is what you get. Still written straight
+   * through to `enodia.prefs`, because a reader wants one of the two and keeps
+   * wanting it.
    */
-  const [detail] = useState(() => loadPrefs().buildDetail)
+  const [detail, setDetail] = useState<BuildDetail>(() => loadPrefs().buildDetail)
+
+  const chooseDetail = (id: BuildDetail) => {
+    setDetail(id)
+    savePrefs({ ...loadPrefs(), buildDetail: id })
+  }
 
   const bar = useMemo(() => facets(library, selection), [library, selection])
   const shown = useMemo(
@@ -174,6 +182,8 @@ export function Builds({ onClose }: { onClose?: () => void }) {
         onClear={() => setSelection(EMPTY_SELECTION)}
         sort={sort}
         onSort={setSort}
+        detail={detail}
+        onDetail={chooseDetail}
         showing={shown.length}
         total={library.length}
       />

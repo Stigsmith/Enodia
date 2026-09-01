@@ -12,25 +12,18 @@
  *
  * Starting a run is always here and always first, because that is what the tool
  * is for.
+ *
+ * **It is navigation now, and nothing else.** Three settings used to live in
+ * here: where the menu sits, how a build opens, and which frame rings a bubble.
+ * Each of them has gone to the place it takes effect, because a setting you
+ * cannot see the result of is a setting you have to guess at.
  */
 
 import { useEffect, useRef, useState } from 'react'
 
-import { loadPrefs, savePrefs } from '../state/prefs.ts'
-import type { BuildDetail } from '../state/prefs.ts'
-import { FRAMES, applyFrame, frameVars, readFrame, writeFrame } from './frames.ts'
-import { NAV_MODES, PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
+import { PANE_QUERY, readNav } from './nav.ts'
 import type { View } from './nav.ts'
 
-/** The two layouts a single build can open in. */
-const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
-  { id: 'poster', name: 'Poster', note: 'The art large, everything else demoted. One build as a page' },
-  {
-    id: 'constellation',
-    name: 'Constellation',
-    note: 'Five fixed positions round the arm. A dark spoke is a gap you see at once',
-  },
-]
 
 type Entry = {
   label: string
@@ -59,36 +52,8 @@ export function Menu({
   onShowBriefing?: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const [frame, setFrame] = useState(readFrame)
-  const [nav, setNav] = useState(readNav)
-  /**
-   * Whether the screen is wide enough for the pane to be offered at all.
-   *
-   * `nav.ts` puts the same 60rem in the CSS, and this is the half that decides
-   * the panel is pinned open rather than the half that decides where it sits.
-   * A stored `pane` on a phone has to change nothing, in either half.
-   */
+  const nav = readNav()
   const [wide, setWide] = useState(() => window.matchMedia(PANE_QUERY).matches)
-  /**
-   * Which layout a single build opens in.
-   *
-   * A setting rather than a control on the build manager itself: a reader wants
-   * one of the two and keeps wanting it, and a switcher on every build asks the
-   * same question every time. Written straight through to `enodia.prefs`, and
-   * the build manager reads it when it mounts.
-   */
-  const [buildDetail, setBuildDetail] = useState<BuildDetail>(() => loadPrefs().buildDetail)
-  const panel = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    applyFrame(frame)
-    writeFrame(frame)
-  }, [frame])
-
-  useEffect(() => {
-    applyNav(nav)
-    writeNav(nav)
-  }, [nav])
 
   useEffect(() => {
     const query = window.matchMedia(PANE_QUERY)
@@ -96,13 +61,17 @@ export function Menu({
     query.addEventListener('change', sync)
     return () => query.removeEventListener('change', sync)
   }, [])
+  const panel = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    savePrefs({ ...loadPrefs(), buildDetail })
-  }, [buildDetail])
-
-  // Pinned open, so nothing that closes a pop-out applies: not a click
-  // outside it, not Escape, and not choosing something in it.
+  /**
+   * Pinned open, so nothing that closes a pop-out applies: not a click outside
+   * it, not Escape, and not choosing something in it.
+   *
+   * Read rather than owned. The control that sets this lives in Settings now,
+   * and `applyNav` has already written `data-nav` on the root by the time this
+   * renders, so the menu asks the document what it is instead of keeping a
+   * second copy that could disagree with it.
+   */
   const pinned = wide && nav === 'pane'
   const showing = pinned || open
   const leave = () => {
@@ -337,105 +306,6 @@ export function Menu({
               </ul>
             </section>
           ))}
-
-          {/* Only on a screen wide enough to hold a pane. Below that the
-              pop-out is the only mode there is, and a setting that changes
-              nothing is a setting that lies. */}
-          {wide ? (
-            <section>
-              <h2>The menu</h2>
-              <ul className="menu-choice">
-                {NAV_MODES.map((option) => (
-                  <li key={option.id}>
-                    <button
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={nav === option.id}
-                      className={nav === option.id ? 'is-on' : ''}
-                      onClick={() => setNav(option.id)}
-                    >
-                      <span className="menu-label">
-                        {option.name}
-                        {nav === option.id ? (
-                          <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
-                        ) : null}
-                      </span>
-                      <span className="menu-note">{option.note}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {/* How a single build opens in the build manager.
-              *
-              * Two of the five layouts survived the review and both were kept,
-              * because they answer different questions: the Poster is "what
-              * shall I try", the Constellation is "where are the gaps". */}
-          <section>
-            <h2>A build opens as</h2>
-            <ul className="menu-choice">
-              {DETAILS.map((option) => (
-                <li key={option.id}>
-                  <button
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={buildDetail === option.id}
-                    className={buildDetail === option.id ? 'is-on' : ''}
-                    onClick={() => setBuildDetail(option.id)}
-                  >
-                    <span className="menu-label">
-                      {option.name}
-                      {buildDetail === option.id ? (
-                        <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
-                      ) : null}
-                    </span>
-                    <span className="menu-note">{option.note}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Which frame rings a bubble. Three now: the owner picked the Exit
-              reward marker and kept Hecate's two circles as alternatives. The
-              swatch is the whole point of it being here: the answer is what it
-              looks like, not what it is called. */}
-          <section>
-            <h2>Frame</h2>
-            <ul className="menu-frames">
-              {FRAMES.map((option) => (
-                <li key={option.id}>
-                  <button
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={frame === option.id}
-                    className={frame === option.id ? 'is-on' : ''}
-                    onClick={() => setFrame(option.id)}
-                  >
-                    {/* Its own geometry, not the applied one, or every swatch
-                        would draw the frame that is already on. */}
-                    <span
-                      className={`menu-frame-swatch${option.square ? ' is-square' : ''}`}
-                      style={frameVars(option) as React.CSSProperties}
-                      aria-hidden="true"
-                    >
-                      <img className="menu-frame-face" src="/gifts/zeus-gift.png" alt="" />
-                      {option.file ? <img className="menu-frame-art" src={`/${option.file}`} alt="" /> : null}
-                    </span>
-                    <span className="menu-label">
-                      {option.name}
-                      {frame === option.id ? (
-                        <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
-                      ) : null}
-                    </span>
-                    <span className="menu-note">{option.note}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
 
         </div>
       ) : null}

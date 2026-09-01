@@ -13,7 +13,7 @@
  * kind of setting from this one and wants a different place.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   collect,
@@ -25,6 +25,7 @@ import {
   restore,
 } from '../state/transfer.ts'
 import type { Manifest } from '../state/transfer.ts'
+import { NAV_MODES, PANE_QUERY, applyNav, readNav, writeNav } from '../ui/nav.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -34,6 +35,28 @@ export function Settings() {
   const [pending, setPending] = useState<Pending>(null)
   const [saidJustNow, setSaidJustNow] = useState<string | null>(null)
   const file = useRef<HTMLInputElement>(null)
+
+  /**
+   * Where the menu sits, which used to be set from inside the menu itself.
+   *
+   * It is offered only on a screen wide enough to hold a pane. Below 60rem the
+   * pop-out is the only mode there is, and a setting that changes nothing is a
+   * setting that lies.
+   */
+  const [nav, setNav] = useState(readNav)
+  const [wide, setWide] = useState(() => window.matchMedia(PANE_QUERY).matches)
+
+  useEffect(() => {
+    applyNav(nav)
+    writeNav(nav)
+  }, [nav])
+
+  useEffect(() => {
+    const query = window.matchMedia(PANE_QUERY)
+    const sync = () => setWide(query.matches)
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
 
   const since = daysSince(lastExport)
   const held = describe(collect())
@@ -83,6 +106,33 @@ export function Settings() {
       <header className="builds-top">
         <h2>Settings</h2>
       </header>
+
+      {wide ? (
+        <section className="setting-block">
+          <h3 className="arcana-rule">The menu</h3>
+          <ul className="menu-choice setting-choice">
+            {NAV_MODES.map((option) => (
+              <li key={option.id}>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={nav === option.id}
+                  className={nav === option.id ? 'is-on' : ''}
+                  onClick={() => setNav(option.id)}
+                >
+                  <span className="menu-label">
+                    {option.name}
+                    {nav === option.id ? (
+                      <img className="menu-chosen" src="/icons/selected.png" alt="" aria-hidden="true" />
+                    ) : null}
+                  </span>
+                  <span className="menu-note">{option.note}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="setting-block">
         <h3 className="arcana-rule">Your things</h3>

@@ -3384,3 +3384,78 @@ button.mark {
   color: var(--unbuilt) !important;
   margin-top: 0.2rem !important;
 }
+
+/* ------------------------------------------------------- where a setting
+ * goes now.
+ *
+ * Three of them used to live in the menu: where the menu sits, how a build
+ * opens, and which ring goes round a bubble. Each has moved to the place it
+ * takes effect, because choosing between two layouts with neither of them on
+ * screen is a guess, not a choice.
+ * ----------------------------------------------------------------------- */
+
+/* How a build opens. Two options, so a switch: one control, two halves, and
+ * the lit half is the answer. */
+.bfilter-layout {
+  display: inline-flex;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-850);
+  overflow: hidden;
+}
+
+.bfilter-layout button {
+  padding: 0.25rem 0.7rem;
+  border: 0;
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: color var(--t-response) var(--e-response);
+}
+
+.bfilter-layout button:hover { color: var(--bone-dim); }
+
+.bfilter-layout button.is-on {
+  background: color-mix(in oklab, var(--lit-dim) 40%, transparent);
+  color: var(--lit-hot);
+}
+
+.bfilter-layout button:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: -2px;
+}
+
+/* The menu mode, in Settings, wearing the same list style the menu used. */
+.setting-choice {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.setting-choice button {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-soft);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.setting-choice button:hover {
+  border-color: var(--div-4);
+  background: var(--ink-850);
+}
+
+.setting-choice button.is-on {
+  border-color: var(--lit-dim);
+  background: var(--ink-850);
+}
+
+.setting-choice button.is-on .menu-label { color: var(--lit); }
