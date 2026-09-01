@@ -42,7 +42,7 @@ export function Changelog() {
   return (
     <Page
       title="Changelog"
-      standfirst="What has changed, newest first, in terms of what it does rather than what it is."
+      standfirst="What has changed in the app, newest first."
     >
       <ol className="log">
         {CHANGELOG.map((release) => (
@@ -70,7 +70,7 @@ export function Roadmap() {
   return (
     <Page
       title="Roadmap"
-      standfirst="What is here, what is coming and what is stuck. Nothing on this page carries a date, because a date on an unpaid side project is a promise nobody has any business making."
+      standfirst="What is built, what is planned, and what is stalled. No dates: this is a side project and any date would be a guess."
     >
       <div className="plan">
         {STAGES.map((stage) => {

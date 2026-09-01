@@ -49,11 +49,17 @@ export function writeName(raw: string): string {
 /**
  * What to call whoever wrote a build.
  *
- * A build made before anyone picked a name has no author, and that is not an
- * error to paper over: `Someone` is the honest word for it, and it is only
- * ever shown for a build that came from somewhere else.
+ * A build made before anyone picked a name has no author. `Someone` is the
+ * accurate word for that; inventing a name would not be.
  */
 export function authorWord(author: string | undefined, mine: string): string {
   if (!author) return 'Someone'
   return author === mine ? 'You' : author
+}
+
+/** The line at the top of a build that arrived in a link. */
+export function sharedLine(author: string | undefined, mine: string): string {
+  if (author && author === mine) return 'You shared this build'
+  if (author) return `${author} shared a build with you`
+  return 'Someone shared a build with you'
 }

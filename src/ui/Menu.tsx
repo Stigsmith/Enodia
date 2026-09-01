@@ -21,7 +21,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { PANE_QUERY, readNav } from './nav.ts'
+import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
 
@@ -52,7 +52,7 @@ export function Menu({
   onShowBriefing?: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const nav = readNav()
+  const [nav, setNav] = useState(readNav)
   const [wide, setWide] = useState(() => window.matchMedia(PANE_QUERY).matches)
 
   useEffect(() => {
@@ -66,13 +66,23 @@ export function Menu({
   /**
    * Pinned open, so nothing that closes a pop-out applies: not a click outside
    * it, not Escape, and not choosing something in it.
-   *
-   * Read rather than owned. The control that sets this lives in Settings now,
-   * and `applyNav` has already written `data-nav` on the root by the time this
-   * renders, so the menu asks the document what it is instead of keeping a
-   * second copy that could disagree with it.
    */
   const pinned = wide && nav === 'pane'
+
+  /**
+   * The pin, and it is the whole control.
+   *
+   * This was two labelled options in Settings, which meant leaving the menu to
+   * change where the menu sits. One button on the panel does the same job
+   * without going anywhere, and it only exists on a screen wide enough for a
+   * pane: below 60rem the pop-out is the only mode there is.
+   */
+  const togglePin = () => {
+    const next = pinned ? 'popout' : 'pane'
+    setNav(next)
+    applyNav(next)
+    writeNav(next)
+  }
   const showing = pinned || open
   const leave = () => {
     if (!pinned) setOpen(false)
@@ -277,6 +287,26 @@ export function Menu({
 
       {showing ? (
         <div className="menu-panel" role="menu">
+          {wide ? (
+            <button
+              type="button"
+              className={`menu-pin${pinned ? ' is-on' : ''}`}
+              aria-pressed={pinned}
+              title={pinned ? 'Unpin the menu' : 'Pin the menu open'}
+              onClick={togglePin}
+            >
+              <span className="visually-hidden">
+                {pinned ? 'Unpin the menu' : 'Pin the menu open'}
+              </span>
+              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                {/* A drawing pin seen from the side: head, shaft, point. */}
+                <path
+                  d="M6 1.6h4a.6.6 0 0 1 0 1.2h-.5l.6 3.3 1.9 1.6a.8.8 0 0 1-.5 1.4H8.6v5a.6.6 0 0 1-1.2 0v-5H4.5a.8.8 0 0 1-.5-1.4l1.9-1.6.6-3.3H6a.6.6 0 0 1 0-1.2Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          ) : null}
           {groups.map((group) => (
             <section key={group.title}>
               <h2>{group.title}</h2>
