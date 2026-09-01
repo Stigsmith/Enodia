@@ -33,6 +33,7 @@ import { ASSEMBLES } from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { checkBuild, blockers } from '../engine/build-check.ts'
+import type { Problem } from '../engine/build-check.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper } from './Fear.tsx'
@@ -66,6 +67,30 @@ const byName = (a: { label: string }, b: { label: string }) => a.label.localeCom
  * counts filled core slots out of five, because "3/5" is the one number that
  * says how far from finished a build is.
  */
+/**
+ * Which tab a problem lives on, so the tray can send you there.
+ *
+ * `Problem.field` was written to let the form point at the right control, which
+ * is the same question one level up now that the controls are on five tabs.
+ */
+const TAB_FOR: Record<Problem['field'], TrayTarget | 'notes'> = {
+  name: 'notes',
+  centrepiece: 'notes',
+  aspect: 'loadout',
+  hex: 'loadout',
+  boons: 'boons',
+  hammers: 'boons',
+  arcana: 'arcana',
+}
+
+const tabFor = (field: Problem['field']): TrayTarget => {
+  const tab = TAB_FOR[field]
+  // The tray only knows the four it can draw. Notes has nothing in the tray to
+  // click, so a Notes problem sends you to the Loadout tab's neighbour rather
+  // than nowhere.
+  return tab === 'notes' ? 'loadout' : tab
+}
+
 const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => {
   const filled = CORE_SLOTS.filter((slot) =>
     build.boons.some((id) => traits.get(id)?.slot === slot),
@@ -221,6 +246,25 @@ export function BuildEditor({
    * add a sixth Olympian, and save past a warning they never saw. Comparing the
    * list means any change to what is being warned about un-acknowledges it.
    */
+  /**
+   * The one thing the tray should say, wherever you are in the form.
+   *
+   * A blocker first, because that is the half that stops a save, then the worst
+   * caveat. One only: a list in the sidebar would be the caveats block again in
+   * a narrower column, and the point of this is to be the thing you cannot miss
+   * rather than the place you read them all.
+   *
+   * `field` already says which control a problem is about, so the tray can send
+   * you to the tab that owns it rather than only telling you something is wrong
+   * somewhere.
+   */
+  const alert = useMemo(() => {
+    const worst = stopping[0]
+    if (worst) return { say: worst.say, blocking: true, go: tabFor(worst.field) }
+    const caveat = caveats[0]
+    return caveat ? { say: caveat, blocking: false, go: 'play' as const } : null
+  }, [stopping, caveats])
+
   const [readCaveats, setReadCaveats] = useState<string[]>([])
   const acknowledged =
     caveats.length === 0 ||
@@ -395,7 +439,7 @@ export function BuildEditor({
         * put one screenful on screen at a time, which is what frees the other
         * half of the width for the tray. */}
       <div className="editor-grid">
-        <BuildTray built={built} onGo={goFromTray} />
+        <BuildTray built={built} onGo={goFromTray} alert={alert} />
 
         <section className="editor-panel">
           <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
@@ -748,7 +792,10 @@ export function BuildEditor({
             * there is nothing to show. */}
           {stopping.length === 0 && caveats.length === 0 ? (
             <div className="editor-check" aria-live="polite">
-              <p className="editor-ok">Nothing in the way.</p>
+              <p className="editor-ok">
+                <img src="/icons/complete.png" alt="" aria-hidden="true" />
+                Nothing in the way.
+              </p>
             </div>
           ) : null}
 

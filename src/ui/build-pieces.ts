@@ -45,6 +45,24 @@ export const FRAME: Record<Rarity, string> = {
   Perfect: 'frames/frame-legendary.png',
 }
 
+/**
+ * The game's backing plates, by the rarity they mark.
+ *
+ * The other half of `FRAME`. A frame rings an icon; a plate sits behind a whole
+ * row and carries the same colour along it, which is how the game draws a list
+ * of boons rather than a single one. 1280 by 320, colour on the left under the
+ * icon, dissolving into fog on the right.
+ */
+export const PLATE: Record<Rarity, string> = {
+  Common: 'frames/plate-common.png',
+  Rare: 'frames/plate-rare.png',
+  Epic: 'frames/plate-epic.png',
+  Heroic: 'frames/plate-heroic.png',
+  Duo: 'frames/plate-duo.png',
+  Legendary: 'frames/plate-legendary.png',
+  Perfect: 'frames/plate-unity.png',
+}
+
 /** The game's slot glyphs, for a core slot that is empty or unlabelled. */
 export const SLOT_GLYPH: Partial<Record<Slot, string>> = {
   Melee: 'slots/attack.webp',
