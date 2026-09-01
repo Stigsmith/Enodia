@@ -217,3 +217,38 @@ describe('sorting', () => {
     expect(SAMPLE_BUILDS.map((build) => build.id)).toEqual(before)
   })
 })
+
+describe('filtering by Fear cleared', () => {
+  /**
+   * A threshold wearing an exact match's clothes.
+   *
+   * Every other facet asks whether a build has exactly this value. Nobody wants
+   * the builds cleared at exactly 34, so a build reports every band it reaches
+   * and picking one means "or better", without `matches` learning anything new.
+   */
+  const at = (fear: number | undefined): ShownBuild => ({
+    ...FIRST_BUILD,
+    id: `fear-${fear ?? 'none'}`,
+    play: fear === undefined ? undefined : { fear },
+  })
+
+  const library = [at(undefined), at(5), at(20), at(34), at(55)]
+
+  it('offers a band only when some build reaches it', () => {
+    const fear = facets(library, EMPTY_SELECTION).find((one) => one.id === 'fear')
+    // 5 reaches nothing, 55 reaches every band up to 50.
+    expect(fear?.options.map((one) => one.value)).toEqual(['10', '20', '30', '40', '50'])
+  })
+
+  it('reads as "or better" rather than as an exact match', () => {
+    const kept = apply(library, choose(EMPTY_SELECTION, 'fear', '20')).map((one) => one.play?.fear)
+    expect(kept.sort((a, b) => (a ?? 0) - (b ?? 0))).toEqual([20, 34, 55])
+  })
+
+  it('is not drawn at all when no build has cleared any Fear', () => {
+    // The shipped library is exactly this case, and a "Fear cleared" control
+    // with no Fear in it is furniture claiming to be a choice.
+    const none = facets([at(undefined), at(undefined)], EMPTY_SELECTION)
+    expect(none.find((one) => one.id === 'fear')).toBeUndefined()
+  })
+})
