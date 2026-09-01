@@ -5432,3 +5432,193 @@ button.mark {
   color: var(--bone-faint);
   text-align: center;
 }
+
+/* -------------------------------------------------------------------------
+ * LOGGING A RUN
+ *
+ * Four answers over the build, rather than the editor's Play tab. The common
+ * update should not be the expensive one.
+ * ---------------------------------------------------------------------- */
+
+.logrun {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.logrun-box {
+  display: grid;
+  gap: 0.7rem;
+  width: min(24rem, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.logrun-box h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  color: var(--bone);
+}
+
+.logrun-yesno,
+.logrun-ended {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.logrun-yesno button,
+.logrun-ended button {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+  color: var(--bone-dim);
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.logrun-yesno button:hover,
+.logrun-ended button:hover {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+/* Neither is pressed until one is: a default answer to "did you clear it" would
+ * be the tool guessing at somebody's own record. */
+.logrun-yesno button.is-on,
+.logrun-ended button.is-on {
+  border-color: var(--lit);
+  background: color-mix(in srgb, var(--lit-dim) 20%, var(--ink-850));
+  color: var(--lit-hot);
+}
+
+/* What it will write, before it writes it. Four taps is quick enough to do by
+ * accident. */
+.logrun-says {
+  margin: 0.2rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--div-2);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+.logrun-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.logrun-actions button {
+  flex: 1 1 auto;
+  padding: 0.5rem 1rem 0.58rem;
+  border: 0;
+  background: url('/shell/button.png') center / 100% 100% no-repeat;
+  color: var(--bone-dim);
+  cursor: pointer;
+  transition: filter 0.12s ease, color 0.12s ease;
+}
+
+.logrun-actions button:hover:not(:disabled) {
+  filter: brightness(1.4);
+  color: var(--bone);
+}
+
+.logrun-actions button:disabled {
+  filter: grayscale(0.7) brightness(0.62);
+  color: var(--bone-faint);
+  cursor: default;
+}
+
+/* -------------------------------------------------------------------------
+ * THE BIN
+ *
+ * Only mentioned when there is something in it. An empty bin advertising
+ * itself is a row of furniture about a thing that has not happened.
+ * ---------------------------------------------------------------------- */
+
+.builds-binline {
+  margin: 0.6rem 0 0;
+}
+
+.builds-binline button {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.builds-binline button:hover {
+  border-color: var(--div-4);
+  color: var(--bone-dim);
+}
+
+.builds-bin {
+  margin-top: 0.6rem;
+  padding: 0.7rem 0.85rem 0.8rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.builds-bin ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.builds-bin li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.builds-bin-name {
+  flex: 1 1 10rem;
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+}
+
+.builds-bin button {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.builds-bin button:hover {
+  border-color: var(--lit);
+  color: var(--lit-hot);
+}
+
+/* The two that really are the end wear the warning colour on hover, because
+ * the whole point of the bin is that everything else in it is reversible. */
+.builds-bin button.is-final:hover {
+  border-color: var(--unbuilt);
+  color: var(--unbuilt);
+}
+
+.builds-bin-all {
+  margin-top: 0.6rem;
+}

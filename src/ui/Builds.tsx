@@ -32,12 +32,13 @@ import { readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
-import { deleteBuild, duplicateBuild, loadBuilds, saveBuild } from '../state/builds.ts'
+import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import { BuildEditor } from './BuildEditor.tsx'
+import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
 import type { Piece } from './build-pieces.ts'
@@ -62,6 +63,9 @@ export function Builds({ onClose }: { onClose?: () => void }) {
   const [sort, setSort] = useState<SortId>('name')
   const [openId, setOpenId] = useState<string | null>(null)
   const [piece, setPiece] = useState<Piece | null>(null)
+  const [logging, setLogging] = useState(false)
+  const [bin, setBin] = useState(() => loadBin())
+  const [showBin, setShowBin] = useState(false)
 
   /**
    * The player's own builds, beside the samples.
@@ -158,6 +162,13 @@ export function Builds({ onClose }: { onClose?: () => void }) {
           {/* Two controls now, so the `margin-left: auto` that pushed a single
             * one right moves onto a wrapper holding both. */}
           <div className="builds-tools">
+            {/* Beside Edit rather than inside it. Playing a build and coming
+              * back to say how it went is the thing that happens most, and it
+              * was the one update that meant opening the editor and hand
+              * editing three numbers. */}
+            <button type="button" className="quiet builds-log" onClick={() => setLogging(true)}>
+              Log run
+            </button>
             {open.by === 'owner' ? (
               <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
                 Edit
@@ -172,6 +183,7 @@ export function Builds({ onClose }: { onClose?: () => void }) {
               }}
               onDelete={() => {
                 setMine(deleteBuild(open.id))
+                setBin(loadBin())
                 setOpenId(null)
               }}
             />
@@ -226,6 +238,19 @@ export function Builds({ onClose }: { onClose?: () => void }) {
         </div>
 
         {piece ? <PieceCard piece={piece} onClose={() => setPiece(null)} /> : null}
+
+        {logging ? (
+          <LogRun
+            build={open}
+            onClose={() => setLogging(false)}
+            onLog={(play) => {
+              // Straight to storage. A logged run is a fact about how it went,
+              // not an edit to the build, so it does not go through the editor
+              // or the checker.
+              setMine(saveBuild({ ...open, play }))
+            }}
+          />
+        ) : null}
       </div>
     )
   }
@@ -248,6 +273,58 @@ export function Builds({ onClose }: { onClose?: () => void }) {
           Create a build
         </button>
       </header>
+
+      {/* The bin, which is only mentioned when there is something in it.
+        *
+        * Deleting used to be the end of a build: one browser, no server, and a
+        * mis-click was final. The confirm step stops the accident and not the
+        * change of mind an hour later. */}
+      {bin.length ? (
+        <p className="builds-binline">
+          <button type="button" onClick={() => setShowBin((was) => !was)}>
+            {showBin ? 'Hide the bin' : `${bin.length} in the bin`}
+          </button>
+        </p>
+      ) : null}
+
+      {showBin && bin.length ? (
+        <section className="builds-bin" aria-label="Deleted builds">
+          <ul>
+            {bin.map((one) => (
+              <li key={one.id}>
+                <span className="builds-bin-name">{one.name || 'Untitled build'}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const back = restoreBuild(one.id)
+                    setMine(back.builds)
+                    setBin(back.bin)
+                  }}
+                >
+                  Put it back
+                </button>
+                <button
+                  type="button"
+                  className="is-final"
+                  onClick={() => setBin(emptyBin(one.id))}
+                >
+                  Gone for good
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="builds-bin-all is-final"
+            onClick={() => {
+              setBin(emptyBin())
+              setShowBin(false)
+            }}
+          >
+            Empty the bin
+          </button>
+        </section>
+      ) : null}
 
       {/* No bar over an empty shelf. Sorting and filtering nothing is furniture,
         * and it was worse than that: it offered to clear six filters nobody had

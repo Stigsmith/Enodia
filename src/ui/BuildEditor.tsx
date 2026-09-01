@@ -40,7 +40,7 @@ import {
   weapons,
 } from '../data/app.ts'
 
-import { ASSEMBLES } from '../data/builds.ts'
+import { ASSEMBLES, PLAYSTYLES } from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { MAX_CARDS, MAX_GRASP, checkBuild, blockers } from '../engine/build-check.ts'
@@ -681,6 +681,13 @@ export function BuildEditor({
               placeholder="Poseidon on the swing, Zeus in the ring."
             />
           </label>
+          <Dropdown
+            label="Leans on"
+            all="Not said"
+            chosen={build.playstyle ?? null}
+            options={PLAYSTYLES.map((one) => ({ value: one.id, label: one.name }))}
+            onChoose={(value) => set('playstyle', (value as ShownBuild['playstyle']) ?? undefined)}
+          />
           <Dropdown
             label="Built around"
             all="Nothing in particular"

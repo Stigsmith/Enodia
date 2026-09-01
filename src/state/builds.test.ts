@@ -17,7 +17,7 @@ import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { winRate } from '../data/builds.ts'
 import { blockers, checkBuild } from '../engine/build-check.ts'
-import { BUILD_SCHEMA, deleteBuild, duplicateBuild, loadBuilds, migrateBuilds, newBuildId, saveBuild } from './builds.ts'
+import { BUILD_SCHEMA, deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, migrateBuilds, newBuildId, restoreBuild, saveBuild } from './builds.ts'
 
 const KEY = 'enodia.builds'
 
@@ -239,5 +239,56 @@ describe('the round trip through storage', () => {
     window.localStorage.setItem(KEY, store([oldShape(), oldShape({ id: 'mine-two' })]))
     deleteBuild('mine-two')
     expect(loadBuilds().map((one) => one.id)).toEqual(['mine-before-this-work'])
+  })
+})
+
+describe('the bin', () => {
+  /**
+   * Deleting was the end of a build: one browser, no server, and a mis-click
+   * was final. The confirm step stops the accident and not the change of mind
+   * an hour later.
+   */
+  const build = (id: string): ShownBuild => ({ ...FIRST_BUILD, id, name: id })
+
+  beforeEach(() => window.localStorage.clear())
+
+  it('keeps a deleted build rather than destroying it', () => {
+    saveBuild(build('keeper'))
+    expect(deleteBuild('keeper')).toEqual([])
+
+    const bin = loadBin()
+    expect(bin).toHaveLength(1)
+    expect(bin[0]?.id).toBe('keeper')
+    expect(bin[0]?.binnedAt).toBeTruthy()
+  })
+
+  it('puts one back, and takes it out of the bin', () => {
+    saveBuild(build('keeper'))
+    deleteBuild('keeper')
+
+    const back = restoreBuild('keeper')
+    expect(back.builds.map((one) => one.id)).toEqual(['keeper'])
+    expect(back.bin).toEqual([])
+    // The bin stamp is not part of the build and does not come back with it.
+    expect(back.builds[0]).not.toHaveProperty('binnedAt')
+  })
+
+  it('empties one, or all of it', () => {
+    saveBuild(build('a'))
+    saveBuild(build('b'))
+    deleteBuild('a')
+    deleteBuild('b')
+    expect(loadBin()).toHaveLength(2)
+
+    expect(emptyBin('a')).toHaveLength(1)
+    expect(emptyBin()).toEqual([])
+  })
+
+  it('rides along in an export, because it is under the same prefix', () => {
+    // `transfer.ts` collects every `enodia.` key, so the bin travels with
+    // everything else and a restored install still has its undo.
+    saveBuild(build('keeper'))
+    deleteBuild('keeper')
+    expect(window.localStorage.getItem('enodia.bin')).toBeTruthy()
   })
 })
