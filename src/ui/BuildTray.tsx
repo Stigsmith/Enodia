@@ -32,7 +32,15 @@ import { Mark } from './BuildMark.tsx'
 import { FearMark } from './Fear.tsx'
 import type { Assembled, Piece } from './build-pieces.ts'
 
-/** Which tab owns a given part of the build, so a mark can open it. */
+/**
+ * Which tab owns a given part of the build, so a mark can open it.
+ *
+ * The tray draws marks for four of the five tabs, and Notes has nothing to
+ * draw. **The alert is not a mark, though**, and it used to be forced into this
+ * same set: a build missing its name sent you to Loadout, which has no name
+ * field. So the alert's target is `TrayTarget | 'notes'` and this stays the set
+ * of tabs a *mark* can open.
+ */
 export type TrayTarget = 'loadout' | 'boons' | 'arcana' | 'play'
 
 export function BuildTray({
@@ -42,7 +50,7 @@ export function BuildTray({
 }: {
   built: Assembled
   /** open the tab that owns this piece, and say which piece was asked for */
-  onGo: (target: TrayTarget, piece: Piece | null) => void
+  onGo: (target: TrayTarget | 'notes', piece: Piece | null, field?: string | null) => void
   /**
    * The one thing most worth knowing about this build, or nothing.
    *
@@ -52,7 +60,7 @@ export function BuildTray({
    * made sticky was that a warning you have scrolled past may as well not
    * exist. A tab away is further than scrolled past.
    */
-  alert: { say: string; blocking: boolean; go: TrayTarget } | null
+  alert: { say: string; blocking: boolean; go: TrayTarget | 'notes'; field: string | null } | null
 }) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
@@ -91,7 +99,7 @@ export function BuildTray({
         <button
           type="button"
           className={`btray-alert${alert.blocking ? ' is-blocking' : ''}`}
-          onClick={() => onGo(alert.go, null)}
+          onClick={() => onGo(alert.go, null, alert.field)}
         >
           <img src="/icons/wants-to-talk.png" alt="" aria-hidden="true" />
           <span>{alert.say}</span>

@@ -118,10 +118,45 @@ describe('what it only notes', () => {
     expect(checkBuild(sketch)).toEqual([])
   })
 
-  it('a duo whose prerequisites are not held yet', () => {
+  it('a duo whose prerequisites are not held yet, and says which they are', () => {
+    /**
+     * The message used to end at "needs prerequisites this build does not hold
+     * yet", which named a problem and gave nobody a way to solve it: the boons
+     * are somewhere in a list of two hundred and nothing said which.
+     *
+     * So the assertion is not the sentence, it is the options. Every one of
+     * them satisfies a set the build has not met, and each says what taking it
+     * would displace.
+     */
     const said = checkBuild(bend({ boons: ['LightningVulnerabilityBoon'], centrepiece: '' }))
-    expect(said.some((p) => p.severity === 'notes' && /prerequisites/.test(p.say))).toBe(true)
+    const note = said.find((p) => p.severity === 'notes' && p.fix)
+    expect(note).toBeTruthy()
     expect(blockers(said)).toEqual([])
+
+    const fix = note!.fix!
+    expect(fix.target).toBe('LightningVulnerabilityBoon')
+    expect(fix.sets.length).toBeGreaterThan(0)
+    for (const set of fix.sets) {
+      expect(set.options.length).toBeGreaterThan(0)
+      // Every option is real, and none of them is already held.
+      for (const option of set.options) {
+        expect(traits.get(option.id)).toBeTruthy()
+        expect(option.name).not.toBe(option.id)
+      }
+    }
+  })
+
+  it('does not offer a set the build already satisfies', () => {
+    // A legendary wanting three sets with two of them held should say what is
+    // missing rather than restate the whole requirement.
+    const duo = traits.get('LightningVulnerabilityBoon')
+    const sets = duo?.requires && 'oneFromEachSet' in duo.requires ? duo.requires.oneFromEachSet : []
+    if (sets.length < 2) return
+
+    const first = sets[0]![0]!
+    const said = checkBuild(bend({ boons: ['LightningVulnerabilityBoon', first], centrepiece: '' }))
+    const fix = said.find((p) => p.fix)?.fix
+    expect(fix?.sets).toHaveLength(sets.length - 1)
   })
 
   it('says which core slots are still empty', () => {

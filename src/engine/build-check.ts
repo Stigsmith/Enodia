@@ -25,7 +25,7 @@
 import { arcanaById, olympians, sources, traits } from '../data/app.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from './slots.ts'
-import { satisfiesRequirement } from './reachability.ts'
+import { requirementSets, satisfiesRequirement } from './reachability.ts'
 import type { Slot, TraitId } from '../data/types.ts'
 
 export type Problem = {
@@ -33,6 +33,45 @@ export type Problem = {
   field: 'name' | 'aspect' | 'boons' | 'hex' | 'hammers' | 'arcana' | 'centrepiece'
   severity: 'blocks' | 'notes'
   say: string
+  /**
+   * What would fix it, when the fix is picking one of a known set.
+   *
+   * **"Needs prerequisites this build does not hold yet" was a dead end.** It
+   * named the problem and gave a player no way at all to find out what was
+   * missing, which the owner hit in playtesting: the boons are somewhere in a
+   * list of two hundred and nothing says which.
+   *
+   * The data was always there. `requirementSets` returns the sets and
+   * `satisfiesRequirement` says which are unmet, so the unmet options can be
+   * listed and each one can say what taking it would displace. The UI turns
+   * these into buttons; the engine only has to know what they are.
+   */
+  fix?: Fix
+}
+
+/** One unmet requirement, and the ways to meet it. */
+export type Fix = {
+  /** the trait that is missing something */
+  target: TraitId
+  /** one entry per unmet set: satisfy each of them */
+  sets: FixSet[]
+}
+
+export type FixSet = {
+  options: FixOption[]
+}
+
+export type FixOption = {
+  id: TraitId
+  name: string
+  /**
+   * What taking this would push out, or null when it costs nothing.
+   *
+   * A core boon displaces whatever holds that slot, and a player choosing
+   * between three options deserves to know which of the three is free before
+   * they pick, not after.
+   */
+  displaces: { id: TraitId; name: string; slot: Slot } | null
 }
 
 const OLYMPIAN = new Set<string>(olympians)
@@ -94,6 +133,42 @@ const HAMMER_ARM = new Map<string, string>()
 for (const source of sources) {
   if (source.kind !== 'hammer' || !source.weapon) continue
   for (const id of source.traits) HAMMER_ARM.set(id, source.weapon)
+}
+
+/**
+ * The ways to satisfy what a trait is missing.
+ *
+ * One entry per unmet set, because `oneFromEachSet` means every set has to be
+ * satisfied and a player needs to see all of them, not the first. Within a set
+ * the options are alternatives: any one will do.
+ *
+ * **A set already satisfied is left out.** A legendary needing three sets with
+ * two of them held should say what is missing, not restate the whole
+ * requirement, which is the difference between a list and an answer.
+ */
+export function fixFor(target: TraitId, held: ReadonlySet<TraitId>, build: ShownBuild): Fix | undefined {
+  const requires = traits.get(target)?.requires
+  if (!requires) return undefined
+
+  const slots = slotMap(build)
+  const sets = requirementSets(requires)
+    .filter((set) => !set.some((id) => held.has(id)))
+    .map((set) => ({
+      options: set.map((id) => {
+        const slot = traits.get(id)?.slot
+        const sitting = slot && CORE_SLOTS.includes(slot) ? slots.get(slot)?.[0] : undefined
+        return {
+          id,
+          name: name(id),
+          displaces:
+            sitting && sitting !== id && slot
+              ? { id: sitting, name: name(sitting), slot }
+              : null,
+        }
+      }),
+    }))
+
+  return sets.length ? { target, sets } : undefined
 }
 
 export function checkBuild(build: ShownBuild): Problem[] {
@@ -186,7 +261,8 @@ export function checkBuild(build: ShownBuild): Problem[] {
       out.push({
         field: 'centrepiece',
         severity: 'notes',
-        say: `${name(build.centrepiece)} needs prerequisites this build does not hold yet.`,
+        say: `${name(build.centrepiece)} needs boons this build does not hold yet.`,
+        fix: fixFor(build.centrepiece, held, build),
       })
     }
   }
@@ -199,7 +275,8 @@ export function checkBuild(build: ShownBuild): Problem[] {
       out.push({
         field: 'boons',
         severity: 'notes',
-        say: `${trait.name} needs prerequisites this build does not hold yet.`,
+        say: `${trait.name} needs boons this build does not hold yet.`,
+        fix: fixFor(id, held, build),
       })
     }
   }
