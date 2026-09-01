@@ -104,10 +104,26 @@ type Stored = {
  * which is how many Exits they have taken. It is labelled an estimate wherever
  * it shows.
  *
- * The real number wants the region data, which is a map generator rather than a
- * table, so this stays an estimate until somebody measures real runs.
+ * ## Where 40 comes from, and why it used to be 12
+ *
+ * A run is four Regions and four boss fights, on either path. The game's own
+ * files carry the structure: the Location data is split by Region letter,
+ * `RoomDataN/O/P/Q` for the Underworld and `RoomDataF/G/H/I` for the Surface.
+ *
+ * How many Locations are in each of them is not in the files at all. It comes
+ * out of a map generator rather than a table, so this is the second kind of
+ * fact `CLAUDE.md` describes: not derivable from source, and the owner's to
+ * state. Measured across real play, a Region runs **8 to 12 Exits**, so a full
+ * run is roughly **32 to 48**, and a good one ends holding 30 to 40 boons.
+ *
+ * It was 12 for a long time, which is one Region rather than a run, and the
+ * mistake was not cosmetic. `bandFor` and `tooFewExits` both read it, so every
+ * verdict was judged against a run a third of its real length and the tool was
+ * far more pessimistic than the game.
+ *
+ * Still an estimate. A better one.
  */
-export const ESTIMATED_EXITS = 12
+export const ESTIMATED_EXITS = 40
 
 export function newRun(
   weapon: WeaponId,
