@@ -253,6 +253,21 @@ describe('what it does not depend on', () => {
     expect(played.cost).toBe(bare.cost)
   })
 
+  it('is unmoved by how much Fear a build has cleared', () => {
+    /**
+     * Two different claims, deliberately kept apart.
+     *
+     * Fear is how hard the run was. The reading is how hard the build is to
+     * assemble. A build cleared at Fear 40 is not easier to put together than
+     * the same build cleared at Fear 0, and letting one move the other would
+     * undo the separation between the rating and the reading.
+     */
+    const none = read({ play: { runs: 5 } })
+    const deep = read({ play: { runs: 5, fear: 57 } })
+    expect(deep.reach).toBe(none.reach)
+    expect(deep.cost).toBe(none.cost)
+  })
+
   it('is the same reading twice, with no run anywhere in it', () => {
     expect(read()).toEqual(read())
   })

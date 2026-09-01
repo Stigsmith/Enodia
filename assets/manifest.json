@@ -1,10 +1,10 @@
 {
- "generated": "2026-08-31",
+ "generated": "2026-09-01",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 978,
+ "count": 979,
  "categories": [
   {
    "name": "arcana",
@@ -86,7 +86,7 @@
   },
   {
    "name": "icons",
-   "count": 15,
+   "count": 16,
    "source": "game"
   },
   {
@@ -7047,6 +7047,14 @@
    "file": "icons/currency.png",
    "bytes": 59077,
    "sha256": "6fcf609d2b2d7ef6f7210f0da93f14d6b498af8c7d80d378419b993d3727e93e",
+   "source": "game"
+  },
+  {
+   "id": "fear",
+   "category": "icons",
+   "file": "icons/fear.png",
+   "bytes": 5863,
+   "sha256": "8d68bbb5d832b0a35357f11b29cd1acca50ad8f2dc1b831f9323cd911b223636",
    "source": "game"
   },
   {

@@ -19,6 +19,7 @@ import { ASSEMBLES, winRate } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { olympians, traits } from '../data/app.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
+import { FearMark } from './Fear.tsx'
 
 const STARS = [1, 2, 3, 4, 5]
 
@@ -41,7 +42,7 @@ export function PlayStrip({ build }: { build: ShownBuild }) {
   const rating = ceiling === null ? (play?.rating ?? 0) : Math.min(play?.rating ?? 0, ceiling)
 
   // Nothing rated, nothing played, nothing judged. Draw nothing.
-  if (!play?.rating && !runs && !assembles) return null
+  if (!play?.rating && !runs && !assembles && !play?.fear) return null
 
   return (
     <div className="playstrip">
@@ -54,6 +55,8 @@ export function PlayStrip({ build }: { build: ShownBuild }) {
           ))}
         </span>
       ) : null}
+
+      <FearMark fear={play?.fear} />
 
       {runs ? (
         <span className="playstrip-runs">

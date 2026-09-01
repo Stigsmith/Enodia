@@ -128,7 +128,9 @@ describe('one build, as a link', () => {
   it('never sends the play record', async () => {
     // It is how a build has gone *here*. Sending it would have the receiver's
     // copy claiming twelve runs it has never had.
-    const mine = build({ play: { rating: 5, runs: 12, clears: 7, assembles: 'reliably' } })
+    // Fear is in here on purpose: a link saying "cleared Fear 40" would be
+    // claiming something about the recipient's runs rather than the sender's.
+    const mine = build({ play: { rating: 5, runs: 12, clears: 7, assembles: 'reliably', fear: 40 } })
     expect(shareable(mine)).not.toHaveProperty('play')
 
     const back = await unpackBuild(await packBuild(mine))

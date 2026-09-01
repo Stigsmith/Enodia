@@ -35,6 +35,7 @@ import { blankBuild } from '../state/builds.ts'
 import { checkBuild, blockers } from '../engine/build-check.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
+import { FearStepper } from './Fear.tsx'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
@@ -42,7 +43,7 @@ import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
 import type { PickOption } from './PickList.tsx'
 import { iconOf } from '../data/app.ts'
-import type { Slot, TraitId } from '../data/types.ts'
+import type { Rarity, Slot, Trait, TraitId } from '../data/types.ts'
 
 const option = (id: TraitId): DropdownOption => ({
   value: id,
@@ -69,11 +70,41 @@ function pickOptions(ids: readonly string[]): PickOption[] {
       label: trait.name ?? id,
       icon: iconOf.get(id) ?? null,
       note: trait.text ?? null,
+      rarity: rarityOf(trait),
     }
     const gods = trait.gods.length ? trait.gods : ['Other']
     for (const god of gods) out.push({ ...base, group: god })
   }
-  return out.sort(byName)
+  return out.sort(byWeight)
+}
+
+/**
+ * What frame a boon wears in the picker.
+ *
+ * A duo and a legendary are what they are before a run starts, so they wear
+ * their own. **Everything else wears Common**, and that is a decision rather
+ * than a default: what rarity a boon turns up at is not knowable in advance and
+ * a Heroic frame here would be a claim no file supports. `build-pieces.ts` makes
+ * the same call for the same reason.
+ */
+function rarityOf(trait: Trait): Rarity {
+  if (trait.kind === 'duo') return 'Duo'
+  if (trait.kind === 'legendary') return 'Legendary'
+  return 'Common'
+}
+
+/**
+ * Duos and legendaries first, then alphabetical.
+ *
+ * The other half of the same problem the frames solve. Sorting a god's forty
+ * boons by name buries the two or three anybody is scrolling to look for
+ * somewhere in the middle of the list.
+ */
+const RANK: Partial<Record<string, number>> = { legendary: 0, duo: 1 }
+
+function byWeight(a: PickOption, b: PickOption): number {
+  const rank = (one: PickOption) => RANK[traits.get(one.value)?.kind ?? ''] ?? 2
+  return rank(a) - rank(b) || a.label.localeCompare(b.label)
 }
 
 export function BuildEditor({
@@ -222,7 +253,18 @@ export function BuildEditor({
       .flatMap((id) => {
         const trait = traits.get(id)
         return trait
-          ? [{ value: id, label: trait.name ?? id, icon: iconOf.get(id) ?? null, note: trait.text ?? null }]
+          ? [
+              {
+                value: id,
+                label: trait.name ?? id,
+                icon: iconOf.get(id) ?? null,
+                note: trait.text ?? null,
+                // A hammer upgrade is not a boon and has no rarity, but an
+                // unframed square in a list of framed ones reads as broken
+                // rather than as different.
+                rarity: 'Common' as const,
+              },
+            ]
           : []
       })
       .sort(byName)
@@ -548,6 +590,11 @@ export function BuildEditor({
                 <p className="editor-hint">{repeat.hardStop} One star until it can be assembled.</p>
               ) : null}
             </div>
+
+            <FearStepper
+              value={play?.fear}
+              onChange={(fear) => setPlay({ fear })}
+            />
 
             <div className="editor-pair">
               <label className="editor-field">
