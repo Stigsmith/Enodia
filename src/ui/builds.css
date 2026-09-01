@@ -4414,6 +4414,9 @@ button.mark {
   .tabpanel > .editor-rule,
   .tabpanel > .editor-hint,
   .tabpanel > .picklist,
+  /* The sorter splits itself into a picker and two trays, so handing it half a
+   * panel and letting it halve that again gave 199px rows. It takes the width. */
+  .tabpanel > .bsort,
   .tabpanel > .slotbar,
   .tabpanel > .editor-plays,
   /* The slot picker, which only exists while a tile is open. Reached by
@@ -4780,4 +4783,277 @@ button.mark {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 1.4rem;
   }
+}
+
+/* -------------------------------------------------------------------------
+ * SORTING BOONS
+ *
+ * One picker on the left, two trays on the right. It replaced two pick lists
+ * that were fed the same options and knew nothing about each other, which is
+ * how the same boon could sit in both at once.
+ * ---------------------------------------------------------------------- */
+
+.bsort {
+  display: grid;
+  gap: 0.8rem;
+}
+
+@media (min-width: 58rem) {
+  .bsort {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.bsort-picker {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+}
+
+.bsort-scroll {
+  max-height: 26rem;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.15rem;
+  align-content: start;
+}
+
+.bsort-rows {
+  display: grid;
+  gap: 0.15rem;
+}
+
+/* One column now, so a row can be the size it should have been. It was 34px in
+ * two 13rem columns, which is what "too small" meant. */
+.bsort-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.45rem;
+  border-radius: var(--r-hair);
+  color: var(--bone-dim);
+  cursor: grab;
+
+  /* **`cover`, not `100% 100%`.** The plate is 1280 by 320, a 4:1 bar, and a row
+   * is nearer 8:1, so stretching it to fill squashed the art to half height and
+   * every plate came out visibly warped. Cropping keeps the proportions, and
+   * what it crops is the middle: the colour that identifies a duo or a legendary
+   * is on the left under the icon, and the soft dissolve is on the right, so
+   * both survive. */
+  background-image: var(--plate, none);
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+.bsort-row:active {
+  cursor: grabbing;
+}
+
+.bsort-row:hover {
+  background-image: url('/frames/plate-highlight.png'), var(--plate, none);
+  color: var(--bone);
+}
+
+/* A boon that cannot be taken is shown and greyed rather than hidden. Hiding it
+ * answers "why is this not in the list" with nothing; greying it answers with
+ * the reason, on the row. */
+.bsort-row.is-blocked {
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  opacity: 0.55;
+}
+
+.bsort-row.is-blocked:hover {
+  background-image: var(--plate, none);
+}
+
+.bsort-row-text {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.bsort-row-name {
+  font-size: 0.82rem;
+  line-height: 1.25;
+  color: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bsort-row-note,
+.bsort-row-blocked {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--bone-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bsort-row-blocked {
+  color: var(--unbuilt);
+}
+
+/* The same move the drag makes, for a phone and for anybody who would rather
+ * press a button. Visible on hover and on focus, so it is reachable by keyboard
+ * rather than only by pointer. */
+.bsort-row-go {
+  display: flex;
+  gap: 0.2rem;
+  flex: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.bsort-row:hover .bsort-row-go,
+.bsort-row:focus-within .bsort-row-go {
+  opacity: 1;
+}
+
+/* Always visible where there is no hover to reveal them. */
+@media (hover: none) {
+  .bsort-row-go {
+    opacity: 1;
+  }
+}
+
+.bsort-row-go button {
+  padding: 0.12rem 0.4rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-pill);
+  background: rgb(0 0 0 / 0.5);
+  color: var(--bone-dim);
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.bsort-row-go button:hover {
+  border-color: var(--lit);
+  color: var(--lit-hot);
+}
+
+/* -- the two trays ------------------------------------------------------ */
+
+.bsort-trays {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.bsort-tray {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.6rem 0.7rem 0.7rem;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-hair);
+  background: rgb(0 0 0 / 0.25);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+/* Dashed until something is over it, then lit: a drop target has to say it is
+ * one before the mouse arrives and say it is the one when it does. */
+.bsort-tray.is-over {
+  border-style: solid;
+  border-color: var(--lit);
+  background: color-mix(in srgb, var(--lit-dim) 14%, transparent);
+}
+
+.bsort-tray .editor-rule,
+.bsort-tray .editor-hint {
+  margin: 0;
+}
+
+.bsort-held {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  min-height: 2.4rem;
+  align-content: flex-start;
+}
+
+.bsort-empty {
+  margin: 0;
+  align-self: center;
+  font-size: 0.72rem;
+  color: var(--bone-faint);
+}
+
+.bsort-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+  padding: 0.15rem 0.3rem 0.15rem 0.2rem;
+  border-radius: var(--r-hair);
+  color: var(--bone-dim);
+  font-size: 0.74rem;
+  cursor: grab;
+  background-image: var(--plate, none);
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+}
+
+.bsort-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bsort-swap,
+.bsort-drop {
+  flex: none;
+  padding: 0 0.15rem;
+  border: 0;
+  background: none;
+  color: var(--bone-faint);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bsort-swap:hover,
+.bsort-drop:hover {
+  color: var(--lit-hot);
+}
+
+/* -- the art, framed the way everything else frames it ------------------ */
+
+.bsort-face {
+  position: relative;
+  display: inline-grid;
+  grid-template: 100% / 100%;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+}
+
+.bsort-chip .bsort-face {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.bsort-art {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.bsort-frame {
+  grid-area: 1 / 1;
+  width: 118%;
+  height: 118%;
+  object-fit: contain;
+  pointer-events: none;
 }

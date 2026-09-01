@@ -40,6 +40,8 @@ import { FearStepper } from './Fear.tsx'
 import { Tabs, TabPanel } from './Tabs.tsx'
 import type { Tab } from './Tabs.tsx'
 import { BuildTray } from './BuildTray.tsx'
+import { BoonSort } from './BoonSort.tsx'
+import type { Tray } from './BoonSort.tsx'
 import type { TrayTarget } from './BuildTray.tsx'
 import { assemble } from './build-pieces.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
@@ -47,9 +49,8 @@ import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
-import type { PickOption } from './PickList.tsx'
 import { iconOf } from '../data/app.ts'
-import type { Rarity, Slot, Trait, TraitId } from '../data/types.ts'
+import type { Slot, TraitId } from '../data/types.ts'
 
 const option = (id: TraitId): DropdownOption => ({
   value: id,
@@ -109,59 +110,7 @@ const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => {
   ]
 }
 
-/**
- * Which god offers a boon, for the grouped picker.
- *
- * A trait's own `gods` is the authority and a duo carries two, so it is filed
- * under both: somebody looking for Killer Current will look under either
- * Poseidon or Zeus and should find it under whichever they try.
- */
-function pickOptions(ids: readonly string[]): PickOption[] {
-  const out: PickOption[] = []
-  for (const id of ids) {
-    const trait = traits.get(id)
-    if (!trait) continue
-    const base = {
-      value: id,
-      label: trait.name ?? id,
-      icon: iconOf.get(id) ?? null,
-      note: trait.text ?? null,
-      rarity: rarityOf(trait),
-    }
-    const gods = trait.gods.length ? trait.gods : ['Other']
-    for (const god of gods) out.push({ ...base, group: god })
-  }
-  return out.sort(byWeight)
-}
 
-/**
- * What frame a boon wears in the picker.
- *
- * A duo and a legendary are what they are before a run starts, so they wear
- * their own. **Everything else wears Common**, and that is a decision rather
- * than a default: what rarity a boon turns up at is not knowable in advance and
- * a Heroic frame here would be a claim no file supports. `build-pieces.ts` makes
- * the same call for the same reason.
- */
-function rarityOf(trait: Trait): Rarity {
-  if (trait.kind === 'duo') return 'Duo'
-  if (trait.kind === 'legendary') return 'Legendary'
-  return 'Common'
-}
-
-/**
- * Duos and legendaries first, then alphabetical.
- *
- * The other half of the same problem the frames solve. Sorting a god's forty
- * boons by name buries the two or three anybody is scrolling to look for
- * somewhere in the middle of the list.
- */
-const RANK: Partial<Record<string, number>> = { legendary: 0, duo: 1 }
-
-function byWeight(a: PickOption, b: PickOption): number {
-  const rank = (one: PickOption) => RANK[traits.get(one.value)?.kind ?? ''] ?? 2
-  return rank(a) - rank(b) || a.label.localeCompare(b.label)
-}
 
 export function BuildEditor({
   initial,
@@ -283,24 +232,28 @@ export function BuildEditor({
     return map
   }, [])
 
+
   /**
-   * Everything that occupies no core slot, grouped by the god who offers it.
+   * Every boon the sorter can place: what a god actually offers, minus the five
+   * core slots, which the slot bar owns.
    *
-   * Filtered to what a god actually offers rather than the whole trait table:
-   * `godPools` is the offer pool, so a trait no god hands out cannot be picked
-   * here, and the groups add up to what a run can actually be given.
+   * Filtered to the offer pools rather than the whole trait table, so a trait
+   * no god hands out cannot be picked and the list adds up to what a run can
+   * actually give you.
+   *
+   * Ids rather than pick options, because `BoonSort` builds its own rows: it
+   * needs each trait's kind for the frame and each one's effect on the build
+   * for the blocked reason, neither of which a `PickOption` carries.
    */
-  const slotless = useMemo(() => {
+  const sortable = useMemo(() => {
     const offered = new Set<string>()
     for (const pool of godPools.values()) {
       for (const id of [...pool.priority, ...pool.pool]) offered.add(id)
     }
-    return pickOptions(
-      [...offered].filter((id) => {
-        const trait = traits.get(id)
-        return trait && (!trait.slot || !CORE_SLOTS.includes(trait.slot))
-      }),
-    )
+    return [...offered].filter((id) => {
+      const trait = traits.get(id)
+      return trait && (!trait.slot || !CORE_SLOTS.includes(trait.slot))
+    })
   }, [])
 
   const hexes = useMemo(
@@ -398,23 +351,29 @@ export function BuildEditor({
     })
   }
 
-  const toggleLoose = (id: TraitId) =>
-    setBuild((was) => ({
-      ...was,
-      boons: was.boons.includes(id) ? was.boons.filter((one) => one !== id) : [...was.boons, id],
-    }))
+  /**
+   * Put a boon in one tray, the other, or neither.
+   *
+   * **It always leaves both first.** That is the whole reason this replaced two
+   * toggles: a boon in the build and also in Worth adding is not a state a
+   * build can be in, and the two toggles could produce it because neither knew
+   * about the other. Removing from both before adding to one makes the bad
+   * state undescribable rather than detectable.
+   */
+  const moveBoon = (id: TraitId, to: Tray | null) =>
+    setBuild((was) => {
+      const boons = was.boons.filter((one) => one !== id)
+      const optional = (was.optional ?? []).filter((one) => one !== id)
+      if (to === 'build') boons.push(id)
+      if (to === 'optional') optional.push(id)
+      return { ...was, boons, optional: optional.length ? optional : undefined }
+    })
 
   const toggleArcana = (id: string) =>
     setBuild((was) => ({
       ...was,
       arcana: was.arcana.includes(id) ? was.arcana.filter((one) => one !== id) : [...was.arcana, id],
     }))
-
-  const toggleOptional = (id: TraitId) =>
-    setBuild((was) => {
-      const list = was.optional ?? []
-      return { ...was, optional: list.includes(id) ? list.filter((one) => one !== id) : [...list, id] }
-    })
 
   const toggleHammer = (id: TraitId) =>
     setBuild((was) => ({
@@ -555,33 +514,7 @@ export function BuildEditor({
           </TabPanel>
 
           <TabPanel id="boons" open={tab}>
-          <h3 className="editor-rule">Beyond the slots</h3>
-          <p className="editor-hint">
-            Duos, legendaries and everything that occupies no slot. This is the build.
-          </p>
-          <PickList
-            options={slotless}
-            chosen={build.boons.filter((id) => {
-              const slot = traits.get(id)?.slot
-              return !slot || !CORE_SLOTS.includes(slot)
-            })}
-            onToggle={toggleLoose}
-            placeholder="Search boons"
-            emptySays="Nothing beyond the five slots yet."
-          />
-
-          <h3 className="editor-rule">Worth adding</h3>
-          <p className="editor-hint">
-            Boons that raise the ceiling without being the build. One boon from a god you take
-            for nothing else still spends an Olympian slot, and this is where that shows.
-          </p>
-          <PickList
-            options={slotless}
-            chosen={build.optional ?? []}
-            onToggle={toggleOptional}
-            placeholder="Search boons"
-            emptySays="No upgrades listed."
-          />
+          <BoonSort build={build} options={sortable} onMove={moveBoon} />
 
           <h3 className="editor-rule">Daedalus Hammer</h3>
           <PickList
