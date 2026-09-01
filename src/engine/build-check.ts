@@ -114,13 +114,35 @@ export function checkBuild(build: ShownBuild): Problem[] {
     }
   }
 
-  // Four, and `HeroData.MaxGodsPerRun` is where that comes from.
+  /**
+   * The Olympian cap, which is a cap on the random pool and not on the run.
+   *
+   * This used to block above four, citing `HeroData.MaxGodsPerRun`. That was
+   * the same shape of mistake as reading `MaxGodsPerRun` without following
+   * `GodLoot`: the constant is real and the conclusion drawn from it was not.
+   *
+   * `RewardLogic.lua:238` calls `ChooseLoot`, which goes through
+   * `GetEligibleLootNames` and freezes the pool to gods already held once
+   * `ReachedMaxGods` is true. Then line 242, unconditionally, and without ever
+   * consulting the cap again:
+   *
+   *     if trait.ForceBoonName ~= nil and trait.Uses > 0 ... then
+   *       lootData = { Name = trait.ForceBoonName }
+   *
+   * A keepsake overwrites the capped choice. All nine Olympians have one, so a
+   * fifth god is a keepsake away and the cap never sees it.
+   *
+   * So five is legal and defensible: bring a keepsake for the one boon you want
+   * from a fifth god. Past that you are spending keepsakes fighting the pool for
+   * gods you were not offered, and `engine/repeat.ts` says so in the reading.
+   * Neither is blocked, because neither is illegal.
+   */
   const gods = olympiansOf(build)
   if (gods.length > 4) {
     out.push({
       field: 'boons',
-      severity: 'blocks',
-      say: `${gods.length} Olympians: ${gods.join(', ')}. A run allows four.`,
+      severity: 'notes',
+      say: `${gods.length} Olympians: ${gods.join(', ')}. Past four the pool is frozen to gods you hold, so the rest have to arrive on a keepsake.`,
     })
   }
 

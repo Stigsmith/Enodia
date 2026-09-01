@@ -31,15 +31,29 @@ describe('what it blocks', () => {
     expect(said.some((p) => /Attack/.test(p.say))).toBe(true)
   })
 
-  it('a fifth Olympian', () => {
-    const said = blockers(
-      checkBuild(
-        bend({
-          boons: ['PoseidonWeaponBoon', 'ZeusSpecialBoon', 'ApolloCastBoon', 'HestiaSprintBoon', 'AresManaBoon'],
-        }),
-      ),
-    )
-    expect(said.some((p) => /allows four/.test(p.say))).toBe(true)
+  it('does not block a fifth Olympian, because the cap is on the pool', () => {
+    /**
+     * This used to be a blocker citing `HeroData.MaxGodsPerRun`, and the
+     * constant was real while the conclusion was not.
+     *
+     * `RewardLogic.lua:238` calls `ChooseLoot`, which goes through
+     * `GetEligibleLootNames` and freezes the pool to gods already held once
+     * `ReachedMaxGods` is true. Line 242 then overwrites that choice outright
+     * if a held trait carries `ForceBoonName` and `Uses > 0`, without ever
+     * consulting the cap again. All nine Olympians have such a keepsake, so a
+     * fifth god is a keepsake away.
+     *
+     * Same shape as the four-gods error `CLAUDE.md` records: a proxy read for
+     * the property, and never checked against the property.
+     */
+    const five = bend({
+      boons: ['PoseidonWeaponBoon', 'ZeusSpecialBoon', 'ApolloCastBoon', 'HestiaSprintBoon', 'AresManaBoon'],
+      centrepiece: 'PoseidonWeaponBoon',
+    })
+    const problems = checkBuild(five)
+    expect(blockers(problems)).toEqual([])
+    // Still said, because it is worth knowing what it will cost.
+    expect(problems.some((p) => p.severity === 'notes' && /keepsake/.test(p.say))).toBe(true)
   })
 
   it('an aspect from another arm', () => {
