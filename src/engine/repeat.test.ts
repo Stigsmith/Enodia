@@ -231,3 +231,33 @@ describe('what it does not depend on', () => {
     expect(readRepeat({ ...FIRST_BUILD, ...modest }, traits, olympians, 4).reach).not.toBe('reliably')
   })
 })
+
+describe('the star ceiling, as the screens apply it', () => {
+  const sixGods: Partial<ShownBuild> = {
+    boons: [
+      'HestiaWeaponBoon',
+      'AphroditeSpecialBoon',
+      'DemeterCastBoon',
+      'ApolloSprintBoon',
+      'ZeusManaBoon',
+      'AresWeaponBoon',
+    ],
+    centrepiece: 'HestiaWeaponBoon',
+    hex: null,
+    hammers: [],
+  }
+
+  it('holds a build that cannot be assembled to one star', () => {
+    // The owner's rule, and it is about honesty rather than taste: something a
+    // run cannot hand over does not get to look like a recommendation.
+    expect(ratingCeiling(read(sixGods))).toBe(1)
+  })
+
+  it('leaves a five-star Needs luck build alone', () => {
+    // The case the rule must not catch. Hard to assemble and worth chasing is a
+    // real kind of build, and the rating and the reading are separate claims.
+    const said = read({ play: { rating: 5, runs: 40, clears: 12, assembles: 'needs-luck' } })
+    expect(said.reach).toBe('needs-luck')
+    expect(ratingCeiling(said)).toBeNull()
+  })
+})
