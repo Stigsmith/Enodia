@@ -74,7 +74,14 @@ export function LogRun({
 
   return (
     <div className="logrun" role="dialog" aria-label="Log a run">
+      {/* Two elements, and the inner one is not decoration. The panel holds the
+        * art and its aspect ratio; the inner holds the padding. Percentage
+        * padding resolves against the *containing block's* width, so on the
+        * panel itself it was measuring against the full-screen overlay and
+        * coming out two and a half times too big. On a child of the panel it
+        * measures against the panel, which is what the frame insets are in. */}
       <div className="logrun-box">
+        <div className="logrun-inner">
         <h3>How did it go?</h3>
 
         <Ask
@@ -87,11 +94,6 @@ export function LogRun({
         />
 
         <Ask label="Did the build come together?" value={assembled} onChoose={setAssembled} />
-
-        {/* The game's own victory banner, on the moment you say you had one.
-          * It is the header it puts over a finished run, and logging a clear
-          * had no moment at all before. */}
-        {cleared ? <div className="logrun-cleared" aria-hidden="true" /> : null}
 
         {/* Only on a clear, because that is the only run it can describe. */}
         {cleared ? (
@@ -140,6 +142,7 @@ export function LogRun({
           <button type="button" className="quiet" onClick={onClose}>
             Never mind
           </button>
+        </div>
         </div>
       </div>
     </div>

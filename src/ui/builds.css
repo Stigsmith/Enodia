@@ -5474,16 +5474,75 @@ button.mark {
   background: rgb(0 0 0 / 0.6);
 }
 
+/**
+ * The dialog, on the game's own pause panel.
+ *
+ * ## Which of the four, and a rejection that stopped applying
+ *
+ * The owner offered `box-confirm`, `box-halfscreen` and `box-pause`. Sampled
+ * all four candidates for where the frame actually starts, because a name does
+ * not tell you that:
+ *
+ * | | ratio | left | right | top | bottom |
+ * |---|---|---|---|---|---|
+ * | `box-confirm` | 1.62 | 9.4% | 9.4% | 7.3% | 3.5% |
+ * | `box-halfscreen` | 1.13 | 12.3% | 12.3% | 2.6% | 0.2% |
+ * | **`box-pause`** | 1.10 | 12.8% | 12.7% | 7.1% | **25.9%** |
+ *
+ * **`box-pause` was rejected first and the rejection was right for a reason
+ * that then stopped being true.** A nine slice needs a frame of roughly even
+ * thickness, and a quarter of this one's height is a soft fade along the
+ * bottom, so slicing it puts the bottom of the frame a quarter of the way up
+ * the panel. That is a real objection to slicing it.
+ *
+ * It is not an objection to *stretching* it, which is what this does now. The
+ * slice went away when the first attempt came out visibly pinched: the
+ * horizontal slice is squeezed 3.2 times against the vertical's 1.7, and uneven
+ * compression on an ornamented frame is a distorted ornament. Holding the art's
+ * own ratio and stretching the whole canvas fixed that, and it also made the
+ * asymmetry harmless: an uneven frame only needs uneven padding.
+ *
+ * Which is why the owner's first pick is the one in use. 1.10 is much closer to
+ * a dialog's shape than 1.62, so the panel is squarer and less of the screen.
+ *
+ * Same technique as `.bcard` with the save slot plate, same reason: ornamented
+ * art either keeps its shape or it shows.
+ */
 .logrun-box {
+  /* 40rem is the width at which 1173 by 1063, minus a frame that spends a
+   * third of its height, leaves a box the content fits inside. */
+  width: min(40rem, 100%);
+  aspect-ratio: 1173 / 1063;
+  max-height: 92vh;
+  border: 0;
+  border-radius: 0;
+  background: url('/shell/box-pause.png') center / 100% 100% no-repeat;
+}
+
+/**
+ * Where the padding lives, and why it is not on the panel.
+ *
+ * **Percentage padding resolves against the containing block's width**, on all
+ * four sides. Put on the panel itself, the containing block is the full-screen
+ * overlay, so 5.5% meant 5.5% of the viewport: 92px where 39 was intended. It
+ * happened to fit at one window size and would have broken at every other. On
+ * a child of the panel the containing block is the panel, which is what the
+ * frame's insets are measured in.
+ *
+ * The two vertical figures are divided by the 1.104 ratio first, because even
+ * here a percentage is a fraction of the width: 7.1 becomes 6.4 and the 25.9
+ * of the bottom fade becomes 23.5. Then clearance on all four.
+ */
+.logrun-inner {
   display: grid;
-  gap: 0.7rem;
-  width: min(24rem, 100%);
-  max-height: 90vh;
+  align-content: center;
+  gap: 0.45rem;
+  height: 100%;
   overflow-y: auto;
-  padding: 1rem 1.1rem 1.1rem;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-soft);
-  background: var(--ink-900);
+  padding: 10.5% 15% 25%;
+  /* Centred throughout. On a symmetric ornamented panel anything set left
+   * reads as having slipped. */
+  text-align: center;
 }
 
 .logrun-box h3 {
@@ -5497,6 +5556,7 @@ button.mark {
 .logrun-ended {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.3rem;
 }
 
@@ -5526,6 +5586,42 @@ button.mark {
   color: var(--lit-hot);
 }
 
+/**
+ * Yes and no, on the game's own accept and cancel plates.
+ *
+ * The game ships a green one and a red one and the tool was drawing two
+ * identical grey pills. Sampled rather than trusted: `button-confirm` averages
+ * (22, 36, 34) and `button-cancel` (35, 25, 24), so the green and the red are
+ * real and are the right way round.
+ *
+ * Only once a choice is made. Both plates lit from the start would be the
+ * dialog answering its own question, which is the thing the rule above exists
+ * to prevent, so the unpressed state stays the quiet pill.
+ */
+.logrun-yesno button.is-on {
+  border: 0 solid transparent;
+  border-width: 0.55rem 1.1rem;
+  border-radius: 0;
+  background: none;
+  color: var(--bone);
+}
+
+.logrun-yesno button:first-child.is-on {
+  border-image: url('/shell/button-confirm.png') 34 fill / 0.55rem 1.1rem stretch;
+}
+
+.logrun-yesno button:last-child.is-on {
+  border-image: url('/shell/button-cancel.png') 34 fill / 0.55rem 1.1rem stretch;
+}
+
+.logrun-yesno button:first-child.is-on:hover {
+  border-image-source: url('/shell/button-confirm-highlight.png');
+}
+
+.logrun-yesno button:last-child.is-on:hover {
+  border-image-source: url('/shell/button-cancel-highlight.png');
+}
+
 /* What it will write, before it writes it. Four taps is quick enough to do by
  * accident. */
 .logrun-says {
@@ -5537,13 +5633,25 @@ button.mark {
   color: var(--bone-faint);
 }
 
+/* The Fear stepper is a grid row, so the panel's `text-align: center` reaches
+ * its labels and not its controls. It has to be told separately. */
+.logrun-inner .editor-field,
+.logrun-inner .fear-row {
+  justify-items: center;
+  justify-content: center;
+}
+
 .logrun-actions {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
 }
 
 .logrun-actions button {
-  flex: 1 1 auto;
+  /* Sized to their labels rather than stretched to the panel. On a 44rem box
+   * `flex: 1 1 auto` gave two buttons a third of a metre of plate each. */
+  flex: 0 1 auto;
+  min-width: 9rem;
   padding: 0.5rem 1rem 0.58rem;
   border: 0;
   background: url('/shell/button.png') center / 100% 100% no-repeat;
@@ -6022,11 +6130,19 @@ button.mark {
 /* The banner the game puts over a finished run, on the moment you say you
  * finished one. It is 5.33:1 ornamental scrollwork with a soft middle, so it
  * takes a full row and nothing sits on top of it. */
-.logrun-cleared {
-  height: 2.6rem;
-  margin: -0.2rem 0 0;
-  background: url('/shell/victory-underworld.png') center / contain no-repeat;
-}
+/**
+ * **The victory banner is gone and is not coming back here.**
+ *
+ * `victory-underworld.png` is a 1920 by 360 header, 5.33 to 1. Logging a clear
+ * had no moment at all, so it was squeezed into a 24rem by 2.6rem strip above
+ * the questions to give it one. It did not read as a moment; it read as a
+ * smear. The owner's word was that if it was meant to carry the whole panel
+ * then it failed, and they were right: a banner that wide wants the width of a
+ * screen, and this dialog is a column.
+ *
+ * The panel itself is the game's now, which is the thing the banner was
+ * standing in for.
+ */
 
 /**
  * **`info-button.png` was planned for here and is not used either.**
@@ -6276,12 +6392,27 @@ button.mark {
 
 /* ---------------------------------------------------------------- and her -- */
 
+/**
+ * Her, and what she is saying, as one centred column.
+ *
+ * The first arrangement put her beside the words with the controls in a corner
+ * of a little grid, and the owner read the whole thing as lopsided: the text
+ * leaning left, the buttons off to one side, no single axis to look along.
+ *
+ * So: the box, then her under it, then the steps under her, all on one centre
+ * line. The text is centred too, which is the other half of the lean. A ragged
+ * right edge inside symmetric padding still reads as left heavy, and there is
+ * no reason for a speech box to be set left.
+ */
 .tour-her {
   position: fixed;
   z-index: 81;
-  width: 18.75rem;
+  /* 27rem. Widened twice, both times because the owner could see the words
+   * were crowding the plate before any measurement said so. */
+  width: 27rem;
   display: grid;
-  gap: 0.5rem;
+  justify-items: center;
+  gap: 0.35rem;
   /* She travels with the light rather than jumping ahead of it. */
   transition:
     left 0.34s var(--e-response, ease),
@@ -6291,66 +6422,69 @@ button.mark {
 /**
  * What she is saying.
  *
- * ## Three plates were tried and two were wrong
+ * ## Four plates were tried and three were wrong
  *
- * **Not `dialogue-static.png`.** Its crescent ornament is baked in at 1.78 and
- * flattens the moment the box is not that shape. Already learned once, behind
- * the caveats bar.
+ * **Not `dialogue-static.png`.** Its crescent is baked in at 1.78 and flattens
+ * the moment the box is not that shape. Learned once behind the caveats bar.
  *
- * **Not `subtitle-generic.png` either, and that one is the interesting miss.**
- * It is named like a plate and it is not one: sampled, its centre alpha is 5 of
- * 255. It is an edge vignette with nothing in the middle, so it wired up
- * correctly, reported the right computed styles, and painted nothing. A
- * screenshot was the only thing that caught it.
+ * **Not `subtitle-generic.png`, which is the interesting miss.** Named like a
+ * plate and not one: sampled, its centre alpha is 5 of 255. An edge vignette
+ * with nothing in the middle, so it wired up correctly, reported the right
+ * computed styles, and painted bare text on air. Only a screenshot caught it.
  *
- * `tooltip-backing.png` is a real plate at 204, and it is already what `Peek`
- * puts behind a line of explanation. Same job here, so the same surface.
+ * **`tooltip-backing.png` worked and was still the wrong one.** It is a hard
+ * framed tooltip, and at a step's width the frame reads as a second panel.
  *
- * The `solid` is load-bearing: `border-image` paints nothing without a border
- * style. Same shorthand shape as `.quiet` at `surface.css:212`.
+ * `background-shade.png` is the owner's pick and the right one. Centre alpha
+ * 209, edges falling to 0: a soft shade rather than a frame. Which is why it
+ * is a plain stretched background and not a nine slice. **There is no frame to
+ * preserve**, so slicing it would only pin a fade in place, and a soft edge
+ * cannot show a seam however far it stretches.
+ *
+ * ## The padding is measured off the art
+ *
+ * The shade falls to nothing at its edges, so text laid near them sits on the
+ * fade rather than the plate and reads as spilling out of it. Sampled across
+ * the file: alpha passes 180 at **11.6 percent** in from each side and 5.9
+ * percent from top and bottom. 15 percent horizontal clears it with room, and
+ * it is a percentage because the box is stretched to 100 percent and a rem
+ * would stop being 15 percent the moment the width changed.
+ *
+ * Same rule as `.bcard`, same reason: `background-size: 100% 100%` stretches
+ * the whole canvas, so padding from the element's edge starts outside the
+ * plate. The corners are the worst case, which is where the owner saw it last.
  */
 .tour-say {
   margin: 0;
-  min-height: 3.4rem;
-  border: 0 solid transparent;
-  border-width: 1.15rem 1.35rem;
-  border-image: url('/shell/tooltip-backing.png') 48 fill / 1.15rem 1.35rem stretch;
-  padding: 0 0.2rem;
+  min-height: 3.6rem;
+  width: 100%;
+  padding: 1.5rem 15%;
+  background: url('/shell/background-shade.png') center / 100% 100% no-repeat;
   color: var(--bone);
   font-size: 0.9rem;
-  line-height: 1.5;
-  text-align: left;
+  line-height: 1.55;
+  text-align: center;
 }
 
-.tour-foot {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    'dora steps'
-    'dora out';
-  align-items: center;
-  gap: 0.4rem 0.7rem;
-}
-
-/**
- * Half the size she was, which is the point.
- *
- * At 17rem she covered the controls she was meant to be pointing at. 8.5rem is
- * still legible and small enough to stand beside a 2rem button without being
- * the whole story.
- */
 .tour-dora {
-  grid-area: dora;
-  width: 8.5rem;
-  height: auto;
+  /**
+   * Sized by height, not width, because she has two poses.
+   *
+   * Thoughtful is 323 by 520 and default is 268 by 520: same height in the
+   * source, different widths. Setting a width makes her *height* change when
+   * the pose does, which moves the whole group and makes the placement jump
+   * mid-tour. Setting the height holds her still and lets the width follow.
+   */
+  height: 10.5rem;
+  width: auto;
   filter: drop-shadow(0 8px 22px var(--ink-950));
 }
 
 .tour-steps {
-  grid-area: steps;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* The game's own stepper arrows, the pair already on the Fear counter. Left and
@@ -6384,30 +6518,13 @@ button.mark {
 }
 
 .tour-count {
+  min-width: 3.4rem;
   font-family: var(--mono);
   font-size: 0.6rem;
   letter-spacing: 0.1em;
+  text-align: center;
   color: var(--bone-faint);
   white-space: nowrap;
-}
-
-.tour-out {
-  grid-area: out;
-  justify-self: start;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--bone-faint);
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.tour-out:hover,
-.tour-out:focus-visible {
-  color: var(--lit);
 }
 
 .tour:focus-visible {
@@ -6418,11 +6535,11 @@ button.mark {
  * phone, so a 8.5rem Dora beside a 18.75rem bubble does not fit. */
 @media (max-width: 30rem) {
   .tour-her {
-    width: min(20rem, calc(100vw - 1.5rem));
+    width: min(23rem, calc(100vw - 1.25rem));
   }
 
   .tour-dora {
-    width: 5.5rem;
+    height: 7rem;
   }
 }
 
