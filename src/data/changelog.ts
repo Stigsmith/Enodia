@@ -19,6 +19,61 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-02',
+    title: 'The build editor, rebuilt',
+    say: 'Most of the first round of playtest feedback, and the editor took the bulk of it.',
+    points: [
+      'Boons are sorted into two trays instead of picked from two lists. A boon is either in the build or worth adding, and it can no longer be in both at once.',
+      'Drag a boon into a tray, or click it to send it into the build. Rows are larger and the game’s own plates sit behind them.',
+      'The picker greys out anything a run could not give you, and says why on the row.',
+      'A missing prerequisite now lists the boons that would satisfy it, says which of them would replace something you already hold, and adds the one you pick.',
+      'Warnings jump to the control they are about rather than to the nearest tab, and put the cursor in it.',
+      'The worst thing about a build is always visible in the left pane, whichever tab you are on.',
+      'Hammer upgrades locked to one aspect no longer appear on the others, in the editor and in the run.',
+      'The Arcana tab now refuses a board a save could not hold, matching the Arcana screen.',
+      'Delete asks first.',
+    ],
+  },
+  {
+    date: '2026-09-02',
+    title: 'Logging runs, and a bin',
+    say: 'Recording how a build went, and getting one back after deleting it.',
+    points: [
+      'Log run, on an open build. Four answers: cleared or not, whether the build came together, the Fear, and where it ended. It says what it will record before it records it.',
+      'Fear is only kept on a clear, and only when it beats what is already there.',
+      'Deleting a build moves it to a bin rather than removing it. Put one back, remove one for good, or empty the bin.',
+      'The bin travels with an export, so a restored browser still has its undo.',
+      'Runs and clears use the game’s own steppers, the way Fear already did.',
+    ],
+  },
+  {
+    date: '2026-09-02',
+    title: 'Reading a build',
+    say: 'What the screens show, and what they show it on.',
+    points: [
+      'Hovering anything says what it is: boons on the game’s boon plate, keepsakes, familiars, Hexes and Arcana on its tooltip backing.',
+      'The five core slots wear the game’s primary frame.',
+      'Worth adding is drawn on both detail layouts, with the Olympians it would cost.',
+      'The Constellation shows the build’s name.',
+      'Copy the card puts a picture of the build on your clipboard, to paste beside the link. A link on its own cannot carry a preview without a server.',
+      'A build can say what it leans on: Attack, Ω Attack, Cast and the rest.',
+      'The Arcana card preview fills the middle of the screen instead of a thin strip.',
+      'The roadmap counts how much of itself is built.',
+      'Wallpapers renamed: Retribution, Hermes, Olympos, Hades chained, Pact of Punishment, Stygian Blade, The Cauldron.',
+    ],
+  },
+  {
+    date: '2026-09-01',
+    title: 'An empty library, and a longer run',
+    say: 'Two corrections, one of them to a number a lot of the tool reads.',
+    points: [
+      'The library ships empty. The placeholder builds are gone: a placeholder in a library reads as a recommendation.',
+      'A run is about forty Exits, not twelve. Four Regions of eight to twelve each. Everything that judges whether a build is still reachable was working against a third of a real run.',
+      'A build may name a fifth Olympian. The cap of four is on the random pool, and a keepsake gets past it.',
+      'Arcana on a build are a couple of suggestions rather than a whole board. Five at the outside.',
+    ],
+  },
+  {
     date: '2026-09-01',
     title: 'Export, import and sharing',
     say: 'Ways to get your builds out of this browser and into another one.',
