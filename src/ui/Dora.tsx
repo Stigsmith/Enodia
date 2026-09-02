@@ -78,6 +78,29 @@ const POKES: { say: string; spooky?: boolean }[] = [
 ]
 
 /**
+ * The other loop, for the mascot on the roadmap.
+ *
+ * Same joke, different grievance. The unbuilt pages have her standing in
+ * nothing, so those lines are about there being nothing; here she is pinned to
+ * the corner of a list of work that is not hers and not finished, so these are
+ * about the list. The owner asked for a set that matches the page she is on
+ * rather than the one the others are on, and this is the difference.
+ *
+ * Same shape: ordered, the last one repeats, and one of them is the ghost voice
+ * she cannot keep up.
+ */
+const PLAN_POKES: { say: string; spooky?: boolean }[] = [
+  { say: 'Hm.' },
+  { say: 'I am watching the list. It is not getting any shorter.' },
+  { say: 'You could read it. That is what it is for.' },
+  { say: 'Every line on there is somebody’s evening. Just so you know.' },
+  { say: 'BEHOLD, THE WORKS OF... no. Sorry. It is a list of jobs.', spooky: true },
+  { say: 'Poking me does not move anything into Built.' },
+  { say: 'I have checked. Twice. Still in Next.' },
+  { say: 'Fine. I have added it to the list. Near the bottom.' },
+]
+
+/**
  * How long she holds the scare.
  *
  * Long enough to register, short enough that it reads as a slip rather than a
@@ -155,16 +178,49 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
  * The mascot alone, for a page that has content of its own.
  *
  * Fixed to the viewport, so whatever it stands beside scrolls and she does not.
- * `aria-hidden` because she is decoration: a screen reader announcing "image"
- * beside every roadmap item is noise, and she carries no information the page
- * does not already state in words.
+ *
+ * **She answers back now.** She was `aria-hidden` decoration and the owner
+ * wanted the poke loop the unbuilt pages already had, which is fair: she is the
+ * same character in the same tool and being clickable in one place and inert in
+ * another is the sort of inconsistency that reads as a bug. The loop is shared
+ * with `Unbuilt` below, and only the lines differ.
+ *
+ * She stays out of the accessibility tree until she has something to say. A
+ * screen reader announcing a decorative image beside every roadmap item is
+ * noise; a line of dialogue somebody deliberately asked for is not.
  */
 export function DoraWatching() {
-  return <img
-      className="dora-watching"
-      data-tour="dora-watching"
-      src="/ui/dora-hardhat.webp"
-      alt=""
-      aria-hidden="true"
-    />
+  const [pokes, setPokes] = useState(0)
+  const [scared, setScared] = useState(false)
+  const line = pokes > 0 ? PLAN_POKES[Math.min(pokes - 1, PLAN_POKES.length - 1)]! : null
+
+  useEffect(() => {
+    if (!line?.spooky) return setScared(false)
+    setScared(true)
+    const stop = window.setTimeout(() => setScared(false), SCARE_MS)
+    return () => window.clearTimeout(stop)
+  }, [line, pokes])
+
+  return (
+    <div className="dora-watching">
+      {line ? (
+        <p className="dora-says" role="status">
+          {line.say}
+        </p>
+      ) : null}
+
+      <button
+        type="button"
+        className={`dora-watching-poke${scared ? ' is-scared' : ''}`}
+        title="Dora"
+        onClick={() => setPokes((was) => was + 1)}
+      >
+        <img
+          src={scared ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+          alt={pokes ? 'Dora, who has been poked' : ''}
+          aria-hidden={pokes ? undefined : true}
+        />
+      </button>
+    </div>
+  )
 }

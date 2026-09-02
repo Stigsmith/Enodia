@@ -6101,19 +6101,56 @@ button.mark {
  * The padding is uneven on purpose: the ornament occupies the top-left corner
  * of the art, so the text starts clear of it.
  */
-.dora-says {
+/**
+ * What she says, wherever she says it.
+ *
+ * ## One plate, three places
+ *
+ * This was `dialogue-static.png` and the tour was on `background-shade.png`,
+ * which meant the same character had two speech boxes depending on which page
+ * she was standing on. The owner asked for the tour's, and it is the better one
+ * anyway: the dialogue box's crescent is baked in at 1.78 and flattens at any
+ * other shape, which is why this rule used to pin a width and a min-height to
+ * stop it collapsing. A soft shade has nothing to distort and needs no
+ * scaffolding to hold it up.
+ *
+ * The padding is measured off the file rather than chosen: alpha passes 180 at
+ * 11.6 percent in from each side, so anything nearer sits on the fade and reads
+ * as spilling out. 15 percent clears it. It is a percentage because the canvas
+ * is stretched to 100 percent, and a rem would stop being 15 percent the moment
+ * the width changed.
+ *
+ * Centred, like the tour's, because a ragged right edge inside symmetric
+ * padding still reads as leaning left.
+ */
+.dora-says,
+.tour-say {
   margin: 0;
-  /* A width, not a max-width. It was shrinking to its text, and at 190px the
-   * crescent ornament is smaller than the letters beside it: the box stopped
-   * reading as the game's box at all. */
-  width: min(24rem, 88vw);
-  min-height: 6.5rem;
-  padding: 2.1rem 2rem 1.8rem 4.2rem;
-  background: url('/shell/dialogue-static.png') center / 100% 100% no-repeat;
+  padding: 1.35rem 15%;
+  background: url('/shell/background-shade.png') center / 100% 100% no-repeat;
   color: var(--bone);
-  font-size: 0.86rem;
-  line-height: 1.45;
-  text-align: left;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.dora-says {
+  /**
+   * It fits what she said, which the old plate could not allow.
+   *
+   * This used to be a fixed `width`, with a comment explaining that a
+   * `max-width` let the box shrink to its text and that at 190px the dialogue
+   * box's crescent ornament came out smaller than the letters beside it. True
+   * of that plate. **The soft shade has no ornament to protect**, so the reason
+   * went away with the art, and "Hm." no longer sits in the middle of 22rem of
+   * empty plate.
+   *
+   * The floor is there so the shortest lines still read as a said thing rather
+   * than a label.
+   */
+  width: fit-content;
+  min-width: 10rem;
+  max-width: min(22rem, 88vw);
+  font-size: 0.84rem;
   animation: dora-says-in 0.14s ease-out;
 }
 
@@ -6139,6 +6176,12 @@ button.mark {
  *
  * Fixed to the viewport rather than to the page, so the plan scrolls past her
  * and she stays put. She faces left, which is where the roadmap is.
+ *
+ * **She answers back now.** She used to be an inert image, `pointer-events:
+ * none` at `z-index: 0`, on the reasoning that decoration must never be in the
+ * way of the page it decorates. That reasoning still holds for most of her, so
+ * the container keeps the click-through and only the two things you can
+ * actually use take it back: her, and whatever she has just said.
  * ---------------------------------------------------------------------- */
 
 .dora-watching {
@@ -6149,7 +6192,9 @@ button.mark {
  * Below that she would be standing on the roadmap rather than beside it. */
 @media (min-width: 78rem) {
   .dora-watching {
-    display: block;
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
     position: fixed;
     /* 4rem rather than 2.5rem: the help mark owns the bottom right corner and
      * spans 1rem to 3.4rem, which put it on her rightmost 0.9rem. Changed here
@@ -6158,21 +6203,77 @@ button.mark {
      * back in on wide screens. Same cascade trap as `.tab.is-open`. */
     right: 4rem;
     bottom: 0;
-    width: 15rem;
-    height: auto;
-    /* Behind everything, and unclickable: she is decoration and must never be
-     * in the way of the page she is looking at. */
-    z-index: 0;
+    /**
+     * The box is as wide as what she says; **she is not.**
+     *
+     * Her width used to be this rule, and the button under it was `width:
+     * 100%`. In a grid the column sizes to its widest child, which is the
+     * speech box at 22rem, so `100%` made her 352px rather than the 240 this
+     * said. She was half again too big and the number here was fiction.
+     *
+     * So the container is the speech box's width and she gets her own, below.
+     */
+    width: min(22rem, 88vw);
+    /* Above the page so she can be clicked, below the drawer, the menu and
+     * every modal. Same layer as the help mark, and for the same reason. */
+    z-index: 12;
+    /* The box she stands in is click-through; the parts you can use are not. */
     pointer-events: none;
-    opacity: 0.9;
-    filter: drop-shadow(0 8px 24px var(--ink-950));
   }
+
+  .dora-watching .dora-says,
+  .dora-watching-poke {
+    pointer-events: auto;
+  }
+
 }
 
 @media (min-width: 100rem) {
   .dora-watching {
     right: 6rem;
-    width: 19rem;
+  }
+
+  .dora-watching-poke {
+    width: 15rem;
+  }
+}
+
+.dora-watching-poke {
+  display: block;
+  /* 12rem, down from the 15 she was drawn at. The owner wanted her smaller once
+   * she started talking: a speech box above a large figure is a lot of
+   * furniture for one corner. */
+  width: 12rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dora-watching-poke img {
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+  filter: drop-shadow(0 8px 24px var(--ink-950));
+  transition: opacity 0.14s ease, transform 0.1s ease;
+}
+
+.dora-watching-poke:hover img {
+  opacity: 1;
+}
+
+.dora-watching-poke:active img {
+  transform: translateY(2px);
+}
+
+/* The moment she tries the ghost voice, same as on the unbuilt pages. */
+.dora-watching-poke.is-scared img {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dora-watching-poke:active img {
+    transform: none;
   }
 }
 
@@ -6513,7 +6614,7 @@ button.mark {
 }
 
 /**
- * What she is saying.
+ * The tour's box. The plate itself is shared with `.dora-says` further down.
  *
  * ## Four plates were tried and three were wrong
  *
@@ -6528,35 +6629,13 @@ button.mark {
  * **`tooltip-backing.png` worked and was still the wrong one.** It is a hard
  * framed tooltip, and at a step's width the frame reads as a second panel.
  *
- * `background-shade.png` is the owner's pick and the right one. Centre alpha
- * 209, edges falling to 0: a soft shade rather than a frame. Which is why it
- * is a plain stretched background and not a nine slice. **There is no frame to
- * preserve**, so slicing it would only pin a fade in place, and a soft edge
- * cannot show a seam however far it stretches.
- *
- * ## The padding is measured off the art
- *
- * The shade falls to nothing at its edges, so text laid near them sits on the
- * fade rather than the plate and reads as spilling out of it. Sampled across
- * the file: alpha passes 180 at **11.6 percent** in from each side and 5.9
- * percent from top and bottom. 15 percent horizontal clears it with room, and
- * it is a percentage because the box is stretched to 100 percent and a rem
- * would stop being 15 percent the moment the width changed.
- *
- * Same rule as `.bcard`, same reason: `background-size: 100% 100%` stretches
- * the whole canvas, so padding from the element's edge starts outside the
- * plate. The corners are the worst case, which is where the owner saw it last.
+ * `background-shade.png` is the owner's pick and the right one, for the reasons
+ * written over the shared rule.
  */
 .tour-say {
-  margin: 0;
   min-height: 3.6rem;
   width: 100%;
-  padding: 1.5rem 15%;
-  background: url('/shell/background-shade.png') center / 100% 100% no-repeat;
-  color: var(--bone);
   font-size: 0.9rem;
-  line-height: 1.55;
-  text-align: center;
 }
 
 .tour-dora {
