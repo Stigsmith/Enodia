@@ -1,0 +1,83 @@
+{
+  // How this site is built and served. Replaces netlify.toml.
+  //
+  // It is a static site with no server: DESIGN.md 1, one page, everything a
+  // person makes kept in their own browser. So there is nothing here about a
+  // database or environment, and there is not meant to be YET. Phase 4 adds an
+  // API under /api/*, on this same origin, which is what lets the CSP in
+  // assets/_headers keep saying connect-src 'self' unchanged.
+  //
+  // Assets-only: `main` is optional for a Worker that serves nothing but files,
+  // and this one has no script at all. Deploy with `npm run deploy`, which
+  // builds first. Cache rules and security headers are in assets/_headers,
+  // which Vite copies into dist/.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "enodia",
+
+  // Phase 4. The API, and nothing else, on this origin under /api/*.
+  "main": "worker/index.ts",
+
+  // Required even with no script. Also puts this past 2025-04-01, which is what
+  // makes not_found_handling below resolve navigations to the app while still
+  // 404ing a missing file.
+  "compatibility_date": "2026-09-02",
+
+  // enodia.<subdomain>.workers.dev, which is where every rule gets verified
+  // before enodia.tools is pointed at any of it.
+  "workers_dev": true,
+
+  "assets": {
+    "directory": "./dist",
+
+    // One page, and the only routing is a #build= fragment, which never reaches
+    // the server. This is here so a mistyped path lands on the app rather than
+    // on a host's 404, and so it keeps working if a real route is ever added.
+    //
+    // BEHAVIOURALLY IDENTICAL to the netlify.toml redirect it replaces, which is
+    // worth writing down because it was first claimed here to be better. It is
+    // not. Measured under wrangler dev: every unmatched path returns index.html
+    // with a 200, whatever the Sec-Fetch-Mode, so a missing image answers with a
+    // page and a success code exactly as before.
+    //
+    // The docs' note about navigation requests is about when a Worker SCRIPT
+    // runs instead of an asset being served. It does not govern this key, and
+    // reading it as though it did was the mistake.
+    //
+    // Getting the better behaviour, a real 404 for a missing file, would need a
+    // Worker script in front of the assets, and that would make every request an
+    // invocation. Static asset requests are free and unlimited; Worker requests
+    // are 100k/day. Not worth it to improve one error message.
+    "not_found_handling": "single-page-application",
+
+    // THE LINE THAT KEEPS THIS FREE, so do not remove it casually.
+    //
+    // Static asset requests are free and unlimited on every plan. Worker
+    // invocations are 100k/day on the free plan. Assets are checked first by
+    // default, so adding a script above did not change that, and this names the
+    // only paths that should reach the script at all.
+    //
+    // Set it to `true` and every page load, every boon icon and every wallpaper
+    // becomes a billable invocation. That is roughly a hundred requests per
+    // visit against a hundred thousand a day.
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Accounts. worker/auth.ts explains the shape.
+  //
+  // `database_id` IS A PLACEHOLDER. `wrangler dev` ignores it and runs on a
+  // local SQLite file under .wrangler/, which is why everything here can be
+  // built and tested without a Cloudflare account. A real deploy needs
+  // `wrangler d1 create enodia` and its id pasted in here.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "enodia",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // better-auth reaches for a few node builtins. Without this the Worker fails
+  // to start rather than failing at a request, so it is not subtle.
+  "compatibility_flags": ["nodejs_compat"]
+}

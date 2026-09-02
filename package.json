@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "In-run build companion for Hades II",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/validate.ts && node scripts/build-app-data.ts",
@@ -13,7 +16,7 @@
     "extract": "node scripts/extract.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "assets": "node scripts/assets.ts",
     "data": "node scripts/build-app-data.ts",
     "sprites": "node scripts/sprites.ts",
@@ -22,9 +25,17 @@
     "health": "node scripts/health.ts",
     "prune": "node scripts/prune.ts",
     "lite": "node scripts/lite.ts",
-    "artifact": "node scripts/artifact.ts"
+    "artifact": "node scripts/artifact.ts",
+    "fonts": "node scripts/fonts.ts",
+    "deploy": "npm run build && wrangler deploy",
+    "db:schema": "npx auth@latest generate --config worker/auth.config.ts --output worker/schema.ts --y",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply enodia --local",
+    "types": "wrangler types"
   },
   "dependencies": {
+    "better-auth": "^1.7.2",
+    "drizzle-orm": "^0.45.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "wasmoon": "^1.16.0"
@@ -35,10 +46,12 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.0",
+    "drizzle-kit": "^0.31.10",
     "jsdom": "^30.0.1",
     "sharp": "^0.35.4",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "wrangler": "^4.128.0"
   }
 }

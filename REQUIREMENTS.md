@@ -128,7 +128,11 @@ user's own data.
 - **Not a wiki.** Reference data exists to feed the engines, not to be browsed for its own sake.
 - **Not a DPS simulator.** See section 8.
 - **No stated probabilities in v1.** See section 6.2.
-- **No accounts, server or social features before Phase 4.**
+- **No accounts, server or social features before Phase 4.** ~~Held through Phases 1 to 3.~~
+  Phase 4 has now started: accounts exist in `worker/`, on a Worker and D1 at the same
+  origin. **The social half of this non-goal still stands**, and deliberately. Friends and
+  leaderboards need the moderation section 5 asks for, and should not be designed in the
+  same breath as the auth they would sit on
 - **Not a competitor to Mobalytics on published build guides.** We will lose that fight.
 
 ---

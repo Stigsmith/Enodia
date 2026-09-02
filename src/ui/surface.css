@@ -447,6 +447,21 @@
   margin: 0;
 }
 
+/* The only link in the app, so it is styled here rather than globally. Underline
+ * offset because the footer sits on --bone-faint and a tight underline reads as
+ * a strikethrough at 0.75rem. */
+.colophon a {
+  color: var(--bone-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.colophon a:hover,
+.colophon a:focus-visible {
+  color: var(--bone);
+}
+
 .mono {
   font-family: var(--mono);
 }

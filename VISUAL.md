@@ -232,8 +232,8 @@ dist/index.html <meta charset="utf-8">
 ```
 
 CLAUDE.md is explicit: the Artifact wrapper injects one, so an encoding bug is invisible
-there and lives on Netlify. A `<meta charset>` bug already mangled every interpunct on the
-live site once.
+there and reaches any host that does not inject one. A `<meta charset>` bug already mangled
+every interpunct on the live site once.
 
 Also unchanged: the page's structure, its roadmap copy, its spoiler tiering, the "also
 considered" section, and the visible disclaimer. This is a restyle, not a rewrite.

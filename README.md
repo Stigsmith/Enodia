@@ -40,8 +40,13 @@ data/curated/         hand-authored judgement, joined on id. see its README
 data/baseline.json    the structural counts the validator holds the extractor to
 src/                  the app. tokens.css is the source for every colour
 assets/               643 images and their manifest, see assets/README.md
-placeholder/          the hand-authored page, live on Netlify until the app ships
+placeholder/          the hand-authored page, live on Netlify until the deploy moves
 dist/                 build output. Vite owns it, git ignores it
+
+wrangler.jsonc        how the site is served. Cloudflare Workers, and the API route
+assets/_headers       cache tiers and security headers, copied into dist/ by Vite
+worker/               Phase 4. The API under /api/*, accounts and nothing else
+migrations/           D1 schema, generated from worker/schema.ts, never hand written
 ```
 
 Three folders are deliberately absent from version control: `extracted/` is 443 MB of
@@ -59,6 +64,13 @@ npm test           # vitest
 npm run extract    # re-read the game's Lua into data/generated
 npm run assets     # rebuild assets/manifest.json. --fill copies icons from extracted/
 npm run typecheck
+npm run fonts      # re-vendor the four typefaces. Not a build step, run by hand
+npm run deploy     # build, then wrangler deploy to Cloudflare
+
+npm run types        # regenerate worker Env types after editing wrangler.jsonc
+npm run db:schema    # better-auth options -> worker/schema.ts
+npm run db:generate  # worker/schema.ts -> a numbered migration in migrations/
+npm run db:migrate   # apply migrations to the local D1
 ```
 
 `npm run extract` loads the game's Lua in a
@@ -68,6 +80,42 @@ diff as a patch note before accepting it with
 `npm run validate -- --update-baseline`.
 
 The old page is served by the `placeholder` config in `.claude/launch.json`, on port 8777.
+The `workers` config runs `wrangler dev` on 8787, which is the only way to see the real cache
+headers, the CSP and the SPA fallback before a deploy. A green build proves none of them.
+
+`npm run fonts` vendors all 38 faces of Caesar Dressing, Inconsolata, Lato and Spectral SC
+into `assets/fonts/`, taking every subset Google returns rather than hand-picking `latin`.
+The page loads nothing from a third party, which is what lets the CSP say `default-src
+'self'` and mean it.
+
+## Accounts
+
+`worker/` is the API, on the same origin under `/api/*`, with accounts in D1 and
+[Better Auth](https://www.better-auth.com/). **The tool works entirely signed out** and an
+account is only needed to share or compete, so almost no visit touches any of it.
+
+`wrangler dev` runs the whole thing, D1 included, against a local SQLite file under
+`.wrangler/`. No Cloudflare account is needed to develop or test it. A real deploy needs
+three things the owner does once:
+
+```bash
+wrangler login
+wrangler d1 create enodia          # paste the id into wrangler.jsonc
+wrangler secret put BETTER_AUTH_SECRET
+```
+
+Locally the secret lives in `.dev.vars`, which is gitignored.
+
+**Rate limiting is stated in `worker/auth.ts`, not defaulted**, because better-auth's default
+is `enabled: isProduction` and Workers sets no `NODE_ENV`, so it would never have switched
+itself on. 60 requests a minute overall, 20 sign-in attempts per five minutes, 10 sign-ups an
+hour, keyed on `cf-connecting-ip`. A Cloudflare rate limiting rule at the edge would be
+better still, since it rejects before a Worker runs, and is the owner's to add.
+
+**`worker/schema.ts` is generated, not written.** Use `npm run db:schema`, which runs
+`npx auth@latest`. Do not use the deprecated `@better-auth/cli`: it is pinned several minors
+behind and emits an `account` table with no `issuer` column, which is `NOT NULL`, so nothing
+complains until the first sign-up fails.
 
 ---
 

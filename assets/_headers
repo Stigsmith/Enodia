@@ -1,0 +1,63 @@
+# How this site is served. Replaces the [[headers]] blocks in netlify.toml, and
+# carries their reasoning rather than just their rules.
+#
+# Vite copies this out of assets/ into dist/, which is the assets directory
+# Workers reads it from. It is parsed at deploy time and never served itself.
+#
+# TWO THINGS THAT WILL BITE WHOEVER EDITS THIS NEXT.
+#
+# 1. A header set twice is JOINED WITH A COMMA, not overridden. So Cache-Control
+#    lives only on patterns that cannot both match one file. Put one on /* and
+#    every image gets two conflicting values.
+# 2. netlify.toml's rules were never actually live. The deploy never picked the
+#    file up, so the site ran on Netlify's defaults and none of this was tested
+#    by anything. Every rule below is verified by reading a real response, not
+#    by trusting that it carried over.
+
+# Vite fingerprints what it emits, so those can never go stale.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Google's font filenames are content hashes, same argument. scripts/fonts.ts.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The art is not fingerprinted: paths are stable because icons.ts derives them
+# from a display name and the validator holds them to it. A day, then
+# revalidate, so a corrected image reaches people without re-fetching 900 files
+# every visit.
+#
+# .jpg is new. netlify.toml only ever named .png and .webp, so the twelve JPGs
+# in themes/ have never had a rule, and one of them is the largest file on the
+# site at 1.6 MB.
+/*.png
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/*.webp
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/*.jpg
+  Cache-Control: public, max-age=86400, must-revalidate
+
+# The page itself names the fingerprinted bundle, so it must never be the stale
+# thing that pins everything else to an old build. This matches what Workers
+# sends by default, and is stated anyway so the intent survives a change of
+# default.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Everything, and deliberately no Cache-Control here. See note 1 above.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Netlify sent this without being asked and netlify.toml never declared it, so
+  # it is a live header with no home in the config. Carried explicitly. Without
+  # `preload`, which is a one-way commitment and the domain is new.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # No third-party anything: no fonts, no analytics, no CDN. The one thing the
+  # page fetches is itself, so the policy can say exactly that. The fonts used
+  # to break this and nobody saw it, because the policy was never applied.
+  #
+  # connect-src 'self' is what lets Phase 4's /api/* work without touching a
+  # character of this. That is the whole reason the API is same-origin.
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'

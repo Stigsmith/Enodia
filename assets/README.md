@@ -11,12 +11,29 @@ Two sources, and the difference matters. **The file extension tells you which:**
 
 `boons/` and `duos/` are mixed, so a category is no longer a source. The extension is.
 
-Two scripts touch this directory and they do different jobs:
+Three scripts touch this directory and they do different jobs:
 
 | Script | Job |
 |---|---|
 | `build-lib.ps1` | Rebuilds the **wiki half** out of the saved-page zips. Deletes `.webp` only, and never enters `arcana/`, `hexes/`, `rarity/` or `vows/`. **Do not remove that guard** |
 | `npm run assets` | Writes `manifest.json`, and the **only** thing that writes it. `--fill` copies missing icons out of the game extraction first |
+| `npm run fonts` | Owns `fonts/` alone. Clears and re-downloads it, and rewrites `src/ui/fonts.css`. Not part of any build |
+
+## Two things in here are not art
+
+`vite.config.ts` sets `publicDir: 'assets'`, so this directory is also what gets copied
+into `dist/`. Two files ride along on purpose:
+
+| | |
+|---|---|
+| `_headers` | Cache tiers and security headers, read by Cloudflare Workers at deploy time. Never served. It is here because Workers reads it from the root of the assets directory, which is `dist/`, and this is the only thing Vite copies there |
+| `fonts/` | 32 `woff2` files, the four typefaces the page used to fetch from Google |
+
+**Neither is visible to anything that walks this directory**, and that is not luck. All
+three of `scripts/assets.ts`, `scripts/validate.ts` and `scripts/prune.ts` filter to image
+extensions, and `prune.ts` takes its categories from directories only. So `_headers` is not
+a category, `woff2` is not a deletion candidate, and the manifest does not gain 32 rows it
+would then have to explain. Anything else added here needs the same check first.
 
 The guard used to delete whole directories, which would have taken the game art in
 `boons/` and `duos/` with it. It now deletes by extension, which is the same rule stated

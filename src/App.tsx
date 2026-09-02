@@ -493,12 +493,44 @@ export function App() {
   )
 }
 
+/**
+ * The Ko-fi handle, and the only place it is written.
+ *
+ * Empty until the account exists, and the footer draws no link while it is, so
+ * a placeholder can never ship pointing at a stranger's donation page. Set it
+ * to the handle alone, not the URL.
+ *
+ * **A plain link on purpose.** Ko-fi's embedded widget wants `script-src` and
+ * `frame-src` opened onto a third party, which is the same hole the Google
+ * Fonts link was and which this project has just finished closing. A link costs
+ * the CSP nothing, because a top-level navigation is not governed by
+ * `default-src` and `form-action 'none'` only blocks form submissions.
+ *
+ * Ko-fi rather than Buy Me a Coffee because Ko-fi takes 0% of a one-off
+ * donation and Buy Me a Coffee takes 5%, with no tier that removes it.
+ *
+ * The wording below is the owner's to change. It says hosting deliberately:
+ * Supergiant's fansite licence covers this art for noncommercial use, and
+ * "chip in for hosting, the tool stays free" is what noncommercial reads like.
+ */
+const KOFI = ''
+
 function Colophon() {
   return (
     <footer className="colophon">
       <p>
         Game data read from build <span className="mono">{gameVersion}</span>. Unofficial fan project, not
         affiliated with Supergiant Games.
+        {KOFI ? (
+          <>
+            {' '}
+            Free, and staying free.{' '}
+            <a href={`https://ko-fi.com/${KOFI}`} target="_blank" rel="noopener noreferrer">
+              Chip in for hosting
+            </a>
+            .
+          </>
+        ) : null}
       </p>
     </footer>
   )

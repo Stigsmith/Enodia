@@ -65,6 +65,31 @@ the wiki has already done that extraction. **Facts from the game, pictures from 
 Static site. No network call at runtime. All state in `localStorage`. The whole of Phase 1
 through 3 ships without a server.
 
+**Phase 4 added one, and it changed less than it sounds.** There is now a Worker on the same
+origin under `/api/*`, and a D1 database behind it holding accounts. Everything above is
+still true of the tool itself: no page load, no boon icon and no logged run touches it. The
+account is additive, and the gate sits at share-or-compete rather than at the door.
+
+```
+  the browser                       same origin                    behind it
+  ───────────                       ───────────                    ─────────
+
+  every page, every image  ────►  static assets, free       ──►  nothing
+  a run, a build, a pick   ────►  localStorage, no request  ──►  nothing
+
+  sign in, publish         ────►  /api/*  the Worker        ──►  D1: user, session,
+                                  run_worker_first only          account, verification
+                                  for these paths
+```
+
+**`run_worker_first: ["/api/*"]` in `wrangler.jsonc` is what keeps that split real** rather
+than aspirational. Static asset requests are free and unlimited; Worker invocations are
+metered. Setting it to `true` would make every wallpaper a billable call.
+
+And the whole API is same-origin on purpose, which is why `assets/_headers` still says
+`connect-src 'self'` with nothing added. A backend anywhere else would have forced that
+policy open to a third party on day one.
+
 ### Package layout
 
 ```
@@ -862,6 +887,10 @@ from its source is how a tally quietly starts lying about which gods you play.
 
 Build sharing is a URL fragment, compressed, no server. Phase 4 adds accounts and nothing
 before it does.
+
+**Phase 4 has started and the accounts exist**, in `worker/`. Sharing by fragment is
+untouched and stays the default: an account is for publishing and competing, not for using
+the tool. Nothing in sections 1 through 9 changed.
 
 ---
 
