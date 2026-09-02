@@ -20,6 +20,19 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-02',
+    title: 'Dora',
+    say: 'None of this makes the tool better. It is going in anyway.',
+    points: [
+      'The sections that are not built yet used to be greyed out and unclickable. They open now, onto an empty page with Dora standing in it holding a clipboard. The phase marker is still there, so nothing is pretending.',
+      'Dora has opinions about being clicked. She has eight of them and they escalate.',
+      'On the fifth click she attempts a frightening voice. It does not hold.',
+      'She also stands on the roadmap and watches it scroll past, which she is not being paid for.',
+      'Her lines were written by reading the 763 she has in the game and copying none of them.',
+      'This entry exists so that the changelog, which is a document about work, contains a note about the work of adding a ghost who does no work.',
+    ],
+  },
+  {
+    date: '2026-09-02',
     title: 'The build editor, rebuilt',
     say: 'Most of the first round of playtest feedback, and the editor took the bulk of it.',
     points: [
