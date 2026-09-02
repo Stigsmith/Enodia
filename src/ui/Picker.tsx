@@ -200,6 +200,21 @@ export function Picker({
       const trait = traits.get(id)
       if (!trait || held.has(id)) return false
       if (!satisfiesRequirement(trait.requires, held)) return false
+      /**
+       * **The aspect gate, which the run was missing.**
+       *
+       * Twenty hammer upgrades across the six arms only exist on one aspect:
+       * the etchings and the ankhs want Anubis, and every arm has a pair or two
+       * like it. The editor learned this when the owner reported being offered
+       * Anubis's hammers on a Circe build; the run was offering the same
+       * sixteen on every aspect and nobody had looked.
+       *
+       * `needsAspect` comes off `GameStateRequirements` as
+       * `LastWeaponUpgradeName`. A run with no aspect chosen is not filtered,
+       * because then nothing is ruled out yet.
+       */
+      const needs = trait.needsAspect
+      if (needs && run.aspect && !needs.includes(run.aspect)) return false
       return canBeOffered(id, run.held, traits).route === 'offer'
     })
 
