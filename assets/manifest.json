@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 981,
+ "count": 982,
  "categories": [
   {
    "name": "arcana",
@@ -140,10 +140,10 @@
   },
   {
    "name": "ui",
-   "count": 21,
+   "count": 22,
    "source": "mixed",
    "wiki": 19,
-   "game": 2
+   "game": 3
   },
   {
    "name": "vows",
@@ -8834,6 +8834,14 @@
    "sha256": "fc90e6eedbe0c93d809d052b1b1544322613018aae7915d043ccd3a5f50f1be7",
    "source": "wiki",
    "needsProvenance": true
+  },
+  {
+   "id": "dora-default",
+   "category": "ui",
+   "file": "ui/dora-default.png",
+   "bytes": 118855,
+   "sha256": "4b175d40f179ceb83b2869906554da7dde3d5bf2fdb242b95b933eddba18b2ae",
+   "source": "game"
   },
   {
    "id": "dora-hardhat",

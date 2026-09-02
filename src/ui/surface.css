@@ -1260,10 +1260,8 @@
 
 /* Where you already are. A pinned pane is on screen the whole time, so it has
  * to say which of its entries is the screen you are looking at. */
-.menu-panel button.is-here {
-  border-color: var(--div-4);
-  background: var(--ink-900);
-}
+/* Superseded by the pressed plate further down this file. Only the label
+ * colour is still set here, where the pane's own rules live. */
 
 .menu-panel button.is-here .menu-label {
   color: var(--lit);
@@ -1918,6 +1916,29 @@
 }
 
 /* Covers rather than pushes, and returns you where you were. DESIGN.md 8. */
+/**
+ * The menu, on the game's own sidebar rather than on a CSS panel.
+ *
+ * ## Why this art and not the save slot
+ *
+ * The owner suggested the build card's plate for the pop-out. It is the wrong
+ * shape and the file already says so: `slot-card.png` is asymmetric top to
+ * bottom with an ornamented head and foot, which is why `.bcard` pins it to
+ * `aspect-ratio: 425 / 630`. A menu whose height follows its content cannot
+ * hold a ratio, and stretching that plate puts its ornament in the wrong place.
+ *
+ * `sidebars.png` is the other half of the same suggestion and it fits exactly.
+ * It is what the editor's leftmost pane already wears, it is 380 by 1080 for a
+ * ratio of 0.35 against the pinned pane's 0.30, and it is a lit left edge with
+ * diagonal streaks rather than a framed box, so it covers to any height without
+ * a shape to distort. Both nav modes get it, because the menu is the same menu
+ * whichever way it is pinned.
+ *
+ * **The border, the radius and the ink are gone rather than layered over.** The
+ * note at 2110 in this file is the reason and it is right: art with its own
+ * frame, put inside a bordered box, draws a panel within a panel. The way out
+ * is to delete the outer box, not to turn the art down until it stops arguing.
+ */
 .menu-panel {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -1930,10 +1951,12 @@
   width: min(21rem, 90vw);
   max-height: 70dvh;
   overflow-y: auto;
-  padding: 0.4rem;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-card);
-  background: var(--ink-850);
+  padding: 0.5rem 0.55rem;
+  border: 0;
+  border-radius: 0;
+  background:
+    url('/shell/sidebars.png') left top / 100% auto no-repeat,
+    var(--ink-900);
   box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
 }
 
@@ -1958,22 +1981,56 @@
   padding: 0;
 }
 
+/**
+ * Every row on the plate "Create a build" already wears, widened.
+ *
+ * The owner's question was whether the one button that looks like the game
+ * could be the rest of them too. It can: `border-image` is why `.quiet` can
+ * stretch one 284 by 80 sprite to any width without the caps distorting, and a
+ * menu row is just a wider, shorter version of the same press.
+ *
+ * The recipe is `.quiet` at line 209, including the `outset` on hover, which is
+ * there because the lit sprite is 302 wide against the plain one's 284 and
+ * folding that glow back inside the box made hovering look like pressing.
+ */
 .menu-panel button {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
   width: 100%;
-  padding: 0.4rem 0.55rem;
-  border: 1px solid transparent;
-  border-radius: var(--r-soft);
+  border: 0 solid transparent;
+  border-width: 0.85rem 1.4rem;
+  border-image: url('/shell/button.png') 30 fill / 0.85rem 1.4rem stretch;
+  border-radius: 0;
+  padding: 0 0.2rem;
   background: none;
   text-align: left;
   cursor: pointer;
 }
 
-.menu-panel button:hover:not(:disabled) {
-  border-color: var(--div-4);
-  background: var(--ink-900);
+.menu-panel button:hover:not(:disabled),
+.menu-panel button:focus-visible {
+  border-image-source: url('/shell/button-highlight.png');
+  border-image-outset: 0.08rem 0.26rem;
+  outline: none;
+}
+
+/**
+ * Where you already are: the plate is pressed in.
+ *
+ * **Not `buttonselected-highlight.png`**, which the note at `builds.css:4584`
+ * already worked out is not a button face at all: 445 by 212, a thin selection
+ * outline in the upper left and empty canvas around it, an overlay the game
+ * composites onto a face. Stretched to a row it draws its outline through the
+ * middle of the label.
+ *
+ * `button-press.png` is a real face and says the right thing anyway. The page
+ * you are on is the one already pushed.
+ */
+.menu-panel button.is-here {
+  border-image-source: url('/shell/button-press.png');
+  border-color: transparent;
+  background: none;
 }
 
 .menu-label {
@@ -2714,8 +2771,10 @@
 /* The motif, not the panel. TraitTrayBacking is a whole panel with its own
  * frame, so using it as a background draws a panel inside this one. At 7
  * percent behind the content it is the smoke VISUAL.md 1 asks for. */
-.rail-sheet::before,
-.menu-panel::before {
+/* `.menu-panel` used to be in here too, borrowing the tray motif at 7 percent
+ * because it had no art of its own. It wears `sidebars.png` at full strength
+ * now, and two backings arguing is what the note at 2110 warns about. */
+.rail-sheet::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -2725,8 +2784,7 @@
   pointer-events: none;
 }
 
-.rail-sheet > *,
-.menu-panel > * {
+.rail-sheet > * {
   position: relative;
 }
 

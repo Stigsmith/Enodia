@@ -275,44 +275,51 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
         aria-hidden="true"
       />
 
+      {/* A centred column: what she is saying, then her, then the steps. The
+        * named way out is gone on the owner's call. Clicking anywhere advances,
+        * the arrows step, Escape leaves, and a button saying so was one more
+        * thing to read on a panel whose whole job is to be read quickly. */}
       <div ref={her} className="tour-her" style={{ left, top }}>
         <p className="tour-say" role="status">
           {step.say}
         </p>
 
-        <div className="tour-foot">
-          <img className="tour-dora" src="/ui/dora-thoughtful.png" alt="" aria-hidden="true" />
+        {/* She shifts pose now and then rather than standing in one attitude
+          * for eight steps. Keyed to the step rather than random, so it does
+          * not flicker on a re-render, and thoughtful stays the usual one:
+          * the change should read as her shifting, not as a slideshow. */}
+        <img
+          className="tour-dora"
+          src={index % 3 === 1 ? '/ui/dora-default.png' : '/ui/dora-thoughtful.png'}
+          alt=""
+          aria-hidden="true"
+        />
 
-          {/* The game's own stepper arrows, the pair already on the Fear
-            * counter in `Fear.tsx`. Left and right rather than up and down,
-            * because this steps forward rather than counts. */}
-          <div className="tour-steps">
-            <button
-              type="button"
-              className="tour-arrow"
-              disabled={index === 0}
-              aria-label="Back a step"
-              onClick={() => go(index - 1)}
-            >
-              <img src="/shell/settings-arrow-left.png" alt="" aria-hidden="true" />
-            </button>
+        {/* The game's own stepper arrows, the pair already on the Fear counter
+          * in `Fear.tsx`. Left and right rather than up and down, because this
+          * steps forward rather than counts. */}
+        <div className="tour-steps">
+          <button
+            type="button"
+            className="tour-arrow"
+            disabled={index === 0}
+            aria-label="Back a step"
+            onClick={() => go(index - 1)}
+          >
+            <img src="/shell/settings-arrow-left.png" alt="" aria-hidden="true" />
+          </button>
 
-            <span className="tour-count">
-              {index + 1} of {live.length}
-            </span>
+          <span className="tour-count">
+            {index + 1} of {live.length}
+          </span>
 
-            <button
-              type="button"
-              className="tour-arrow"
-              aria-label={last ? 'Finish' : 'Next step'}
-              onClick={() => go(index + 1)}
-            >
-              <img src="/shell/settings-arrow-right.png" alt="" aria-hidden="true" />
-            </button>
-          </div>
-
-          <button type="button" className="tour-out" onClick={onClose}>
-            {last ? 'Right you are' : 'Leave it'}
+          <button
+            type="button"
+            className="tour-arrow"
+            aria-label={last ? 'Finish' : 'Next step'}
+            onClick={() => go(index + 1)}
+          >
+            <img src="/shell/settings-arrow-right.png" alt="" aria-hidden="true" />
           </button>
         </div>
       </div>
