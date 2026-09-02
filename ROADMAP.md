@@ -12,11 +12,12 @@ Last updated 2 September 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit". **Complete.** Phase 4 started: accounts exist, `worker/` |
+| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, accounts held shut on mail |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
 | **Tests** | 420, across 23 files |
 | **Validator** | 0 failures, 3 warnings |
 | **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
+| **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
@@ -296,10 +297,12 @@ walking `InheritFrom` itself.
 |---|---|---|
 | The Cloudflare deploy | The owner | Needs `wrangler login` once, which is a browser sign-in this cannot do. Then `npm run deploy`. Every header and cache rule is already verified under `wrangler dev` |
 | `enodia.tools` | The owner | Verified free at the registry, $23/year at cost from Cloudflare Registrar. A purchase, so it is the owner's. Nothing waits on it: the deploy is verified on `workers.dev` and the domain attaches after |
+| ~~`wrangler login`~~, ~~`wrangler d1 create`~~, ~~the secret~~, ~~the domain~~ | **Done, 2 September 2026.** Live at `enodia.me` |
 | `wrangler d1 create enodia` | The owner | Needs the login above. `wrangler.jsonc` carries a placeholder `database_id`, which `wrangler dev` ignores and a real deploy does not. Paste the id it prints |
 | `wrangler secret put BETTER_AUTH_SECRET` | The owner | Signs every session cookie. `.dev.vars` covers local. Without it in production the Worker returns 500 by design, rather than signing cookies with `undefined` |
-| A mail provider | The owner | **Stage 3 cannot ship without one.** No provider means no email verification and no password reset, so the first person to forget a password is locked out permanently. Fine now, since Stage 2 has no UI |
-| The Ko-fi handle | The owner | `App.tsx` `KOFI` is empty and the footer draws no link while it is, so no placeholder can ship pointing at a stranger. Set it to the handle alone once the account exists |
+| A mail provider | The owner | **The one thing holding accounts shut.** Reset is written and waits on a key: `worker/email.ts` is Resend, `RESEND_API_KEY` and `MAIL_FROM` are read from secrets, and `/api/capabilities` reports whether it is configured. Owner is setting one up, expected 3 September 2026 |
+| Flipping `ACCOUNTS_LIVE` | The owner | One constant in `src/state/account.ts`, false today. It drives the account room, the menu badge, the menu note and the Publish item together. Flip it once the mail key is in. **It is a UI gate only**: `/api/auth/*` is reachable regardless, which is accepted and explained where the constant is defined |
+| ~~The Ko-fi handle~~ | **Done.** `stigsmith`, live in the footer |
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
