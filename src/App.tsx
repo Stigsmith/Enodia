@@ -27,6 +27,8 @@ import { Settings } from './ui/Settings.tsx'
 import { Changelog, Roadmap } from './ui/Pages.tsx'
 import { About, Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
+import { Account } from './ui/Account.tsx'
+import { ACCOUNTS_LIVE } from './state/account.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
@@ -288,6 +290,20 @@ export function App() {
 
   /* The rooms that are empty on purpose. One branch, because the only thing
    * that differs between them is the name over the door. */
+  /**
+   * The account room opens only when accounts are actually safe to hand a
+   * stranger. `ACCOUNTS_LIVE` is false until password reset exists, because an
+   * account with no way back in is a trap with a nice form on it. Until then
+   * this stays one of Dora's empty rooms, which is the truthful state.
+   */
+  if (screen === 'account' && ACCOUNTS_LIVE) {
+    return frame(
+      <div className="shell is-wide">
+        <Account />
+      </div>,
+    )
+  }
+
   const unbuilt: Partial<Record<View, { title: string; phase: string }>> = {
     exchange: { title: 'Build exchange', phase: 'Phase 4' },
     account: { title: 'Account', phase: 'Phase 4' },
