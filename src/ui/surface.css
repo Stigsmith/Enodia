@@ -3105,7 +3105,11 @@
 
 .standing {
   position: fixed;
-  right: 0;
+  /* Clear of the help mark, which owns the bottom right corner. The handle has
+   * `margin-left: auto` so it simply slides, and the body has the room inside
+   * its 26rem. Shifting the drawer beats giving the mark a per-screen offset:
+   * that is a list that only grows, and the next screen would not know. */
+  right: 3.8rem;
   bottom: 0;
   z-index: 15;
   max-width: min(26rem, 92vw);

@@ -34,6 +34,7 @@ import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
+import { HelpProvider, PageHelp } from './ui/PageHelp.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
@@ -214,6 +215,9 @@ export function App() {
     /* Every `Mark` on every screen reads its hover handlers out of here, so
      * this wraps the whole app rather than any one layout. */
     <PeekProvider>
+    {/* The editor is a mode inside Builds rather than a view of its own, so it
+      * names its own help topic from in there. This is what it names it to. */}
+    <HelpProvider>
     <div className="app">
       <Hecate />
       <Menu
@@ -224,6 +228,10 @@ export function App() {
         onShowBriefing={run ? openBriefing : undefined}
       />
       <div className="app-view">{children}</div>
+
+      {/* One mark, every screen, because `frame` wraps all of them. It draws
+        * nothing on a screen that has no explanation written for it. */}
+      <PageHelp view={screen} />
 
       {/* A shared build covers whatever screen you were on, because it is a
         * question that has to be answered before anything else makes sense. */}
@@ -241,6 +249,7 @@ export function App() {
         />
       ) : null}
     </div>
+    </HelpProvider>
     </PeekProvider>
   )
 
