@@ -34,6 +34,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
+import { ROAR_MS } from './Dora.tsx'
 import type { Step } from './tour.ts'
 
 /** Breathing space around the lit element, so the ring is not on its edge. */
@@ -68,6 +69,14 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
   const live = useMemo(() => steps.filter((step) => !step.at || rectOf(step.at)), [steps])
 
   const [index, setIndex] = useState(0)
+  /**
+   * Whether she has dropped the ghost voice on the step she is on.
+   *
+   * Same two-part line as the poke loop: the capitals first, then her giving up
+   * on them. Held here rather than in the step, because it is about where you
+   * are in a step rather than about the step itself.
+   */
+  const [dropped, setDropped] = useState(false)
   const [spot, setSpot] = useState<Spot>(null)
   const [ready, setReady] = useState(false)
   const box = useRef<HTMLDivElement>(null)
@@ -89,15 +98,29 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
 
   const step = live[Math.min(index, live.length - 1)]
   const last = index >= live.length - 1
+  /** She is mid-voice: the capitals are up and nothing may move on yet. */
+  const roaring = Boolean(step?.roar) && !dropped
 
   const go = useCallback(
     (to: number) => {
+      // Locked while she is doing the voice. The climb-down is the punchline
+      // and clicking past it before it lands throws the joke away. It unlocks
+      // itself, so there is nothing to get stuck behind.
+      if (roaring) return
       if (to < 0) return
       if (to >= live.length) return onClose()
       setIndex(to)
     },
-    [live.length, onClose],
+    [live.length, onClose, roaring],
   )
+
+  /** The capitals, then her dropping them, on a timer rather than on a click. */
+  useEffect(() => {
+    setDropped(false)
+    if (!step?.roar) return
+    const stop = window.setTimeout(() => setDropped(true), ROAR_MS)
+    return () => window.clearTimeout(stop)
+  }, [step])
 
   /**
    * Bring the step's anchor into view, then measure it once it has stopped.
@@ -156,7 +179,10 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
   useEffect(() => {
     box.current?.focus()
     const key = (event: KeyboardEvent) => {
+      // Escape is the way out and stays open even mid-voice: locking somebody
+      // inside a joke is not the same as making them wait for it.
       if (event.key === 'Escape') return onClose()
+      if (roaring) return
       if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         go(index + 1)
@@ -168,7 +194,7 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
     }
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
-  }, [index, go, onClose])
+  }, [index, go, onClose, roaring])
 
   useLayoutEffect(() => {
     const node = her.current
@@ -280,8 +306,8 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
         * the arrows step, Escape leaves, and a button saying so was one more
         * thing to read on a panel whose whole job is to be read quickly. */}
       <div ref={her} className="tour-her" style={{ left, top }}>
-        <p className="tour-say" role="status">
-          {step.say}
+        <p className={`tour-say${roaring ? ' is-roaring' : ''}`} role="status">
+          {roaring ? step.roar : step.say}
         </p>
 
         {/* She shifts pose now and then rather than standing in one attitude
@@ -289,8 +315,14 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
           * not flicker on a re-render, and thoughtful stays the usual one:
           * the change should read as her shifting, not as a slideshow. */}
         <img
-          className="tour-dora"
-          src={index % 3 === 1 ? '/ui/dora-default.png' : '/ui/dora-thoughtful.png'}
+          className={`tour-dora${roaring ? ' is-roaring' : ''}`}
+          src={
+            roaring
+              ? '/ui/dora-spooky.png'
+              : index % 3 === 1
+                ? '/ui/dora-default.png'
+                : '/ui/dora-thoughtful.png'
+          }
           alt=""
           aria-hidden="true"
         />
@@ -302,7 +334,7 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
           <button
             type="button"
             className="tour-arrow"
-            disabled={index === 0}
+            disabled={index === 0 || roaring}
             aria-label="Back a step"
             onClick={() => go(index - 1)}
           >
@@ -316,6 +348,7 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
           <button
             type="button"
             className="tour-arrow"
+            disabled={roaring}
             aria-label={last ? 'Finish' : 'Next step'}
             onClick={() => go(index + 1)}
           >

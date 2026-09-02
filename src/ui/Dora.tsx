@@ -119,7 +119,7 @@ const PLAN_POKES: Poke[] = [
  * read as a flicker rather than as a bit. This is long enough to register as
  * her having a go, and short enough that it is still a slip rather than a mode.
  */
-const ROAR_MS = 1600
+export const ROAR_MS = 1600
 
 /**
  * The poke loop, shared by both of her.
