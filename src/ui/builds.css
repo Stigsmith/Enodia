@@ -5541,9 +5541,17 @@ button.mark {
  * art either keeps its shape or it shows.
  */
 .logrun-box {
-  /* 40rem is the width at which 1173 by 1063, minus a frame that spends a
-   * third of its height, leaves a box the content fits inside. */
-  width: min(40rem, 100%);
+  /**
+   * 48rem, a fifth up from 40.
+   *
+   * The title was clipping into the ornament, and scaling the panel is the fix
+   * rather than more padding **because the type does not scale with it**. The
+   * frame, its ornament and the percentage padding are all fractions of the
+   * width, so they hold their relationship at any size; `h3` is 1.05rem and
+   * stays 1.05rem. A bigger panel is therefore a proportionally smaller title,
+   * which is the clearance. The owner's instinct, and the arithmetic agrees.
+   */
+  width: min(48rem, 100%);
   aspect-ratio: 1173 / 1063;
   max-height: 92vh;
   border: 0;
@@ -5656,6 +5664,26 @@ button.mark {
 .logrun-yesno button.is-on,
 .logrun-ended button.is-on {
   color: var(--bone);
+}
+
+/**
+ * The coloured plates are scaled up, and it is not a nudge to taste.
+ *
+ * Sampled: `button-confirm` and `button-cancel` are 400 by 125 canvases whose
+ * **visible plate is only 350 by 70**. Forty-four percent of the height is
+ * transparent glow. `button.png` is 284 by 80 with a 272 by 71 plate, so its
+ * art fills 89 percent of its canvas against these two filling 56.
+ *
+ * Stretched to the same box, the same box therefore gets a full plate when
+ * unpressed and a squat one when pressed, which is the squashing the owner saw
+ * on the press rather than on the plate.
+ *
+ * 114 by 179 percent is the reciprocal of those two fractions, so the visible
+ * plate lands exactly on the button and the glow falls outside and is clipped.
+ * Losing a soft outer halo is the cheaper of the two.
+ */
+.logrun-yesno button.is-on {
+  background-size: 114% 179%;
 }
 
 .logrun-yesno button:first-child.is-on {
