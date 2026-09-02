@@ -71,7 +71,13 @@ export function Standing({
 
   return (
     <aside className={`standing${open ? ' is-open' : ''}`} aria-label="What is still open">
-      <button type="button" className="standing-handle" onClick={() => setOpen((was) => !was)} aria-expanded={open}>
+      <button
+        type="button"
+        className="standing-handle"
+        data-tour="standing-handle"
+        onClick={() => setOpen((was) => !was)}
+        aria-expanded={open}
+      >
         {open ? 'Close' : `${counted.open} builds open`}
       </button>
 

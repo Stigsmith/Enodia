@@ -435,7 +435,7 @@ export function App() {
          * knowing how many Exits a run has left, so asking them to correct the
          * number was asking the tool's question instead of answering theirs.
          * It is derived from Exits taken now and reads as the guess it is. */}
-        <p className="topbar-exits">
+        <p className="topbar-exits" data-tour="topbar-exits">
           <span className="topbar-about">about</span>
           <strong>{run.exitsLeft}</strong>
           <span>Exits left</span>
@@ -471,7 +471,7 @@ export function App() {
 
       </header>
 
-      <aside className="railbar" aria-label="Your slots">
+      <aside className="railbar" data-tour="railbar" aria-label="Your slots">
         <Rail held={run.held} />
       </aside>
 

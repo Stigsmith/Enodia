@@ -153,7 +153,7 @@ export function About() {
           changes as you stack it.
         </p>
         <p className="ref-say">
-          Read from game build <span className="ref-mono">{gameVersion}</span>. When the game
+          Read from game build <span className="ref-mono" data-tour="about-version">{gameVersion}</span>. When the game
           patches, the data is extracted again and the differences are reviewed rather than
           accepted.
         </p>

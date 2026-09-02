@@ -56,7 +56,16 @@ const BAND_CAP = 5
  */
 const ARCANA_CAP = 5
 
-export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string) => void }) {
+export function Card({
+  built,
+  onOpen,
+  first,
+}: {
+  built: Assembled
+  onOpen: (id: string) => void
+  /** the one the tour points at, so it lights a card rather than the whole grid */
+  first?: boolean
+}) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
   const arcana = built.crossroads.pieces.filter((piece) => piece.kind === 'arcana')
@@ -64,7 +73,7 @@ export function Card({ built, onOpen }: { built: Assembled; onOpen: (id: string)
   const read = readRepeat(build, traits, olympians)
 
   return (
-    <li className="bcard">
+    <li className="bcard" {...(first ? { 'data-tour': 'builds-card' } : {})}>
       <button type="button" className="bcard-hit" onClick={() => onOpen(build.id)}>
         <span className="bcard-head">
           <span className="bcard-name">{build.name}</span>

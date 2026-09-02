@@ -6204,122 +6204,233 @@ button.mark {
   transform: translateY(-2px);
 }
 
-/* ------------------------------------------------------- the dim and her -- */
+/* Out of the way while the tour runs. It is the control that opened it, so
+ * leaving it lit in the corner is the tour offering to start the tour. */
+.pagehelp-open.is-away {
+  opacity: 0;
+  pointer-events: none;
+}
 
-.pagehelp {
+/* --------------------------------------------------------------- the tour -- */
+
+/**
+ * The light, and the dim around it.
+ *
+ * **One element does both.** `box-shadow: 0 0 0 9999px` paints the dim
+ * everywhere outside this box, so the hole is the box itself and there is no
+ * mask, no clip-path and no second layer to keep in step. It also animates,
+ * which a mask would not: transitioning the box's own position and size makes
+ * the light travel between steps, and that is most of what makes this read as
+ * somebody showing you round.
+ *
+ * 0.62, not the 0.88 the static panel used. At 0.88 the page was gone, and a
+ * companion pointing at a page you cannot see is just a manual with a picture.
+ */
+.tour-spot {
+  position: fixed;
+  z-index: 79;
+  border-radius: var(--r-soft);
+  box-shadow:
+    0 0 0 9999px rgb(0 0 0 / 0.62),
+    0 0 0 1px color-mix(in srgb, var(--lit) 55%, transparent),
+    0 0 22px 3px color-mix(in srgb, var(--lit) 30%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    left 0.34s var(--e-response, ease),
+    top 0.34s var(--e-response, ease),
+    width 0.34s var(--e-response, ease),
+    height 0.34s var(--e-response, ease),
+    opacity 0.2s ease;
+}
+
+.tour.is-ready .tour-spot {
+  opacity: 1;
+}
+
+/* A step about the page as a whole lights nothing, so the hole collapses to
+ * the middle of the screen and only the dim is left. */
+.tour-spot.is-whole {
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  box-shadow: 0 0 0 9999px rgb(0 0 0 / 0.62);
+}
+
+/**
+ * Catches every click.
+ *
+ * The cutout is light and takes no presses, so without this the page under the
+ * hole would still be live and a click meant as "next" would press whatever she
+ * was pointing at. Any click here is the next step.
+ */
+.tour-catch {
   position: fixed;
   inset: 0;
-  /* Over everything, `.logrun` at 70 included. */
-  z-index: 80;
-  display: grid;
-  align-items: end;
-  justify-items: center;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
-  /* 0.88 and a blur, not 0.78 and nothing. At 0.78 the page behind stayed
-   * legible enough to read, so her lines were competing with a roadmap for
-   * attention and losing. Caught in a screenshot; every computed style said
-   * the text was fine. */
-  background: rgb(0 0 0 / 0.88);
-  backdrop-filter: blur(3px);
+  z-index: 78;
+  border: 0;
+  background: none;
   cursor: pointer;
-  /* Nothing here is ever allowed to fall off the bottom. Measured: the editor
-   * says four lines, and three of them plus her already reach 632px of a 640
-   * tall phone. Scrolling is the floor under that; the rule below is what
-   * usually keeps it from being needed. */
-  overflow-y: auto;
-  animation: pagehelp-in 0.18s ease-out;
 }
 
-/* She stands beside the words rather than under them once there is room. */
-@media (min-width: 52rem) {
-  .pagehelp {
-    grid-template-columns: minmax(0, 34rem) auto;
-    align-items: center;
-    justify-content: center;
-    gap: 2.5rem;
-  }
-}
+/* ---------------------------------------------------------------- and her -- */
 
-.pagehelp:focus-visible {
-  outline: none;
-}
-
-@keyframes pagehelp-in {
-  from {
-    opacity: 0;
-  }
-}
-
-.pagehelp-body {
+.tour-her {
+  position: fixed;
+  z-index: 81;
+  width: 18.75rem;
   display: grid;
-  gap: 0.75rem;
-  max-width: 34rem;
+  gap: 0.5rem;
+  /* She travels with the light rather than jumping ahead of it. */
+  transition:
+    left 0.34s var(--e-response, ease),
+    top 0.34s var(--e-response, ease);
+}
+
+/**
+ * What she is saying.
+ *
+ * ## Three plates were tried and two were wrong
+ *
+ * **Not `dialogue-static.png`.** Its crescent ornament is baked in at 1.78 and
+ * flattens the moment the box is not that shape. Already learned once, behind
+ * the caveats bar.
+ *
+ * **Not `subtitle-generic.png` either, and that one is the interesting miss.**
+ * It is named like a plate and it is not one: sampled, its centre alpha is 5 of
+ * 255. It is an edge vignette with nothing in the middle, so it wired up
+ * correctly, reported the right computed styles, and painted nothing. A
+ * screenshot was the only thing that caught it.
+ *
+ * `tooltip-backing.png` is a real plate at 204, and it is already what `Peek`
+ * puts behind a line of explanation. Same job here, so the same surface.
+ *
+ * The `solid` is load-bearing: `border-image` paints nothing without a border
+ * style. Same shorthand shape as `.quiet` at `surface.css:212`.
+ */
+.tour-say {
+  margin: 0;
+  min-height: 3.4rem;
+  border: 0 solid transparent;
+  border-width: 1.15rem 1.35rem;
+  border-image: url('/shell/tooltip-backing.png') 48 fill / 1.15rem 1.35rem stretch;
+  padding: 0 0.2rem;
+  color: var(--bone);
+  font-size: 0.9rem;
+  line-height: 1.5;
   text-align: left;
 }
 
-.pagehelp-line {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.55;
-  color: var(--bone);
+.tour-foot {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'dora steps'
+    'dora out';
+  align-items: center;
+  gap: 0.4rem 0.7rem;
 }
 
-/* Quiet, because the rule is "anywhere", and this is for whoever would rather
- * aim at a control than have guessed that. */
-.pagehelp-close {
+/**
+ * Half the size she was, which is the point.
+ *
+ * At 17rem she covered the controls she was meant to be pointing at. 8.5rem is
+ * still legible and small enough to stand beside a 2rem button without being
+ * the whole story.
+ */
+.tour-dora {
+  grid-area: dora;
+  width: 8.5rem;
+  height: auto;
+  filter: drop-shadow(0 8px 22px var(--ink-950));
+}
+
+.tour-steps {
+  grid-area: steps;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* The game's own stepper arrows, the pair already on the Fear counter. Left and
+ * right rather than up and down, because this steps rather than counts. */
+.tour-arrow {
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.tour-arrow img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tour-arrow:hover:not(:disabled),
+.tour-arrow:focus-visible {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.tour-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.tour-count {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--bone-faint);
+  white-space: nowrap;
+}
+
+.tour-out {
+  grid-area: out;
   justify-self: start;
-  margin-top: 0.5rem;
-  padding: 0.35rem 0.9rem;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-soft);
+  padding: 0;
+  border: 0;
   background: none;
   color: var(--bone-faint);
   font-family: var(--mono);
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
 }
 
-.pagehelp-close:hover,
-.pagehelp-close:focus-visible {
+.tour-out:hover,
+.tour-out:focus-visible {
   color: var(--lit);
 }
 
-/* She rises in rather than fading, so it reads as her arriving. */
-.pagehelp-dora {
-  width: auto;
-  max-width: min(17rem, 44vw);
-  height: auto;
-  filter: drop-shadow(0 12px 30px var(--ink-950));
-  animation: pagehelp-dora-in 0.24s ease-out;
+.tour:focus-visible {
+  outline: none;
 }
 
-/* A short screen, where she and four lines of text are competing for the same
- * height. She gives way, because the words are the feature and she is the
- * delivery. Only bites where the two stack, which is below 52rem wide. */
-@media (max-height: 44rem) and (max-width: 51.99rem) {
-  .pagehelp-dora {
-    max-height: 32dvh;
+/* Narrow: she gets out of her own way. The group is nearly the width of a
+ * phone, so a 8.5rem Dora beside a 18.75rem bubble does not fit. */
+@media (max-width: 30rem) {
+  .tour-her {
+    width: min(20rem, calc(100vw - 1.5rem));
+  }
+
+  .tour-dora {
+    width: 5.5rem;
   }
 }
 
-@keyframes pagehelp-dora-in {
-  from {
-    opacity: 0;
-    transform: translateY(1.5rem);
-  }
-}
-
+/* The light jumps rather than travelling, and `Tour.tsx` drops its scroll to
+ * instant to match. */
 @media (prefers-reduced-motion: reduce) {
-  .pagehelp,
-  .pagehelp-dora {
-    animation: none;
-  }
-
-  .pagehelp-open:hover,
-  .pagehelp-open:focus-visible {
-    transform: none;
+  .tour-spot,
+  .tour-her {
+    transition: none;
   }
 }

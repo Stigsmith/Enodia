@@ -103,7 +103,7 @@ export function Settings() {
           knows whose it is. <strong>There is no account behind it.</strong> It is stored in this
           browser, nobody checks it, and two people can pick the same one.
         </p>
-        <label className="setting-name">
+        <label className="setting-name" data-tour="setting-name">
           <span>Name</span>
           <input
             type="text"
@@ -123,7 +123,7 @@ export function Settings() {
           />
         </label>
       </section>
-      <section className="setting-block">
+      <section className="setting-block" data-tour="setting-export">
         <h3 className="arcana-rule">Your things</h3>
         <p className="setting-say">
           Everything you have made lives in this browser and nowhere else. There is no account and
@@ -152,7 +152,7 @@ export function Settings() {
         {saidJustNow ? <p className="setting-done">{saidJustNow}</p> : null}
       </section>
 
-      <section className="setting-block">
+      <section className="setting-block" data-tour="setting-import">
         <h3 className="arcana-rule">From a file</h3>
         <p className="setting-say">
           An import <strong>replaces</strong> what is here. It is not a merge: a build this file
