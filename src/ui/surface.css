@@ -242,10 +242,40 @@
   outline: none;
 }
 
-/* A press, now that hover is not pretending to be one. Small and deliberate. */
+/**
+ * **`button-press.png` is not the press for `button.png`.** Measured, after the
+ * owner spotted that pressing a menu row squared its corners off.
+ *
+ * The shell ships two button families and they are different shapes. Profiling
+ * the left edge of each sprite from the top of its plate downwards:
+ *
+ * | sprite | edge travels | shape |
+ * |---|---|---|
+ * | `button` | 17 rows | chamfered |
+ * | `button-highlight` | 17 rows | chamfered |
+ * | `button-press` | **2 rows** | square |
+ * | `buttonsecondary` | 1 row | square |
+ * | `buttonsecondary-press` | 1 row | square |
+ *
+ * `button-press` belongs with `buttonsecondary`, not with `button`. Swapping it
+ * in for a press or a selection replaces a chamfered plate with a rectangular
+ * one for as long as the state lasts, which is exactly what it looked like.
+ *
+ * So: **a press keeps the plate and changes the light**, and a current state
+ * uses `button-highlight`, which is the only lit face in the chamfered family.
+ * Nothing in this file swaps between the two families any more.
+ *
+ * `buttonselected-highlight` is still not an option and the note further down
+ * still stands: rendered out, it is a left stroke, a right stroke and a bottom
+ * stroke, an outline the game composites over a face rather than a face.
+ */
+
+/* A press, now that hover is not pretending to be one. Small and deliberate,
+ * and it keeps the plate: it dims and sinks rather than changing shape. */
 .quiet:active {
-  border-image-source: url('/shell/button-press.png');
+  border-image-source: url('/shell/button.png');
   border-image-outset: 0;
+  filter: brightness(0.82);
   transform: translateY(1px);
 }
 
@@ -2008,27 +2038,29 @@
   cursor: pointer;
 }
 
-.menu-panel button:hover:not(:disabled),
-.menu-panel button:focus-visible {
-  border-image-source: url('/shell/button-highlight.png');
-  border-image-outset: 0.08rem 0.26rem;
+/* Warmer, not lit. The lit plate belongs to the page you are actually on. */
+.menu-panel button:hover:not(:disabled):not(.is-here),
+.menu-panel button:focus-visible:not(.is-here) {
+  filter: brightness(1.35);
   outline: none;
 }
 
 /**
- * Where you already are: the plate is pressed in.
+ * Where you already are: the plate is lit.
  *
- * **Not `buttonselected-highlight.png`**, which the note at `builds.css:4584`
- * already worked out is not a button face at all: 445 by 212, a thin selection
- * outline in the upper left and empty canvas around it, an overlay the game
- * composites onto a face. Stretched to a row it draws its outline through the
- * middle of the label.
+ * This was `button-press.png`, on the reasoning that the page you are on is the
+ * one already pushed. Nice idea, wrong sprite: that one is square and this one
+ * is chamfered, so being on a page squared its corners off. See the table at
+ * the top of this file.
  *
- * `button-press.png` is a real face and says the right thing anyway. The page
- * you are on is the one already pushed.
+ * `button-highlight.png` is the only lit face in the chamfered family, so it
+ * takes the current state and hover drops to brightening the plain plate. That
+ * is the better split anyway: current should be lit and hover should only be
+ * warmer.
  */
 .menu-panel button.is-here {
-  border-image-source: url('/shell/button-press.png');
+  border-image-source: url('/shell/button-highlight.png');
+  border-image-outset: 0.08rem 0.26rem;
   border-color: transparent;
   background: none;
 }

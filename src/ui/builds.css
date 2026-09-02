@@ -3658,7 +3658,7 @@ button.mark {
 }
 
 .builds-layout button.is-on {
-  background-image: url('/shell/button-press.png');
+  background-image: url('/shell/button-highlight.png');
   color: var(--lit-hot);
 }
 
@@ -4621,15 +4621,18 @@ button.mark {
  * overlays the game composites on top of a face, not faces themselves.
  * Stretching one to a button puts the outline through the middle of the label.
  *
- * `button.png` and `button-press.png` are the real faces, filled and
+ * `button.png` and `button-highlight.png` are the real faces, filled and
  * filigreed, so those are what the states use, with light doing the rest. */
 .builds-back:hover {
   filter: brightness(1.4);
   color: var(--bone);
 }
 
+/* A press keeps the plate and changes the light. `button-press.png` is the
+ * secondary family's face and is square where this one is chamfered; see the
+ * table over `.quiet:active` in `surface.css`. */
 .builds-back:active {
-  background-image: url('/shell/button-press.png');
+  filter: brightness(0.82);
 }
 
 /* The arrow is still drawn by the original rule further up: the button art has
@@ -4702,7 +4705,7 @@ button.mark {
 }
 
 .editor-actions > button:not(.editor-delete):active:not(:disabled) {
-  background-image: url('/shell/button-press.png');
+  filter: brightness(0.82);
   filter: none;
 }
 
@@ -5712,7 +5715,7 @@ button.mark {
 /* Where it ended is a choice among four rather than an accept or a cancel, so
  * it takes the pressed plate the menu and the tabs use for "this one". */
 .logrun-ended button.is-on {
-  background-image: url('/shell/button-press.png');
+  background-image: url('/shell/button-highlight.png');
 }
 
 /* What it will write, before it writes it. Four taps is quick enough to do by
