@@ -29,7 +29,7 @@ export function Page({
       <header className="builds-top">
         <h2>{title}</h2>
       </header>
-      <p className="page-standfirst">{standfirst}</p>
+      <p className="page-standfirst" data-tour="about-standfirst">{standfirst}</p>
       {children}
     </div>
   )
@@ -45,7 +45,7 @@ export function Changelog() {
       title="Changelog"
       standfirst="What has changed in the app, newest first."
     >
-      <ol className="log">
+      <ol className="log" data-tour="changelog-log">
         {CHANGELOG.map((release) => (
           <li key={`${release.date}-${release.title}`} className="log-entry">
             <p className="log-when">
@@ -92,7 +92,7 @@ export function Roadmap() {
 
       {/* The whole thing at a glance, before any of the detail. */}
       <div className="plan-progress">
-        <div className="plan-bar" role="img" aria-label={`${built} of ${outstanding} built`}>
+        <div className="plan-bar" data-tour="plan-bar" role="img" aria-label={`${built} of ${outstanding} built`}>
           <span className="plan-bar-fill" style={{ width: `${share}%` }} />
         </div>
         <p className="plan-count">

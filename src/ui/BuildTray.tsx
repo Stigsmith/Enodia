@@ -70,7 +70,7 @@ export function BuildTray({
   )
 
   return (
-    <aside className="btray" aria-label="The build so far">
+    <aside className="btray" data-tour="editor-tray" aria-label="The build so far">
       <header className="btray-head">
         <p className="btray-arm">
           {built.arm}

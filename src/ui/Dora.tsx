@@ -136,6 +136,7 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
         <button
           type="button"
           className={`unbuilt-poke${scared ? ' is-scared' : ''}`}
+          data-tour="unbuilt-dora"
           title="Dora"
           onClick={() => setPokes((was) => was + 1)}
         >
@@ -159,5 +160,11 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
  * does not already state in words.
  */
 export function DoraWatching() {
-  return <img className="dora-watching" src="/ui/dora-hardhat.webp" alt="" aria-hidden="true" />
+  return <img
+      className="dora-watching"
+      data-tour="dora-watching"
+      src="/ui/dora-hardhat.webp"
+      alt=""
+      aria-hidden="true"
+    />
 }

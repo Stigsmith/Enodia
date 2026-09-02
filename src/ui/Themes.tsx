@@ -40,7 +40,7 @@ export function Themes({
         off that theme&rsquo;s own art, then solved so all four read at the same contrast.
       </p>
 
-      <ul className="theme-grid">
+      <ul className="theme-grid" data-tour="theme-grid">
         {THEMES.map((one) => (
           <li key={one.id}>
             <ThemeCard one={one} chosen={one.id === theme} onChoose={() => onTheme(one.id)} />

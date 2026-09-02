@@ -162,7 +162,7 @@ export function Builds({ onClose }: { onClose?: () => void }) {
 
           {/* Two controls now, so the `margin-left: auto` that pushed a single
             * one right moves onto a wrapper holding both. */}
-          <div className="builds-tools">
+          <div className="builds-tools" data-tour="builds-tools">
             {/* Beside Edit rather than inside it. Playing a build and coming
               * back to say how it went is the thing that happens most, and it
               * was the one update that meant opening the editor and hand
@@ -270,7 +270,12 @@ export function Builds({ onClose }: { onClose?: () => void }) {
             ? 'Pick an arm, or open one to see how it works.'
             : 'Nothing here yet. What you make is yours and stays in this browser.'}
         </p>
-        <button type="button" className="quiet builds-new" onClick={() => setEditing('new')}>
+        <button
+          type="button"
+          className="quiet builds-new"
+          data-tour="builds-new"
+          onClick={() => setEditing('new')}
+        >
           Create a build
         </button>
       </header>
@@ -289,7 +294,7 @@ export function Builds({ onClose }: { onClose?: () => void }) {
       ) : null}
 
       {showBin && bin.length ? (
-        <section className="builds-bin" aria-label="Deleted builds">
+        <section className="builds-bin" data-tour="builds-bin" aria-label="Deleted builds">
           <ul>
             {bin.map((one) => (
               <li key={one.id}>
@@ -345,9 +350,13 @@ export function Builds({ onClose }: { onClose?: () => void }) {
       ) : null}
 
       {shown.length ? (
-        <ul className="builds-grid">
-          {shown.map((build) => (
-            <Card key={build.id} built={assemble(build)} onOpen={setOpenId} />
+        <ul className="builds-grid" data-tour="builds-grid">
+          {shown.map((build, at) => (
+            /* The tour points at the first card rather than the whole grid.
+              * The grid is most of the viewport, which leaves Dora nowhere to
+              * stand outside the thing she is describing, and she is describing
+              * one card's reading anyway. */
+            <Card key={build.id} built={assemble(build)} onOpen={setOpenId} first={at === 0} />
           ))}
         </ul>
       ) : library.length === 0 ? (

@@ -99,7 +99,7 @@ export function Setup({
             * says so rather than showing an empty row. */}
           {aspect ? (
             <>
-              <h2 className="step-heading">Going for a build</h2>
+              <h2 className="step-heading" data-tour="setup-from-build">Going for a build</h2>
               {onAspect.length ? (
                 <ul className="path-row">
                   {onAspect.map((one) => {

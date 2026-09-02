@@ -524,7 +524,9 @@ export function BuildEditor({
         <BuildTray built={built} onGo={goFromTray} alert={alert} />
 
         <section className="editor-panel" ref={panelRef}>
-          <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
+          <div data-tour="editor-tabs">
+            <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
+          </div>
 
           <TabPanel id="loadout" open={tab}>
           <h3 className="editor-rule">The arm</h3>
@@ -818,7 +820,7 @@ export function BuildEditor({
           * save this yet" were in different places and one of them moved. Here
           * they are one column with the Save button at the bottom of it, so the
           * reason a save is refused is beside the thing refusing. */}
-        <aside className="editor-rail" aria-label="Before you save">
+        <aside className="editor-rail" data-tour="editor-rail" aria-label="Before you save">
           {stopping.length ? (
             <div className="editor-banner is-blocking" role="alert">
               <span className="editor-banner-head">
@@ -911,7 +913,7 @@ export function BuildEditor({
         * build, and it wants the width to say six things with their reasons
         * beside them. In the rail it would have been a column of wrapped
         * fragments, and in the panel it moved every time a tab changed height. */}
-      <div className="editor-reading">
+      <div className="editor-reading" data-tour="editor-reading">
         <div className="editor-repeat-head">
           <span className="editor-rule">Putting it together</span>
           <Stamp read={repeat} size="medium" showSay />

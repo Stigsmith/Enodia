@@ -94,7 +94,7 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
       </header>
 
       <div className="arcana-stage">
-        <div className="arcana-grid" role="group" aria-label="The Arcana board">
+        <div className="arcana-grid" data-tour="arcana-grid" role="group" aria-label="The Arcana board">
           {arcanaBoard.map((row, r) =>
             row.map((id, c) => {
               const card = arcanaById.get(id)
@@ -180,7 +180,7 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
             works out the rest.
           </p>
 
-          <div className="arcana-bases" aria-label="Base layouts">
+          <div className="arcana-bases" data-tour="arcana-bases" aria-label="Base layouts">
             {ARCANA_LAYOUTS.map((layout) =>
               isBlank(layout) ? (
                 <span key={layout.id} className="arcana-base is-empty">
@@ -203,7 +203,7 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
             )}
           </div>
 
-          <div className={`arcana-grasp${over ? ' is-over' : ''}`}>
+          <div className={`arcana-grasp${over ? ' is-over' : ''}`} data-tour="arcana-grasp">
             <span className="arcana-grasp-used">{board.grasp}</span>
             <span className="arcana-grasp-of">of</span>
             <label>
