@@ -12,12 +12,12 @@ Last updated 2 September 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit". **Complete** |
+| **Phase** | 1, "The Exit". **Complete.** Phase 4 started: accounts exist, `worker/` |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
 | **Tests** | 420, across 23 files |
 | **Validator** | 0 failures, 3 warnings |
-| **Build** | `dist/` is **63 MB and 608 files**, and it runs from a plain static server |
-| **Deploy** | `netlify.toml` publishes `dist/`. Node pinned to 22, hashed assets immutable, a CSP that says the page fetches nothing but itself |
+| **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
+| **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
 **Phase 1 is complete.** Set up a run, log what each Exit gave, and the timeline records what
@@ -33,9 +33,20 @@ target from the standing drawer and that pin is what the card leads with.
 **A mis-tap costs one tap.** Every logged station carries "This did not happen", and taking
 one back replays the run from empty so everything after it is recomputed, deaths included.
 
-**The deploy target is settled.** `netlify.toml` publishes `dist/`, so the hand-authored
-`placeholder/index.html` is no longer what a deploy serves. Running the deploy is the
-owner's, and the only step left: `npx netlify deploy --prod --dir=dist`.
+**The deploy target moved to Cloudflare.** `wrangler.jsonc` publishes `dist/` to Workers
+static assets, so the hand-authored `placeholder/index.html` is no longer what a deploy
+serves. Running it is the owner's, and the only step left: `npm run deploy`.
+
+**Netlify's rules were never actually live**, which is why this is not a like-for-like move.
+The CLI deploy never picked `netlify.toml` up, so the site ran on Netlify's defaults: no CSP,
+no `X-Content-Type-Options`, no `Referrer-Policy`, and a bad path 404ing instead of landing
+on the app. Every one of those takes effect for the first time on Workers, verified by
+reading real responses rather than trusting that they carried over.
+
+**The fonts are self-hosted now.** `index.html` used to pull four families from Google while
+the CSP forbade exactly that, which nobody saw because the CSP was never applied. `npm run
+fonts` vendors all 38 faces into `assets/fonts/`, so the policy ships unchanged and the page
+loads nothing from anybody else. 680 KB, of which a first paint fetches two files.
 
 **Two rounds of playtest feedback have landed since Phase 1 closed**, and they changed more
 than polish. The editor was rebuilt around two boon trays, the warnings now name what would
@@ -260,8 +271,9 @@ the honest state: placeholder builds read as recommendations, so they were cut. 
 carries `how`, `luck`, `playstyle` and `by`, and the filters derive themselves from whatever
 is added. This is the owner's, and the community's after that.
 
-**2. Run the deploy.** `netlify.toml` is written and `dist/` builds clean.
-`npx netlify deploy --prod --dir=dist` is the whole of it.
+**2. Run the deploy.** `wrangler.jsonc` is written, `dist/` builds clean, and every rule is
+verified under `wrangler dev`. `npm run deploy` is the whole of it, once `wrangler login` has
+run once. Netlify stays up until it is checked.
 
 **3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
 of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
@@ -282,7 +294,12 @@ walking `InheritFrom` itself.
 
 | What | On | Note |
 |---|---|---|
-| Netlify redeploy | The owner | `netlify.toml` publishes `dist/` and the build is clean. One command: `npx netlify deploy --prod --dir=dist` |
+| The Cloudflare deploy | The owner | Needs `wrangler login` once, which is a browser sign-in this cannot do. Then `npm run deploy`. Every header and cache rule is already verified under `wrangler dev` |
+| `enodia.tools` | The owner | Verified free at the registry, $23/year at cost from Cloudflare Registrar. A purchase, so it is the owner's. Nothing waits on it: the deploy is verified on `workers.dev` and the domain attaches after |
+| `wrangler d1 create enodia` | The owner | Needs the login above. `wrangler.jsonc` carries a placeholder `database_id`, which `wrangler dev` ignores and a real deploy does not. Paste the id it prints |
+| `wrangler secret put BETTER_AUTH_SECRET` | The owner | Signs every session cookie. `.dev.vars` covers local. Without it in production the Worker returns 500 by design, rather than signing cookies with `undefined` |
+| A mail provider | The owner | **Stage 3 cannot ship without one.** No provider means no email verification and no password reset, so the first person to forget a password is locked out permanently. Fine now, since Stage 2 has no UI |
+| The Ko-fi handle | The owner | `App.tsx` `KOFI` is empty and the footer draws no link while it is, so no placeholder can ship pointing at a stranger. Set it to the handle alone once the account exists |
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |

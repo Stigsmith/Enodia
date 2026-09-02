@@ -1,3 +1,19 @@
+# SUPERSEDED by wrangler.jsonc. Kept only until the Cloudflare deploy is checked.
+#
+# Two things worth knowing before anyone trusts a line of this file.
+#
+# NONE OF IT WAS EVER LIVE. The CLI deploy never picked it up, so enodia-hades
+# .netlify.app ran on Netlify's own defaults: no CSP, no X-Content-Type-Options,
+# no Referrer-Policy, and a bad path 404ing rather than landing on the app.
+# Measured by reading real response headers, not inferred.
+#
+# THE CSP BELOW CONTRADICTED THE PAGE. index.html loaded four families from
+# Google Fonts while this said default-src 'self' with no font-src. Nobody saw
+# it because of the line above. The fonts are vendored now, so the same policy
+# ships in assets/_headers unchanged and is finally true.
+#
+# Delete this file once `npm run deploy` has run and the new host is verified.
+
 # How this site is built and served.
 #
 # It is a static site with no server: `DESIGN.md` 1, one page, no network call

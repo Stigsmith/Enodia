@@ -1,0 +1,16 @@
+{
+  // The Worker is typechecked separately from the app, and has to be.
+  //
+  // `tsconfig.json` gives the app `lib: DOM` and `types: node`. The Workers
+  // runtime types in worker-configuration.d.ts redeclare a lot of the same
+  // globals with different shapes, so one project holding both produces dozens
+  // of conflicting-declaration errors that mean nothing.
+  //
+  // `npm run typecheck` runs both.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": []
+  },
+  "include": ["worker", "worker-configuration.d.ts", "drizzle.config.ts"]
+}
