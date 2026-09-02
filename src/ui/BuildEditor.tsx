@@ -523,7 +523,7 @@ export function BuildEditor({
       <div className="editor-grid">
         <BuildTray built={built} onGo={goFromTray} alert={alert} />
 
-        <section className="editor-panel" ref={panelRef}>
+        <section className="editor-panel" data-tour="editor-panel" ref={panelRef}>
           <div data-tour="editor-tabs">
             <Tabs tabs={TABS(build)} open={tab} onOpen={setTab} label="What to edit" />
           </div>

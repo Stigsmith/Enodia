@@ -136,27 +136,47 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
       return
     }
 
-    const el = document.querySelector(`[data-tour="${step.at}"]`)
-    if (!el) {
-      setSpot(null)
-      setReady(true)
-      return
+    /**
+     * A step can open the thing it is about before it points at it.
+     *
+     * Naming five tabs is not the same as showing you them, and the owner asked
+     * for the second one. `press` is another `data-tour` value, so a step drives
+     * the page through the same controls a person would, rather than through a
+     * handler the editor would have to expose. Nothing here knows what a tab is.
+     */
+    if (step.press) {
+      const control = document.querySelector<HTMLElement>(`[data-tour="${step.press}"]`)
+      control?.click()
     }
 
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: still ? 'instant' : 'smooth' })
 
-    // Settle, then measure. Two frames past the scroll for the smooth case,
-    // which is cheaper and steadier than listening for `scrollend` and having
-    // to guess whether it will ever fire.
-    const settle = window.setTimeout(
-      () => {
-        setSpot(rectOf(step.at))
+    /**
+     * Measured after the press has rendered, not before.
+     *
+     * A press changes what is on screen, so the anchor's rect afterwards is not
+     * the rect before. One frame for React to commit, then scroll, then settle.
+     */
+    const settle = window.setTimeout(() => {
+      const el = document.querySelector(`[data-tour="${step.at}"]`)
+      if (!el) {
+        setSpot(null)
         setReady(true)
-      },
-      still ? 0 : 380,
-    )
-    return () => window.clearTimeout(settle)
+        return
+      }
+      el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: still ? 'instant' : 'smooth' })
+      const rest = window.setTimeout(
+        () => {
+          setSpot(rectOf(step.at))
+          setReady(true)
+        },
+        still ? 0 : 380,
+      )
+      hold.push(rest)
+    }, step.press ? 40 : 0)
+
+    const hold: number[] = [settle]
+    return () => hold.forEach((one) => window.clearTimeout(one))
   }, [step])
 
   /**

@@ -43,6 +43,17 @@ export type Step = {
   at?: string
   say: string
   /**
+   * A `data-tour` value to press before the step is shown.
+   *
+   * So a step can open the thing it is about rather than describing something
+   * you cannot see. She names five tabs and then walks you through them, which
+   * is the difference between a list and being shown round.
+   *
+   * It presses whatever a person would press, so nothing here has to know what
+   * a tab is or reach into a screen's own state.
+   */
+  press?: string
+  /**
    * The ghost voice, said first and in capitals, before she drops it and says
    * `say` instead.
    *
@@ -81,7 +92,54 @@ export const TOURS: Record<string, Step[]> = {
     },
     {
       at: 'editor-tabs',
-      say: 'Five tabs. Loadout, boons, the Arcana, your notes, and how it has actually gone.',
+      say: 'Five tabs across the top, and you press them. That is how you get at everything. Here, I will show you.',
+    },
+    {
+      press: 'tab-loadout',
+      at: 'editor-panel',
+      say: 'Loadout. The arm, the aspect, the five slots, and what you are carrying in with you.',
+    },
+    {
+      press: 'tab-boons',
+      at: 'editor-panel',
+      say: 'Boons. Everything past those five slots, and the hammer if you are taking one. Two columns, and the left one is the one that matters.',
+    },
+    /**
+     * Why the split is worth explaining, and the fact that makes it free.
+     *
+     * `loadBearing` in `repeat.ts` leaves `optional` out of the reading
+     * entirely, and its comment says why: it is already declared as upside
+     * rather than as the build, so counting it would be telling somebody off
+     * for labelling their build correctly. Sorting honestly therefore costs
+     * nothing, which is the part nobody would guess.
+     */
+    {
+      at: 'editor-panel',
+      say: 'The build is what it genuinely does not work without. Everything else goes in Worth adding, and being honest about that is free: whatever sits over there is not counted against the reading.',
+    },
+    /**
+     * The owner's example, and the numbers behind it are the hammer charge in
+     * `repeat.ts`: two named upgrades cost 3, and its tip records that a run
+     * offers two hammers at most out of everything an arm has.
+     */
+    {
+      at: 'editor-panel',
+      say: 'Say you name two hammer upgrades. A run offers two at most, out of everything your arm has, so you are asking for both to land exactly as you wrote them. Lovely the once. Less lovely on the tenth go.',
+    },
+    {
+      press: 'tab-arcana',
+      at: 'editor-panel',
+      say: 'Arcana. Not the whole board, just the cards worth bringing for this particular idea.',
+    },
+    {
+      press: 'tab-notes',
+      at: 'editor-panel',
+      say: 'Notes. Its name lives here, which is the one thing it will refuse to save without.',
+    },
+    {
+      press: 'tab-play',
+      at: 'editor-panel',
+      say: 'And how it has actually gone. Runs, clears, the highest Fear you cleared with it.',
     },
     {
       at: 'editor-rail',
@@ -102,10 +160,7 @@ export const TOURS: Record<string, Step[]> = {
      */
     {
       at: 'editor-rail',
-      say: 'Fun thing. You can save a build carrying every warning it has got. You only have to tick that you read them, which is this tool making you say it out loud.',
-    },
-    {
-      say: 'And if it is properly out of reach, the stars stop at one. However many you gave it. It keeps your number and shows mine.',
+      say: 'Fun thing. You can save a build carrying every warning it has got, so long as you tick that you read them. And if it is properly out of reach, the stars stop at one however many you gave it.',
     },
     {
       roar: 'AND YET YOU WOULD HAND THIS TO SOMEBODY. SIX OLYMPIANS. FOUR KEEPSAKES. A PRAYER. THEY WILL DIE IN EREBUS AND THEY WILL THINK IT WAS THEIR FAULT.',
