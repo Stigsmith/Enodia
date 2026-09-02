@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 /**
  * Dora, in a hard hat, standing where a screen is not built yet.
@@ -56,19 +56,35 @@ const IDLE = [
  * Ordered, and the last one repeats. Randomising would lose the joke: it only
  * works if she notices you are still doing it.
  */
-const POKES = [
-  'Hm.',
-  'Yes. Still nothing here.',
-  'You know poking me does not build it.',
-  'I am going to start charging.',
-  'WHO DARES DISTURB MY... no, sorry, I cannot keep that up.',
-  'Personal space. Please.',
-  'We are just doing this now, are we.',
+const POKES: { say: string; spooky?: boolean }[] = [
+  { say: 'Hm.' },
+  { say: 'Yes. Still nothing here.' },
+  { say: 'You know poking me does not build it.' },
+  { say: 'I am going to start charging.' },
+  /**
+   * The one where she tries it on.
+   *
+   * `spooky` is a flag on the line rather than an index checked elsewhere,
+   * because an index is a second place to remember when somebody reorders the
+   * list, and the whole joke is that the scare lands on this exact sentence.
+   */
+  { say: 'WHO DARES DISTURB MY... no, sorry, I cannot keep that up.', spooky: true },
+  { say: 'Personal space. Please.' },
+  { say: 'We are just doing this now, are we.' },
   // The vocabulary rule fails on "room", and it is right to: it cannot tell
   // Dora squatting from a Location. There is an escape hatch and this did not
   // need it, which is the better outcome.
-  'Fine. I live here now. You may visit.',
+  { say: 'Fine. I live here now. You may visit.' },
 ]
+
+/**
+ * How long she holds the scare.
+ *
+ * Long enough to register, short enough that it reads as a slip rather than a
+ * state. She drops the voice mid-sentence in the line itself, so the picture
+ * should drop it about as fast.
+ */
+const SCARE_MS = 700
 
 /** The full page, for a section that does not exist yet. */
 export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
@@ -82,7 +98,21 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
   const idle = IDLE[[...title].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % IDLE.length]!
 
   const [pokes, setPokes] = useState(0)
-  const said = pokes > 0 ? POKES[Math.min(pokes - 1, POKES.length - 1)]! : null
+  const [scared, setScared] = useState(false)
+  const line = pokes > 0 ? POKES[Math.min(pokes - 1, POKES.length - 1)]! : null
+
+  /**
+   * She turns for a moment on the line where she tries the voice.
+   *
+   * The timer is cleaned up on the way out, so poking again mid-scare restarts
+   * it rather than leaving a stale timeout to end the next one early.
+   */
+  useEffect(() => {
+    if (!line?.spooky) return setScared(false)
+    setScared(true)
+    const stop = window.setTimeout(() => setScared(false), SCARE_MS)
+    return () => window.clearTimeout(stop)
+  }, [line, pokes])
 
   return (
     <div className="unbuilt">
@@ -97,19 +127,23 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
           * once behind the caveats bar and rejected: the crescent ornament is
           * baked in at 1.78:1 and a wide warning strip flattened the moon. A
           * speech box is close to its native shape, so here it fits. */}
-        {said ? (
+        {line ? (
           <p className="dora-says" role="status">
-            {said}
+            {line.say}
           </p>
         ) : null}
 
         <button
           type="button"
-          className="unbuilt-poke"
+          className={`unbuilt-poke${scared ? ' is-scared' : ''}`}
           title="Dora"
           onClick={() => setPokes((was) => was + 1)}
         >
-          <img className="unbuilt-dora" src="/ui/dora-hardhat.webp" alt="Dora, who has nothing to add" />
+          <img
+            className="unbuilt-dora"
+            src={scared ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+            alt="Dora, who has nothing to add"
+          />
         </button>
       </div>
     </div>
