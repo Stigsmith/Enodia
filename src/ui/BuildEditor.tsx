@@ -62,6 +62,7 @@ import { Tabs, TabPanel } from './Tabs.tsx'
 import type { Tab } from './Tabs.tsx'
 import { BuildTray } from './BuildTray.tsx'
 import { BoonSort } from './BoonSort.tsx'
+import { ElementPanel } from './Elements.tsx'
 import type { Tray } from './BoonSort.tsx'
 import type { TrayTarget } from './BuildTray.tsx'
 import { assemble } from './build-pieces.ts'
@@ -641,6 +642,12 @@ export function BuildEditor({
             placeholder="Search upgrades"
             emptySays="No hammer upgrades yet."
           />
+
+          {/* What the build's boons add up to elementally, and what that is or
+            * is not enough for. Editor only, on the owner's own account of when
+            * they look: while inspecting a build, to work out how much more of
+            * an element a gated boon wants. */}
+          <ElementPanel build={build} />
 
           </TabPanel>
 

@@ -403,6 +403,58 @@ function aspectGate(id: string): string[] | null {
   return null
 }
 
+/**
+ * The element a boon carries, and the element counts a boon is gated behind.
+ *
+ * ## Two different things, from two different places
+ *
+ * **What a boon *is*.** `AirBoon` in `TraitData.lua` sets `Elements = { "Air" }`
+ * and 157 offerable traits inherit from one of the five, so the resolved index
+ * carries `Elements` directly and this just reads it.
+ *
+ * **What a boon *needs*.** Ten traits gate on how many of an element you hold,
+ * through a `GameStateRequirements` path of
+ * `CurrentRun.Hero.Elements.<Element>`. Those live on the raw table, same as the
+ * aspect gate, because the resolved index drops requirement blocks.
+ *
+ * ## Appear and activate are separate, and the game means it
+ *
+ * `GameStateRequirements` is what it takes for the boon to be **offered**.
+ * `ActivationRequirements` is what it takes for it to **switch on** once held.
+ * Frosty Veneer appears at 4 Water and does nothing until 6. A tool that
+ * collapsed those into one number would be wrong for every boon that has both,
+ * which is half of them.
+ */
+const ELEMENT_PATH = ['CurrentRun', 'Hero', 'Elements']
+
+function elementGate(rules: unknown): Record<string, number> | null {
+  if (!Array.isArray(rules)) return null
+  const out: Record<string, number> = {}
+  for (const rule of rules) {
+    const one = rule as { Path?: unknown[]; Value?: unknown }
+    const path = one.Path
+    if (!Array.isArray(path) || path.length < 4) continue
+    if (ELEMENT_PATH.some((part, index) => path[index] !== part)) continue
+    if (typeof one.Value === 'number') out[String(path[3])] = one.Value
+  }
+  return Object.keys(out).length ? out : null
+}
+
+function elementsOf(id: string): string[] | null {
+  const held = (externalTables.traits[id] as { Elements?: unknown } | undefined)?.Elements
+  return Array.isArray(held) && held.length ? held.map(String) : null
+}
+
+function needsElements(id: string): { appear?: Record<string, number>; activate?: Record<string, number> } | null {
+  const raw = rawTraits[id] as
+    | { GameStateRequirements?: unknown; ActivationRequirements?: unknown }
+    | undefined
+  const appear = elementGate(raw?.GameStateRequirements)
+  const activate = elementGate(raw?.ActivationRequirements)
+  if (!appear && !activate) return null
+  return { ...(appear ? { appear } : {}), ...(activate ? { activate } : {}) }
+}
+
 const records = [...traits.values()]
   // Templates with no display name are never rendered, and 84 of them would be
   // a third of the payload.
@@ -417,6 +469,8 @@ const records = [...traits.values()]
     ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
     ...(trait.requires ? { requires: trait.requires } : {}),
     ...(aspectGate(trait.id) ? { needsAspect: aspectGate(trait.id) } : {}),
+    ...(elementsOf(trait.id) ? { elements: elementsOf(trait.id) } : {}),
+    ...(needsElements(trait.id) ? { needsElements: needsElements(trait.id) } : {}),
     ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
     ...(describe(trait.id) ? { text: describe(trait.id) } : {}),
     ...(renderFor(trait) ? { render: renderFor(trait) } : {}),

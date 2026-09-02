@@ -6043,3 +6043,110 @@ button.mark {
  * The seven other adoptions all match their target's proportions. This one had
  * no home and the flat token ground is better than a stretched picture.
  */
+
+/* -------------------------------------------------------------------------
+ * ELEMENTS
+ *
+ * Editor only. The owner looks at elements almost never in play, and then only
+ * to work out how much of one a gated boon still wants, which happens while
+ * inspecting a build. So it is here and not on the card, the detail views or
+ * the run.
+ * ---------------------------------------------------------------------- */
+
+.elements {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.7rem 0.8rem 0.8rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+}
+
+.elements .editor-rule,
+.elements .editor-hint {
+  margin: 0;
+}
+
+.elements-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.element-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--bone);
+}
+
+.element-count img {
+  width: 1.3rem;
+  height: 1.3rem;
+  object-fit: contain;
+}
+
+/* Zero is drawn rather than hidden: the five are a fixed set and a missing one
+ * would read as "no such element" rather than "none of it". */
+.element-count.is-none {
+  opacity: 0.35;
+}
+
+.elements-gates {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.elements-gates li {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--div-4);
+}
+
+.elements-gate-name {
+  font-size: 0.78rem;
+  color: var(--bone-dim);
+}
+
+.elements-gate-rows {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.elements-gate-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--unbuilt);
+}
+
+/* Met is the quiet state. A threshold you have cleared is not news. */
+.elements-gate-row.is-met,
+.elements-gate-row span.is-met {
+  color: var(--lit);
+}
+
+.elements-gate-label {
+  min-width: 5.5rem;
+  color: var(--bone-faint);
+}
+
+/* The element a boon brings, on its row in the picker. Small: a fact about the
+ * boon, not a reason to take one. */
+.bsort-element {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  object-fit: contain;
+  opacity: 0.85;
+}
