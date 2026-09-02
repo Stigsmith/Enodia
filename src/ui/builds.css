@@ -6960,3 +6960,141 @@ button.mark {
   line-height: 1.6;
   color: var(--bone-faint);
 }
+
+/* ---------------------------------------------------------------------------
+ * The Account room.
+ *
+ * Sits inside `.page` and reuses `.ref` for its sections, because it is a
+ * reading screen that happens to have one form on it. The only new shapes are
+ * the form controls, which nothing else in the tool needed until now: this is
+ * the first screen that asks somebody to type something secret.
+ * ------------------------------------------------------------------------- */
+
+.acct-modes {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.acct-mode {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: none;
+  font-family: var(--display);
+  font-size: 0.9rem;
+  color: var(--bone-dim);
+  cursor: pointer;
+}
+
+.acct-mode.is-on {
+  border-color: var(--lit-hot);
+  color: var(--lit-hot);
+  background: var(--ink-800);
+}
+
+.acct-form {
+  display: grid;
+  gap: 0.9rem;
+  max-width: 22rem;
+}
+
+.acct-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.acct-field > span {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  color: var(--bone-dim);
+}
+
+.acct-field input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+  font-family: var(--body);
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.acct-field input:focus-visible {
+  outline: none;
+  border-color: var(--lit-hot);
+}
+
+.acct-hint {
+  font-family: var(--body);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+/* A warning about a real consequence, so it takes the warning ramp rather than
+ * the quiet one. It is telling somebody they can lose an account. */
+.acct-warn {
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--rim-magenta);
+  border-radius: var(--r-hair);
+  color: var(--bone-dim);
+}
+
+.acct-error {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--rim-magenta);
+}
+
+.acct-go {
+  justify-self: start;
+  padding: 0.55rem 1.2rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: var(--ink-800);
+  font-family: var(--display);
+  font-size: 0.95rem;
+  color: var(--bone);
+  cursor: pointer;
+}
+
+.acct-go:hover:not(:disabled),
+.acct-go:focus-visible:not(:disabled) {
+  border-color: var(--lit-hot);
+  color: var(--lit-hot);
+}
+
+.acct-go:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.acct-link {
+  margin-top: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.acct-link:hover,
+.acct-link:focus-visible { color: var(--bone); }
+
+.acct-mono {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  color: var(--bone-dim);
+}
+
+.acct-quiet {
+  font-family: var(--body);
+  color: var(--bone-faint);
+}

@@ -19,23 +19,46 @@
  * The adapter defaults to false already, but a correctness property should not
  * rest on a default that could change: stated, with the reason.
  *
- * **No email is sent, so there is no verification and no password reset.**
- * There is no mail provider and adding one is a vendor, an account and a bill.
- * That is fine for this stage, which has no UI and no users. It is NOT fine for
- * Stage 3, where somebody will lock themselves out on the first day. Anything
- * that puts a sign-in form in front of a real person needs a provider first.
+ * **Password reset exists only when mail is configured.** `worker/email.ts`
+ * reports whether a provider is set, and the reset flow is added to the options
+ * only when it is. The alternative, which better-auth allows, is an endpoint
+ * that succeeds and sends nothing while somebody waits for a letter that was
+ * never written.
+ *
+ * Email verification is still off, and that is a separate call: verification
+ * locks somebody out of their own account until they find a letter, whereas
+ * reset is the only route back in. One is tidiness, the other is the difference
+ * between a forgotten password and a dead account.
  */
 
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
+import { configured, resetLetter, send } from './email.ts'
 import * as schema from './schema.ts'
 
 /** A week. Long enough that logging in is rare, short enough that a stolen one expires. */
 const SESSION_DAYS = 7
 
-export function createAuth(db: DrizzleD1Database<typeof schema>, secret: string, origin: string) {
+/** What `send` needs, threaded through so this file names no environment variable. */
+type Mail = { RESEND_API_KEY?: string; MAIL_FROM?: string }
+
+export function createAuth(
+  db: DrizzleD1Database<typeof schema>,
+  secret: string,
+  origin: string,
+  mail: Mail = {},
+) {
+  /**
+   * **Password reset appears only when mail can actually be sent.**
+   *
+   * better-auth is happy to expose /request-password-reset with no sender
+   * configured: it succeeds, sends nothing, and the person waits forever for a
+   * letter that was never written. Offering the flow only when there is a
+   * provider means a locked-out person gets told the truth instead.
+   */
+  const canMail = configured(mail)
   return betterAuth({
     secret,
     // Derived from the request rather than configured, because the same code
@@ -57,8 +80,26 @@ export function createAuth(db: DrizzleD1Database<typeof schema>, secret: string,
 
     emailAndPassword: {
       enabled: true,
-      // No provider, so this cannot be true yet. When it can be, it should be.
+      /**
+       * Still false, and it is a separate decision from reset.
+       *
+       * Verification gates somebody out of their own account until they find a
+       * letter, which for a tool nobody has heard of is a wall at the worst
+       * moment. Reset is the one that has to exist, because it is the only
+       * route back in. Turn this on when there is a reason beyond tidiness.
+       */
       requireEmailVerification: false,
+
+      ...(canMail
+        ? {
+            sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
+              await send(mail, { to: user.email, ...resetLetter(url) })
+            },
+            // An hour. Long enough to find the letter, short enough that a link
+            // sitting in an old inbox is not a way in.
+            resetPasswordTokenExpiresIn: 3600,
+          }
+        : {}),
     },
 
     session: {
@@ -98,6 +139,13 @@ export function createAuth(db: DrizzleD1Database<typeof schema>, secret: string,
         '/sign-up/email': { window: 3600, max: 10 },
         // Sign-in is the one worth brute forcing.
         '/sign-in/email': { window: 300, max: 20 },
+        /**
+         * Reset is the one that costs somebody ELSE something. Every call sends
+         * a letter to an address the caller types, so an unlimited endpoint is
+         * a way to flood a stranger's inbox using this domain's reputation.
+         * Three an hour is more than a forgetful person needs.
+         */
+        '/request-password-reset': { window: 3600, max: 3 },
       },
     },
 

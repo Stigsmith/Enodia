@@ -21,6 +21,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { ACCOUNTS_LIVE } from '../state/account.ts'
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
@@ -222,8 +223,10 @@ export function Menu({
         /* Empty rooms rather than dead rows. See `nav.ts` for why. */
         {
           label: 'Account',
-          unbuilt: true,
-          note: 'Phase 4',
+          /* One constant drives the door, the badge and the note. A menu that
+           * says "not built" over a room that opens is worse than either. */
+          unbuilt: !ACCOUNTS_LIVE,
+          note: ACCOUNTS_LIVE ? 'Sign in, to publish a build with a short link' : 'Phase 4',
           here: view === 'account',
           action: () => {
             onGo('account')

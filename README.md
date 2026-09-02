@@ -104,7 +104,14 @@ wrangler d1 create enodia          # paste the id into wrangler.jsonc
 wrangler secret put BETTER_AUTH_SECRET
 ```
 
-Locally the secret lives in `.dev.vars`, which is gitignored.
+Locally the secret lives in `.dev.vars`, which is gitignored, along with the optional
+`RESEND_API_KEY` and `MAIL_FROM`. Without those two, `worker/auth.ts` does not offer password
+reset at all rather than silently sending nothing, and `/api/capabilities` says so, so the UI
+can grey it out and explain.
+
+**Changing `database_id` in `wrangler.jsonc` orphans the local database.** It is keyed by that
+id, so `wrangler dev` quietly starts on an empty one and the only symptom is a 500 on any
+request with a session cookie. Re-run `npm run db:migrate` after any change to it.
 
 **Rate limiting is stated in `worker/auth.ts`, not defaulted**, because better-auth's default
 is `enabled: isProduction` and Workers sets no `NODE_ENV`, so it would never have switched

@@ -164,6 +164,13 @@ the play experience cannot see.
   now:** it deletes `.webp` and never `.png`, and stays out of `arcana/`, `hexes/`,
   `rarity/` and `vows/`. Deleting whole directories, which it used to do, would take the
   game art in `boons/` and `duos/` with it. Do not remove that guard
+- **The local D1 is keyed by `database_id`, so changing that id orphans it.**
+  Editing `wrangler.jsonc` from the placeholder to the real id silently pointed
+  `wrangler dev` at a fresh empty database, and the only symptom was a 500 on any
+  request carrying a session cookie: `no such table: session`. Nothing else broke,
+  because every endpoint that does not touch the database kept working.
+  `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/` grows one `.sqlite` per id.
+  **Re-run `npm run db:migrate` after any change to that id**
 - **`run_worker_first: ["/api/*"]` is the line that keeps hosting free.** Static asset
   requests are unlimited on every Cloudflare plan; Worker invocations are 100k/day. Assets
   are matched first by default, so the API script did not change that, and this names the

@@ -61,10 +61,27 @@ export default {
     // outside one. The origin comes off the request rather than a config so the
     // same code serves workers.dev and enodia.tools without either being told.
     const db = drizzle(env.DB, { schema })
-    const auth = createAuth(db, env.BETTER_AUTH_SECRET, url.origin)
+    // The mail keys are optional and are threaded in rather than read inside,
+    // so worker/auth.ts names no environment variable of its own.
+    const auth = createAuth(db, env.BETTER_AUTH_SECRET, url.origin, {
+      RESEND_API_KEY: env.RESEND_API_KEY,
+      MAIL_FROM: env.MAIL_FROM,
+    })
 
     if (url.pathname.startsWith('/api/auth/')) {
       return auth.handler(request)
+    }
+
+    /**
+     * What this deployment can actually do.
+     *
+     * Public, and it exists for one reason: password reset only works when a
+     * mail provider is configured, and the UI must not offer a flow that
+     * silently sends nothing. Better to grey it out and say why than to show
+     * somebody "check your email" for a letter nobody wrote.
+     */
+    if (url.pathname === '/api/capabilities') {
+      return json({ passwordReset: Boolean(env.RESEND_API_KEY && env.MAIL_FROM) })
     }
 
     if (url.pathname === '/api/me') {
