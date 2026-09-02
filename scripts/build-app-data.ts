@@ -672,6 +672,17 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
       text: describe(id),
       cost: typeof card.Cost === 'number' ? card.Cost : null,
       /**
+       * **The lite copy first, the original as the fallback.**
+       *
+       * `scripts/lite.ts` writes a 420px webp beside each card because the
+       * board was serving 689px art into a 94px slot: 39.2 MB for one screen,
+       * which was 61 percent of the whole site. The full-size art stays on
+       * disk for the quality setting that is coming, and `prune.ts` leaves it
+       * out of `dist/` meanwhile because nothing names it.
+       *
+       * Falling back rather than requiring it means a card whose lite copy has
+       * not been generated still renders, just heavily.
+       *
        * Kept inside `arcana/`, and the full slug tried before the bare one.
        *
        * Most cards are filed without their article, so "The Boatman" needs the
@@ -683,7 +694,7 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
        * `assets/README.md` already warns that a slug can be claimed twice and
        * that directory order silently decides which wins.
        */
-      icon: arcanaIcon(slug) ?? arcanaIcon(bare) ?? null,
+      icon: arcanaIcon(`${slug}-lite`) ?? arcanaIcon(`${bare}-lite`) ?? arcanaIcon(slug) ?? arcanaIcon(bare) ?? null,
       /**
        * The game's own dimmed twin, for a card that is not equipped.
        *
@@ -691,7 +702,12 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
        * lit one in CSS, because the game did not desaturate: the inactive art
        * is redrawn, and a filter approximating it looks like a filter.
        */
-      iconOff: arcanaIcon(`${slug}-inactive`) ?? arcanaIcon(`${bare}-inactive`) ?? null,
+      iconOff:
+        arcanaIcon(`${slug}-inactive-lite`) ??
+        arcanaIcon(`${bare}-inactive-lite`) ??
+        arcanaIcon(`${slug}-inactive`) ??
+        arcanaIcon(`${bare}-inactive`) ??
+        null,
       /**
        * What has to be true for a conditional card to switch itself on.
        *
