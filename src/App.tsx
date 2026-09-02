@@ -513,7 +513,7 @@ export function App() {
  * Supergiant's fansite licence covers this art for noncommercial use, and
  * "chip in for hosting, the tool stays free" is what noncommercial reads like.
  */
-const KOFI = ''
+const KOFI = 'stigsmith'
 
 function Colophon() {
   return (
