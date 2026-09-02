@@ -5719,3 +5719,105 @@ button.mark {
 .plan-stage.is-waiting .plan-dot {
   border-style: dashed;
 }
+
+/* -------------------------------------------------------------------------
+ * DORA, WHERE A THING IS NOT BUILT
+ *
+ * Four menu rows were `disabled`, which is honest and dead: a greyed entry
+ * says a thing exists and then refuses to say anything else. They open onto
+ * this instead. The phase marker stays, so nothing pretends the feature is
+ * closer than it is.
+ * ---------------------------------------------------------------------- */
+
+.unbuilt {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  justify-items: center;
+  min-height: 60vh;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+@media (min-width: 46rem) {
+  .unbuilt {
+    grid-template-columns: 1fr auto;
+    justify-items: end;
+    gap: 3rem;
+    text-align: right;
+  }
+}
+
+.unbuilt-body {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: inherit;
+  max-width: 26rem;
+}
+
+.unbuilt h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.unbuilt-say {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+}
+
+.unbuilt-phase {
+  margin: 0.2rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lit-hot);
+}
+
+.unbuilt-dora {
+  width: min(15rem, 60vw);
+  height: auto;
+  filter: drop-shadow(0 10px 26px var(--ink-950));
+}
+
+/* -------------------------------------------------------------------------
+ * DORA, WATCHING THE ROADMAP
+ *
+ * Fixed to the viewport rather than to the page, so the plan scrolls past her
+ * and she stays put. She faces left, which is where the roadmap is.
+ * ---------------------------------------------------------------------- */
+
+.dora-watching {
+  display: none;
+}
+
+/* Only where there is room to the right of the text without crowding it.
+ * Below that she would be standing on the roadmap rather than beside it. */
+@media (min-width: 78rem) {
+  .dora-watching {
+    display: block;
+    position: fixed;
+    right: 2.5rem;
+    bottom: 0;
+    width: 15rem;
+    height: auto;
+    /* Behind everything, and unclickable: she is decoration and must never be
+     * in the way of the page she is looking at. */
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.9;
+    filter: drop-shadow(0 8px 24px var(--ink-950));
+  }
+}
+
+@media (min-width: 100rem) {
+  .dora-watching {
+    right: 6rem;
+    width: 19rem;
+  }
+}

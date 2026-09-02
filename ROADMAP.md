@@ -622,7 +622,7 @@ what is pinned with no diff, which is the truth.
 | `REQUIREMENTS.md` | Why it exists, what it is, scope by phase, dead positions |
 | `DESIGN.md` | Architecture, the engines, the build order, open items |
 | `VISUAL.md` | The visual language. Every colour sampled from the game, with its source file |
-| `LESSONS.md` | Engineering discipline carried from the previous tool |
+| `archive/` | Documents that did their job. `LESSONS.md` is the seed `CLAUDE.md` grew out of, and is superseded by it |
 | `assets/README.md` | The image library and its gaps |
 | `decisions/` | Decision records, dated. Applied to the documents above, kept for the reasoning |
 | `project/` | Configuration for the companion Claude.ai project, not for the product |

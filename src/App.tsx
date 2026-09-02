@@ -26,6 +26,7 @@ import { Themes } from './ui/Themes.tsx'
 import { Settings } from './ui/Settings.tsx'
 import { Changelog, Roadmap } from './ui/Pages.tsx'
 import { About, Help } from './ui/Reference.tsx'
+import { Unbuilt } from './ui/Dora.tsx'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
@@ -256,6 +257,23 @@ export function App() {
     return frame(
       <div className="shell is-wide">
         <Reading />
+      </div>,
+    )
+  }
+
+  /* The rooms that are empty on purpose. One branch, because the only thing
+   * that differs between them is the name over the door. */
+  const unbuilt: Partial<Record<View, { title: string; phase: string }>> = {
+    exchange: { title: 'Build exchange', phase: 'Phase 4' },
+    account: { title: 'Account', phase: 'Phase 4' },
+    friends: { title: 'Friends', phase: 'Phase 4' },
+    leaderboards: { title: 'Leaderboards', phase: 'Phase 4' },
+  }
+  const room = unbuilt[screen]
+  if (room) {
+    return frame(
+      <div className="shell is-wide">
+        <Unbuilt title={room.title} phase={room.phase} />
       </div>,
     )
   }

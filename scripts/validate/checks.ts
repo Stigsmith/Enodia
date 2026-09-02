@@ -850,7 +850,7 @@ export function checkCurated(bundle: Bundle): Finding[] {
     if (!Array.isArray(doc.knownGaps)) {
       out.push(
         fail('curated', `${file.path} has no knownGaps array`, [
-          'A gap recorded in chat is a gap nobody reads again. LESSONS.md.',
+          'A gap recorded in chat is a gap nobody reads again. CLAUDE.md.',
         ]),
       )
     }
