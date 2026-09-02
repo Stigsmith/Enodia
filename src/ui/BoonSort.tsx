@@ -37,6 +37,7 @@ import { iconOf, olympians, traits } from '../data/app.ts'
 import { olympiansOf, slotMap } from '../engine/build-check.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { FRAME, PLATE } from './build-pieces.ts'
+import { ELEMENT_ICON } from './Elements.tsx'
 import type { ShownBuild } from '../data/builds.ts'
 import type { Rarity, TraitId } from '../data/types.ts'
 
@@ -62,6 +63,8 @@ type Row = {
   text: string | null
   rarity: Rarity
   god: string | null
+  /** the element it carries, for the 196 that carry one */
+  element: string | null
   /** why this cannot be taken, when it cannot */
   blocked: string | null
 }
@@ -149,6 +152,7 @@ export function BoonSort({
           text: trait.text ?? null,
           rarity: rarityOf(trait.kind),
           god: trait.gods[0] ?? null,
+          element: trait.elements?.[0] ?? null,
           blocked,
         },
       ]
@@ -284,6 +288,17 @@ function Rows({
           onDragEnd={() => onDrag(null)}
         >
           <Face row={row} />
+          {/* The element it brings, which is what the tally at the foot of the
+            * tab is counting. Small: it is a fact about the boon, not the
+            * reason to take one. */}
+          {row.element ? (
+            <img
+              className="bsort-element"
+              src={`/${ELEMENT_ICON[row.element]}`}
+              alt=""
+              title={row.element}
+            />
+          ) : null}
           <span className="bsort-row-text">
             <span className="bsort-row-name">{row.name}</span>
             {row.blocked ? (

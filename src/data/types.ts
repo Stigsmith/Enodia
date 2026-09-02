@@ -72,6 +72,23 @@ export type Trait = {
    */
   needsAspect?: string[] | null
   /**
+   * The element this boon carries, where it carries one.
+   *
+   * `AirBoon` and its four siblings set `Elements` and 196 traits inherit from
+   * one, so the resolved index has it directly. It is an array because the
+   * shape in the game is one, though nothing in build 138174 carries two.
+   */
+  elements?: string[] | null
+  /**
+   * The element counts this boon is gated behind, for the ten that are.
+   *
+   * **Two thresholds, and the difference is the whole point.** `appear` is what
+   * it takes to be offered the boon; `activate` is what it takes for it to do
+   * anything once held. Frosty Veneer appears at 4 Water and sits inert until 6.
+   * Collapsing them into one number would be wrong for the five that have both.
+   */
+  needsElements?: { appear?: Record<string, number>; activate?: Record<string, number> } | null
+  /**
    * The game's own sentence about what this does, with the Keywords resolved
    * and the formatting codes stripped. A player who has never seen a boon can
    * find out what it is without leaving the tool.

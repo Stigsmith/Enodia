@@ -19,6 +19,8 @@ type RawTrait = {
   weapon?: string
   requires?: Requirement
   needsAspect?: string[]
+  elements?: string[]
+  needsElements?: { appear?: Record<string, number>; activate?: Record<string, number> }
   icon?: string
   text?: string
   render?: string
@@ -67,6 +69,8 @@ export const traits: TraitIndex = new Map(
       requiredWeapon: trait.weapon ?? null,
       requires: trait.requires ?? null,
       needsAspect: trait.needsAspect ?? null,
+      elements: trait.elements ?? null,
+      needsElements: trait.needsElements ?? null,
       text: trait.text ?? null,
     } satisfies Trait,
   ]),
