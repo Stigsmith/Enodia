@@ -13,17 +13,23 @@
  *
  * ## What is here
  *
- *   /api/auth/*   handed whole to better-auth: sign up, sign in, sign out, session
- *   /api/me       the one protected route, and mostly a way to prove the gate works
+ *   /api/auth/*      handed whole to better-auth: sign up, sign in, sign out, session
+ *   /api/capabilities  what this deployment can do. Public, and honest about mail
+ *   /api/me            who is signed in
+ *   /api/builds        publish one, list yours, unpublish one
+ *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *
- * Nothing social. No publishing, no friends, no leaderboards. `REQUIREMENTS.md`
- * 5 wants moderation designed before any of that exists, and it should not be
- * drawn in the same breath as the auth it would sit on.
+ * **Still nothing social.** A published build is unlisted: no gallery, no index,
+ * no search, and a random id rather than a sequential one, so it is reachable
+ * only by somebody who was handed the link. `REQUIREMENTS.md` 5 wants moderation
+ * designed before anything discoverable exists, and this is deliberately not
+ * that. Friends and leaderboards are still not here.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
 
 import { createAuth } from './auth.ts'
+import { listMine, publish, read, unpublish } from './publish.ts'
 import * as schema from './schema.ts'
 
 /**
@@ -91,6 +97,46 @@ export default {
         user: { id: session.user.id, email: session.user.email, name: session.user.name },
         expiresAt: session.session.expiresAt,
       })
+    }
+
+    /**
+     * Reading a published build, and the only route here that does not care who
+     * you are. Somebody handed a short link should not need an account to open
+     * it: that would make publishing useless for the thing it exists for.
+     */
+    const shared = /^\/api\/b\/([A-Za-z0-9]{1,32})$/.exec(url.pathname)
+    if (shared && request.method === 'GET') {
+      const found = await read(db, shared[1] as string)
+      if (!found) return json({ error: 'no such build' }, 404)
+      return json(found)
+    }
+
+    if (url.pathname === '/api/builds' || url.pathname.startsWith('/api/builds/')) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session) return json({ error: 'not signed in' }, 401)
+      const userId = session.user.id
+
+      if (url.pathname === '/api/builds' && request.method === 'GET') {
+        return json({ builds: await listMine(db, userId) })
+      }
+
+      if (url.pathname === '/api/builds' && request.method === 'POST') {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+        const outcome = await publish(db, userId, body)
+        if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+        return json(outcome, 201)
+      }
+
+      const mine = /^\/api\/builds\/([A-Za-z0-9]{1,32})$/.exec(url.pathname)
+      if (mine && request.method === 'DELETE') {
+        const gone = await unpublish(db, userId, mine[1] as string)
+        // Not found and not yours answer the same way, so this cannot be used
+        // to ask whether a given id exists on somebody else's account.
+        if (!gone) return json({ error: 'no such build' }, 404)
+        return json({ ok: true })
+      }
+
+      return json({ error: 'no such route' }, 404)
     }
 
     return json({ error: 'no such route' }, 404)

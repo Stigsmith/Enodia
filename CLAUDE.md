@@ -164,6 +164,10 @@ the play experience cannot see.
   now:** it deletes `.webp` and never `.png`, and stays out of `arcana/`, `hexes/`,
   `rarity/` and `vows/`. Deleting whole directories, which it used to do, would take the
   game art in `boons/` and `duos/` with it. Do not remove that guard
+- **`worker/schema.ts` is generated and `worker/schema-app.ts` is not.** Anything of ours
+  put in the generated file survives until the next `npm run db:schema` and then vanishes
+  without a word, taking the migration history's idea of reality with it. `drizzle.config.ts`
+  reads both
 - **The local D1 is keyed by `database_id`, so changing that id orphans it.**
   Editing `wrangler.jsonc` from the placeholder to the real id silently pointed
   `wrangler dev` at a fresh empty database, and the only symptom was a 500 on any

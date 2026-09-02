@@ -34,6 +34,8 @@ import { SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
+import { ACCOUNTS_LIVE } from '../state/account.ts'
+import { publishBuild } from '../state/publish.ts'
 import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import { readName } from '../state/identity.ts'
@@ -199,6 +201,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
                 setBin(loadBin())
                 setOpenId(null)
               }}
+              {...(onGo ? { onGo } : {})}
             />
           </div>
         </header>
@@ -445,14 +448,17 @@ function BuildMenu({
   build,
   onDuplicate,
   onDelete,
+  onGo,
 }: {
   build: ShownBuild
   onDuplicate: () => void
   onDelete: () => void
+  onGo?: (view: View) => void
 }) {
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [shared, setShared] = useState<'copied' | 'failed' | null>(null)
+  const [published, setPublished] = useState<string | null>(null)
   const [picture, setPicture] = useState<'working' | 'copied' | 'saved' | 'failed' | null>(null)
   const panel = useRef<HTMLDivElement>(null)
 
@@ -522,6 +528,54 @@ function BuildMenu({
                   : 'Copies a link holding the whole build'}
             </span>
           </button>
+
+          {/*
+            * Publish, which is the same job done shorter.
+            *
+            * Share above needs no account and never will: the build travels
+            * inside the link. It is also 1,588 characters, which Discord
+            * renders as a wall. Publishing stores the build and hands back
+            * about thirty characters instead. That difference is the only
+            * thing an account buys, which is why the item sits here, next to
+            * the thing it improves, rather than on a screen of its own.
+            */}
+          {ACCOUNTS_LIVE ? (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setPublished('working')
+                void publishBuild(build).then((outcome) => {
+                  if (!outcome.ok) {
+                    // Not signed in is the one refusal worth acting on rather
+                    // than just reporting, so it offers the way to fix it.
+                    setPublished(outcome.say)
+                    return
+                  }
+                  navigator.clipboard?.writeText(outcome.link).then(
+                    () => setPublished('Short link copied'),
+                    () => setPublished(outcome.link),
+                  ) ?? setPublished(outcome.link)
+                })
+              }}
+            >
+              <span className="bmenu-label">Publish</span>
+              <span className="bmenu-note">
+                {published === 'working'
+                  ? 'Publishing'
+                  : published
+                    ? published
+                    : 'Stores it, and copies a short link instead of a long one'}
+              </span>
+            </button>
+          ) : null}
+
+          {ACCOUNTS_LIVE && published?.includes('signed in') && onGo ? (
+            <button type="button" role="menuitem" onClick={() => onGo('account')}>
+              <span className="bmenu-label">Sign in</span>
+              <span className="bmenu-note">Publishing needs an account. Sharing never will</span>
+            </button>
+          ) : null}
 
           {/* The picture, separately.
             *
