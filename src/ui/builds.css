@@ -3589,6 +3589,9 @@ button.mark {
 }
 
 .builds-layout button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.25rem 0.7rem;
   border: 0;
   background: none;
@@ -3600,6 +3603,27 @@ button.mark {
 }
 
 .builds-layout button:hover { color: var(--bone-dim); }
+
+/**
+ * The game's own on and off dot, in front of each label.
+ *
+ * `settings-toggle-on/off.png` are 45 by 45 and round: a radio indicator rather
+ * than a slider, which is what this control is. It reads as a choice between
+ * two now instead of a highlighted half of a pill.
+ */
+.builds-layout button::before {
+  content: '';
+  width: 0.7rem;
+  height: 0.7rem;
+  flex: none;
+  background: url('/shell/settings-toggle-off.png') center / contain no-repeat;
+  opacity: 0.55;
+}
+
+.builds-layout button.is-on::before {
+  background-image: url('/shell/settings-toggle-on.png');
+  opacity: 1;
+}
 
 .builds-layout button.is-on {
   background: color-mix(in oklab, var(--lit-dim) 40%, transparent);
@@ -5636,18 +5660,26 @@ button.mark {
   margin: 0 0 1.6rem;
 }
 
+/**
+ * The game's own bar, which was sitting unused while this drew a gradient.
+ *
+ * `settings-bar-bg` and `-fill` are 406 by 16 and used on the settings sliders,
+ * so they are built to be stretched along their length and not across it. The
+ * height is held near the source's own 16px for that reason.
+ */
 .plan-bar {
-  height: 0.4rem;
-  border-radius: var(--r-pill);
-  background: var(--ink-850);
+  height: 0.9rem;
+  background: url('/shell/settings-bar-bg.png') left center / 100% 100% no-repeat;
   overflow: hidden;
 }
 
 .plan-bar-fill {
   display: block;
   height: 100%;
-  border-radius: var(--r-pill);
-  background: linear-gradient(90deg, var(--lit-dim), var(--lit-hot));
+  /* Sized to the bar rather than to itself, so the fill's own art does not
+   * squash as the percentage changes: the element is clipped, the picture is
+   * not rescaled. */
+  background: url('/shell/settings-bar-fill.png') left center / auto 100% repeat-x;
 }
 
 .plan-count {
@@ -5937,3 +5969,77 @@ button.mark {
     width: 19rem;
   }
 }
+
+/* -------------------------------------------------------------------------
+ * THE GAME'S OWN MARKS, ON THINGS THAT ALREADY EXISTED
+ *
+ * Adopted out of the 70 idle files in `assets/shell/`. Every one below replaces
+ * something the tool was drawing by hand rather than adding decoration, which
+ * is the line: art used because it exists is how a tool stops looking designed.
+ * ---------------------------------------------------------------------- */
+
+/* Saved and failed, on the game's own cloud marks. `.setting-done` and
+ * `.setting-bad` are the export and import results, which is the same pair the
+ * game uses these for. */
+.setting-done,
+.setting-bad {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.setting-done::before,
+.setting-bad::before {
+  content: '';
+  width: 1.4rem;
+  height: 1.2rem;
+  flex: none;
+  background: center / contain no-repeat;
+}
+
+.setting-done::before {
+  background-image: url('/shell/cloudsuccess.png');
+}
+
+.setting-bad::before {
+  background-image: url('/shell/cloudfail.png');
+}
+
+/* A rule between the sections of a reading page. It is 486 by 7, so it stretches
+ * along its length the way it was drawn to. */
+.builds-how,
+.builds-repeat {
+  border-top: 0;
+  padding-top: 1.4rem;
+  background: url('/shell/divider.png') top center / 100% 0.45rem no-repeat;
+}
+
+/* The banner the game puts over a finished run, on the moment you say you
+ * finished one. It is 5.33:1 ornamental scrollwork with a soft middle, so it
+ * takes a full row and nothing sits on top of it. */
+.logrun-cleared {
+  height: 2.6rem;
+  margin: -0.2rem 0 0;
+  background: url('/shell/victory-underworld.png') center / contain no-repeat;
+}
+
+/**
+ * **`info-button.png` was planned for here and is not used either.**
+ *
+ * An info mark belongs on a control that opens help. The Help page is already
+ * titled Help, so a mark beside that title says the word twice. There is no
+ * such control in the tool today, so the art keeps waiting for one rather than
+ * being put somewhere it does not mean anything.
+ */
+
+/**
+ * **`box-settings.png` was tried here and is not used.**
+ *
+ * It is 883 by 1063, a portrait box, and a settings block is wide and short.
+ * Stretched to fill one it put a visible vertical seam through every panel,
+ * which is the same error as the boon plates and the button overlays: art has a
+ * shape and using it against that shape looks broken rather than themed.
+ *
+ * The seven other adoptions all match their target's proportions. This one had
+ * no home and the flat token ground is better than a stretched picture.
+ */

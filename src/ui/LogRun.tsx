@@ -88,6 +88,11 @@ export function LogRun({
 
         <Ask label="Did the build come together?" value={assembled} onChoose={setAssembled} />
 
+        {/* The game's own victory banner, on the moment you say you had one.
+          * It is the header it puts over a finished run, and logging a clear
+          * had no moment at all before. */}
+        {cleared ? <div className="logrun-cleared" aria-hidden="true" /> : null}
+
         {/* Only on a clear, because that is the only run it can describe. */}
         {cleared ? (
           <Stepper
