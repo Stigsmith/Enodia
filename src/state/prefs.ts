@@ -36,6 +36,23 @@ export type Prefs = {
   /** Poster or Constellation, for a single build. */
   buildDetail: BuildDetail
   /**
+   * Whether the "these live in this browser" warning has been read and dismissed.
+   *
+   * It appears once somebody HAS builds, which is the opposite of where the
+   * empty state used to put it. Telling a person their work can be lost while
+   * they have no work is a sentence about nothing; the same sentence over a
+   * library of eleven builds is the one that gets somebody to press export.
+   */
+  backupWarningSeen: boolean
+  /**
+   * Whether the landing page has been walked through.
+   *
+   * A page that explains the tool is worth exactly one showing. After that it
+   * is a screen between somebody and the thing they came back for, so it goes
+   * and lives in the menu instead.
+   */
+  seenLanding: boolean
+  /**
    * How much Grasp this save has.
    *
    * `MetaUpgradeCostData.StartingMetaUpgradeLimit` is 10 and it rises as you
@@ -51,6 +68,8 @@ export const DEFAULT_PREFS: Prefs = {
   staleAfterHours: 3,
   buildDetail: 'poster',
   graspLimit: 10,
+  backupWarningSeen: false,
+  seenLanding: false,
 }
 
 function migrate(stored: unknown): Prefs | null {
@@ -74,6 +93,11 @@ function migrate(stored: unknown): Prefs | null {
       typeof record.graspLimit === 'number' && record.graspLimit > 0
         ? record.graspLimit
         : DEFAULT_PREFS.graspLimit,
+    // Same reasoning as buildDetail above: absent in anything stored before the
+    // warning existed, and absent means "not seen yet", which is the default.
+    // No version bump for an additive field.
+    backupWarningSeen: record.backupWarningSeen === true,
+    seenLanding: record.seenLanding === true,
   }
 }
 

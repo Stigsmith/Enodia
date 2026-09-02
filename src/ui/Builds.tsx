@@ -38,6 +38,7 @@ import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
+import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -59,7 +60,7 @@ const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
   },
 ]
 
-export function Builds({ onClose }: { onClose?: () => void }) {
+export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: View) => void }) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
   const [openId, setOpenId] = useState<string | null>(null)
@@ -77,6 +78,17 @@ export function Builds({ onClose }: { onClose?: () => void }) {
    */
   const [mine, setMine] = useState<ShownBuild[]>(loadBuilds)
   const [editing, setEditing] = useState<ShownBuild | 'new' | null>(null)
+
+  /**
+   * Whether to say out loud that these can be lost. Read once on mount, because
+   * it only changes when somebody dismisses it and that path sets the state.
+   */
+  const [warned, setWarned] = useState(() => loadPrefs().backupWarningSeen)
+
+  const stopWarning = () => {
+    setWarned(true)
+    savePrefs({ ...loadPrefs(), backupWarningSeen: true })
+  }
 
   const library = useMemo(() => [...mine, ...SAMPLE_BUILDS], [mine])
 
@@ -347,6 +359,45 @@ export function Builds({ onClose }: { onClose?: () => void }) {
         showing={shown.length}
         total={library.length}
       />
+      ) : null}
+
+      {/*
+        * The loss warning, and it appears only once there is something to lose.
+        *
+        * The empty state has always said "yours and stays in this browser",
+        * which is the right sentence at the wrong moment: somebody with no
+        * builds has nothing at stake and does not read it. The same sentence
+        * over a library they have actually filled is the one that gets a copy
+        * made. So the empty state keeps its line and this arrives after it.
+        *
+        * `mine` and not `library`: a warning about losing the sample builds
+        * would be a warning about losing nothing.
+        *
+        * It points at the export rather than at an account, on purpose. An
+        * account publishes one build to get a short link. It does not back
+        * anything up, and saying otherwise would sell a thing that does not
+        * exist yet.
+        */}
+      {mine.length > 0 && !warned ? (
+        <aside className="keep" role="note">
+          <p className="keep-say">
+            These live in this browser and nowhere else. Clearing site data takes them with it,
+            and so does a new phone.
+          </p>
+          <p className="keep-do">
+            {onGo ? (
+              <button type="button" className="keep-go" onClick={() => onGo('settings')}>
+                Export them
+              </button>
+            ) : (
+              <span>Settings has an export.</span>
+            )}{' '}
+            It writes one file you keep.
+          </p>
+          <button type="button" className="keep-dismiss" onClick={stopWarning}>
+            Got it
+          </button>
+        </aside>
       ) : null}
 
       {shown.length ? (

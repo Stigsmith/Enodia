@@ -23,6 +23,12 @@
  * and both need the name.
  */
 export type View =
+  /**
+   * The first screen a stranger sees, and the only one that sells anything.
+   * Shown once, skipped entirely for anybody arriving on a share link, and
+   * reachable again from the menu. `Landing.tsx` says why it is not a wall.
+   */
+  | 'landing'
   | 'builds'
   | 'arcana'
   | 'themes'

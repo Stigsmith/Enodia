@@ -309,6 +309,18 @@ export function Menu({
             leave()
           },
         },
+        {
+          /* The landing page shows itself once and then lives here. Somebody
+           * who skipped it, or who wants the line to send a friend, should
+           * still be able to get at it. */
+          label: 'What this is',
+          note: 'The page a first visit opens on',
+          here: view === 'landing',
+          action: () => {
+            onGo('landing')
+            leave()
+          },
+        },
       ],
     },
   ]

@@ -17,7 +17,7 @@ import { gameVersion, iconOf, traits, weapons } from './data/app.ts'
 import { brief, isWorthShowing } from './engine/briefing.ts'
 import type { Briefing as Card } from './engine/briefing.ts'
 import { buildStanding, buildTally, sayOf } from './engine/build-run.ts'
-import { loadPrefs } from './state/prefs.ts'
+import { loadPrefs, savePrefs } from './state/prefs.ts'
 import { lastSeen, loadTrail, markSeen, saveTrail } from './state/snapshot.ts'
 import { Briefing } from './ui/Briefing.tsx'
 import { Hecate } from './ui/Hecate.tsx'
@@ -36,6 +36,7 @@ import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
 import { HelpProvider, PageHelp } from './ui/PageHelp.tsx'
 import { Rail } from './ui/Rail.tsx'
+import { Landing } from './ui/Landing.tsx'
 import { Setup } from './ui/Setup.tsx'
 import { Timeline } from './ui/Timeline.tsx'
 import { Standing } from './ui/Standing.tsx'
@@ -101,7 +102,22 @@ export function App() {
    *
    * The run wins on arrival when there is one. Everything else lands on Builds.
    */
-  const [view, setView] = useState<View>(() => (run ? 'run' : 'builds'))
+  const [view, setView] = useState<View>(() => {
+    if (run) return 'run'
+    /**
+     * The landing page, once, and never in front of somebody who came for a
+     * build. A share link means they clicked through to see one specific thing,
+     * and an explainer there answers a question they did not ask.
+     */
+    if (!loadPrefs().seenLanding && !buildInUrl(window.location.hash)) return 'landing'
+    return 'builds'
+  })
+
+  /** Walked through, so it stops being a screen and becomes a menu entry. */
+  const leaveLanding = () => {
+    savePrefs({ ...loadPrefs(), seenLanding: true })
+    setView('builds')
+  }
 
   /**
    * A build that arrived in a link.
@@ -320,10 +336,18 @@ export function App() {
     )
   }
 
+  if (screen === 'landing') {
+    return frame(
+      <div className="shell">
+        <Landing onEnter={leaveLanding} />
+      </div>,
+    )
+  }
+
   if (screen === 'builds') {
     return frame(
       <div className="shell is-wide">
-        <Builds key={libraryAt} />
+        <Builds key={libraryAt} onGo={setView} />
       </div>,
     )
   }
