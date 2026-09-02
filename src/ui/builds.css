@@ -5795,11 +5795,60 @@ button.mark {
   line-height: 0;
 }
 
+/**
+ * A fixed box, so the swap does not move the page.
+ *
+ * The hard hat is 427 by 776 and the nightmare is 265 by 520: close in
+ * proportion but not equal, and at `height: auto` the shorter one would let the
+ * layout jump under her for the length of the scare. The box holds and the art
+ * fits inside it.
+ */
+.unbuilt-poke {
+  height: min(27rem, 55vh);
+}
+
 .unbuilt-dora {
   width: min(15rem, 60vw);
-  height: auto;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
   filter: drop-shadow(0 10px 26px var(--ink-950));
   transition: transform 0.12s ease;
+}
+
+/**
+ * The moment she tries the voice on.
+ *
+ * She drops it mid-sentence in the line itself, so the picture drops it about
+ * as fast. A sharp cut in and a quick settle out, with the glow doing the work
+ * rather than a scale: she is a shade and growing would read as a cartoon.
+ */
+.unbuilt-poke.is-scared .unbuilt-dora {
+  animation: dora-scare 0.7s ease-out;
+  filter: drop-shadow(0 0 26px rgb(140 255 190 / 0.45)) drop-shadow(0 10px 26px var(--ink-950));
+}
+
+@keyframes dora-scare {
+  0% {
+    transform: translateY(6px) scale(1.03);
+    opacity: 0.4;
+  }
+  12% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* The scare is the joke, so it is not removed under reduced motion: the swap
+ * still happens and only the movement goes. */
+@media (prefers-reduced-motion: reduce) {
+  .unbuilt-poke.is-scared .unbuilt-dora {
+    animation: none;
+  }
 }
 
 /* A small recoil, because being poked should do something. */
