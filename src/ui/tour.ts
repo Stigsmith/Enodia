@@ -162,9 +162,26 @@ export const TOURS: Record<string, Step[]> = {
       at: 'editor-rail',
       say: 'Fun thing. You can save a build carrying every warning it has got, so long as you tick that you read them. And if it is properly out of reach, the stars stop at one however many you gave it.',
     },
+    /**
+     * The closer.
+     *
+     * **A threat rather than a pronouncement**, which was the owner's fix and
+     * the right one: she is a shade, haunting people is the one thing she is
+     * actually qualified for, and it makes it personal instead of a sermon.
+     * Sharing is the sting because sharing is where an impossible build stops
+     * being your own problem.
+     *
+     * Six is checked rather than picked: `hardStop` fires above five Olympians.
+     *
+     * **This roar waits for a click rather than timing out.** Every other one
+     * in the tool drops itself, because there a click means "poke again" and
+     * a timer is the only way to stop somebody skipping the punchline. The tour
+     * advances on clicks anyway, so here she can just hold it, and holding it
+     * is funnier when it is the last thing you see.
+     */
     {
-      roar: 'AND YET YOU WOULD HAND THIS TO SOMEBODY. SIX OLYMPIANS. FOUR KEEPSAKES. A PRAYER. THEY WILL DIE IN EREBUS AND THEY WILL THINK IT WAS THEIR FAULT.',
-      say: 'No, seriously. Do not be an arse. Make builds somebody can actually get to.',
+      roar: 'SHARE A BUILD WITH SIX OLYMPIANS IN IT AND I WILL HAUNT YOU. NOT BRIEFLY. NOT SYMBOLICALLY. FOREVER.',
+      say: 'No, seriously. Do not be an arse. Make builds somebody can recreate.',
     },
   ],
 

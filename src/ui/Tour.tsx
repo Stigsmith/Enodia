@@ -34,7 +34,6 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
-import { ROAR_MS } from './Dora.tsx'
 import type { Step } from './tour.ts'
 
 /** Breathing space around the lit element, so the ring is not on its edge. */
@@ -103,10 +102,9 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
 
   const go = useCallback(
     (to: number) => {
-      // Locked while she is doing the voice. The climb-down is the punchline
-      // and clicking past it before it lands throws the joke away. It unlocks
-      // itself, so there is nothing to get stuck behind.
-      if (roaring) return
+      // The click that ends the voice ends only the voice. She drops it, says
+      // the quiet half, and the step after that is the one that moves on.
+      if (roaring) return setDropped(true)
       if (to < 0) return
       if (to >= live.length) return onClose()
       setIndex(to)
@@ -114,12 +112,18 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
     [live.length, onClose, roaring],
   )
 
-  /** The capitals, then her dropping them, on a timer rather than on a click. */
+  /**
+   * The capitals reset when the step does. **They do not time out.**
+   *
+   * The poke loops drop the voice on a timer because there a click means "poke
+   * again", so waiting is the only way to stop somebody skipping the punchline.
+   * The tour is click-driven from end to end, so here the drop is just the next
+   * click. She holds the form as long as you leave her in it, which is also the
+   * better joke: it is the last thing in the editor tour and it should sit
+   * there until you blink.
+   */
   useEffect(() => {
     setDropped(false)
-    if (!step?.roar) return
-    const stop = window.setTimeout(() => setDropped(true), ROAR_MS)
-    return () => window.clearTimeout(stop)
   }, [step])
 
   /**
@@ -368,8 +372,7 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
           <button
             type="button"
             className="tour-arrow"
-            disabled={roaring}
-            aria-label={last ? 'Finish' : 'Next step'}
+            aria-label={roaring ? 'Let her finish' : last ? 'Finish' : 'Next step'}
             onClick={() => go(index + 1)}
           >
             <img src="/shell/settings-arrow-right.png" alt="" aria-hidden="true" />
