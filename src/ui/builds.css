@@ -5779,10 +5779,77 @@ button.mark {
   color: var(--lit-hot);
 }
 
+/* Her and her speech, stacked, so the box sits above her head. */
+.unbuilt-her {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+}
+
+.unbuilt-poke {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
 .unbuilt-dora {
   width: min(15rem, 60vw);
   height: auto;
   filter: drop-shadow(0 10px 26px var(--ink-950));
+  transition: transform 0.12s ease;
+}
+
+/* A small recoil, because being poked should do something. */
+.unbuilt-poke:active .unbuilt-dora {
+  transform: translateX(3px) rotate(0.6deg);
+}
+
+/**
+ * What she says, on the game's own dialogue box.
+ *
+ * **This art was tried once and rejected**, behind the caveats bar in the
+ * editor: it is 2280 by 1280 with the crescent ornament baked in at the top
+ * left, and stretching it to a wide warning strip flattened the moon. A speech
+ * box is close to its native proportion, so the thing it was wrong for is the
+ * thing it is right for here.
+ *
+ * The padding is uneven on purpose: the ornament occupies the top-left corner
+ * of the art, so the text starts clear of it.
+ */
+.dora-says {
+  margin: 0;
+  /* A width, not a max-width. It was shrinking to its text, and at 190px the
+   * crescent ornament is smaller than the letters beside it: the box stopped
+   * reading as the game's box at all. */
+  width: min(24rem, 88vw);
+  min-height: 6.5rem;
+  padding: 2.1rem 2rem 1.8rem 4.2rem;
+  background: url('/shell/dialogue-static.png') center / 100% 100% no-repeat;
+  color: var(--bone);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  text-align: left;
+  animation: dora-says-in 0.14s ease-out;
+}
+
+@keyframes dora-says-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dora-says {
+    animation: none;
+  }
+
+  .unbuilt-poke:active .unbuilt-dora {
+    transform: none;
+  }
 }
 
 /* -------------------------------------------------------------------------
