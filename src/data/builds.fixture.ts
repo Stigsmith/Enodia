@@ -33,7 +33,7 @@
 
 import type { ShownBuild } from './builds.ts'
 
-export const EVERY_PAIR: ShownBuild = {
+export const FIRST_BUILD: ShownBuild = {
 
   id: 'sample-four-gods',
   name: 'Every Pair',
@@ -97,14 +97,5 @@ export const EVERY_PAIR: ShownBuild = {
   ],
 }
 
-/**
- * The old name, because the tests were written against it.
- *
- * Kept as an alias rather than renamed across nine test files in a commit that
- * is about emptying the library: two changes in one diff is how a rename hides
- * a behaviour change.
- */
-export const FIRST_BUILD = EVERY_PAIR
-
 /** A library of one, for the tests that want a list rather than a build. */
-export const SAMPLE_BUILDS: ShownBuild[] = [EVERY_PAIR]
+export const SAMPLE_BUILDS: ShownBuild[] = [FIRST_BUILD]

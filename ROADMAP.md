@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 29 August 2026, game build `138174`.
+Last updated 2 September 2026, game build `138174`.
 
 ---
 
@@ -14,9 +14,10 @@ Last updated 29 August 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete** |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 343, across 17 files |
-| **Validator** | 8 checks, 0 failures, 3 warnings |
-| **Build** | `dist/` is **10 MB and 518 files**, and it runs from a plain static server |
+| **Tests** | 420, across 23 files |
+| **Validator** | 0 failures, 3 warnings |
+| **Build** | `dist/` is **63 MB and 608 files**, and it runs from a plain static server |
+| **Deploy** | `netlify.toml` publishes `dist/`. Node pinned to 22, hashed assets immutable, a CSP that says the page fetches nothing but itself |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
 **Phase 1 is complete.** Set up a run, log what each Exit gave, and the timeline records what
@@ -32,10 +33,15 @@ target from the standing drawer and that pin is what the card leads with.
 **A mis-tap costs one tap.** Every logged station carries "This did not happen", and taking
 one back replays the run from empty so everything after it is recomputed, deaths included.
 
-Not shipped yet: the hand-authored page is still `placeholder/index.html` and still what
-Netlify serves. **The app is deployable now** rather than merely built: `npm run build`
-produces 10 MB, and `npm run preview` or the `dist` entry in `.claude/launch.json` serves it
-to check before pointing Netlify at it. Which is still a decision, not a task.
+**The deploy target is settled.** `netlify.toml` publishes `dist/`, so the hand-authored
+`placeholder/index.html` is no longer what a deploy serves. Running the deploy is the
+owner's, and the only step left: `npx netlify deploy --prod --dir=dist`.
+
+**Two rounds of playtest feedback have landed since Phase 1 closed**, and they changed more
+than polish. The editor was rebuilt around two boon trays, the warnings now name what would
+fix them, runs are logged without opening the editor, deleting is recoverable, and two
+mechanical claims turned out to be wrong. `src/data/changelog.ts` is the readable version;
+the corrections are below and in `CLAUDE.md`.
 
 ---
 
@@ -226,17 +232,36 @@ conditionals came on and why each of the rest did not; it fails only on the impo
 
 ---
 
+## Corrections since Phase 1
+
+Three things the tool asserted that were wrong. All three are now in `CLAUDE.md` with their
+sources, because each was believed for a while and each shaped code.
+
+**A run is about forty Exits, not twelve.** Four Regions of eight to twelve. `RoomDataN/O/P/Q`
+and `RoomDataF/G/H/I` give the structure; the per-Region count is generated rather than
+tabled, so the number is the owner's measurement. Everything judging reachability had been
+working against a third of a real run.
+
+**The four-Olympian cap is on the random pool, not on the run.** `RewardLogic.lua:238` calls
+`ChooseLoot`, which freezes the pool once `ReachedMaxGods` is true; line 242 overwrites that
+from any held `ForceBoonName` without consulting the cap. A fifth god is a keepsake away.
+
+**A run has four keepsakes, not one.** One at the start and a swap at the rack after each of
+the first three bosses, one `GiftRack` per Region gated on `WorldUpgradePostBossGiftRack`.
+
+---
+
 ## What I would pick up next
 
 Phase 1 is done and nothing below blocks anything else. In the order I would take them.
 
-**1. Real build definitions.** The shape is settled and the screen is waiting for content:
-`ShownBuild` carries `how` and `by`, the filters derive themselves from whatever is added,
-and the eight samples are placeholders. This is the owner's, and the community's after that.
+**1. Real build definitions.** The shape is settled and the library now ships empty, which is
+the honest state: placeholder builds read as recommendations, so they were cut. `ShownBuild`
+carries `how`, `luck`, `playstyle` and `by`, and the filters derive themselves from whatever
+is added. This is the owner's, and the community's after that.
 
-**2. Point Netlify at `dist/`.** The owner's call, and the only thing between this and
-people using it. The build is 10 MB, it runs from a plain static server, and
-`.claude/launch.json` has a `dist` entry to check it first.
+**2. Run the deploy.** `netlify.toml` is written and `dist/` builds clean.
+`npx netlify deploy --prod --dir=dist` is the whole of it.
 
 **3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
 of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
@@ -257,11 +282,11 @@ walking `InheritFrom` itself.
 
 | What | On | Note |
 |---|---|---|
-| Netlify redeploy | The owner | The live page is several revisions behind, and its publish directory is now `placeholder/` rather than `dist/`. **`dist/` is 10 MB and deployable now**, and `npm run preview` or the `dist` entry in `.claude/launch.json` serves it |
+| Netlify redeploy | The owner | `netlify.toml` publishes `dist/` and the build is clean. One command: `npx netlify deploy --prod --dir=dist` |
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
-| Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The eight in `src/data/builds.ts` are samples and are labelled as such on the page. `how` and `by` are ready for them |
+| Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The library ships empty now: `SAMPLE_BUILDS` is `[]` and the stress-test build lives in `builds.fixture.ts`, which nothing in the app imports. `how`, `luck`, `playstyle` and `by` are ready for them |
 
 ---
 
