@@ -71,6 +71,7 @@ import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
+import { useHelpTopic } from './PageHelp.tsx'
 import { iconOf } from '../data/app.ts'
 import type { Slot, TraitId } from '../data/types.ts'
 
@@ -148,6 +149,10 @@ export function BuildEditor({
   onCancel: () => void
   onDelete?: (id: string) => void
 }) {
+  /* This screen is a mode inside Builds rather than a view of its own, so the
+   * help mark would otherwise explain the overview to somebody standing here. */
+  useHelpTopic('editor')
+
   const firstWeapon = weapons[0]
   const [build, setBuild] = useState<ShownBuild>(
     () => initial ?? blankBuild(firstWeapon?.id ?? '', aspectsOf(firstWeapon?.id ?? '')[0]?.id ?? ''),

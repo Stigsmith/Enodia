@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 980,
+ "count": 981,
  "categories": [
   {
    "name": "arcana",
@@ -140,10 +140,10 @@
   },
   {
    "name": "ui",
-   "count": 20,
+   "count": 21,
    "source": "mixed",
    "wiki": 19,
-   "game": 1
+   "game": 2
   },
   {
    "name": "vows",
@@ -8851,6 +8851,14 @@
    "file": "ui/dora-spooky.png",
    "bytes": 97728,
    "sha256": "dd8d73ff934c4b787b62f8cb8ac45d9b5ed1b552486652556ba9d6071ffafaaf",
+   "source": "game"
+  },
+  {
+   "id": "dora-thoughtful",
+   "category": "ui",
+   "file": "ui/dora-thoughtful.png",
+   "bytes": 132201,
+   "sha256": "46b8f27c184a64897bc50ac256e831bed202904c9e1ad0234593b11f288b7e15",
    "source": "game"
   },
   {

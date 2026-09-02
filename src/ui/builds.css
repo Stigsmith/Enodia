@@ -5950,7 +5950,12 @@ button.mark {
   .dora-watching {
     display: block;
     position: fixed;
-    right: 2.5rem;
+    /* 4rem rather than 2.5rem: the help mark owns the bottom right corner and
+     * spans 1rem to 3.4rem, which put it on her rightmost 0.9rem. Changed here
+     * rather than in a later override, because a later block at this
+     * specificity also beat the `min-width: 100rem` rule below and dragged her
+     * back in on wide screens. Same cascade trap as `.tab.is-open`. */
+    right: 4rem;
     bottom: 0;
     width: 15rem;
     height: auto;
@@ -6149,4 +6154,172 @@ button.mark {
   flex: none;
   object-fit: contain;
   opacity: 0.85;
+}
+
+/* -------------------------------------------------------------------------
+ * DORA EXPLAINS THE PAGE
+ *
+ * The home `info-button.png` was waiting for. It was adopted in the art audit
+ * and then rejected for want of one: an info mark belongs on a control that
+ * opens help, and there was no such control.
+ *
+ * ## The corner had to be earned
+ *
+ * Every corner of this app is occupied on at least one screen. Top left is the
+ * menu button, top right is `.editor-banner` once the editor scrolls, bottom
+ * left is the pinned pane at `data-nav="pane"`, and bottom right holds the
+ * Standing drawer on the run screen and the mascot's hem on the roadmap.
+ *
+ * Bottom right is the owner's pick, so the two occupants there move aside by
+ * one rule each, further down this file and in `surface.css`. Moving the
+ * furniture beats teaching the mark a magic offset per screen, which is a list
+ * that only ever grows and that the next screen will not know about.
+ * ---------------------------------------------------------------------- */
+
+.pagehelp-open {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  /* Above every page surface, below the Standing drawer at 15, the phone
+   * picker sheet, the menu at 30 and every modal. So anything that opens over
+   * the page covers the mark, which is correct: help for the page underneath
+   * is not what you are doing while a drawer is open. */
+  z-index: 12;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  /* The game's own mark, and its own highlight on hover. Two files, one swap,
+   * exactly the pair the game ships them as. */
+  background: url('/shell/info-button.png') center / contain no-repeat;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.pagehelp-open:hover,
+.pagehelp-open:focus-visible {
+  background-image: url('/shell/info-button-highlight.png');
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* ------------------------------------------------------- the dim and her -- */
+
+.pagehelp {
+  position: fixed;
+  inset: 0;
+  /* Over everything, `.logrun` at 70 included. */
+  z-index: 80;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  /* 0.88 and a blur, not 0.78 and nothing. At 0.78 the page behind stayed
+   * legible enough to read, so her lines were competing with a roadmap for
+   * attention and losing. Caught in a screenshot; every computed style said
+   * the text was fine. */
+  background: rgb(0 0 0 / 0.88);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  /* Nothing here is ever allowed to fall off the bottom. Measured: the editor
+   * says four lines, and three of them plus her already reach 632px of a 640
+   * tall phone. Scrolling is the floor under that; the rule below is what
+   * usually keeps it from being needed. */
+  overflow-y: auto;
+  animation: pagehelp-in 0.18s ease-out;
+}
+
+/* She stands beside the words rather than under them once there is room. */
+@media (min-width: 52rem) {
+  .pagehelp {
+    grid-template-columns: minmax(0, 34rem) auto;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+}
+
+.pagehelp:focus-visible {
+  outline: none;
+}
+
+@keyframes pagehelp-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.pagehelp-body {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 34rem;
+  text-align: left;
+}
+
+.pagehelp-line {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--bone);
+}
+
+/* Quiet, because the rule is "anywhere", and this is for whoever would rather
+ * aim at a control than have guessed that. */
+.pagehelp-close {
+  justify-self: start;
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-soft);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.pagehelp-close:hover,
+.pagehelp-close:focus-visible {
+  color: var(--lit);
+}
+
+/* She rises in rather than fading, so it reads as her arriving. */
+.pagehelp-dora {
+  width: auto;
+  max-width: min(17rem, 44vw);
+  height: auto;
+  filter: drop-shadow(0 12px 30px var(--ink-950));
+  animation: pagehelp-dora-in 0.24s ease-out;
+}
+
+/* A short screen, where she and four lines of text are competing for the same
+ * height. She gives way, because the words are the feature and she is the
+ * delivery. Only bites where the two stack, which is below 52rem wide. */
+@media (max-height: 44rem) and (max-width: 51.99rem) {
+  .pagehelp-dora {
+    max-height: 32dvh;
+  }
+}
+
+@keyframes pagehelp-dora-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagehelp,
+  .pagehelp-dora {
+    animation: none;
+  }
+
+  .pagehelp-open:hover,
+  .pagehelp-open:focus-visible {
+    transform: none;
+  }
 }
