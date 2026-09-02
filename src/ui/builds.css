@@ -6668,6 +6668,26 @@ button.mark {
   font-size: 0.9rem;
 }
 
+/**
+ * The ghost voice, when she tries it on.
+ *
+ * Louder than she normally is and spaced out, because it is a performance and
+ * she is not good at it. The plate stays the same: swapping that as well would
+ * make it a mode rather than a slip.
+ */
+.tour-say.is-roaring {
+  color: var(--lit-hot);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--lit) 45%, transparent);
+}
+
+/* Her nightmare form is a narrower sprite at the same 520 tall, so the fixed
+ * height below already keeps the group from jumping when she turns. */
+.tour-dora.is-roaring {
+  filter: drop-shadow(0 8px 26px var(--ink-950))
+    drop-shadow(0 0 16px color-mix(in srgb, var(--lit) 30%, transparent));
+}
+
 .tour-dora {
   /**
    * Sized by height, not width, because she has two poses.

@@ -42,6 +42,15 @@ export type Step = {
   /** the `data-tour` value she stands beside, or nothing for a whole-page line */
   at?: string
   say: string
+  /**
+   * The ghost voice, said first and in capitals, before she drops it and says
+   * `say` instead.
+   *
+   * Same field and same behaviour as the poke loop in `Dora.tsx`, which is
+   * where the joke started. A step with one of these holds, ignores clicks
+   * while it holds, and moves itself on.
+   */
+  roar?: string
 }
 
 export const TOURS: Record<string, Step[]> = {
@@ -81,6 +90,26 @@ export const TOURS: Record<string, Step[]> = {
     {
       at: 'editor-reading',
       say: 'This is the honest one. How much luck the whole build needs, and then exactly where the luck goes.',
+    },
+    /**
+     * The closer, and the fact in it is real.
+     *
+     * `caveats` in `BuildEditor.tsx` are the warnings that do not stop a save,
+     * only make you tick that you read them, and a hard stop is one of those
+     * rather than a blocker. `ratingCeiling` then returns 1 for any build with
+     * a hard stop, whatever is stored against it. So: you can save it, you have
+     * to admit you read the warning, and it will never show more than a star.
+     */
+    {
+      at: 'editor-rail',
+      say: 'Fun thing. You can save a build carrying every warning it has got. You only have to tick that you read them, which is this tool making you say it out loud.',
+    },
+    {
+      say: 'And if it is properly out of reach, the stars stop at one. However many you gave it. It keeps your number and shows mine.',
+    },
+    {
+      roar: 'AND YET YOU WOULD HAND THIS TO SOMEBODY. SIX OLYMPIANS. FOUR KEEPSAKES. A PRAYER. THEY WILL DIE IN EREBUS AND THEY WILL THINK IT WAS THEIR FAULT.',
+      say: 'No, seriously. Do not be an arse. Make builds somebody can actually get to.',
     },
   ],
 
