@@ -31,6 +31,7 @@ import { Account } from './ui/Account.tsx'
 import { ACCOUNTS_LIVE } from './state/account.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
+import { openPublished, publishedInUrl } from './state/publish.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
 import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
@@ -111,7 +112,13 @@ export function App() {
      * build. A share link means they clicked through to see one specific thing,
      * and an explainer there answers a question they did not ask.
      */
-    if (!loadPrefs().seenLanding && !buildInUrl(window.location.hash)) return 'landing'
+    if (
+      !loadPrefs().seenLanding &&
+      !buildInUrl(window.location.hash) &&
+      !publishedInUrl(window.location.pathname)
+    ) {
+      return 'landing'
+    }
     return 'builds'
   })
 
@@ -162,6 +169,28 @@ export function App() {
     // this the link would sit in the address bar doing nothing at all.
     window.addEventListener('hashchange', take)
     return () => window.removeEventListener('hashchange', take)
+  }, [])
+
+  /**
+   * A published build, arriving as `/b/<id>`.
+   *
+   * The other half of the same feature as the fragment above. A fragment
+   * carries the whole build and needs no server; a short link carries an id and
+   * fetches one. Both end in the same place, which is `arrived`, so everything
+   * downstream treats them identically.
+   *
+   * Mount only, and no listener: a short link is a real navigation, so the page
+   * reloads and this runs again on its own.
+   */
+  useEffect(() => {
+    const id = publishedInUrl(window.location.pathname)
+    if (!id) return
+    // Cleared first, for the same reason the fragment is: a reload should not
+    // offer the same build again after it has been answered.
+    history.replaceState(null, '', '/')
+    void openPublished(id).then((build) => {
+      if (build) setArrived(build)
+    })
   }, [])
 
   /**

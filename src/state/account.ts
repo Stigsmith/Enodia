@@ -37,6 +37,20 @@
  * - a mail provider, and `sendResetPassword` wired into `worker/auth.ts`
  * - **Discord**, as a social provider. No password, so nothing to reset, no
  *   email to send, and it is where this audience already is
+ *
+ * ## This is a UI gate, and only a UI gate
+ *
+ * Being precise, because the difference matters: `/api/auth/*` is deployed and
+ * reachable whatever this says. Somebody who reads the JavaScript and posts to
+ * the endpoint by hand can still make an account, and would then hit the same
+ * missing reset.
+ *
+ * That is accepted rather than overlooked. The endpoints are rate limited, none
+ * of them are linked from anywhere, and a person willing to curl their way into
+ * an account is not the person who gets stranded by a missing reset. Closing the
+ * server side too would also lock the owner out of testing their own deployment.
+ * **If that trade stops looking right, the place to close it is `worker/auth.ts`,
+ * not here.**
  */
 export const ACCOUNTS_LIVE = false
 

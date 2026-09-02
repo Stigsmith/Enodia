@@ -88,11 +88,25 @@ into `assets/fonts/`, taking every subset Google returns rather than hand-pickin
 The page loads nothing from a third party, which is what lets the CSP say `default-src
 'self'` and mean it.
 
-## Accounts
+## Accounts and publishing
 
 `worker/` is the API, on the same origin under `/api/*`, with accounts in D1 and
 [Better Auth](https://www.better-auth.com/). **The tool works entirely signed out** and an
 account is only needed to share or compete, so almost no visit touches any of it.
+
+**An account buys exactly one thing: a short link.** `linkFor` packs a whole build into a URL
+fragment, which is why sharing needs no server and always will not. It is also **1,588
+characters**, which Discord renders as a wall. Publishing stores the same payload under a
+random ten-character id, so the link becomes `enodia.me/b/aB3xK9pQmR`, about thirty.
+
+Published builds are **unlisted, not public**: no gallery, no index, no search, and a random
+id rather than a sequential one, so one is reachable only by whoever was handed the link.
+`REQUIREMENTS.md` 5 wants moderation designed before anything discoverable exists, and this
+is deliberately not that.
+
+Publishing is a copy, not a move. The build in the browser stays the record and stays what
+the export writes. `ACCOUNTS_LIVE` in `src/state/account.ts` hides all of it until password
+reset works.
 
 `wrangler dev` runs the whole thing, D1 included, against a local SQLite file under
 `.wrangler/`. No Cloudflare account is needed to develop or test it. A real deploy needs
