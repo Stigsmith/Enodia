@@ -4,12 +4,14 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 982,
+ "count": 1032,
  "categories": [
   {
    "name": "arcana",
-   "count": 52,
-   "source": "game"
+   "count": 102,
+   "source": "mixed",
+   "wiki": 50,
+   "game": 52
   },
   {
    "name": "artifacts",
@@ -158,12 +160,30 @@
  ],
  "assets": [
   {
+   "id": "artificer-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/artificer-inactive-lite.webp",
+   "bytes": 53988,
+   "sha256": "4747e23e7015e2d4251e6c0256c7134216feaf558024aa0c524afffb7a190e20",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "artificer-inactive",
    "category": "arcana",
    "file": "arcana/artificer-inactive.png",
    "bytes": 645697,
    "sha256": "8b20de2024457603720201a00a092392c3b4cf2ef429ab8f6628d47371d9c125",
    "source": "game"
+  },
+  {
+   "id": "artificer-lite",
+   "category": "arcana",
+   "file": "arcana/artificer-lite.webp",
+   "bytes": 62944,
+   "sha256": "4b693d95167b08275b959757a00bf7e903ad1fbdc552dd9eaf6047dfe662c678",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "artificer",
@@ -174,12 +194,30 @@
    "source": "game"
   },
   {
+   "id": "boatman-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/boatman-inactive-lite.webp",
+   "bytes": 36992,
+   "sha256": "f91791ccffd14bc60ab00bce58ad57534e234875fa4716acafc1e712c7223d9f",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "boatman-inactive",
    "category": "arcana",
    "file": "arcana/boatman-inactive.png",
    "bytes": 495193,
    "sha256": "2b30e80e12596407fa1219710fdbdd1db5f16d70f927d18ef330adb11f6cbe93",
    "source": "game"
+  },
+  {
+   "id": "boatman-lite",
+   "category": "arcana",
+   "file": "arcana/boatman-lite.webp",
+   "bytes": 49486,
+   "sha256": "d7df23e794407d599f13ad098c6fe314aac720fdaf08b0ccb2ba8dc6c848db15",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "boatman",
@@ -190,12 +228,30 @@
    "source": "game"
   },
   {
+   "id": "centaur-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/centaur-inactive-lite.webp",
+   "bytes": 50896,
+   "sha256": "6c26a176e88c2ea0cbc92fea6c9f88a7b6954f9f28de0dc81331b5fafcca932b",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "centaur-inactive",
    "category": "arcana",
    "file": "arcana/centaur-inactive.png",
    "bytes": 713340,
    "sha256": "f4760c77f853c8bee4ad18499556603b7525b3070c13fd69f96b29fa953bf0c6",
    "source": "game"
+  },
+  {
+   "id": "centaur-lite",
+   "category": "arcana",
+   "file": "arcana/centaur-lite.webp",
+   "bytes": 62908,
+   "sha256": "a4557bd2ef38b856b16317a779e9199b23618a4e3387bc3a2356002bd2293e35",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "centaur",
@@ -206,12 +262,30 @@
    "source": "game"
   },
   {
+   "id": "champions-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/champions-inactive-lite.webp",
+   "bytes": 56968,
+   "sha256": "b24288ac0e09e95776b8256094191ff9e4b9e3c53dacf456d29f92a043b25a2f",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "champions-inactive",
    "category": "arcana",
    "file": "arcana/champions-inactive.png",
    "bytes": 777608,
    "sha256": "7af062e658d487f7a1a7ebf4b40d7790df6d4688fe4ec75336508b1576d5c636",
    "source": "game"
+  },
+  {
+   "id": "champions-lite",
+   "category": "arcana",
+   "file": "arcana/champions-lite.webp",
+   "bytes": 71938,
+   "sha256": "adfd89435a39baf13a0b47c663b8eb49b5028ae4c5a3d3684e0b060797735219",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "champions",
@@ -222,12 +296,30 @@
    "source": "game"
   },
   {
+   "id": "death-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/death-inactive-lite.webp",
+   "bytes": 51960,
+   "sha256": "d595fa3a6389abbcb3a1b708689741a7fdea3f6145b9f84611d9f3abf6ee17b8",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "death-inactive",
    "category": "arcana",
    "file": "arcana/death-inactive.png",
    "bytes": 700816,
    "sha256": "081bc69d088912e383bf26b6326d1e596cfb136058257bece808875f12a08bfa",
    "source": "game"
+  },
+  {
+   "id": "death-lite",
+   "category": "arcana",
+   "file": "arcana/death-lite.webp",
+   "bytes": 63692,
+   "sha256": "5e11ff774bc7394f743249ad87d5f62d17aadd4cef11f4273f49cd702a48109c",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "death",
@@ -238,12 +330,30 @@
    "source": "game"
   },
   {
+   "id": "divinity-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/divinity-inactive-lite.webp",
+   "bytes": 66076,
+   "sha256": "42bf11563a48380e6184ae423c82eef1171292a2fe466c60459a34feeefd42b4",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "divinity-inactive",
    "category": "arcana",
    "file": "arcana/divinity-inactive.png",
    "bytes": 881961,
    "sha256": "65ff584a4b043fff3deb81b33fcc918e1a4618b1b51a453f34df150faf0bcdff",
    "source": "game"
+  },
+  {
+   "id": "divinity-lite",
+   "category": "arcana",
+   "file": "arcana/divinity-lite.webp",
+   "bytes": 77692,
+   "sha256": "cc86b250c2b90d967a93b776ed0af0acf85b449a151054150f4d3d0073bb98e2",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "divinity",
@@ -262,12 +372,30 @@
    "source": "game"
   },
   {
+   "id": "eternity-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/eternity-inactive-lite.webp",
+   "bytes": 48166,
+   "sha256": "5ed052c8691f4a1e75bc0ec5c00951f88438fd372f8eeb253244d0f65c0ea00b",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "eternity-inactive",
    "category": "arcana",
    "file": "arcana/eternity-inactive.png",
    "bytes": 622442,
    "sha256": "63ba759601e0542d86a6065d9bdd943e8548f199826c55a5023359dd7b218ba2",
    "source": "game"
+  },
+  {
+   "id": "eternity-lite",
+   "category": "arcana",
+   "file": "arcana/eternity-lite.webp",
+   "bytes": 60262,
+   "sha256": "3af3646fd6d42e8676fe818fd0d29c5bfdb7c4735511f09eb97d7d750bf868d8",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "eternity",
@@ -278,12 +406,30 @@
    "source": "game"
   },
   {
+   "id": "excellence-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/excellence-inactive-lite.webp",
+   "bytes": 58788,
+   "sha256": "54da8363c9355b92e099a7addbfcfb44a73664a4fe98a9dac42b23a4997777cf",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "excellence-inactive",
    "category": "arcana",
    "file": "arcana/excellence-inactive.png",
    "bytes": 827139,
    "sha256": "18e44be2698e48eca7c3a161e79af3b71ce693227641c859fe9e493757226992",
    "source": "game"
+  },
+  {
+   "id": "excellence-lite",
+   "category": "arcana",
+   "file": "arcana/excellence-lite.webp",
+   "bytes": 70028,
+   "sha256": "7d8fbf76b7bc57913a49a90aeb99b9878075af1f3bcb2be45f140c7b7bf8d71c",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "excellence",
@@ -294,12 +440,30 @@
    "source": "game"
   },
   {
+   "id": "furies-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/furies-inactive-lite.webp",
+   "bytes": 49546,
+   "sha256": "1da999e6cc2a0484e3785e517c7d8cf644428fb27f2ff6cec1dac145c1d66101",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "furies-inactive",
    "category": "arcana",
    "file": "arcana/furies-inactive.png",
    "bytes": 646898,
    "sha256": "e47a51992e70202c49b20935de460822af6b9cabeb0191f658bc2d3ab1122386",
    "source": "game"
+  },
+  {
+   "id": "furies-lite",
+   "category": "arcana",
+   "file": "arcana/furies-lite.webp",
+   "bytes": 62854,
+   "sha256": "2141f02a001f1c706420ca3d975b1d0868baeaaf838e8293bce9364fd7d89d76",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "furies",
@@ -318,12 +482,30 @@
    "source": "game"
   },
   {
+   "id": "huntress-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/huntress-inactive-lite.webp",
+   "bytes": 45440,
+   "sha256": "b110dfa5031d79e15a2576c7c25cbc7e2631b34642d636eaac1a6cfb14740de9",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "huntress-inactive",
    "category": "arcana",
    "file": "arcana/huntress-inactive.png",
    "bytes": 566602,
    "sha256": "f8c390b9d4d441f22992695c3e27925b8c3a90720035c58e58e3baafe93fcafe",
    "source": "game"
+  },
+  {
+   "id": "huntress-lite",
+   "category": "arcana",
+   "file": "arcana/huntress-lite.webp",
+   "bytes": 53838,
+   "sha256": "f68166ab71b671bc183d87f5cd3c1411fc6bbe2a04b0a362acf25a5875e48c19",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "huntress",
@@ -334,12 +516,30 @@
    "source": "game"
   },
   {
+   "id": "judgment-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/judgment-inactive-lite.webp",
+   "bytes": 59764,
+   "sha256": "de5478a71f6d38f7630b89e7820b8d6b2936512731fc3c2694b25f51bbcea9fc",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "judgment-inactive",
    "category": "arcana",
    "file": "arcana/judgment-inactive.png",
    "bytes": 748939,
    "sha256": "75aab95debba5e9a1424995b1d0fde3e03b39cfb50aba2a0abecbeadd2f889be",
    "source": "game"
+  },
+  {
+   "id": "judgment-lite",
+   "category": "arcana",
+   "file": "arcana/judgment-lite.webp",
+   "bytes": 70854,
+   "sha256": "b3c0587a0485e6542a8148619b165ae3de9445fd205757abf210a93040cfed05",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "judgment",
@@ -350,12 +550,30 @@
    "source": "game"
   },
   {
+   "id": "lovers-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/lovers-inactive-lite.webp",
+   "bytes": 58198,
+   "sha256": "c78311a2969d46660adc40efdf81f6bad42971a7418981c0c79d337bebe68a42",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "lovers-inactive",
    "category": "arcana",
    "file": "arcana/lovers-inactive.png",
    "bytes": 775316,
    "sha256": "f0d3b3363251562980c3acd6330c07ef8cb5d2cec8829c72a3aa165f4a85727e",
    "source": "game"
+  },
+  {
+   "id": "lovers-lite",
+   "category": "arcana",
+   "file": "arcana/lovers-lite.webp",
+   "bytes": 69574,
+   "sha256": "3376be0c776fc1aff701c230f1d3515247a3569183edab8ff722de453affee89",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "lovers",
@@ -366,12 +584,30 @@
    "source": "game"
   },
   {
+   "id": "messenger-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/messenger-inactive-lite.webp",
+   "bytes": 56970,
+   "sha256": "39393f8630fbb4ce3d7a33801996ef6f88915a9ae7646dc348149ab472a3db8c",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "messenger-inactive",
    "category": "arcana",
    "file": "arcana/messenger-inactive.png",
    "bytes": 786845,
    "sha256": "e5054c0a8e3456f82d41c291dcc7ac1ed9b0f8180f6205fc2005c47e0cbbd6bd",
    "source": "game"
+  },
+  {
+   "id": "messenger-lite",
+   "category": "arcana",
+   "file": "arcana/messenger-lite.webp",
+   "bytes": 68222,
+   "sha256": "f8bb6d17dcc49b3284417dc552e7819dac982d97e40943540a36239255371bd4",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "messenger",
@@ -382,12 +618,30 @@
    "source": "game"
   },
   {
+   "id": "moon-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/moon-inactive-lite.webp",
+   "bytes": 54384,
+   "sha256": "3dce75c856313a6fc1e338215a8b6294bb7d9116e95f27dd13a8b76c47f3557f",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "moon-inactive",
    "category": "arcana",
    "file": "arcana/moon-inactive.png",
    "bytes": 766757,
    "sha256": "33875684c11b8850448871787560939142c59072145f93a058f3a58f90a83712",
    "source": "game"
+  },
+  {
+   "id": "moon-lite",
+   "category": "arcana",
+   "file": "arcana/moon-lite.webp",
+   "bytes": 65072,
+   "sha256": "adaf50d4f629cda7b1602f98f77dc4c9a31ecc04e6967989d62c446fec4a20b9",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "moon",
@@ -398,12 +652,30 @@
    "source": "game"
   },
   {
+   "id": "night-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/night-inactive-lite.webp",
+   "bytes": 54392,
+   "sha256": "1dde6659655999dd8e541b676259eb54a0b975b5d99f6c61bebbebdf93300574",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "night-inactive",
    "category": "arcana",
    "file": "arcana/night-inactive.png",
    "bytes": 695133,
    "sha256": "5b586e81cf9ce1a7baf2e33d8075374261f73dcb9c2765d487f991b82184f5e9",
    "source": "game"
+  },
+  {
+   "id": "night-lite",
+   "category": "arcana",
+   "file": "arcana/night-lite.webp",
+   "bytes": 62328,
+   "sha256": "bff4004cc63413219136ba705be1cdab8fa62f88276d3f23e15204550f6b7f16",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "night",
@@ -414,12 +686,30 @@
    "source": "game"
   },
   {
+   "id": "origination-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/origination-inactive-lite.webp",
+   "bytes": 55150,
+   "sha256": "8bc5b77c4fb3f617f8c78ace2b219b9f1f625832f6a88495bae80327e8e61cc3",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "origination-inactive",
    "category": "arcana",
    "file": "arcana/origination-inactive.png",
    "bytes": 712179,
    "sha256": "60db2ff23e1dca4343a9aeba2005e14b3d1caf1480f883e6d46d383d7fc9db8d",
    "source": "game"
+  },
+  {
+   "id": "origination-lite",
+   "category": "arcana",
+   "file": "arcana/origination-lite.webp",
+   "bytes": 68748,
+   "sha256": "81e6ac10aa459c3aeb9bceaefd7c00528dea2418ec1798d8d4a89f38e3fef04e",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "origination",
@@ -430,12 +720,30 @@
    "source": "game"
   },
   {
+   "id": "persistence-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/persistence-inactive-lite.webp",
+   "bytes": 50816,
+   "sha256": "6e4b2eba27cfdfd7e9b1f7598f9432a69502043fff19138d5fbccf3a7dd669a7",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "persistence-inactive",
    "category": "arcana",
    "file": "arcana/persistence-inactive.png",
    "bytes": 632046,
    "sha256": "9da562d0bd3262b42aa04763b7c2a688add6c29124716d4d1f076d6e4745c5ce",
    "source": "game"
+  },
+  {
+   "id": "persistence-lite",
+   "category": "arcana",
+   "file": "arcana/persistence-lite.webp",
+   "bytes": 62894,
+   "sha256": "b10704c1a0b8228cd2a7ca41411c5dc731af9389eb9f8e00967517574516f48d",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "persistence",
@@ -446,12 +754,30 @@
    "source": "game"
   },
   {
+   "id": "queen-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/queen-inactive-lite.webp",
+   "bytes": 58484,
+   "sha256": "85c099631d37328bc577ed897101f87df9d335aa3ece593a5b6535109f668d26",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "queen-inactive",
    "category": "arcana",
    "file": "arcana/queen-inactive.png",
    "bytes": 766686,
    "sha256": "0fbfbe84df6419621e8a61e9c9fd131382feb7271cff30944ed25238e2073538",
    "source": "game"
+  },
+  {
+   "id": "queen-lite",
+   "category": "arcana",
+   "file": "arcana/queen-lite.webp",
+   "bytes": 68092,
+   "sha256": "27df9f6692a8c62bb66446578fa722459d2046410e7940eba9aa3d8d1cafc0d0",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "queen",
@@ -462,12 +788,30 @@
    "source": "game"
   },
   {
+   "id": "sorceress-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/sorceress-inactive-lite.webp",
+   "bytes": 50458,
+   "sha256": "d82ac34ce3cdf8779b714f09033973c7c8c1de50723050addf27ae9b2fdf7af3",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "sorceress-inactive",
    "category": "arcana",
    "file": "arcana/sorceress-inactive.png",
    "bytes": 609236,
    "sha256": "e3ee604eb8825b8e8ec9d4fde73d0c6140f151542d109d5ef320204855d4348d",
    "source": "game"
+  },
+  {
+   "id": "sorceress-lite",
+   "category": "arcana",
+   "file": "arcana/sorceress-lite.webp",
+   "bytes": 62984,
+   "sha256": "58b0b04eba1e41abd0b1527994a377713aa2e38a4c47439322cf9af2cfbf0a87",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "sorceress",
@@ -478,12 +822,30 @@
    "source": "game"
   },
   {
+   "id": "strength-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/strength-inactive-lite.webp",
+   "bytes": 48870,
+   "sha256": "641f45f5dbc272e67a9b5b8c8be8575be853beba96c1fc0416d96700837684a7",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "strength-inactive",
    "category": "arcana",
    "file": "arcana/strength-inactive.png",
    "bytes": 602848,
    "sha256": "7dca1d468945d7762f26cf0a1b2e37da31cb1db34f6e2888b030eaba43a370c8",
    "source": "game"
+  },
+  {
+   "id": "strength-lite",
+   "category": "arcana",
+   "file": "arcana/strength-lite.webp",
+   "bytes": 61306,
+   "sha256": "cb8c7cea143668de7d1d78c7025bcdc31aa75133f9f03ae8e111f3be9827c24d",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "strength",
@@ -494,12 +856,30 @@
    "source": "game"
   },
   {
+   "id": "swift-runner-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/swift-runner-inactive-lite.webp",
+   "bytes": 56472,
+   "sha256": "b10b28cfd569ebdeb4bbd54316f269e2ded47c9d1b9880e1b3de5460395909f3",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "swift-runner-inactive",
    "category": "arcana",
    "file": "arcana/swift-runner-inactive.png",
    "bytes": 774344,
    "sha256": "da58dba7e8fab9d8fda53505ebcc6b38e4fa4bd5b107df28c3cca78496bcc5b0",
    "source": "game"
+  },
+  {
+   "id": "swift-runner-lite",
+   "category": "arcana",
+   "file": "arcana/swift-runner-lite.webp",
+   "bytes": 67810,
+   "sha256": "f66125715cbef639105f30c11d4eda3dafabcb5d1a3c90a56ccba01976fea3ee",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "swift-runner",
@@ -510,12 +890,30 @@
    "source": "game"
   },
   {
+   "id": "the-enchantress-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/the-enchantress-inactive-lite.webp",
+   "bytes": 55874,
+   "sha256": "dfb8622e14e734eaf6192679340c79e67db5c779b53b39b3672c4fcfb64a8358",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "the-enchantress-inactive",
    "category": "arcana",
    "file": "arcana/the-enchantress-inactive.png",
    "bytes": 772308,
    "sha256": "7bc4f9333a4fea0b2b134513449e31fc85d95b31e92a4304de1f95fb3cdddbd1",
    "source": "game"
+  },
+  {
+   "id": "the-enchantress-lite",
+   "category": "arcana",
+   "file": "arcana/the-enchantress-lite.webp",
+   "bytes": 68892,
+   "sha256": "2a862cdbfbe4be18dd9612bc5657b7522c7ce2def62062cddb44c21dda8b3ff6",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "the-enchantress",
@@ -526,12 +924,30 @@
    "source": "game"
   },
   {
+   "id": "the-fates-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/the-fates-inactive-lite.webp",
+   "bytes": 44440,
+   "sha256": "087f3dc7fbcba1b67023167f89669a202419e6c1eb354cb3ebf5e0426fa77a01",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "the-fates-inactive",
    "category": "arcana",
    "file": "arcana/the-fates-inactive.png",
    "bytes": 638517,
    "sha256": "49fad5cb9c4ed94f233290cb2f3a6c83b0c33dbefb4c2577c33187604264cd23",
    "source": "game"
+  },
+  {
+   "id": "the-fates-lite",
+   "category": "arcana",
+   "file": "arcana/the-fates-lite.webp",
+   "bytes": 55632,
+   "sha256": "ce1e2b1124c8a61323c4ccc49d184e6a6f71f8d99f83a760a445eae7ba820879",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "the-fates",
@@ -542,12 +958,30 @@
    "source": "game"
   },
   {
+   "id": "unseen-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/unseen-inactive-lite.webp",
+   "bytes": 56540,
+   "sha256": "b3d1c7c541fbccd4d1b6b6413cec0b23f8be76a827186013e43275bd743f4727",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "unseen-inactive",
    "category": "arcana",
    "file": "arcana/unseen-inactive.png",
    "bytes": 799591,
    "sha256": "c80a6e9655efb39c2bb1a7abf824e56d1acd5a2864bd9ff755bc441b71945f76",
    "source": "game"
+  },
+  {
+   "id": "unseen-lite",
+   "category": "arcana",
+   "file": "arcana/unseen-lite.webp",
+   "bytes": 68832,
+   "sha256": "f15adde971587bfc49cd6f9eb5d644b5edc3046846d48159fbd0ead363cab6d8",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "unseen",
@@ -558,12 +992,30 @@
    "source": "game"
   },
   {
+   "id": "wayward-son-inactive-lite",
+   "category": "arcana",
+   "file": "arcana/wayward-son-inactive-lite.webp",
+   "bytes": 52486,
+   "sha256": "7db1b5d730886562dc10d8158113a2eeb0cf7d83ad18cf6f933bf3cda3c985a6",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
    "id": "wayward-son-inactive",
    "category": "arcana",
    "file": "arcana/wayward-son-inactive.png",
    "bytes": 685794,
    "sha256": "6efcf643c306c9d0f86ad275451c32cb85b8790322de4c26c85dd48117ae6fd7",
    "source": "game"
+  },
+  {
+   "id": "wayward-son-lite",
+   "category": "arcana",
+   "file": "arcana/wayward-son-lite.webp",
+   "bytes": 64792,
+   "sha256": "473ea58ddd07a8f80513559e599e4a2847533ef12593cc98d17c2105cb35c51a",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "wayward-son",
