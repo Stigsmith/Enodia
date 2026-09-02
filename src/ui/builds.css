@@ -5678,12 +5678,19 @@ button.mark {
  * unpressed and a squat one when pressed, which is the squashing the owner saw
  * on the press rather than on the plate.
  *
- * 114 by 179 percent is the reciprocal of those two fractions, so the visible
- * plate lands exactly on the button and the glow falls outside and is clipped.
- * Losing a soft outer halo is the cheaper of the two.
+ * **The target is the other plate, not the button.** The first correction
+ * scaled the coloured one until it filled the box, which overshot in the other
+ * direction and made the pressed state visibly taller: the plain plate does not
+ * fill its box either, it fills 95.8 by 88.7 percent of it.
+ *
+ * So the scale is one fraction over the other rather than one over one:
+ * 0.958 / 0.875 and 0.887 / 0.560, which is 109 by 158 percent. Both plates
+ * then paint the same number of pixels and the press changes the colour and
+ * nothing else. The glow falls outside and is clipped, which is the cheaper of
+ * the two losses.
  */
 .logrun-yesno button.is-on {
-  background-size: 114% 179%;
+  background-size: 109% 158%;
 }
 
 .logrun-yesno button:first-child.is-on {
