@@ -22,8 +22,20 @@
   // 404ing a missing file.
   "compatibility_date": "2026-09-02",
 
-  // enodia.<subdomain>.workers.dev, which is where every rule gets verified
-  // before enodia.tools is pointed at any of it.
+  // The real address. `custom_domain` makes Cloudflare create the DNS record
+  // and the certificate itself, so there is nothing to configure by hand.
+  //
+  // Registered 2 September 2026. `.tools` turned out not to be offered at
+  // checkout despite being free at the registry, which is why the plan's
+  // shortlist did not survive contact with the registrar.
+  //
+  // No `www`. If it is ever wanted it should be a redirect rule to the apex
+  // rather than a second custom domain, so there is only ever one address the
+  // tool answers on and only one origin holding a session cookie.
+  "routes": [{ "pattern": "enodia.me", "custom_domain": true }],
+
+  // Kept as a fallback while the domain settles. Worth turning off once
+  // enodia.me is serving, so the tool has one address rather than two.
   "workers_dev": true,
 
   "assets": {
@@ -64,15 +76,20 @@
 
   // Accounts. worker/auth.ts explains the shape.
   //
-  // `database_id` IS A PLACEHOLDER. `wrangler dev` ignores it and runs on a
-  // local SQLite file under .wrangler/, which is why everything here can be
-  // built and tested without a Cloudflare account. A real deploy needs
-  // `wrangler d1 create enodia` and its id pasted in here.
+  // `wrangler dev` ignores `database_id` entirely and runs on a local SQLite
+  // file under .wrangler/, which is why all of this can be built and tested
+  // with no Cloudflare account at all. The id below is the real one, from
+  // `wrangler d1 create enodia`, and only `--remote` commands and deploys use
+  // it. Created 2 September 2026, region WEUR.
+  //
+  // The binding is DB, not `enodia`. `wrangler d1 create` suggests naming the
+  // binding after the database; the code says `env.DB` and that is what the
+  // generated types in worker-configuration.d.ts follow.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "enodia",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "fbccb28a-1a83-4d5c-a367-8880a04055b7",
       "migrations_dir": "migrations"
     }
   ],
