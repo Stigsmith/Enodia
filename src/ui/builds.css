@@ -6013,14 +6013,42 @@ button.mark {
 }
 
 /* Her and her speech, stacked, so the box sits above her head. */
+/**
+ * Her, with a band above her kept clear for whatever she says.
+ *
+ * ## Two failures, and the fix is the same one
+ *
+ * In the flow, the box sized to its line and every poke moved her down and
+ * changed the page height with her. Absolutely positioned above her, it stopped
+ * moving anything and started running off the top of the screen instead,
+ * because she stands near the top of a short page.
+ *
+ * A fixed grid row does both jobs. The first row is 7rem whether she has said
+ * anything or not, so nothing below it can move; the box sits at the bottom of
+ * that row and grows upward into space that was already reserved, so it cannot
+ * push past the top either. 7rem is three lines at this width, which is one
+ * more than the longest line needs.
+ *
+ * The roadmap one never had either problem: that whole group is `position:
+ * fixed`, so it has nothing to push and no flow to leave.
+ */
 .unbuilt-her {
   position: relative;
   display: grid;
+  grid-template-rows: 7rem auto;
   justify-items: center;
-  gap: 0.6rem;
+  align-items: end;
+}
+
+.unbuilt-her .dora-says {
+  grid-row: 1;
+  align-self: end;
+  margin-bottom: 0.6rem;
+  max-width: min(22rem, 88vw);
 }
 
 .unbuilt-poke {
+  grid-row: 2;
   padding: 0;
   border: 0;
   background: none;
@@ -6154,10 +6182,12 @@ button.mark {
   animation: dora-says-in 0.14s ease-out;
 }
 
+/* Opacity only. It used to lift on a `transform`, which the absolute centring
+ * on the unbuilt page also uses, so the two fought and the box slid in from
+ * the left every time she spoke. */
 @keyframes dora-says-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
   }
 }
 

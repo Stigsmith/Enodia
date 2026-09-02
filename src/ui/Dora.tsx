@@ -51,12 +51,23 @@ const IDLE = [
 ]
 
 /**
+ * A line she says when poked, and optionally the bit she says first.
+ *
+ * `roar` is the ghost voice, in capitals, and `say` is her dropping it. They
+ * were one string with the join written into the middle of it, which read
+ * correctly and played wrong: the scare and the climb-down landed in the same
+ * instant, so the joke was over before you could see there had been one.
+ * Two fields, shown in order, with a hold between them.
+ */
+type Poke = { say: string; roar?: string }
+
+/**
  * Poked once, twice, and then rather too many times.
  *
  * Ordered, and the last one repeats. Randomising would lose the joke: it only
  * works if she notices you are still doing it.
  */
-const POKES: { say: string; spooky?: boolean }[] = [
+const POKES: Poke[] = [
   { say: 'Hm.' },
   { say: 'Yes. Still nothing here.' },
   { say: 'You know poking me does not build it.' },
@@ -64,11 +75,11 @@ const POKES: { say: string; spooky?: boolean }[] = [
   /**
    * The one where she tries it on.
    *
-   * `spooky` is a flag on the line rather than an index checked elsewhere,
+   * `roar` is a field on the line rather than an index checked elsewhere,
    * because an index is a second place to remember when somebody reorders the
    * list, and the whole joke is that the scare lands on this exact sentence.
    */
-  { say: 'WHO DARES DISTURB MY... no, sorry, I cannot keep that up.', spooky: true },
+  { roar: 'WHO DARES DISTURB MY...', say: 'no, sorry. I cannot keep that up.' },
   { say: 'Personal space. Please.' },
   { say: 'We are just doing this now, are we.' },
   // The vocabulary rule fails on "room", and it is right to: it cannot tell
@@ -89,27 +100,69 @@ const POKES: { say: string; spooky?: boolean }[] = [
  * Same shape: ordered, the last one repeats, and one of them is the ghost voice
  * she cannot keep up.
  */
-const PLAN_POKES: { say: string; spooky?: boolean }[] = [
+const PLAN_POKES: Poke[] = [
   { say: 'Hm.' },
   { say: 'I am watching the list. It is not getting any shorter.' },
   { say: 'You could read it. That is what it is for.' },
   { say: 'Every line on there is somebody’s evening. Just so you know.' },
-  { say: 'BEHOLD, THE WORKS OF... no. Sorry. It is a list of jobs.', spooky: true },
+  { roar: 'BEHOLD, THE WORKS OF...', say: 'no. Sorry. It is a list of jobs.' },
   { say: 'Poking me does not move anything into Built.' },
   { say: 'I have checked. Twice. Still in Next.' },
   { say: 'Fine. I have added it to the list. Near the bottom.' },
 ]
 
 /**
- * How long she holds the scare.
+ * How long she holds the voice.
  *
- * Long enough to register, short enough that it reads as a slip rather than a
- * state. She drops the voice mid-sentence in the line itself, so the picture
- * should drop it about as fast.
+ * **1600, up from 700.** At 700 the owner could not see it happen: the turn,
+ * the capitals and the climb-down all arrived inside a fifth of a second and it
+ * read as a flicker rather than as a bit. This is long enough to register as
+ * her having a go, and short enough that it is still a slip rather than a mode.
  */
-const SCARE_MS = 700
+const ROAR_MS = 1600
 
-/** The full page, for a section that does not exist yet. */
+/**
+ * The poke loop, shared by both of her.
+ *
+ * Two components wanted the same escalation with different lines, and the
+ * second one having its own copy is how the two drift apart. One hook, and the
+ * lines are the argument.
+ *
+ * **The hold is locked.** While she is doing the voice, poking does nothing:
+ * the climb-down is the punchline and clicking past it before it arrives throws
+ * the joke away. It unlocks itself, so there is nothing to get stuck behind.
+ */
+function usePoke(lines: Poke[]) {
+  const [pokes, setPokes] = useState(0)
+  const [dropped, setDropped] = useState(false)
+
+  const line = pokes > 0 ? lines[Math.min(pokes - 1, lines.length - 1)]! : null
+  const roaring = Boolean(line?.roar) && !dropped
+
+  /**
+   * The voice, then her dropping it, on a timer rather than on a click.
+   *
+   * Cleaned up on the way out, so poking again mid-hold cannot leave a stale
+   * timeout to end the next one early.
+   */
+  useEffect(() => {
+    setDropped(false)
+    if (!line?.roar) return
+    const stop = window.setTimeout(() => setDropped(true), ROAR_MS)
+    return () => window.clearTimeout(stop)
+  }, [line, pokes])
+
+  return {
+    say: line ? (roaring ? line.roar : line.say) : null,
+    roaring,
+    poke: () => {
+      if (roaring) return
+      setPokes((was) => was + 1)
+    },
+  }
+}
+
+/** The full page, for a section that does not exist yet. *//** The full page, for a section that does not exist yet. */
 export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
   /**
    * The idle line is picked from the title rather than at random.
@@ -120,22 +173,7 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
    */
   const idle = IDLE[[...title].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % IDLE.length]!
 
-  const [pokes, setPokes] = useState(0)
-  const [scared, setScared] = useState(false)
-  const line = pokes > 0 ? POKES[Math.min(pokes - 1, POKES.length - 1)]! : null
-
-  /**
-   * She turns for a moment on the line where she tries the voice.
-   *
-   * The timer is cleaned up on the way out, so poking again mid-scare restarts
-   * it rather than leaving a stale timeout to end the next one early.
-   */
-  useEffect(() => {
-    if (!line?.spooky) return setScared(false)
-    setScared(true)
-    const stop = window.setTimeout(() => setScared(false), SCARE_MS)
-    return () => window.clearTimeout(stop)
-  }, [line, pokes])
+  const { say, roaring, poke } = usePoke(POKES)
 
   return (
     <div className="unbuilt">
@@ -150,22 +188,23 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
           * once behind the caveats bar and rejected: the crescent ornament is
           * baked in at 1.78:1 and a wide warning strip flattened the moon. A
           * speech box is close to its native shape, so here it fits. */}
-        {line ? (
+        {say ? (
           <p className="dora-says" role="status">
-            {line.say}
+            {say}
           </p>
         ) : null}
 
         <button
           type="button"
-          className={`unbuilt-poke${scared ? ' is-scared' : ''}`}
+          className={`unbuilt-poke${roaring ? ' is-scared' : ''}`}
           data-tour="unbuilt-dora"
           title="Dora"
-          onClick={() => setPokes((was) => was + 1)}
+          aria-disabled={roaring || undefined}
+          onClick={poke}
         >
           <img
             className="unbuilt-dora"
-            src={scared ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+            src={roaring ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
             alt="Dora, who has nothing to add"
           />
         </button>
@@ -190,35 +229,27 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
  * noise; a line of dialogue somebody deliberately asked for is not.
  */
 export function DoraWatching() {
-  const [pokes, setPokes] = useState(0)
-  const [scared, setScared] = useState(false)
-  const line = pokes > 0 ? PLAN_POKES[Math.min(pokes - 1, PLAN_POKES.length - 1)]! : null
-
-  useEffect(() => {
-    if (!line?.spooky) return setScared(false)
-    setScared(true)
-    const stop = window.setTimeout(() => setScared(false), SCARE_MS)
-    return () => window.clearTimeout(stop)
-  }, [line, pokes])
+  const { say, roaring, poke } = usePoke(PLAN_POKES)
 
   return (
     <div className="dora-watching">
-      {line ? (
+      {say ? (
         <p className="dora-says" role="status">
-          {line.say}
+          {say}
         </p>
       ) : null}
 
       <button
         type="button"
-        className={`dora-watching-poke${scared ? ' is-scared' : ''}`}
+        className={`dora-watching-poke${roaring ? ' is-scared' : ''}`}
         title="Dora"
-        onClick={() => setPokes((was) => was + 1)}
+        aria-disabled={roaring || undefined}
+        onClick={poke}
       >
         <img
-          src={scared ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
-          alt={pokes ? 'Dora, who has been poked' : ''}
-          aria-hidden={pokes ? undefined : true}
+          src={roaring ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+          alt={say ? 'Dora, who has been poked' : ''}
+          aria-hidden={say ? undefined : true}
         />
       </button>
     </div>
