@@ -31,6 +31,19 @@ export type View =
   | 'about'
   | 'roadmap'
   | 'changelog'
+  /**
+   * Rooms that exist and are empty.
+   *
+   * These four were `disabled` menu rows, which is honest and dead: a greyed
+   * entry says a thing exists and then refuses to say anything else. They open
+   * now, onto a page holding a phase marker and Dora in a hard hat. Nothing
+   * pretends the feature is closer than it is; "not yet" is just somewhere you
+   * can walk into.
+   */
+  | 'exchange'
+  | 'account'
+  | 'friends'
+  | 'leaderboards'
   | 'setup'
   | 'run'
 

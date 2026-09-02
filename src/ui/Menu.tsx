@@ -30,10 +30,18 @@ type Entry = {
   note: string
   /** a mark beside the label, where one says it faster than the words */
   icon?: string
-  /** absent means it is not built, and it says so */
   action?: () => void
   /** the screen this entry goes to is the screen you are on */
   here?: boolean
+  /**
+   * Built or not, said explicitly.
+   *
+   * **It used to be inferred from a missing `action`**, which stopped working
+   * the moment the unbuilt sections got somewhere to go: they have actions now
+   * and would have read as finished. The state and the ability to click are two
+   * different facts and the row needs both.
+   */
+  unbuilt?: boolean
 }
 
 export function Menu({
@@ -134,7 +142,16 @@ export function Menu({
             leave()
           },
         },
-        { label: 'Build exchange', note: 'Share and import builds. Phase 4' },
+        {
+          label: 'Build exchange',
+          unbuilt: true,
+          note: 'Share and import builds. Phase 4',
+          here: view === 'exchange',
+          action: () => {
+            onGo('exchange')
+            leave()
+          },
+        },
       ],
     },
     {
@@ -202,9 +219,37 @@ export function Menu({
     {
       title: 'You',
       entries: [
-        { label: 'Account', note: 'Phase 4' },
-        { label: 'Friends', note: 'Phase 4' },
-        { label: 'Leaderboards', note: 'Phase 4' },
+        /* Empty rooms rather than dead rows. See `nav.ts` for why. */
+        {
+          label: 'Account',
+          unbuilt: true,
+          note: 'Phase 4',
+          here: view === 'account',
+          action: () => {
+            onGo('account')
+            leave()
+          },
+        },
+        {
+          label: 'Friends',
+          unbuilt: true,
+          note: 'Phase 4',
+          here: view === 'friends',
+          action: () => {
+            onGo('friends')
+            leave()
+          },
+        },
+        {
+          label: 'Leaderboards',
+          unbuilt: true,
+          note: 'Phase 4',
+          here: view === 'leaderboards',
+          action: () => {
+            onGo('leaderboards')
+            leave()
+          },
+        },
       ],
     },
     {
@@ -319,7 +364,7 @@ export function Menu({
                       /* Where you already are, which a pinned pane has to say
                          because it is on screen the whole time. */
                       aria-current={entry.here ? 'page' : undefined}
-                      className={`${entry.action ? '' : 'is-unbuilt'}${entry.here ? ' is-here' : ''}`}
+                      className={`${entry.unbuilt ? 'is-unbuilt' : ''}${entry.here ? ' is-here' : ''}`}
                       onClick={entry.action}
                       disabled={!entry.action}
                     >

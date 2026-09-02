@@ -12,6 +12,7 @@
 
 import { CHANGELOG } from '../data/changelog.ts'
 import { ROADMAP, STAGES } from '../data/roadmap.ts'
+import { DoraWatching } from './Dora.tsx'
 import type { Stage } from '../data/roadmap.ts'
 
 export function Page({
@@ -85,6 +86,10 @@ export function Roadmap() {
       title="Roadmap"
       standfirst="What is built, what is planned, and what is stalled. No dates: this is a side project and any date would be a guess."
     >
+      {/* Dora, watching it go by. Fixed to the viewport rather than the page,
+        * so the plan scrolls past her and she does not move. */}
+      <DoraWatching />
+
       {/* The whole thing at a glance, before any of the detail. */}
       <div className="plan-progress">
         <div className="plan-bar" role="img" aria-label={`${built} of ${outstanding} built`}>

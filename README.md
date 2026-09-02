@@ -28,7 +28,7 @@ ROADMAP.md         the single status view. what is done, next, blocked
 REQUIREMENTS.md    why it exists, what it is, scope by phase
 DESIGN.md          architecture, the engines, the build order
 VISUAL.md          the visual language, every colour sourced from the game
-LESSONS.md         engineering discipline carried from the previous tool
+archive/           documents that did their job. Nothing current reads them
 
 decisions/         dated decision records. applied to the docs, kept for the reasoning
 project/           config for the companion Claude.ai project, not for the product
