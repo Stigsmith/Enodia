@@ -41,6 +41,9 @@ export function Tabs<T extends string>({
           type="button"
           role="tab"
           id={`tab-${tab.id}`}
+          /* So a tour step can press this one before it talks about it. Every
+           * tab row in the tool gets the anchor, not just the editor's. */
+          data-tour={`tab-${tab.id}`}
           aria-selected={tab.id === open}
           aria-controls={`panel-${tab.id}`}
           className={`tab${tab.id === open ? ' is-open' : ''}`}

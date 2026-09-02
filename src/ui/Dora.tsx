@@ -242,6 +242,10 @@ export function DoraWatching() {
       <button
         type="button"
         className={`dora-watching-poke${roaring ? ' is-scared' : ''}`}
+        /* The tour points here to say "that is me over there". On the button
+         * rather than the wrapper, so it lights her and not the speech box
+         * above her, which may be empty at the time. */
+        data-tour="dora-watching"
         title="Dora"
         aria-disabled={roaring || undefined}
         onClick={poke}
