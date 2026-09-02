@@ -1923,6 +1923,10 @@
   top: calc(100% + 0.5rem);
   left: 0;
   z-index: 20;
+  /* A column, so the pin can hold a strip at the top rather than floating over
+   * whatever the first group turns out to be. */
+  display: flex;
+  flex-direction: column;
   width: min(21rem, 90vw);
   max-height: 70dvh;
   overflow-y: auto;
@@ -4240,17 +4244,28 @@
   position: relative;
 }
 
+/**
+ * A row of its own, rather than a corner of somebody else's.
+ *
+ * **It was absolutely positioned into the panel's top right**, which put it at
+ * x=302 while the first group heading ran to x=332: inside the heading's box,
+ * reading as though it were sitting on the word "Builds". Every group heading
+ * happens to be short enough that it had not collided outright, which is luck
+ * rather than layout.
+ *
+ * Sticky in its own strip instead. Two things fall out of that: no heading
+ * shares a row with it, and it stops scrolling away, which it did before
+ * because an absolute child of a scrolling box scrolls with the content.
+ */
 .menu-panel .menu-pin {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  flex-direction: row;
-  gap: 0;
-  top: 0.55rem;
-  right: 0.55rem;
+  position: sticky;
+  top: 0;
   z-index: 2;
   display: grid;
   place-items: center;
+  justify-self: end;
+  margin-left: auto;
+  margin-bottom: 0.15rem;
   width: 1.7rem;
   height: 1.7rem;
   padding: 0;
