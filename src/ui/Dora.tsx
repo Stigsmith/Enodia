@@ -61,7 +61,18 @@ const IDLE = [
  * instant, so the joke was over before you could see there had been one.
  * Two fields, shown in order, with a hold between them.
  */
-type Poke = { say: string; roar?: string }
+type Poke = {
+  say: string
+  roar?: string
+  /**
+   * A word of `say` to turn into the Ko-fi link.
+   *
+   * The word rather than the markup, so `say` stays a plain string and the two
+   * cannot drift apart. Matched on its first occurrence and left alone if it is
+   * not there, which is what makes editing the line safe.
+   */
+  tip?: string
+}
 
 /**
  * Poked once, twice, and then rather too many times.
@@ -156,6 +167,9 @@ function usePoke(lines: Poke[]) {
 
   return {
     say: line ? (roaring ? line.roar : line.say) : null,
+    /* Not while she is roaring: that is `roar`, a different sentence, and the
+     * word is not in it. */
+    tip: line && !roaring ? line.tip : undefined,
     roaring,
     poke: () => {
       if (roaring) return
@@ -285,10 +299,35 @@ const TIP_POKES: Poke[] = [
   {
     roar: 'OR I WILL HAUNT YOUR OFFSPRING',
     say: 'but seriously. If you love the tool, a tip would be appreciated.',
+    /* The one line where she means it, so it is the one that can be clicked. */
+    tip: 'tip',
   },
   { say: 'That was the whole bit. There is not a second bit.' },
   { say: 'I am going to start charging for the poking as well.' },
 ]
+
+/**
+ * One word of a line, turned into the Ko-fi link.
+ *
+ * Returns the string untouched when there is no word to link, no handle to
+ * point at, or the word is not in the line, so an edit to her copy can only
+ * ever lose the link rather than break the render.
+ */
+function linkTip(text: string, word: string | undefined, url: string | null) {
+  if (!word || !url) return text
+  const at = text.indexOf(word)
+  if (at < 0) return text
+
+  return (
+    <>
+      {text.slice(0, at)}
+      <a className="dora-says-tip" href={url} target="_blank" rel="noopener noreferrer">
+        {word}
+      </a>
+      {text.slice(at + word.length)}
+    </>
+  )
+}
 
 /**
  * Dora on the landing page: her column, and the ask underneath it.
@@ -313,7 +352,7 @@ const TIP_POKES: Poke[] = [
  * a stranger.
  */
 export function DoraAsking() {
-  const { say, roaring, poke } = usePoke(TIP_POKES)
+  const { say, tip, roaring, poke } = usePoke(TIP_POKES)
   const url = kofiUrl()
 
   return (
@@ -324,7 +363,7 @@ export function DoraAsking() {
         <div className="dora-col-says">
           {say ? (
             <p className="dora-says" role="status">
-              {say}
+              {linkTip(say, tip, url)}
             </p>
           ) : null}
         </div>
@@ -345,13 +384,13 @@ export function DoraAsking() {
 
       <div className={`dora-ask${say ? ' is-talking' : ''}`}>
         <p className="dora-ask-say">
-          Do you have any idea how much work went into this. Neither do I, I stopped counting.
-          A bottle of Nectar would not go unnoticed.
+          Do you have any idea how much work went into this? Neither do we, Dora and I stopped
+          counting. A bottle of Nectar would not go unnoticed.
         </p>
         {url ? (
           <p className="dora-ask-do">
             <a href={url} target="_blank" rel="noopener noreferrer">
-              Buy her a Nectar
+              Buy us a Nectar
             </a>{' '}
             if the tool has been any use. It stays free either way.
           </p>

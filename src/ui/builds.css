@@ -7343,11 +7343,31 @@ p.landing-say {
  * once, so it carries more weight and gets more size.
  */
 .dora-col-says .dora-says {
-  /* Half again on the original 0.84rem. She says one thing on a page somebody
-   * reads once, so it carries more weight here than on the unbuilt screens. */
-  font-size: 1.26rem;
+  /* Half again on the original 0.84rem, less a point. She says one thing on a
+   * page somebody reads once, so it carries more weight here than on the
+   * unbuilt screens, but 1.26rem was a shade heavy for the line length. */
+  font-size: 1.2rem;
   max-width: 100%;
   text-align: center;
+}
+
+/**
+ * The one linked word in what she says.
+ *
+ * Underlined rather than only recoloured, because inside a speech bubble on
+ * artwork there is no surrounding body text to be a different colour from, and
+ * colour alone is not an affordance for anybody who cannot see this one.
+ */
+.dora-says-tip {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.dora-says-tip:hover,
+.dora-says-tip:focus-visible {
+  color: var(--lit-hot);
 }
 
 .dora-col-says {
@@ -7480,6 +7500,49 @@ p.landing-say {
   .dora-col {
     grid-area: her;
     margin-right: -1.5rem;
+    /* The containing block for her bubble, which is taken out of the flow just
+     * below. Only on the wide grid: see there for why. */
+    position: relative;
+    /**
+     * One row here, not two.
+     *
+     * The bubble leaves the flow at this breakpoint, and an out-of-flow child
+     * is not a grid item: the button became the *first* row rather than the
+     * second, that row is `auto`, and its only content is an absolutely
+     * positioned picture with no height. She disappeared while the column still
+     * measured a healthy 506px.
+     */
+    grid-template-rows: 1fr;
+  }
+
+  /**
+   * She grows upward, and the bubble goes above her rather than into her.
+   *
+   * The page ends exactly at the fold, so there is no slack to grow into: the
+   * `.landing` row is 506px because her column asks for that and the two text
+   * columns are shorter. Making her box taller would push the ask and the fine
+   * print down and put the page over a screen, which is the one thing this
+   * layout may not do.
+   *
+   * So nothing gets taller. Taking the bubble out of the flow collapses the
+   * reserved row it was sitting in, her row is the `1fr` that absorbs it, and
+   * she gains that height at the top while her feet stay on the column's
+   * bottom edge, which has not moved. `object-position: bottom center` is what
+   * pins them there.
+   *
+   * `bottom: 100%` then floats the bubble entirely above the column, into the
+   * empty right half of the header row, with `margin-bottom` as the gap over
+   * her head. Out of flow, so none of this can move anything else.
+   *
+   * **Wide screens only.** Stacked on a phone her column follows the name
+   * section, and a bubble hung above it would land on that text.
+   */
+  .dora-col-says {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    margin-bottom: 1.4rem;
   }
   .dora-ask { grid-area: ask; }
   .landing-fine { grid-area: fine; }
