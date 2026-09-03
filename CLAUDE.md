@@ -164,6 +164,12 @@ the play experience cannot see.
   now:** it deletes `.webp` and never `.png`, and stays out of `arcana/`, `hexes/`,
   `rarity/` and `vows/`. Deleting whole directories, which it used to do, would take the
   game art in `boons/` and `duos/` with it. Do not remove that guard
+- **The backend is tested inside workerd, not in node.** `npm run test:worker` runs
+  `worker/**/*.test.ts` through `@cloudflare/vitest-pool-workers` against a real local D1,
+  and `npm test` runs it after the other 420. It is a separate project because none of what
+  matters is true in node: no D1 binding, no `cf-connecting-ip`, no workerd. **Every backend
+  bug so far was invisible to a type check and a green build**, so each of those is now a
+  test that was proven to fail before it was kept
 - **`worker/schema.ts` is generated and `worker/schema-app.ts` is not.** Anything of ours
   put in the generated file survives until the next `npm run db:schema` and then vanishes
   without a word, taking the migration history's idea of reality with it. `drizzle.config.ts`

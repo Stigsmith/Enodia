@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "validate": "node scripts/validate.ts",
     "extract": "node scripts/extract.mjs",
-    "test": "vitest run",
+    "test": "vitest run && vitest run --config vitest.worker.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "assets": "node scripts/assets.ts",
@@ -31,7 +31,8 @@
     "db:schema": "npx auth@latest generate --config worker/auth.config.ts --output worker/schema.ts --y",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply enodia --local",
-    "types": "wrangler types"
+    "types": "wrangler types",
+    "test:worker": "vitest run --config vitest.worker.config.ts"
   },
   "dependencies": {
     "better-auth": "^1.7.2",
@@ -41,6 +42,7 @@
     "wasmoon": "^1.16.0"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.4.0",
     "@types/react": "^19.2.18",

@@ -60,7 +60,8 @@ Three folders are deliberately absent from version control: `extracted/` is 443 
 npm run dev        # vite, port 5173
 npm run build      # validates first, then builds. a broken reference stops it
 npm run validate   # the validator on its own
-npm test           # vitest
+npm test           # vitest, both projects: 420 in node, 25 inside workerd
+npm run test:worker # just the backend, against a real local D1
 npm run extract    # re-read the game's Lua into data/generated
 npm run assets     # rebuild assets/manifest.json. --fill copies icons from extracted/
 npm run typecheck
