@@ -164,6 +164,14 @@ the play experience cannot see.
   now:** it deletes `.webp` and never `.png`, and stays out of `arcana/`, `hexes/`,
   `rarity/` and `vows/`. Deleting whole directories, which it used to do, would take the
   game art in `boons/` and `duos/` with it. Do not remove that guard
+- **The validator's `InheritFrom` walk is not redundant with `traits-resolved.json`, and
+  the roadmap was wrong to say it was.** Resolution copies parent values down but records
+  nothing about where they came from, and the duo classification is entirely about where:
+  reading the resolved `IsDuoBoon` gives **46 duos and 0 Hex duos** rather than 37 and 9.
+  For `GodLoot` there is no resolved loot file at all, and dropping that walk gives **7
+  Olympians instead of 9**. `scripts/validate/inheritance.test.ts` pins both and fails if
+  either is broken. **The walk does not need to be transitive**, though: every marker is at
+  depth 1, which was assumed the other way round until it was measured
 - **The backend is tested inside workerd, not in node.** `npm run test:worker` runs
   `worker/**/*.test.ts` through `@cloudflare/vitest-pool-workers` against a real local D1,
   and `npm test` runs it after the other 420. It is a separate project because none of what
