@@ -34,9 +34,12 @@
  *
  * ## The name, and what was checked
  *
- * - **Headmistress Hecate** and **the Crossroads** are the game's own words,
- *   found verbatim in `Content/Game/Text/en/*.sjson`
- * - **Hades II never uses "Enodia"**, which is why this can say so flatly
+ * It does not explain that Hecate stands at a crossroads. Anybody reading this
+ * has walked out of the Crossroads a hundred times, and telling them is not a
+ * fact, it is filler. What they will not know is the hymn.
+ *
+ * - **Hades II never uses "Enodia"**, which is why this can say so flatly.
+ *   Checked against every English text file in `Content/Game/Text/en/`
  * - **krokopeplos, shared only by Hecate and Melinoë in the Orphic Hymns**, is
  *   Morand, *Études sur les Hymnes Orphiques* (Brill 2001), pp. 127 and 182.
  *   The scope matters: it is a stock Homeric epithet for Eos, so the claim is
@@ -99,10 +102,10 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
             night roads, where travellers left offerings and asked her to see them safely on.
           </p>
           <p>
-            <strong>She kept the job.</strong> Headmistress Hecate is standing in the Crossroads
-            you walk out of every run, and in the Orphic hymns she and Melinoë are the only two
-            goddesses called <em lang="grc-Latn">krokopeplos</em>, saffron-cloaked. Hades II
-            never uses the name itself. It did not have to.
+            <strong>The pairing goes further than the Crossroads.</strong> In the Orphic hymns,
+            Hecate and Melinoë are the only two goddesses called{' '}
+            <em lang="grc-Latn">krokopeplos</em>, saffron-cloaked. Hades II never uses the name
+            Enodia, so it is borrowed from the hymns rather than from the game.
           </p>
         </section>
       </div>

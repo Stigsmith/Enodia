@@ -323,14 +323,27 @@ export function DoraAsking() {
             if the tool has been any use. It stays free either way.
           </p>
         ) : null}
+
+        {/*
+          * What she says goes in a slot, not in a floating bubble.
+          *
+          * A bubble is right on the unbuilt pages, where she has a whole empty
+          * room to herself. This page fits one screen, and on a full screen
+          * there is no empty region big enough for a 22rem bubble, so a
+          * floating one always lands on a paragraph. Three goes at moving it
+          * proved that rather than fixing it.
+          *
+          * So: in the flow, where it cannot overlap anything, and a fixed
+          * height so a longer line does not push the page around. Always
+          * rendered, empty or not, because a slot that appears and disappears
+          * is the same reflow by another name.
+          */}
+        <p className="dora-ask-heard" role="status">
+          {say}
+        </p>
       </div>
 
       <div className="dora-ask-her">
-        {say ? (
-          <p className="dora-says" role="status">
-            {say}
-          </p>
-        ) : null}
         <button
           type="button"
           className={`dora-ask-poke${roaring ? ' is-scared' : ''}`}
