@@ -28,6 +28,7 @@
  */
 
 import { gameVersion } from '../data/app.ts'
+import { DoraAsking } from './Dora.tsx'
 
 export function Landing({ onEnter }: { onEnter: () => void }) {
   return (
@@ -73,11 +74,29 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
       <section className="landing-block">
         <h2>Where the name comes from</h2>
         <p>
-          <strong>Enodia</strong> is an epithet of Hecate. It means <em>she of the ways</em>,
-          the one who stands at the crossroads and knows what each of them leads to. The game
-          only ever calls her Hecate, so the name is ours to borrow, and it is the job: you are
-          at a fork, and something should tell you where the roads go.
+          <strong>Enodia</strong> is Greek, and it means roughly <em>she of the ways</em>, or
+          the one in the road. It is not a name so much as a job description: it was an epithet
+          of <strong>Hecate</strong>, who stands where three roads meet, holding a torch,
+          because the crossroads is the place you most need somebody who knows what each way
+          leads to.
         </p>
+        <p>
+          That is the whole reason it is on this. You are standing at an Exit with four symbols
+          in front of you, which is a crossroads with a timer on it. A tool for that moment
+          could hardly be called anything else.
+        </p>
+        <p>
+          Hecate is in Hades II and the game <em>never</em> uses this name for her, which was
+          checked rather than assumed: &ldquo;Enodia&rdquo; appears nowhere in the game&rsquo;s
+          text files. She is only ever Hecate there. So the name is borrowed from the myth
+          rather than lifted from the game, which felt like the right distance for something
+          unofficial.
+        </p>
+      </section>
+
+      <section className="landing-block">
+        <h2>Who made you do all this</h2>
+        <DoraAsking />
       </section>
 
       <section className="landing-block">
