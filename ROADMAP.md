@@ -318,9 +318,20 @@ These are real and none of them block step 2.
 
 - ~~Inheritance is not resolved in the extractor~~. **Done.** The extractor runs the game's
   own `ProcessDataInheritance` and writes `traits-resolved.json`. 49 traits state a `Slot`,
-  122 carry one afterwards. The validator still walks `InheritFrom` itself for
-  classification and `GodLoot`, which is now a redundant second implementation and should
-  read the resolved file instead
+  122 carry one afterwards
+- ~~The validator's own `InheritFrom` walk is a redundant second implementation and should
+  read the resolved file instead~~. **Checked, and it is not redundant.** Two separate
+  reasons, both pinned by `scripts/validate/inheritance.test.ts`:
+  - **Resolution is lossy for provenance.** A duo inherits `IsDuoBoon` from `SynergyTrait`;
+    a Hex duo states it on its own record. After resolution both carry the same flag and
+    nothing says where it came from, so reading it reports **46 duos and 0 Hex duos**
+    instead of 37 and 9. `InheritFrom` is byte-identical in both files, so there is no
+    shortcut hiding in there either
+  - **There is no `loot-resolved.json`.** For `GodLoot` the swap has no file to read.
+    Dropping that walk gives **7 Olympians instead of 9**, losing Poseidon and Zeus, which
+    is `CLAUDE.md` error 3 exactly
+  One belief did not survive the test: the walk does **not** need to be transitive. Every
+  marker sits at depth 1, so the recursion is insurance rather than load bearing
 - `traits.json` is eight entity types in one file. The game tags every one via
   `InheritFrom`, so splitting is mechanical
 - 84 of 651 traits have no display name. Believed to be base templates, unverified
