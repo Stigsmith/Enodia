@@ -6844,122 +6844,6 @@ button.mark {
   border-color: var(--div-4);
 }
 
-/* ---------------------------------------------------------------------------
- * The landing page.
- *
- * Reuses the reading measure from `.page` because it is a reading screen, and
- * the type scale from `.ref-*` because a fourth heading treatment would make
- * the tool look like four tools. What is different is the top: a name at
- * poster size, and the way in placed above everything that explains it.
- * ------------------------------------------------------------------------- */
-
-.landing {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 2.5rem 1rem 5rem;
-}
-
-@media (min-width: 60rem) {
-  .landing { padding: 4rem 2rem 6rem; }
-}
-
-.landing-top {
-  margin-bottom: 1.75rem;
-}
-
-/* The name face, at the one size in the tool where the name is the subject
- * rather than a label on something else. */
-.landing-mark {
-  margin: 0;
-  font-family: var(--name);
-  font-weight: 400;
-  font-synthesis-weight: none;
-  font-size: clamp(2.6rem, 11vw, 4.2rem);
-  line-height: 1;
-  letter-spacing: 0.02em;
-  color: var(--bone);
-}
-
-.landing-lede {
-  margin: 0.6rem 0 0;
-  font-family: var(--body);
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: var(--bone-dim);
-  text-wrap: pretty;
-}
-
-/* The way in. Deliberately the first control on the page. */
-.landing-in {
-  display: inline-block;
-  padding: 0.7rem 1.6rem;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-soft);
-  background: var(--ink-800);
-  font-family: var(--display);
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  color: var(--bone);
-  cursor: pointer;
-}
-
-.landing-in:hover,
-.landing-in:focus-visible {
-  border-color: var(--lit-hot);
-  color: var(--lit-hot);
-}
-
-.landing-in-note {
-  margin: 0.5rem 0 0;
-  font-family: var(--body);
-  font-size: 0.82rem;
-  color: var(--bone-faint);
-}
-
-.landing-in-again {
-  margin-top: 2rem;
-}
-
-.landing-block {
-  margin-top: 2.25rem;
-}
-
-.landing-block h2 {
-  margin: 0 0 0.6rem;
-  font-family: var(--display);
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  color: var(--lit-hot);
-  text-wrap: balance;
-}
-
-.landing-block p {
-  margin: 0 0 0.8rem;
-  font-family: var(--body);
-  font-size: 0.95rem;
-  line-height: 1.65;
-  color: var(--bone-dim);
-  text-wrap: pretty;
-}
-
-.landing-block p:last-child { margin-bottom: 0; }
-
-.landing-block strong { color: var(--bone); }
-
-.landing-mono {
-  font-family: var(--mono);
-  color: var(--bone);
-}
-
-.landing-fine {
-  margin: 2.5rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--div-2);
-  font-family: var(--body);
-  font-size: 0.78rem;
-  line-height: 1.6;
-  color: var(--bone-faint);
-}
 
 /* ---------------------------------------------------------------------------
  * The Account room.
@@ -7171,54 +7055,175 @@ button.mark {
 }
 
 /* ---------------------------------------------------------------------------
- * Dora on the landing page, asking for a tip.
+ * The landing page, and Dora on it.
  *
- * Side by side rather than stacked like `.unbuilt`, because here she is beside
- * a paragraph rather than filling a room that has nothing else in it. She is
- * also smaller for the same reason: on an empty page she is the content, and on
- * this one she is an aside next to it.
+ * **Built to a height budget.** On a desktop this page does not scroll, which
+ * is a constraint rather than a preference: a landing page with a second screen
+ * is one whose second screen is optional. So it is two columns on a wide
+ * display, the type is a notch down from the reading pages, and Dora costs no
+ * height at all because she is positioned into the corner rather than laid out.
  *
- * The scare reuses `dora-scare` rather than defining a second one. Two
- * animations for one joke is how they end up looking different.
+ * The order of these rules matters. The wide-screen block is LAST, because it
+ * overrides the base at equal specificity and a media query that loses is
+ * invisible: it reports `true` and changes nothing.
  * ------------------------------------------------------------------------- */
 
-/**
- * She stands beside the reading column, not inside it.
- *
- * Three attempts at this, and the first two were both wrong in the same way:
- * they gave her a share of the 40rem measure, and the prose paid for it.
- *
- *   1. An `auto` column sized itself to her speech bubble, so every click
- *      re-wrapped the paragraph
- *   2. A fixed 9rem column stopped the reflow, and the bubble then printed on
- *      top of the text instead, which is worse
- *   3. A fixed 16rem column stopped that too, and took the paragraph from
- *      416px down to 288px to do it
- *
- * `.landing` is `max-width: 40rem` and centred, so on a wide screen there are
- * several hundred pixels of empty margin either side of it. That is where she
- * goes: out of the column altogether, in space that was doing nothing. The
- * prose keeps its full measure and nothing of hers can reach it, because she is
- * not in it.
- *
- * Below the width where that margin exists she stacks underneath, which is the
- * phone layout and is fine.
- */
-.dora-ask {
+.landing {
   position: relative;
-  display: grid;
-  gap: 1rem;
-  align-items: center;
-  grid-template-columns: 1fr;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 2rem;
 }
 
+.landing-top {
+  margin-bottom: 1.5rem;
+}
+
+/* The name face, at the one size in the tool where the name is the subject
+ * rather than a label on something else. */
+.landing-mark {
+  margin: 0;
+  font-family: var(--name);
+  font-weight: 400;
+  font-synthesis-weight: none;
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+}
+
+.landing-lede {
+  margin: 0.5rem 0 0;
+  max-width: 34rem;
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--bone-dim);
+  text-wrap: pretty;
+}
+
+/* The button and its note on one line, so they cost one row and not two. */
+.landing-go {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1rem 0 0;
+  flex-wrap: wrap;
+}
+
+.landing-in {
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-soft);
+  background: var(--ink-800);
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+  cursor: pointer;
+}
+
+.landing-in:hover,
+.landing-in:focus-visible {
+  border-color: var(--lit-hot);
+  color: var(--lit-hot);
+}
+
+.landing-in-note {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  color: var(--bone-faint);
+}
+
+.landing-cols {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.landing-block h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--lit-hot);
+  text-wrap: balance;
+}
+
+.landing-block p {
+  margin: 0 0 0.65rem;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--bone-dim);
+  text-wrap: pretty;
+}
+
+.landing-block p:last-child {
+  margin-bottom: 0;
+}
+
+.landing-block strong {
+  color: var(--bone);
+}
+
+.landing-mono {
+  font-family: var(--mono);
+  color: var(--bone);
+}
+
+/* The Greek, and how to say it.
+ *
+ * **None of the four vendored faces has Greek**, measured rather than assumed:
+ * Ἐνοδία renders the same width in Spectral SC as in plain serif, so the
+ * browser falls back. `scripts/fonts.ts` takes every subset Google offers and
+ * Google offers no greek slice for any of these families, which is the same
+ * reason the game's Ω falls back everywhere else in the tool.
+ *
+ * So the stack is chosen rather than left to chance. Palatino has real
+ * polytonic Greek on Windows and macOS both, and sits closest to Spectral SC of
+ * anything likely to be installed. One word does not justify a fifth family.
+ *
+ * `p.landing-greek` and not `.landing-greek`, because `.landing-block p` is
+ * 0,1,1 and a bare class is 0,1,0. The first version lost to it silently and
+ * the Greek rendered in Lato, a sans. */
+p.landing-greek {
+  margin: 0.2rem 0 0.1rem;
+  font-family: "Palatino Linotype", Palatino, "Spectral SC", Georgia, serif;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: var(--lit-hot);
+}
+
+p.landing-say {
+  margin: 0 0 0.7rem;
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: var(--bone-dim);
+}
+
+.landing-fine {
+  margin: 1.5rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--div-2);
+  font-family: var(--body);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+/* -------------------------------------------------------- Dora, asking -- */
+
+.dora-ask {
+  margin-top: 1.5rem;
+}
 
 .dora-ask-say,
 .dora-ask-do {
-  margin: 0 0 0.8rem;
+  margin: 0 0 0.5rem;
   font-family: var(--body);
-  font-size: 0.95rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.55;
   color: var(--bone-dim);
   text-wrap: pretty;
 }
@@ -7244,57 +7249,49 @@ button.mark {
   justify-content: center;
   align-items: flex-end;
   /**
-   * Room for the speech bubble, which is out of flow and would otherwise print
-   * over whatever is above her.
+   * Room for the speech bubble, which is out of flow.
    *
-   * Kept in both layouts. In the stacked one it is what stops the bubble
-   * landing on the paragraph above her, measured at 29px inside it before this.
-   * Out in the margin there is nothing above her anyway, so it costs nothing
-   * and one rule is better than two that have to agree.
+   * 10rem is measured, not guessed: her longest line is a four line bubble at
+   * 143px, and the 5rem this started as left it sitting 38px on her hat.
    *
-   * The bubble is anchored to the TOP of this padding rather than above the
-   * box. See the note on it: anchoring to the bottom moved the bubble up by
-   * exactly as much as the padding added, which reserved nothing at all.
+   * The bubble anchors to the TOP of this padding. Anchoring it to `bottom:
+   * 100%` instead moved the bubble up by exactly as much as the padding added,
+   * so the reserve did nothing at all.
    */
-  /* 10rem, measured. A three line bubble is 118px and the longest line she has
-   * runs to four, so 80px was not close and the bubble sat 38px onto her hat. */
   padding-top: 10rem;
+  margin-top: 1rem;
 }
 
 /**
- * Out of flow entirely, which is the other half of the fix.
+ * Opaque, and above everything.
  *
- * Even in a fixed column an in-flow bubble would still change the column's
- * HEIGHT as the line got longer or shorter, and the row would breathe on every
- * click. Absolute takes it out of the box's sizing altogether, so she can say
- * anything of any length and nothing on the page moves.
+ * `.dora-says` paints itself with `background-shade.png`, which is a soft
+ * SEMI-TRANSPARENT shade. Everywhere else in the tool it sits over artwork and
+ * that is the point. Here it can land over a paragraph, and the owner's report
+ * was exactly that: "the text clips through her text bubble". It was not
+ * clipping, it was showing through.
  *
- * Anchored right and allowed to grow leftwards over the picture's own column,
- * because it is a speech bubble and hanging over the speaker is what they do.
+ * A speech bubble covering a bit of prose while somebody is poking a cartoon is
+ * fine. A speech bubble you can read the prose through is not. So an opaque
+ * ground goes behind the shade, and a stacking order puts it on top.
+ *
+ * The width is deliberately not capped to her 7rem column here: at that width
+ * the bubble would be a word per line. It is capped by `.dora-says` itself at
+ * 22rem and hangs leftwards, which is what a speech bubble does.
  */
 .dora-ask-her .dora-says {
   position: absolute;
-  /**
-   * `top: 0`, INSIDE the reserved padding, and not `bottom: 100%` above the box.
-   *
-   * `bottom` is measured from the bottom of her box, so adding `padding-top` to
-   * make room moved the box and the bubble up together and reserved nothing.
-   * Anchoring to the top puts the bubble in the space that was set aside for it.
-   */
   top: 0;
   right: 0;
   width: max-content;
-  /* Never wider than her own column, so it cannot cross into the paragraph.
-   * `100%` and not a rem value: the column is the constraint, and stating it
-   * twice is how the two drift apart when one of them changes. */
-  max-width: 100%;
   margin: 0;
+  background-color: var(--ink-950);
+  border-radius: var(--r-soft);
+  z-index: 2;
 }
 
-/* A fixed height, so swapping the two pictures cannot shift the page under a
- * reader mid-sentence. Same reasoning as `.unbuilt-poke`, smaller number. */
 .dora-ask-poke {
-  height: min(14rem, 30vh);
+  height: 9rem;
   padding: 0;
   border: 0;
   background: none;
@@ -7303,7 +7300,7 @@ button.mark {
 }
 
 .dora-ask-poke img {
-  width: min(8rem, 40vw);
+  width: 5.5rem;
   height: 100%;
   object-fit: contain;
   object-position: bottom;
@@ -7311,6 +7308,8 @@ button.mark {
   transition: transform 0.12s ease;
 }
 
+/* Reuses `dora-scare` from the unbuilt pages. Two animations for one joke is
+ * how they end up looking different. */
 .dora-ask-poke.is-scared img {
   animation: dora-scare 0.7s ease-out;
   filter: drop-shadow(0 0 22px rgb(140 255 190 / 0.45)) drop-shadow(0 8px 20px var(--ink-950));
@@ -7326,58 +7325,57 @@ button.mark {
   transform: translateY(-2px);
 }
 
+/* ------------------------------------------------- the wide-screen shape -- */
+
 /**
- * LAST, and the position in this file is load bearing.
+ * LAST in the file, and that is load bearing.
  *
- * This block was written above `.dora-ask-her` and lost to it: same
- * specificity, and the later rule wins. The media query matched, reported
- * `true`, and `position: absolute` never applied, so she stayed in flow and
- * the section reserved 408px of height for 88px of text. That gap beside her
- * was the bug, and it looked like a layout choice rather than a cascade one.
+ * These rules override the base ones at equal specificity, so written above
+ * them they would lose. That happened: `position: absolute` never applied, the
+ * query reported `true` throughout, and she stayed in flow reserving 408px of
+ * height for 88px of text.
  */
-@media (min-width: 72rem) {
+@media (min-width: 60rem) {
+  .landing {
+    /* A screenful, and the page is laid out to fill it rather than to run off
+     * the bottom of it. `dvh` so a phone's collapsing toolbar does not count. */
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    align-content: start;
+    padding: 2.5rem 2rem 1.25rem;
+  }
+
+  .landing-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-content: start;
+  }
+
+  /**
+   * Dora into the bottom right corner, costing no height.
+   *
+   * In flow she is 9rem of picture plus 10rem of speech reserve, which on an
+   * 800px screen is a quarter of the budget spent on a joke. Positioned, she
+   * spends none of it, and her paragraph keeps the left of the row to itself.
+   */
+  .dora-ask {
+    margin-top: 1.25rem;
+    /* She is 7rem wide at `right: 2rem`, so she owns the last 9rem. 10 clears
+     * her with a rem to spare; 8 had her standing on the fine print. */
+    padding-right: 10rem;
+  }
+
   .dora-ask-her {
     position: absolute;
-    left: 100%;
-    margin-left: 2rem;
-    bottom: 0;
-    width: 12rem;
+    right: 2rem;
+    bottom: 1.25rem;
+    width: 7rem;
+    margin-top: 0;
   }
 
-  /* Her column is gone, so the text has the whole measure back. */
-  .dora-ask {
-    grid-template-columns: 1fr;
+  /* Clear of her, so the smallest type on the page never runs under her feet. */
+  .landing-fine {
+    padding-right: 10rem;
   }
-}
-
-/* The Greek, and how to say it.
- *
- * **None of the four vendored faces has Greek**, which was measured rather than
- * assumed: Ἐνοδία renders the same width in Spectral SC as in plain serif, so
- * the browser is falling back. `scripts/fonts.ts` takes every subset Google
- * offers and Google offers no greek slice for any of these families, which is
- * the same reason the game's Ω falls back everywhere else in the tool.
- *
- * So the stack is chosen rather than left to chance. Palatino has real
- * polytonic Greek on both Windows and macOS and sits closest to Spectral SC of
- * anything likely to be installed; the generic serif is the floor. One word at
- * display size does not justify vendoring a fifth family.
- *
- * The selector is `p.landing-greek` because `.landing-block p` is 0,1,1 and a
- * bare class is 0,1,0. The first version of this lost to it silently and the
- * Greek rendered in Lato, which is a sans and has no business drawing it. */
-p.landing-greek {
-  margin: 0.4rem 0 0.2rem;
-  font-family: "Palatino Linotype", Palatino, "Spectral SC", Georgia, serif;
-  font-size: clamp(2rem, 8vw, 2.8rem);
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-  color: var(--lit-hot);
-}
-
-p.landing-say {
-  margin: 0 0 1.1rem;
-  font-family: var(--body);
-  font-size: 0.95rem;
-  color: var(--bone-dim);
 }
