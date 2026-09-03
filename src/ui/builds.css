@@ -7192,9 +7192,17 @@ button.mark {
   grid-template-columns: 1fr;
 }
 
+/**
+ * A FIXED second column, not `auto`.
+ *
+ * `auto` sizes the column to its widest child, and her widest child is the
+ * speech bubble, whose width changes with every line she says. So the text
+ * beside her was being re-wrapped on every click, which is the one thing a
+ * paragraph must not do while somebody is reading it.
+ */
 @media (min-width: 34rem) {
   .dora-ask {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 9rem;
   }
 }
 
@@ -7225,23 +7233,34 @@ button.mark {
 
 .dora-ask-her {
   position: relative;
-  display: grid;
-  grid-template-rows: auto auto;
-  justify-items: center;
-  align-items: end;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 }
 
+/**
+ * Out of flow entirely, which is the other half of the fix.
+ *
+ * Even in a fixed column an in-flow bubble would still change the column's
+ * HEIGHT as the line got longer or shorter, and the row would breathe on every
+ * click. Absolute takes it out of the box's sizing altogether, so she can say
+ * anything of any length and nothing on the page moves.
+ *
+ * Anchored right and allowed to grow leftwards over the picture's own column,
+ * because it is a speech bubble and hanging over the speaker is what they do.
+ */
 .dora-ask-her .dora-says {
-  grid-row: 1;
-  align-self: end;
-  margin-bottom: 0.6rem;
-  max-width: min(18rem, 80vw);
+  position: absolute;
+  bottom: calc(100% - 1.5rem);
+  right: 0;
+  width: max-content;
+  max-width: min(16rem, 70vw);
+  margin: 0;
 }
 
 /* A fixed height, so swapping the two pictures cannot shift the page under a
  * reader mid-sentence. Same reasoning as `.unbuilt-poke`, smaller number. */
 .dora-ask-poke {
-  grid-row: 2;
   height: min(14rem, 30vh);
   padding: 0;
   border: 0;
