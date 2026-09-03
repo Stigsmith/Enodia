@@ -130,3 +130,30 @@ export const friendship = sqliteTable(
     index('friendship_userId_idx').on(table.userId),
   ],
 )
+
+/**
+ * The counters behind `worker/limit.ts`, one row per key per window.
+ *
+ * **A table of ours rather than better-auth's `rate_limit`, and that is not
+ * tidiness.** Its database storage prunes with
+ * `deleteMany({ where: [{ field: 'lastRequest', operator: 'lt', value: cutoff }] })`
+ * where `cutoff` is `now - longestObservedWindow`, and `longestObservedWindow`
+ * is the longest window **better-auth itself** has configured. There is no key
+ * filter on that delete. Rows of ours in that table would be pruned on a
+ * schedule set by a rule in `worker/auth.ts`, so lowering the sign-up window
+ * from an hour would silently shorten every limit here. Its `key` column is
+ * also `UNIQUE`, so a key of ours colliding with one of theirs would merge two
+ * counters into one.
+ *
+ * `key` is the primary key rather than a separate id, because the whole access
+ * pattern is one upsert on it. See `limit.ts` for why that has to be one
+ * statement.
+ */
+export const apiRateLimit = sqliteTable('api_rate_limit', {
+  /** `<rule>:<who>`, where who is a user id or an address. `limit.ts` builds it. */
+  key: text('key').primaryKey(),
+  /** Requests taken in the current window, including the one that went over. */
+  count: integer('count').notNull(),
+  /** When the current window opened, epoch ms. Fixed, not sliding. */
+  windowStart: integer('window_start').notNull(),
+})

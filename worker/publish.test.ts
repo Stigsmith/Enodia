@@ -41,6 +41,7 @@ const publish = (cookie: string, name = 'Every Pair', payload = 'Zpackedbuildpay
 
 beforeEach(async () => {
   await env.DB.prepare('delete from rate_limit').run()
+  await env.DB.prepare('delete from api_rate_limit').run()
 })
 
 describe('the gate', () => {
