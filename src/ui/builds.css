@@ -3364,9 +3364,9 @@ button.mark {
 /* ==========================================================================
  * THE READING SCREENS
  *
- * Help, About, Roadmap and Changelog. They share a shell because they are the
- * same kind of thing, and a tool whose text pages each look slightly different
- * reads as four tools.
+ * Help, Roadmap and Changelog. They share a shell because they are the same
+ * kind of thing, and a tool whose text pages each look slightly different reads
+ * as three tools. There were four until About was binned into Help.
  *
  * One measure, narrow enough to read: running text sits near 65 characters
  * whatever the window is doing, which is the one typographic rule worth being

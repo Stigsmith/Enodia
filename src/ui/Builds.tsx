@@ -283,7 +283,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
         <p className="builds-note">
           {library.length
             ? 'Pick an arm, or open one to see how it works.'
-            : 'Nothing here yet. What you make is yours and stays in this browser.'}
+            : 'Nothing here yet. What you make is yours, and it stays in this browser until you send it somewhere.'}
         </p>
         <button
           type="button"
@@ -367,7 +367,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
       {/*
         * The loss warning, and it appears only once there is something to lose.
         *
-        * The empty state has always said "yours and stays in this browser",
+        * The empty state has always said the library stays in this browser,
         * which is the right sentence at the wrong moment: somebody with no
         * builds has nothing at stake and does not read it. The same sentence
         * over a library they have actually filled is the one that gets a copy
