@@ -7182,27 +7182,69 @@ button.mark {
  * animations for one joke is how they end up looking different.
  * ------------------------------------------------------------------------- */
 
+/**
+ * She stands beside the reading column, not inside it.
+ *
+ * Three attempts at this, and the first two were both wrong in the same way:
+ * they gave her a share of the 40rem measure, and the prose paid for it.
+ *
+ *   1. An `auto` column sized itself to her speech bubble, so every click
+ *      re-wrapped the paragraph
+ *   2. A fixed 9rem column stopped the reflow, and the bubble then printed on
+ *      top of the text instead, which is worse
+ *   3. A fixed 16rem column stopped that too, and took the paragraph from
+ *      416px down to 288px to do it
+ *
+ * `.landing` is `max-width: 40rem` and centred, so on a wide screen there are
+ * several hundred pixels of empty margin either side of it. That is where she
+ * goes: out of the column altogether, in space that was doing nothing. The
+ * prose keeps its full measure and nothing of hers can reach it, because she is
+ * not in it.
+ *
+ * Below the width where that margin exists she stacks underneath, which is the
+ * phone layout and is fine.
+ */
 .dora-ask {
+  position: relative;
   display: grid;
   gap: 1rem;
-  /* Centred, not bottom aligned. Aligning the paragraph to her feet left a
-   * visible gap above it, because she is taller than the two lines beside her
-   * and the empty space read as a mistake rather than as composition. */
   align-items: center;
   grid-template-columns: 1fr;
 }
 
 /**
- * A FIXED second column, not `auto`.
+ * A FIXED second column, and wide enough to hold her speech bubble.
  *
- * `auto` sizes the column to its widest child, and her widest child is the
- * speech bubble, whose width changes with every line she says. So the text
- * beside her was being re-wrapped on every click, which is the one thing a
- * paragraph must not do while somebody is reading it.
+ * Both halves are load bearing and the first fix had only one of them.
+ *
+ * **Fixed**, because `auto` sizes a column to its widest child, and her widest
+ * child is the bubble, whose width changes with every line. The text beside her
+ * was being re-wrapped on every click.
+ *
+ * **16rem**, because the bubble is up to 16rem and a 9rem column left it
+ * hanging seven rem over the paragraph. Out of flow it no longer pushed the
+ * text, so it printed on top of it instead, which is worse. She gets a column
+ * her whole self fits in, and then nothing of hers can reach the prose.
  */
-@media (min-width: 34rem) {
+/**
+ * 72rem, and the number is arithmetic rather than taste.
+ *
+ * The page is 40rem wide. She needs 12rem plus a 2rem gap, so 14rem of margin
+ * on one side, so 40 + 28 = 68rem before she fits with the page still centred.
+ * 72 leaves a little air so she is never touching the viewport edge.
+ */
+@media (min-width: 72rem) {
+  .dora-ask-her {
+    position: absolute;
+    left: 100%;
+    margin-left: 2rem;
+    bottom: 0;
+    width: 12rem;
+  }
+
+  /* Her column is gone, so the text has the whole measure back. */
   .dora-ask {
-    grid-template-columns: 1fr 9rem;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -7236,6 +7278,20 @@ button.mark {
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  /**
+   * Room for the speech bubble, which is out of flow and would otherwise print
+   * over whatever is above her.
+   *
+   * Kept in both layouts. In the stacked one it is what stops the bubble
+   * landing on the paragraph above her, measured at 29px inside it before this.
+   * Out in the margin there is nothing above her anyway, so it costs nothing
+   * and one rule is better than two that have to agree.
+   *
+   * The bubble is anchored to the TOP of this padding rather than above the
+   * box. See the note on it: anchoring to the bottom moved the bubble up by
+   * exactly as much as the padding added, which reserved nothing at all.
+   */
+  padding-top: 5rem;
 }
 
 /**
@@ -7251,10 +7307,20 @@ button.mark {
  */
 .dora-ask-her .dora-says {
   position: absolute;
-  bottom: calc(100% - 1.5rem);
+  /**
+   * `top: 0`, INSIDE the reserved padding, and not `bottom: 100%` above the box.
+   *
+   * `bottom` is measured from the bottom of her box, so adding `padding-top` to
+   * make room moved the box and the bubble up together and reserved nothing.
+   * Anchoring to the top puts the bubble in the space that was set aside for it.
+   */
+  top: 0;
   right: 0;
   width: max-content;
-  max-width: min(16rem, 70vw);
+  /* Never wider than her own column, so it cannot cross into the paragraph.
+   * `100%` and not a rem value: the column is the constraint, and stating it
+   * twice is how the two drift apart when one of them changes. */
+  max-width: 100%;
   margin: 0;
 }
 
