@@ -7258,11 +7258,33 @@ p.landing-say {
   color: var(--lit-hot);
 }
 
+/**
+ * She fills the column rather than sitting in the middle of it.
+ *
+ * `auto 1fr`: the speech row takes what it needs and she takes everything
+ * left, so she is exactly as tall as the two text columns beside her and stays
+ * that way if their copy changes. A fixed 9rem left 119px of dead space above
+ * her and made her look dropped in rather than placed.
+ *
+ * Aligned to the end, because she is the rightmost thing on the page and
+ * centring her in her own column left a gap to her right that read as a
+ * mistake rather than as breathing room.
+ */
 .dora-col {
   display: grid;
-  grid-template-rows: auto auto;
-  justify-items: center;
-  align-content: end;
+  /**
+   * `minmax(14rem, 1fr)` and not a bare `1fr`.
+   *
+   * On the wide grid her column is stretched to match the text ones, so `1fr`
+   * gives her everything left over and she comes out around 2.3x her old size.
+   * Off that grid, stacked on a phone, there is no height to fill: `1fr`
+   * resolved to the max-content of an absolutely positioned image, which is
+   * zero, and she disappeared while every other measurement looked healthy.
+   * The floor is what she gets when nothing is stretching her.
+   */
+  grid-template-rows: auto minmax(14rem, 1fr);
+  justify-items: end;
+  min-height: 0;
 }
 
 /**
@@ -7293,14 +7315,29 @@ p.landing-say {
  * moving it a fourth time.
  */
 .dora-col-says {
-  min-height: 9.5rem;
+  /* 5.5rem, measured at this column width: the tallest thing she says renders
+   * at 84px. It was 9.5rem when her column was narrower and the reserve was a
+   * guess, and the difference was 68px of nothing above her head. */
+  min-height: 5.5rem;
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
 
 .dora-col-poke {
-  height: 9rem;
+  /* The row decides how tall she is, not a number here. */
+  position: relative;
+  /**
+   * Full width, and it has to be stated.
+   *
+   * `justify-items: end` on the column shrink wraps its children, and with the
+   * picture absolutely positioned this button has no content to wrap to. It
+   * collapsed to zero width and she vanished entirely while every measurement
+   * still reported a healthy 327px of height.
+   */
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   padding: 0;
   border: 0;
   background: none;
@@ -7308,11 +7345,24 @@ p.landing-say {
   line-height: 0;
 }
 
+/**
+ * Absolutely positioned, and that is the load bearing part.
+ *
+ * In flow, `width: 100%` on a 427x776 image drives its own height through the
+ * aspect ratio, and `height: 100%` cannot resolve against a `1fr` row, so she
+ * sized herself to 494px and pushed the page 231px past a screen. She was
+ * growing the row she was meant to be filling.
+ *
+ * Out of flow she contributes no height at all, so the row is sized by the two
+ * text columns and she takes exactly what is left of it.
+ */
 .dora-col-poke img {
-  width: 5.5rem;
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom;
+  object-position: bottom right;
   filter: drop-shadow(0 8px 20px var(--ink-950));
   transition: transform 0.12s ease;
 }
@@ -7351,7 +7401,7 @@ p.landing-say {
     min-height: 100dvh;
     max-width: 76rem;
     display: grid;
-    grid-template-columns: 1fr 1fr 15rem;
+    grid-template-columns: 1fr 1fr 17rem;
     grid-template-rows: auto 1fr auto auto;
     grid-template-areas:
       "head head head"
