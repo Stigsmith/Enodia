@@ -393,7 +393,11 @@ export function App() {
 
   if (screen === 'landing') {
     return frame(
-      <div className="shell">
+      /* `is-wide` and not the plain shell: that one caps at 46rem, which
+       * squeezed the landing's two columns to 296px each and made the page
+       * 118px too tall to fit a screen. `is-wide` also scrolls itself rather
+       * than the document, the way every other screen here does. */
+      <div className="shell is-wide">
         <Landing onEnter={leaveLanding} />
       </div>,
     )
