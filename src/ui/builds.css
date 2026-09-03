@@ -7185,7 +7185,10 @@ button.mark {
 .dora-ask {
   display: grid;
   gap: 1rem;
-  align-items: end;
+  /* Centred, not bottom aligned. Aligning the paragraph to her feet left a
+   * visible gap above it, because she is taller than the two lines beside her
+   * and the empty space read as a mistake rather than as composition. */
+  align-items: center;
   grid-template-columns: 1fr;
 }
 
