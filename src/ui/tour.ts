@@ -77,7 +77,7 @@ export const TOURS: Record<string, Step[]> = {
     },
     {
       at: 'builds-new',
-      say: 'New one starts there. None of this is a recommendation, mind. It is all yours, and it lives in this browser and nowhere else.',
+      say: 'New one starts there. None of this is a recommendation, mind. It is all yours, and it stays in this browser unless you send it somewhere.',
     },
     {
       at: 'builds-bin',
@@ -211,7 +211,7 @@ export const TOURS: Record<string, Step[]> = {
     },
     {
       at: 'setting-export',
-      say: 'Export. One file, the lot of it. No server behind any of this, so that file is the only copy there is. Lose it and it is properly gone.',
+      say: 'Export. One file, the lot of it. Nothing here is backed up anywhere, so that file is the only copy there is. Lose it and it is properly gone.',
     },
     {
       at: 'setting-import',
@@ -227,19 +227,10 @@ export const TOURS: Record<string, Step[]> = {
    */
   help: [
     { say: 'The reference. Every state, band and percentage on the run screen, written out properly.' },
+    { say: 'Where the numbers came from first, though. One player, reading the game’s own files. Not a wiki.' },
+    { say: 'And the build they were read out of is up there. When something goes stale, at least you know what it was true for.' },
     { say: 'So this page does my job. Thoroughly. In order. With headings.' },
     { say: 'I am the short version. We have an understanding.' },
-  ],
-
-  about: [
-    {
-      at: 'about-standfirst',
-      say: 'Who made this and where the numbers come from. One player, reading the game’s own files. Not a wiki.',
-    },
-    {
-      at: 'about-version',
-      say: 'That is the build it was all read out of. When something goes stale, at least you know what it was true for.',
-    },
   ],
 
   roadmap: [

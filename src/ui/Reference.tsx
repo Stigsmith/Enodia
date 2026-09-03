@@ -1,16 +1,20 @@
 /**
- * Help and About: the two questions the tool cannot answer by being used.
+ * Help: the questions the tool cannot answer by being used.
  *
- * **Help explains the four words and the three bands**, because those are the
- * whole vocabulary of the run surface and nothing on screen has room to define
- * them. Every definition here is the one the engine actually implements, not a
- * friendly approximation of it: a help page that rounds off a rule is worse
- * than none, because it is believed.
+ * **Where the numbers come from, then what they mean.** Those are the two halves
+ * and they belong in that order: a reader who does not know the rules were read
+ * out of the game's own files has no reason to trust the definitions under them.
  *
- * **About says where the numbers come from and who owns the art.** The tool
- * reads the game's own shipped files, and it is somebody's fan project, and
- * both of those are things a reader is owed on one page rather than in a
- * footnote.
+ * The first section arrived here when the About page was binned. About had four
+ * sections and three of them were already said elsewhere: the disclaimer word
+ * for word in the landing fine print, the refusal to judge a build in the
+ * roadmap, and a "your things stay here" promise that the landing page had
+ * already dropped for making a promise with an expiry date. Provenance was the
+ * one thing only About said, so provenance is the one thing that moved.
+ *
+ * **Every definition here is the one the engine actually implements**, not a
+ * friendly approximation of it: a help page that rounds off a rule is worse than
+ * none, because it is believed.
  */
 
 import { gameVersion } from '../data/app.ts'
@@ -20,8 +24,26 @@ export function Help() {
   return (
     <Page
       title="Help"
-      standfirst="What each term on the run screen means. These are the rules as the tool implements them."
+      standfirst="Where the numbers come from, and what each term on the run screen means. These are the rules as the tool implements them."
     >
+      <section className="ref">
+        <h3 className="ref-rule">Where the numbers come from</h3>
+        <p className="ref-say">
+          Hades II ships its logic as plain-text Lua. Everything mechanical in this tool is read
+          out of those files rather than from a wiki or a guide: which boons occupy which slot,
+          what every duo requires, how many Olympians a run allows, and how a boon&rsquo;s value
+          changes as you stack it.
+        </p>
+        <p className="ref-say">
+          Read from game build <span className="ref-mono">{gameVersion}</span>. When the game
+          patches, the data is extracted again and the differences are reviewed rather than
+          accepted.
+        </p>
+        <p className="ref-say">
+          Every image here is the game&rsquo;s own, used to point at the thing it depicts.
+        </p>
+      </section>
+
       <section className="ref">
         <h3 className="ref-rule">The four states</h3>
         <p className="ref-say">
@@ -132,64 +154,6 @@ export function Help() {
         <p className="ref-say">
           Two of them can never be on together: one wants three cards or fewer, the other wants at
           least five. That conflict is most of the reason there are only a few shapes worth having.
-        </p>
-      </section>
-    </Page>
-  )
-}
-
-export function About() {
-  return (
-    <Page
-      title="About"
-      standfirst="A build companion for Hades II, built by a player, using data read from the game’s own files."
-    >
-      <section className="ref">
-        <h3 className="ref-rule">Where the numbers come from</h3>
-        <p className="ref-say">
-          Hades II ships its logic as plain-text Lua. Everything mechanical in this tool is read
-          out of those files rather than from a wiki or a guide: which boons occupy which slot,
-          what every duo requires, how many Olympians a run allows, and how a boon&rsquo;s value
-          changes as you stack it.
-        </p>
-        <p className="ref-say">
-          Read from game build <span className="ref-mono" data-tour="about-version">{gameVersion}</span>. When the game
-          patches, the data is extracted again and the differences are reviewed rather than
-          accepted.
-        </p>
-      </section>
-
-      <section className="ref">
-        <h3 className="ref-rule">What it will not tell you</h3>
-        <p className="ref-say">
-          Whether a build is <em>good</em> is not in any file, and this tool does not pretend
-          otherwise. It will say what the game would not allow, what is still reachable, and what a
-          pick closed. It will not tell you a build is strong, and the eight builds it ships with
-          are samples for testing the screens, labelled as such.
-        </p>
-      </section>
-
-      <section className="ref">
-        <h3 className="ref-rule">Your things stay here</h3>
-        <p className="ref-say">
-          There is no account and no server. Every build, run and setting lives in this
-          browser&rsquo;s own storage and is sent nowhere. Nothing is tracked and nothing is
-          measured about you.
-        </p>
-        <p className="ref-say">
-          That has a cost worth knowing: clearing this browser&rsquo;s data takes everything with
-          it. Settings has an export, and it says how long it has been since you used it. A build
-          shared as a link carries the build inside the link itself, which is why that works
-          without a server too.
-        </p>
-      </section>
-
-      <section className="ref">
-        <h3 className="ref-rule">The disclaimer</h3>
-        <p className="ref-say">
-          An unofficial fan project, free, non-commercial, and not affiliated with or endorsed by
-          Supergiant Games. Hades II, its art and its text are theirs. Every image here is the
-          game&rsquo;s own, used to point at the thing it depicts.
         </p>
       </section>
     </Page>

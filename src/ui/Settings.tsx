@@ -100,8 +100,8 @@ export function Settings() {
         <h3 className="arcana-rule">Your name</h3>
         <p className="setting-say">
           Put on the builds you make, and it travels with one you share so the person opening it
-          knows whose it is. <strong>There is no account behind it.</strong> It is stored in this
-          browser, nobody checks it, and two people can pick the same one.
+          knows whose it is. <strong>It is not a sign-in.</strong> It is stored in this browser,
+          nobody checks it, and two people can pick the same one.
         </p>
         <label className="setting-name" data-tour="setting-name">
           <span>Name</span>
@@ -126,8 +126,8 @@ export function Settings() {
       <section className="setting-block" data-tour="setting-export">
         <h3 className="arcana-rule">Your things</h3>
         <p className="setting-say">
-          Everything you have made lives in this browser and nowhere else. There is no account and
-          no server, so an export is the only copy that exists.
+          Everything you have made lives in this browser. Nothing here is backed up anywhere, so
+          an export is the only other copy that exists.
         </p>
 
         <div className="setting-row">

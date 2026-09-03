@@ -27,6 +27,12 @@ export type View =
    * The first screen a stranger sees, and the only one that sells anything.
    * Shown once, skipped entirely for anybody arriving on a share link, and
    * reachable again from the menu. `Landing.tsx` says why it is not a wall.
+   *
+   * **This is what the menu's About row opens.** There used to be a separate
+   * `about` view beside it, and by the time the landing page had been condensed
+   * onto one screen the two were saying the same things. The internal name
+   * stays `landing`, because that is still what it is: the page a first visit
+   * lands on. Only the label people read says About.
    */
   | 'landing'
   | 'builds'
@@ -34,7 +40,6 @@ export type View =
   | 'themes'
   | 'settings'
   | 'help'
-  | 'about'
   | 'roadmap'
   | 'changelog'
   /**

@@ -280,7 +280,7 @@ export function Menu({
         },
         {
           label: 'Help',
-          note: 'What the states, the bands and the percentages mean',
+          note: 'Where the numbers come from, and what the states and bands mean',
           here: view === 'help',
           action: () => {
             onGo('help')
@@ -306,20 +306,17 @@ export function Menu({
           },
         },
         {
-          label: 'About',
-          note: 'Where the data comes from, and the disclaimer',
-          here: view === 'about',
-          action: () => {
-            onGo('about')
-            leave()
-          },
-        },
-        {
           /* The landing page shows itself once and then lives here. Somebody
            * who skipped it, or who wants the line to send a friend, should
-           * still be able to get at it. */
-          label: 'What this is',
-          note: 'The page a first visit opens on',
+           * still be able to get at it.
+           *
+           * It carries the About name now. This row sat under a separate About
+           * page for a while and the two had grown into the same page: one said
+           * what the tool is, the other said what the tool is and then repeated
+           * the landing page's own disclaimer back at you. Where the numbers
+           * come from was the only part worth keeping and it is in Help. */
+          label: 'About',
+          note: 'What this is, and where the name comes from',
           here: view === 'landing',
           action: () => {
             onGo('landing')

@@ -25,7 +25,7 @@ import { Arcana } from './ui/Arcana.tsx'
 import { Themes } from './ui/Themes.tsx'
 import { Settings } from './ui/Settings.tsx'
 import { Changelog, Roadmap } from './ui/Pages.tsx'
-import { About, Help } from './ui/Reference.tsx'
+import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account } from './ui/Account.tsx'
 import { Friends } from './ui/Friends.tsx'
@@ -306,7 +306,6 @@ export function App() {
    * branch and one shell rather than four of each. */
   const reading: Partial<Record<View, () => React.JSX.Element>> = {
     help: Help,
-    about: About,
     roadmap: Roadmap,
     changelog: Changelog,
   }

@@ -2,12 +2,12 @@
  * The reading screens: what changed, what is coming.
  *
  * They share a shell because they are the same kind of thing, and because a
- * tool whose text pages each look slightly different reads as four tools. The
+ * tool whose text pages each look slightly different reads as three tools. The
  * shell is a header, a standfirst and a measure narrow enough to read.
  *
- * Help and About live here too when they are written. Nothing on these screens
- * is interactive, which is the point: they are the two questions a reader has
- * that the rest of the tool cannot answer by being used.
+ * Help uses it too, from `Reference.tsx`. Nothing on these screens is
+ * interactive, which is the point: they are the questions a reader has that the
+ * rest of the tool cannot answer by being used.
  */
 
 import { CHANGELOG } from '../data/changelog.ts'
@@ -29,7 +29,7 @@ export function Page({
       <header className="builds-top">
         <h2>{title}</h2>
       </header>
-      <p className="page-standfirst" data-tour="about-standfirst">{standfirst}</p>
+      <p className="page-standfirst" data-tour="page-standfirst">{standfirst}</p>
       {children}
     </div>
   )
