@@ -7273,3 +7273,35 @@ button.mark {
 .dora-ask-poke:hover img {
   transform: translateY(-2px);
 }
+
+/* The Greek, and how to say it.
+ *
+ * **None of the four vendored faces has Greek**, which was measured rather than
+ * assumed: Ἐνοδία renders the same width in Spectral SC as in plain serif, so
+ * the browser is falling back. `scripts/fonts.ts` takes every subset Google
+ * offers and Google offers no greek slice for any of these families, which is
+ * the same reason the game's Ω falls back everywhere else in the tool.
+ *
+ * So the stack is chosen rather than left to chance. Palatino has real
+ * polytonic Greek on both Windows and macOS and sits closest to Spectral SC of
+ * anything likely to be installed; the generic serif is the floor. One word at
+ * display size does not justify vendoring a fifth family.
+ *
+ * The selector is `p.landing-greek` because `.landing-block p` is 0,1,1 and a
+ * bare class is 0,1,0. The first version of this lost to it silently and the
+ * Greek rendered in Lato, which is a sans and has no business drawing it. */
+p.landing-greek {
+  margin: 0.4rem 0 0.2rem;
+  font-family: "Palatino Linotype", Palatino, "Spectral SC", Georgia, serif;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: var(--lit-hot);
+}
+
+p.landing-say {
+  margin: 0 0 1.1rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  color: var(--bone-dim);
+}

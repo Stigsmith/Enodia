@@ -19,12 +19,32 @@
  * through to see a specific build, and putting an explainer in front of them is
  * answering a question they did not ask. `App.tsx` checks the fragment first.
  *
- * ## Why the name is explained here
+ * ## Why the name is explained here, and what was checked
  *
- * The owner asked for it, and it earns its place: **Enodia is an epithet of
- * Hecate, and it means she of the ways.** The game only ever calls her Hecate,
- * so the name is not lifted from it, and it says what the tool does. Somebody
- * who reads that once will remember the address.
+ * The owner asked for it and wrote it, and it earns its place: somebody who
+ * reads it once will remember the address.
+ *
+ * Every claim in that section was checked, because a landing page is the worst
+ * place to be wrong:
+ *
+ * - **Headmistress Hecate** and **the Crossroads** are the game's own words,
+ *   found verbatim in `Content/Game/Text/en/*.sjson`
+ * - **Hades II never uses "Enodia"**, which is why the section can say so
+ *   flatly. It appears nowhere in the English text files
+ * - **krokopeplos, shared only by Hecate and Melinoë in the Orphic Hymns**, is
+ *   Morand, *Études sur les Hymnes Orphiques* (Brill 2001), pp. 127 and 182.
+ *   Note the scope: `krokopeplos` is a stock Homeric epithet for Eos, so the
+ *   claim is true of the Orphic Hymns and would be false of Greek generally
+ *
+ * One line was rewritten. The owner's draft ended "the name was in the game
+ * before it was on this page", which reads as though the game uses it, and it
+ * does not. The reversal is kept and the claim made true: the game never uses
+ * the name, it just already had the crossroads.
+ *
+ * Enodia was also a Thessalian goddess in her own right before the word became
+ * a title, and it was applied to Artemis, Persephone and Selene as well as to
+ * Hecate. "An epithet of Hecate" is correct and is the relevant half; the rest
+ * is not worth a paragraph on a landing page.
  */
 
 import { gameVersion } from '../data/app.ts'
@@ -73,24 +93,31 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
 
       <section className="landing-block">
         <h2>Where the name comes from</h2>
+
+        {/* The Greek and the pronunciation sit above the prose rather than
+          * inside it, because they are the two things somebody actually wants
+          * from this section and burying them in a sentence hides both. */}
+        <p className="landing-greek" lang="grc">
+          Ἐνοδία
+        </p>
+        <p className="landing-say">
+          Enodia, <span className="landing-mono">eh·NOH·dee·uh</span>
+        </p>
+
         <p>
-          <strong>Enodia</strong> is Greek, and it means roughly <em>she of the ways</em>, or
-          the one in the road. It is not a name so much as a job description: it was an epithet
-          of <strong>Hecate</strong>, who stands where three roads meet, holding a torch,
-          because the crossroads is the place you most need somebody who knows what each way
-          leads to.
+          An epithet of <strong>Hecate</strong> meaning <em>she of the ways</em>, from{' '}
+          <em lang="grc-Latn">en hodos</em>, on the road. She was invoked at crossroads and on
+          night roads, where travellers left offerings and asked her to see them safely on.
         </p>
         <p>
-          That is the whole reason it is on this. You are standing at an Exit with four symbols
-          in front of you, which is a crossroads with a timer on it. A tool for that moment
-          could hardly be called anything else.
+          <strong>She kept the job.</strong> Headmistress Hecate is standing in the Crossroads
+          you walk out of every single run. And in the Orphic hymns she and Melinoë are the
+          only two goddesses given the same epithet, <em lang="grc-Latn">krokopeplos</em>,
+          saffron-cloaked.
         </p>
         <p>
-          Hecate is in Hades II and the game <em>never</em> uses this name for her, which was
-          checked rather than assumed: &ldquo;Enodia&rdquo; appears nowhere in the game&rsquo;s
-          text files. She is only ever Hecate there. So the name is borrowed from the myth
-          rather than lifted from the game, which felt like the right distance for something
-          unofficial.
+          Hades II never uses the name itself. It did not have to: the Crossroads was already
+          there, and so was she.
         </p>
       </section>
 
