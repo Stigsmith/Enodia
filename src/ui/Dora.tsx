@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { kofiUrl } from '../data/kofi.ts'
+
 /**
  * Dora, in a hard hat, standing where a screen is not built yet.
  *
@@ -256,6 +258,92 @@ export function DoraWatching() {
           aria-hidden={say ? undefined : true}
         />
       </button>
+    </div>
+  )
+}
+
+/**
+ * The lines for the landing page, where she asks for a tip.
+ *
+ * A third set rather than a third copy of the loop. `usePoke` is the same one
+ * the other two use; only the lines differ, which is the arrangement the hook
+ * exists for.
+ *
+ * Nectar and Ambrosia because those are what you give somebody in this game
+ * when you like them. Asking for money in a fan tool reads as a hand out;
+ * asking for a drink reads as her.
+ */
+const TIP_POKES: Poke[] = [
+  { say: 'Hm.' },
+  { say: 'Still here. Still owed a drink, by my reckoning.' },
+  { say: 'A tip. That is all. Nectar, Ambrosia, whatever is going.' },
+  /**
+   * The one the owner wrote, and the shape the mechanic was already built for:
+   * the voice lands on its own sentence and the climb-down is a separate one,
+   * so the scare and the apology never arrive together.
+   */
+  {
+    roar: 'OR I WILL HAUNT YOUR OFFSPRING',
+    say: 'but seriously. If you love the tool, a tip would be appreciated.',
+  },
+  { say: 'That was the whole bit. There is not a second bit.' },
+  { say: 'I am going to start charging for the poking as well.' },
+]
+
+/**
+ * Dora on the landing page, asking for a tip.
+ *
+ * She is already the one who tells you a thing is not built, so she is the one
+ * who gets to mention that building it was work. The ask is hers rather than
+ * the page's, which is the difference between a character and a banner.
+ *
+ * **The link is a plain anchor and nothing is embedded.** `data/kofi.ts` says
+ * why: Ko-fi's widget would want `script-src` and `frame-src` opened onto a
+ * third party, and the whole point of `assets/_headers` is that they are shut.
+ *
+ * Draws nothing at all when there is no handle, so this cannot ship pointing at
+ * a stranger.
+ */
+export function DoraAsking() {
+  const { say, roaring, poke } = usePoke(TIP_POKES)
+  const url = kofiUrl()
+
+  return (
+    <div className="dora-ask">
+      <div className="dora-ask-body">
+        <p className="dora-ask-say">
+          Do you have any idea how much work went into this. Neither do I, I stopped counting.
+          A bottle of Nectar would not go unnoticed.
+        </p>
+        {url ? (
+          <p className="dora-ask-do">
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              Buy her a Nectar
+            </a>{' '}
+            if the tool has been any use. It stays free either way.
+          </p>
+        ) : null}
+      </div>
+
+      <div className="dora-ask-her">
+        {say ? (
+          <p className="dora-says" role="status">
+            {say}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          className={`dora-ask-poke${roaring ? ' is-scared' : ''}`}
+          title="Dora"
+          aria-disabled={roaring || undefined}
+          onClick={poke}
+        >
+          <img
+            src={roaring ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+            alt={say ? 'Dora, who has been poked' : 'Dora, who would like a tip'}
+          />
+        </button>
+      </div>
     </div>
   )
 }

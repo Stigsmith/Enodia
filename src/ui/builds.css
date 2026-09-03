@@ -7169,3 +7169,104 @@ button.mark {
 .frnd-feed a:focus-visible {
   color: var(--lit-hot);
 }
+
+/* ---------------------------------------------------------------------------
+ * Dora on the landing page, asking for a tip.
+ *
+ * Side by side rather than stacked like `.unbuilt`, because here she is beside
+ * a paragraph rather than filling a room that has nothing else in it. She is
+ * also smaller for the same reason: on an empty page she is the content, and on
+ * this one she is an aside next to it.
+ *
+ * The scare reuses `dora-scare` rather than defining a second one. Two
+ * animations for one joke is how they end up looking different.
+ * ------------------------------------------------------------------------- */
+
+.dora-ask {
+  display: grid;
+  gap: 1rem;
+  align-items: end;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 34rem) {
+  .dora-ask {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.dora-ask-say,
+.dora-ask-do {
+  margin: 0 0 0.8rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--bone-dim);
+  text-wrap: pretty;
+}
+
+.dora-ask-do {
+  margin-bottom: 0;
+}
+
+.dora-ask-do a {
+  color: var(--bone);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dora-ask-do a:hover,
+.dora-ask-do a:focus-visible {
+  color: var(--lit-hot);
+}
+
+.dora-ask-her {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-items: end;
+}
+
+.dora-ask-her .dora-says {
+  grid-row: 1;
+  align-self: end;
+  margin-bottom: 0.6rem;
+  max-width: min(18rem, 80vw);
+}
+
+/* A fixed height, so swapping the two pictures cannot shift the page under a
+ * reader mid-sentence. Same reasoning as `.unbuilt-poke`, smaller number. */
+.dora-ask-poke {
+  grid-row: 2;
+  height: min(14rem, 30vh);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.dora-ask-poke img {
+  width: min(8rem, 40vw);
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  filter: drop-shadow(0 8px 20px var(--ink-950));
+  transition: transform 0.12s ease;
+}
+
+.dora-ask-poke.is-scared img {
+  animation: dora-scare 0.7s ease-out;
+  filter: drop-shadow(0 0 22px rgb(140 255 190 / 0.45)) drop-shadow(0 8px 20px var(--ink-950));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dora-ask-poke.is-scared img {
+    animation: none;
+  }
+}
+
+.dora-ask-poke:hover img {
+  transform: translateY(-2px);
+}
