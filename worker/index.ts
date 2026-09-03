@@ -31,11 +31,19 @@
  * `REQUIREMENTS.md` 5 wants moderation designed before anything discoverable
  * exists. **Leaderboards would be the first thing that crosses that line**, and
  * they are still not here.
+ *
+ * ## Limits
+ *
+ * better-auth limits `/api/auth/*` and can see nothing else, so everything
+ * above was unlimited until `worker/limit.ts`. Every route here now takes one
+ * counter before it does any work: the public read on the caller's address,
+ * the rest on the account. `limit.ts` holds the numbers and the reasoning.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
 
 import { createAuth } from './auth.ts'
+import { RULES, keyFor, take } from './limit.ts'
 import {
   buildsOfFriend,
   codeFor,
@@ -67,6 +75,32 @@ const json = (body: unknown, status = 200) =>
     status,
     headers: { 'content-type': 'application/json; charset=utf-8' },
   })
+
+/**
+ * A refusal from `limit.ts`, in the shape the client already reads.
+ *
+ * `src/state/publish.ts` shows `body.error` verbatim on any non-ok response, so
+ * this sentence is what somebody sees. It says how long, because "too many
+ * requests" with no number is indistinguishable from being broken.
+ *
+ * `retry-after` is the standard header and is seconds. better-auth sends
+ * `X-Retry-After` for the same thing on its own routes, which is not the
+ * standard name; both are set here so a client written against either works.
+ */
+const tooMany = (retryAfter: number) =>
+  new Response(
+    JSON.stringify({
+      error: `Too many requests. Try again in ${retryAfter} second${retryAfter === 1 ? '' : 's'}.`,
+    }),
+    {
+      status: 429,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'retry-after': String(retryAfter),
+        'x-retry-after': String(retryAfter),
+      },
+    },
+  )
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -122,6 +156,10 @@ export default {
      */
     const shared = /^\/api\/b\/([A-Za-z0-9]{1,32})$/.exec(url.pathname)
     if (shared && request.method === 'GET') {
+      // Counted before the lookup, not after. A limiter that runs once the work
+      // is done has already paid for the work.
+      const over = await take(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
       const found = await read(db, shared[1] as string)
       if (!found) return json({ error: 'no such build' }, 404)
       return json(found)
@@ -131,6 +169,18 @@ export default {
       const session = await auth.api.getSession({ headers: request.headers })
       if (!session) return json({ error: 'not signed in' }, 401)
       const userId = session.user.id
+
+      /**
+       * One check for the whole group, with publishing counted separately.
+       *
+       * Publishing is the only route under here that creates something, so it
+       * gets its own rule and its own counter. Everything else is reading or
+       * removing your own things and shares `own`, which is generous enough
+       * that a person cannot reach it and low enough to bound a script.
+       */
+      const rule = url.pathname === '/api/builds' && request.method === 'POST' ? 'publish' : 'own'
+      const over = await take(db, keyFor.user(rule, userId), RULES[rule])
+      if (over) return tooMany(over.retryAfter)
 
       if (url.pathname === '/api/builds' && request.method === 'GET') {
         return json({ builds: await listMine(db, userId) })
@@ -163,6 +213,13 @@ export default {
       const session = await auth.api.getSession({ headers: request.headers })
       if (!session) return json({ error: 'not signed in' }, 401)
       const userId = session.user.id
+
+      /* Redeeming looks up a string the caller chose, so it is the one route
+       * here that reads on a stranger's say-so. Its own counter, for that. */
+      const rule =
+        url.pathname === '/api/friends/redeem' && request.method === 'POST' ? 'redeem' : 'own'
+      const over = await take(db, keyFor.user(rule, userId), RULES[rule])
+      if (over) return tooMany(over.retryAfter)
 
       if (url.pathname === '/api/friends' && request.method === 'GET') {
         return json({ friends: await listFriends(db, userId) })

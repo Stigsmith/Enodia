@@ -48,6 +48,7 @@ beforeEach(async () => {
   // Shared database across the file, so the rate limiter's counters have to be
   // cleared or the first test's attempts bleed into the second's budget.
   await env.DB.prepare('delete from rate_limit').run()
+  await env.DB.prepare('delete from api_rate_limit').run()
 })
 
 describe('what the deployment admits to', () => {
