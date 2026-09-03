@@ -29,7 +29,7 @@
  */
 
 import { sql } from 'drizzle-orm'
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 import { user } from './schema.ts'
 
@@ -68,4 +68,65 @@ export const publishedBuild = sqliteTable(
       .notNull(),
   },
   (table) => [index('published_build_userId_idx').on(table.userId)],
+)
+
+/**
+ * How two people become friends, and why it is a code rather than a search.
+ *
+ * **You cannot look somebody up here, on purpose.** `name` is not unique, so it
+ * cannot address anybody. `email` is unique, so a search by email would let a
+ * stranger test whether any given address has an account, one address at a
+ * time. Neither is a good front door.
+ *
+ * A code is: you share it with somebody you already talk to, in Discord or
+ * wherever, and they redeem it. Nothing is enumerable, nothing is searchable,
+ * and there are no handles to claim, which also means there are no handles to
+ * moderate. That last one matters more than it sounds for a public fan tool.
+ *
+ * One code per account, and it can be rotated. If it ends up somewhere public,
+ * rotate it and the old one stops working. Rotating does not touch existing
+ * friendships.
+ */
+export const friendCode = sqliteTable('friend_code', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  code: text('code').notNull().unique(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+})
+
+/**
+ * A friendship, stored as two rows rather than one ordered pair.
+ *
+ * `(userId, friendId)` and its mirror. It costs a row and buys the only query
+ * that matters being a single indexed lookup on `userId`, rather than an OR
+ * across two columns that no index covers well. Both rows are written together
+ * and deleted together.
+ *
+ * **Redeeming a code is consent from both sides**, which is why there is no
+ * request-and-accept step. Sharing your code is you agreeing; using it is them
+ * agreeing. Adding a pending state would be ceremony around a decision both
+ * people have already made.
+ *
+ * Either side can remove it, and removal takes both rows.
+ */
+export const friendship = sqliteTable(
+  'friendship',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    friendId: text('friend_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.friendId] }),
+    index('friendship_userId_idx').on(table.userId),
+  ],
 )

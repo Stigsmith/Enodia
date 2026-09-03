@@ -7098,3 +7098,74 @@ button.mark {
   font-family: var(--body);
   color: var(--bone-faint);
 }
+
+/* ---------------------------------------------------------------------------
+ * The Friends room. Sits inside `.page` and borrows `.ref` and `.acct-*`,
+ * because it is the same kind of screen as Account: mostly reading, with a
+ * couple of controls. The only new shapes are the code itself, which wants to
+ * be read out loud, and the two lists.
+ * ------------------------------------------------------------------------- */
+
+.frnd-code {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.8rem 0 0.6rem;
+}
+
+/* Monospace and spaced out, because this gets read aloud and typed by hand. */
+.frnd-code-value {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+  font-family: var(--mono);
+  font-size: 1.25rem;
+  letter-spacing: 0.18em;
+  color: var(--lit-hot);
+}
+
+.frnd-list,
+.frnd-feed {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.frnd-list li,
+.frnd-feed li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--div-2);
+  font-family: var(--body);
+  font-size: 0.9rem;
+}
+
+.frnd-list li:last-child,
+.frnd-feed li:last-child {
+  border-bottom: 0;
+}
+
+.frnd-name {
+  color: var(--bone);
+}
+
+.frnd-since,
+.frnd-by {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--bone-faint);
+}
+
+.frnd-feed a {
+  color: var(--bone);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.frnd-feed a:hover,
+.frnd-feed a:focus-visible {
+  color: var(--lit-hot);
+}

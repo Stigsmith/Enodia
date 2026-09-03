@@ -18,17 +18,33 @@
  *   /api/me            who is signed in
  *   /api/builds        publish one, list yours, unpublish one
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
+ *   /api/friends       your code, redeem one, your list, remove one
+ *   /api/friends/feed  what your friends have published
  *
- * **Still nothing social.** A published build is unlisted: no gallery, no index,
- * no search, and a random id rather than a sequential one, so it is reachable
- * only by somebody who was handed the link. `REQUIREMENTS.md` 5 wants moderation
- * designed before anything discoverable exists, and this is deliberately not
- * that. Friends and leaderboards are still not here.
+ * **Nothing here is discoverable, which is the line that matters.** A published
+ * build is unlisted: no gallery, no index, no search, and a random id rather
+ * than a sequential one, so it is reachable only by whoever was handed the link.
+ * Friends is a list you build one person at a time from codes you were given by
+ * hand, so it is not discovery either, and the moderation tool for it is
+ * removing somebody.
+ *
+ * `REQUIREMENTS.md` 5 wants moderation designed before anything discoverable
+ * exists. **Leaderboards would be the first thing that crosses that line**, and
+ * they are still not here.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
 
 import { createAuth } from './auth.ts'
+import {
+  buildsOfFriend,
+  codeFor,
+  friendsFeed,
+  listFriends,
+  redeem,
+  rotateCode,
+  unfriend,
+} from './friends.ts'
 import { listMine, publish, read, unpublish } from './publish.ts'
 import * as schema from './schema.ts'
 
@@ -134,6 +150,57 @@ export default {
         // to ask whether a given id exists on somebody else's account.
         if (!gone) return json({ error: 'no such build' }, 404)
         return json({ ok: true })
+      }
+
+      return json({ error: 'no such route' }, 404)
+    }
+
+    /**
+     * Friends. Every route here needs a session, and none of them is public:
+     * unlike a published build, there is nothing here a stranger should reach.
+     */
+    if (url.pathname === '/api/friends' || url.pathname.startsWith('/api/friends/')) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session) return json({ error: 'not signed in' }, 401)
+      const userId = session.user.id
+
+      if (url.pathname === '/api/friends' && request.method === 'GET') {
+        return json({ friends: await listFriends(db, userId) })
+      }
+
+      if (url.pathname === '/api/friends/code' && request.method === 'GET') {
+        return json({ code: await codeFor(db, userId) })
+      }
+
+      if (url.pathname === '/api/friends/code' && request.method === 'POST') {
+        return json({ code: await rotateCode(db, userId) })
+      }
+
+      if (url.pathname === '/api/friends/redeem' && request.method === 'POST') {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+        const outcome = await redeem(db, userId, body.code)
+        if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+        return json({ friend: outcome }, 201)
+      }
+
+      if (url.pathname === '/api/friends/feed' && request.method === 'GET') {
+        return json({ builds: await friendsFeed(db, userId) })
+      }
+
+      const one = /^\/api\/friends\/([A-Za-z0-9]{1,64})$/.exec(url.pathname)
+      if (one && request.method === 'DELETE') {
+        const gone = await unfriend(db, userId, one[1] as string)
+        if (!gone) return json({ error: 'not on your list' }, 404)
+        return json({ ok: true })
+      }
+
+      const theirs = /^\/api\/friends\/([A-Za-z0-9]{1,64})\/builds$/.exec(url.pathname)
+      if (theirs && request.method === 'GET') {
+        const builds = await buildsOfFriend(db, userId, theirs[1] as string)
+        // Not a friend and no such account answer identically. Telling them
+        // apart would make this a way to ask who has an account here.
+        if (!builds) return json({ error: 'not on your list' }, 404)
+        return json({ builds })
       }
 
       return json({ error: 'no such route' }, 404)

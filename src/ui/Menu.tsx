@@ -235,8 +235,10 @@ export function Menu({
         },
         {
           label: 'Friends',
-          unbuilt: true,
-          note: 'Phase 4',
+          // Same constant as the Account room, so the door and the badge cannot
+          // disagree about whether the thing exists.
+          unbuilt: !ACCOUNTS_LIVE,
+          note: ACCOUNTS_LIVE ? 'Swap codes, and see what they publish' : 'Phase 4',
           here: view === 'friends',
           action: () => {
             onGo('friends')

@@ -105,6 +105,16 @@ id rather than a sequential one, so one is reachable only by whoever was handed 
 `REQUIREMENTS.md` 5 wants moderation designed before anything discoverable exists, and this
 is deliberately not that.
 
+**Friends is a code, not a search.** You cannot look anybody up: a display name is not
+unique so it cannot address anybody, and searching by email would let a stranger test whether
+any given address has an account here. You hand somebody an eight character code, they redeem
+it, and both directions are written at once. There are no handles to claim and therefore no
+handles to moderate.
+
+A friend sees what you published and nothing else. There is no feed of strangers, no gallery
+and no search, so nothing here is discoverable. **Leaderboards would be the first thing that
+crosses that line**, which is why they are still not built.
+
 Publishing is a copy, not a move. The build in the browser stays the record and stays what
 the export writes. `ACCOUNTS_LIVE` in `src/state/account.ts` hides all of it until password
 reset works.
