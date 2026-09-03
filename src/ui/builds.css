@@ -7248,46 +7248,35 @@ p.landing-say {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  /**
-   * Room for the speech bubble, which is out of flow.
-   *
-   * 10rem is measured, not guessed: her longest line is a four line bubble at
-   * 143px, and the 5rem this started as left it sitting 38px on her hat.
-   *
-   * The bubble anchors to the TOP of this padding. Anchoring it to `bottom:
-   * 100%` instead moved the bubble up by exactly as much as the padding added,
-   * so the reserve did nothing at all.
-   */
-  padding-top: 10rem;
+  /* No reserve any more: there is no floating bubble to hold. */
   margin-top: 1rem;
 }
 
 /**
- * Opaque, and above everything.
+ * What she says, in a slot rather than a bubble.
  *
- * `.dora-says` paints itself with `background-shade.png`, which is a soft
- * SEMI-TRANSPARENT shade. Everywhere else in the tool it sits over artwork and
- * that is the point. Here it can land over a paragraph, and the owner's report
- * was exactly that: "the text clips through her text bubble". It was not
- * clipping, it was showing through.
+ * The bubble is right on the unbuilt pages: she has an empty room and it can
+ * float anywhere. This page fits one screen, and on a full screen there is no
+ * empty region big enough for a 22rem bubble, so a floating one always lands on
+ * a paragraph. It was moved three times to prove that.
  *
- * A speech bubble covering a bit of prose while somebody is poking a cartoon is
- * fine. A speech bubble you can read the prose through is not. So an opaque
- * ground goes behind the shade, and a stacking order puts it on top.
+ * The last attempt put an opaque ground behind `background-shade.png` so text
+ * could not show through it. That PNG is soft edged, so an opaque box behind it
+ * rendered as a hard black square around a soft bubble. The artifact was the
+ * fix, which is usually the sign the fix is wrong.
  *
- * The width is deliberately not capped to her 7rem column here: at that width
- * the bubble would be a word per line. It is capped by `.dora-says` itself at
- * 22rem and hangs leftwards, which is what a speech bubble does.
+ * In the flow it cannot overlap anything. `min-height` for two lines means a
+ * longer line does not push the page around, and the element is always present
+ * so an empty slot is the same size as a full one.
  */
-.dora-ask-her .dora-says {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: max-content;
-  margin: 0;
-  background-color: var(--ink-950);
-  border-radius: var(--r-soft);
-  z-index: 2;
+.dora-ask-heard {
+  min-height: 2.9rem;
+  margin: 0.6rem 0 0;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--lit-hot);
+  text-wrap: pretty;
 }
 
 .dora-ask-poke {
