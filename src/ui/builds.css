@@ -5653,7 +5653,7 @@ button.mark {
 }
 
 .logrun-yesno button {
-  min-width: 5.5rem;
+  min-width: 6rem;
 }
 
 .logrun-yesno button:hover:not(.is-on),
@@ -7135,11 +7135,6 @@ button.mark {
   color: var(--bone-faint);
 }
 
-.landing-cols {
-  display: grid;
-  gap: 1.75rem;
-}
-
 .landing-block h2 {
   margin: 0 0 0.5rem;
   font-family: var(--display);
@@ -7215,7 +7210,27 @@ p.landing-say {
 /* -------------------------------------------------------- Dora, asking -- */
 
 .dora-ask {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
+  padding-left: 0.9rem;
+  /* Transparent rather than absent, so lighting up cannot shift the text. */
+  border-left: 2px solid transparent;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+/**
+ * Lit while she is talking.
+ *
+ * She is small and off in the third column, and somebody who pokes her should
+ * get an answer somewhere they are already reading. The border is always there
+ * and only changes colour, so nothing moves when it comes on.
+ */
+.dora-ask.is-talking {
+  border-left-color: var(--lit-hot);
+}
+
+.dora-ask.is-talking .dora-ask-say,
+.dora-ask.is-talking .dora-ask-do {
+  color: var(--bone);
 }
 
 .dora-ask-say,
@@ -7243,13 +7258,11 @@ p.landing-say {
   color: var(--lit-hot);
 }
 
-.dora-ask-her {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  /* No reserve any more: there is no floating bubble to hold. */
-  margin-top: 1rem;
+.dora-col {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-content: end;
 }
 
 /**
@@ -7269,17 +7282,24 @@ p.landing-say {
  * longer line does not push the page around, and the element is always present
  * so an empty slot is the same size as a full one.
  */
-.dora-ask-heard {
-  min-height: 2.9rem;
-  margin: 0.6rem 0 0;
-  font-family: var(--body);
-  font-size: 0.9rem;
-  line-height: 1.45;
-  color: var(--lit-hot);
-  text-wrap: pretty;
+/**
+ * Her speech row, a fixed height so a longer line does not move her.
+ *
+ * Same reasoning as `.unbuilt-her`'s reserved row. The bubble itself is
+ * `.dora-says`, unchanged from the rest of the tool: the soft shade PNG, which
+ * is right here because it now sits over artwork and over nothing else. It
+ * could not sit anywhere on the two-column layout without landing on a
+ * paragraph, and giving her a column of her own is what fixed that, rather than
+ * moving it a fourth time.
+ */
+.dora-col-says {
+  min-height: 9.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-.dora-ask-poke {
+.dora-col-poke {
   height: 9rem;
   padding: 0;
   border: 0;
@@ -7288,7 +7308,7 @@ p.landing-say {
   line-height: 0;
 }
 
-.dora-ask-poke img {
+.dora-col-poke img {
   width: 5.5rem;
   height: 100%;
   object-fit: contain;
@@ -7299,18 +7319,18 @@ p.landing-say {
 
 /* Reuses `dora-scare` from the unbuilt pages. Two animations for one joke is
  * how they end up looking different. */
-.dora-ask-poke.is-scared img {
+.dora-col-poke.is-scared img {
   animation: dora-scare 0.7s ease-out;
   filter: drop-shadow(0 0 22px rgb(140 255 190 / 0.45)) drop-shadow(0 8px 20px var(--ink-950));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dora-ask-poke.is-scared img {
+  .dora-col-poke.is-scared img {
     animation: none;
   }
 }
 
-.dora-ask-poke:hover img {
+.dora-col-poke:hover img {
   transform: translateY(-2px);
 }
 
@@ -7329,42 +7349,24 @@ p.landing-say {
     /* A screenful, and the page is laid out to fill it rather than to run off
      * the bottom of it. `dvh` so a phone's collapsing toolbar does not count. */
     min-height: 100dvh;
+    max-width: 76rem;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 1fr 15rem;
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+      "head head head"
+      "what name her"
+      "ask  ask  ask"
+      "fine fine fine";
+    column-gap: 2.5rem;
     align-content: start;
     padding: 2.5rem 2rem 1.25rem;
   }
 
-  .landing-cols {
-    grid-template-columns: 1fr 1fr;
-    gap: 2.5rem;
-    align-content: start;
-  }
-
-  /**
-   * Dora into the bottom right corner, costing no height.
-   *
-   * In flow she is 9rem of picture plus 10rem of speech reserve, which on an
-   * 800px screen is a quarter of the budget spent on a joke. Positioned, she
-   * spends none of it, and her paragraph keeps the left of the row to itself.
-   */
-  .dora-ask {
-    margin-top: 1.25rem;
-    /* She is 7rem wide at `right: 2rem`, so she owns the last 9rem. 10 clears
-     * her with a rem to spare; 8 had her standing on the fine print. */
-    padding-right: 10rem;
-  }
-
-  .dora-ask-her {
-    position: absolute;
-    right: 2rem;
-    bottom: 1.25rem;
-    width: 7rem;
-    margin-top: 0;
-  }
-
-  /* Clear of her, so the smallest type on the page never runs under her feet. */
-  .landing-fine {
-    padding-right: 10rem;
-  }
+  .landing-top { grid-area: head; }
+  .landing-what { grid-area: what; }
+  .landing-name { grid-area: name; }
+  .dora-col { grid-area: her; }
+  .dora-ask { grid-area: ask; }
+  .landing-fine { grid-area: fine; }
 }

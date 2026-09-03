@@ -5,8 +5,14 @@
  *
  * On a desktop this does not scroll. A landing page you have to scroll is one
  * whose second half is optional, and if it is optional it should not be
- * written. So the layout is two columns on a wide screen and the copy is cut to
- * fit them rather than the other way round.
+ * written. So the copy is cut to fit the layout rather than the other way round.
+ *
+ * Three columns on a wide screen: what it does, where the name came from, and
+ * Dora. She has a column of her own because her speech bubble needs somewhere
+ * to be. It kept landing on a paragraph when the layout had no room for it, and
+ * three attempts at repositioning it only moved which paragraph. Her paragraphs
+ * run the full width underneath all three, which is why `DoraAsking` returns
+ * two elements and `.landing` places them by grid area.
  *
  * ## It sells, it does not block
  *
@@ -68,8 +74,7 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
         </p>
       </header>
 
-      <div className="landing-cols">
-        <section className="landing-block">
+      <section className="landing-block landing-what">
           <h2>What it does</h2>
           <p>
             <strong>Builds that hold up.</strong> The editor reads the game&rsquo;s own script
@@ -86,9 +91,9 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
             still on for the build you wanted, or whether it is time to make something else out
             of what you have.
           </p>
-        </section>
+      </section>
 
-        <section className="landing-block">
+      <section className="landing-block landing-name">
           <h2>Where the name comes from</h2>
           <p className="landing-greek" lang="grc">
             Ἐνοδία
@@ -107,8 +112,7 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
             <em lang="grc-Latn">krokopeplos</em>, saffron-cloaked. Hades II never uses the name
             Enodia, so it is borrowed from the hymns rather than from the game.
           </p>
-        </section>
-      </div>
+      </section>
 
       <DoraAsking />
 

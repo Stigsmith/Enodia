@@ -291,16 +291,24 @@ const TIP_POKES: Poke[] = [
 ]
 
 /**
- * Dora on the landing page, asking for a tip.
+ * Dora on the landing page: her column, and the ask underneath it.
  *
- * She is already the one who tells you a thing is not built, so she is the one
- * who gets to mention that building it was work. The ask is hers rather than
- * the page's, which is the difference between a character and a banner.
+ * **Two elements, not one, and they are not siblings on the page.** She stands
+ * in the third column beside the two text ones; her paragraphs run the full
+ * width below all three. So this returns a fragment and `.landing` places both
+ * by grid area. Wrapping them in a shared box would put her paragraph in a
+ * column, which is where it was and is not where it goes.
  *
- * **The link is a plain anchor and nothing is embedded.** `data/kofi.ts` says
- * why: Ko-fi's widget would want `script-src` and `frame-src` opened onto a
- * third party, and the whole point of `assets/_headers` is that they are shut.
+ * The bubble is back, and this time it has somewhere to be. It kept landing on
+ * a paragraph before because the layout had no space for it; a column of her
+ * own is that space. Its row is a fixed height so a longer line does not move
+ * her, the way `.unbuilt-her` reserves a row for the same reason.
  *
+ * **The paragraphs light up while she is talking.** She is small and off to one
+ * side, and somebody poking her should get a cue somewhere they are already
+ * reading rather than only in the corner.
+ *
+ * The link is a plain anchor and nothing is embedded: `data/kofi.ts` says why.
  * Draws nothing at all when there is no handle, so this cannot ship pointing at
  * a stranger.
  */
@@ -309,8 +317,33 @@ export function DoraAsking() {
   const url = kofiUrl()
 
   return (
-    <div className="dora-ask">
-      <div className="dora-ask-body">
+    <>
+      <div className="dora-col">
+        {/* Always rendered, empty or not: a row that appears when she speaks is
+          * a row that moves her picture every time somebody pokes her. */}
+        <div className="dora-col-says">
+          {say ? (
+            <p className="dora-says" role="status">
+              {say}
+            </p>
+          ) : null}
+        </div>
+
+        <button
+          type="button"
+          className={`dora-col-poke${roaring ? ' is-scared' : ''}`}
+          title="Dora"
+          aria-disabled={roaring || undefined}
+          onClick={poke}
+        >
+          <img
+            src={roaring ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
+            alt={say ? 'Dora, who has been poked' : 'Dora, who would like a tip'}
+          />
+        </button>
+      </div>
+
+      <div className={`dora-ask${say ? ' is-talking' : ''}`}>
         <p className="dora-ask-say">
           Do you have any idea how much work went into this. Neither do I, I stopped counting.
           A bottle of Nectar would not go unnoticed.
@@ -323,40 +356,7 @@ export function DoraAsking() {
             if the tool has been any use. It stays free either way.
           </p>
         ) : null}
-
-        {/*
-          * What she says goes in a slot, not in a floating bubble.
-          *
-          * A bubble is right on the unbuilt pages, where she has a whole empty
-          * room to herself. This page fits one screen, and on a full screen
-          * there is no empty region big enough for a 22rem bubble, so a
-          * floating one always lands on a paragraph. Three goes at moving it
-          * proved that rather than fixing it.
-          *
-          * So: in the flow, where it cannot overlap anything, and a fixed
-          * height so a longer line does not push the page around. Always
-          * rendered, empty or not, because a slot that appears and disappears
-          * is the same reflow by another name.
-          */}
-        <p className="dora-ask-heard" role="status">
-          {say}
-        </p>
       </div>
-
-      <div className="dora-ask-her">
-        <button
-          type="button"
-          className={`dora-ask-poke${roaring ? ' is-scared' : ''}`}
-          title="Dora"
-          aria-disabled={roaring || undefined}
-          onClick={poke}
-        >
-          <img
-            src={roaring ? '/ui/dora-spooky.png' : '/ui/dora-hardhat.webp'}
-            alt={say ? 'Dora, who has been poked' : 'Dora, who would like a tip'}
-          />
-        </button>
-      </div>
-    </div>
+    </>
   )
 }
