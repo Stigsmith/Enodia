@@ -7212,41 +7212,6 @@ button.mark {
   grid-template-columns: 1fr;
 }
 
-/**
- * A FIXED second column, and wide enough to hold her speech bubble.
- *
- * Both halves are load bearing and the first fix had only one of them.
- *
- * **Fixed**, because `auto` sizes a column to its widest child, and her widest
- * child is the bubble, whose width changes with every line. The text beside her
- * was being re-wrapped on every click.
- *
- * **16rem**, because the bubble is up to 16rem and a 9rem column left it
- * hanging seven rem over the paragraph. Out of flow it no longer pushed the
- * text, so it printed on top of it instead, which is worse. She gets a column
- * her whole self fits in, and then nothing of hers can reach the prose.
- */
-/**
- * 72rem, and the number is arithmetic rather than taste.
- *
- * The page is 40rem wide. She needs 12rem plus a 2rem gap, so 14rem of margin
- * on one side, so 40 + 28 = 68rem before she fits with the page still centred.
- * 72 leaves a little air so she is never touching the viewport edge.
- */
-@media (min-width: 72rem) {
-  .dora-ask-her {
-    position: absolute;
-    left: 100%;
-    margin-left: 2rem;
-    bottom: 0;
-    width: 12rem;
-  }
-
-  /* Her column is gone, so the text has the whole measure back. */
-  .dora-ask {
-    grid-template-columns: 1fr;
-  }
-}
 
 .dora-ask-say,
 .dora-ask-do {
@@ -7291,7 +7256,9 @@ button.mark {
    * box. See the note on it: anchoring to the bottom moved the bubble up by
    * exactly as much as the padding added, which reserved nothing at all.
    */
-  padding-top: 5rem;
+  /* 10rem, measured. A three line bubble is 118px and the longest line she has
+   * runs to four, so 80px was not close and the bubble sat 38px onto her hat. */
+  padding-top: 10rem;
 }
 
 /**
@@ -7357,6 +7324,30 @@ button.mark {
 
 .dora-ask-poke:hover img {
   transform: translateY(-2px);
+}
+
+/**
+ * LAST, and the position in this file is load bearing.
+ *
+ * This block was written above `.dora-ask-her` and lost to it: same
+ * specificity, and the later rule wins. The media query matched, reported
+ * `true`, and `position: absolute` never applied, so she stayed in flow and
+ * the section reserved 408px of height for 88px of text. That gap beside her
+ * was the bug, and it looked like a layout choice rather than a cascade one.
+ */
+@media (min-width: 72rem) {
+  .dora-ask-her {
+    position: absolute;
+    left: 100%;
+    margin-left: 2rem;
+    bottom: 0;
+    width: 12rem;
+  }
+
+  /* Her column is gone, so the text has the whole measure back. */
+  .dora-ask {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* The Greek, and how to say it.
