@@ -7283,8 +7283,29 @@ p.landing-say {
    * The floor is what she gets when nothing is stretching her.
    */
   grid-template-rows: auto minmax(14rem, 1fr);
-  justify-items: end;
-  min-height: 0;
+  /**
+   * A floor of her own, so the text columns cannot shrink her.
+   *
+   * The row is sized by its tallest item, which is normally the prose. Widening
+   * the page to pay for her bigger bubble made that prose shorter, the row
+   * shorter with it, and her 224px where she had been 327. This makes her the
+   * tallest item instead, and the text columns simply have space beneath them.
+   *
+   * Capped against the viewport as well as stated in `rem`, because this floor
+   * is the one thing on the page that can push it past a screen. On a tall
+   * monitor she takes the 34rem; on a short one the `dvh` wins and she gives
+   * the height back rather than introducing a scrollbar. `dvh` and not `vh`,
+   * same as `.landing`, so a phone's collapsing toolbar does not count.
+   *
+   * This was written once already and did nothing, because the `min-height: 0`
+   * below it was still here and a later declaration of the same property wins
+   * however much reasoning sits above the earlier one.
+   */
+  min-height: min(34rem, 46dvh);
+  /* Stretch, not `end`. With `end` both children shrank to their content and
+   * hugged the right edge, so the bubble could not be centred over her: the
+   * flex `justify-content: center` inside had no spare width to centre in. */
+  justify-items: stretch;
 }
 
 /**
@@ -7314,11 +7335,26 @@ p.landing-say {
  * paragraph, and giving her a column of her own is what fixed that, rather than
  * moving it a fourth time.
  */
+/**
+ * Her bubble, a third larger than the shared one and centred on her.
+ *
+ * `.dora-says` is sized for the unbuilt pages, where she is enormous and it
+ * sits under her. Here it is the only thing she says on a page somebody reads
+ * once, so it carries more weight and gets more size.
+ */
+.dora-col-says .dora-says {
+  /* Half again on the original 0.84rem. She says one thing on a page somebody
+   * reads once, so it carries more weight here than on the unbuilt screens. */
+  font-size: 1.26rem;
+  max-width: 100%;
+  text-align: center;
+}
+
 .dora-col-says {
-  /* 5.5rem, measured at this column width: the tallest thing she says renders
-   * at 84px. It was 9.5rem when her column was narrower and the reserve was a
-   * guess, and the difference was 68px of nothing above her head. */
-  min-height: 5.5rem;
+  /* Re-measured after the bubble grew: it needs more room at the larger type,
+   * and this is the tallest line at the wider column rather than a guess. */
+  /* Re-measured at the larger type and the wider column. */
+  min-height: 8rem;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -7362,7 +7398,10 @@ p.landing-say {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: bottom right;
+  /* Centred, so the bubble above her is over her head rather than off to one
+   * side of it. She was bottom right when she was small and the column was a
+   * corner; now the column is hers and she should be in the middle of it. */
+  object-position: bottom center;
   filter: drop-shadow(0 8px 20px var(--ink-950));
   transition: transform 0.12s ease;
 }
@@ -7399,10 +7438,29 @@ p.landing-say {
     /* A screenful, and the page is laid out to fill it rather than to run off
      * the bottom of it. `dvh` so a phone's collapsing toolbar does not count. */
     min-height: 100dvh;
-    max-width: 76rem;
+    /**
+     * 84rem, widened to pay for her column rather than taking it from the prose.
+     *
+     * A bubble half again as large needs a column half again as wide, and at
+     * 76rem that came straight out of the two text columns: they would have gone
+     * from 360px to 328 and grown taller to compensate.
+     */
+    max-width: 84rem;
     display: grid;
-    grid-template-columns: 1fr 1fr 17rem;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-columns: 1fr 1fr 26rem;
+    /**
+     * All `auto`, and NOT `auto 1fr auto auto`.
+     *
+     * `1fr` absorbs every spare pixel of viewport height, which is invisible on
+     * a short screen and ruinous on a tall one: at 1100px it dumped 300px into
+     * the columns row, stretching Dora to fill it and opening a gap between the
+     * columns and her paragraphs. The row should be as tall as its content,
+     * which is the two text columns, and she stretches to match them.
+     *
+     * `align-content: start` then leaves the spare height below the fine print,
+     * where it is just background.
+     */
+    grid-template-rows: auto auto auto auto;
     grid-template-areas:
       "head head head"
       "what name her"
@@ -7416,7 +7474,13 @@ p.landing-say {
   .landing-top { grid-area: head; }
   .landing-what { grid-area: what; }
   .landing-name { grid-area: name; }
-  .dora-col { grid-area: her; }
+  /* Nudged past the page's own padding, toward the edge. She and her bubble
+   * are centred together in this column, so moving the column moves both and
+   * the bubble stays over her head. */
+  .dora-col {
+    grid-area: her;
+    margin-right: -1.5rem;
+  }
   .dora-ask { grid-area: ask; }
   .landing-fine { grid-area: fine; }
 }
