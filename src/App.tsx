@@ -28,6 +28,7 @@ import { Changelog, Roadmap } from './ui/Pages.tsx'
 import { About, Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account } from './ui/Account.tsx'
+import { Friends } from './ui/Friends.tsx'
 import { ACCOUNTS_LIVE } from './state/account.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
@@ -329,6 +330,14 @@ export function App() {
     return frame(
       <div className="shell is-wide">
         <Account />
+      </div>,
+    )
+  }
+
+  if (screen === 'friends' && ACCOUNTS_LIVE) {
+    return frame(
+      <div className="shell is-wide">
+        <Friends />
       </div>,
     )
   }
