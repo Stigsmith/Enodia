@@ -14,6 +14,8 @@
  * the lie.
  */
 
+import { clearStamped, writeStamped } from './stamps.ts'
+
 const KEY = 'enodia.name'
 
 /**
@@ -38,8 +40,11 @@ export function readName(): string {
 export function writeName(raw: string): string {
   const name = tidyName(raw)
   try {
-    if (name) localStorage.setItem(KEY, name)
-    else localStorage.removeItem(KEY)
+    /* Clearing the name is a change like setting it, so both are stamped.
+     * Without that, emptying the field on a phone would lose to a stale name on
+     * a desktop and the name would come back. */
+    if (name) writeStamped(KEY, name)
+    else clearStamped(KEY)
   } catch {
     // A browser that refuses storage still gets the name for this session.
   }

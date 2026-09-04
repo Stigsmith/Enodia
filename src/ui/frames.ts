@@ -29,6 +29,8 @@
  * hairlines and the ground between them.
  */
 
+import { writeStamped } from '../state/stamps.ts'
+
 export type FrameOption = {
   id: string
   name: string
@@ -137,7 +139,7 @@ export function readFrame(): string {
 
 export function writeFrame(id: string) {
   try {
-    localStorage.setItem(KEY, id)
+    writeStamped(KEY, id)
   } catch {
     // A browser that refuses storage still gets the frame for this session.
   }

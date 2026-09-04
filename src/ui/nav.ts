@@ -22,6 +22,8 @@
  * Here rather than in `App.tsx` because the menu is what moves between them
  * and both need the name.
  */
+import { writeStamped } from '../state/stamps.ts'
+
 export type View =
   /**
    * The first screen a stranger sees, and the only one that sells anything.
@@ -102,7 +104,7 @@ export function readNav(): string {
 
 export function writeNav(id: string) {
   try {
-    localStorage.setItem(KEY, id)
+    writeStamped(KEY, id)
   } catch {
     // A browser that refuses storage still gets the mode for this session.
   }
