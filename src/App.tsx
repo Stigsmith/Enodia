@@ -29,7 +29,7 @@ import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
 import { Friends } from './ui/Friends.tsx'
-import { ACCOUNTS_LIVE, currentAccount, resetInUrl } from './state/account.ts'
+import { ACCOUNTS_LIVE, ACCOUNT_CHANGED, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
 import { useSync } from './state/useSync.ts'
 import { KOFI, kofiUrl } from './data/kofi.ts'
@@ -148,11 +148,25 @@ export function App() {
   useEffect(() => {
     if (!ACCOUNTS_LIVE) return
     let live = true
-    void currentAccount().then((who) => {
-      if (live) setSignedIn(Boolean(who))
-    })
+    const check = () =>
+      void currentAccount().then((who) => {
+        if (live) setSignedIn(Boolean(who))
+      })
+
+    check()
+    /**
+     * And again whenever somebody signs in or out.
+     *
+     * Asking once was a real bug and a quiet one: signing in did not start
+     * syncing, so a build made in that same session saved locally, reached
+     * nothing, and only travelled after a reload. Nothing errored and the
+     * screen looked correct, which is exactly the kind of thing driving the
+     * interface catches and driving the API does not.
+     */
+    window.addEventListener(ACCOUNT_CHANGED, check)
     return () => {
       live = false
+      window.removeEventListener(ACCOUNT_CHANGED, check)
     }
   }, [])
 

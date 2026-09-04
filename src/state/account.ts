@@ -216,11 +216,30 @@ export function resetInUrl(search: string): ResetArrival | null {
 export const completeReset = (token: string, newPassword: string): Promise<Outcome> =>
   post('/api/auth/reset-password', { token, newPassword })
 
-export const signUp = (name: string, email: string, password: string): Promise<Outcome> =>
-  post('/api/auth/sign-up/email', { name, email, password })
+/**
+ * Told whenever somebody signs in or out, so sync can start and stop.
+ *
+ * An event rather than a callback threaded down through the tree, because the
+ * two places that care are `Account.tsx`, which does the signing, and `App.tsx`,
+ * which owns the sync loop, and they are nowhere near each other.
+ *
+ * **This was missing and the bug was silent.** `App` read the account once when
+ * it mounted, so signing in did not start syncing: a build made in that session
+ * saved locally, reached nothing, and only travelled after a reload. Nothing
+ * errored, and the tool looked like it was working.
+ */
+export const ACCOUNT_CHANGED = 'enodia:account'
 
-export const signIn = (email: string, password: string): Promise<Outcome> =>
-  post('/api/auth/sign-in/email', { email, password })
+const announce = (outcome: Outcome): Outcome => {
+  if (outcome.ok) window.dispatchEvent(new Event(ACCOUNT_CHANGED))
+  return outcome
+}
+
+export const signUp = async (name: string, email: string, password: string): Promise<Outcome> =>
+  announce(await post('/api/auth/sign-up/email', { name, email, password }))
+
+export const signIn = async (email: string, password: string): Promise<Outcome> =>
+  announce(await post('/api/auth/sign-in/email', { email, password }))
 
 /** An empty object, not an empty body: the endpoint requires JSON and refuses otherwise. */
 /**
@@ -236,5 +255,5 @@ export const signIn = (email: string, password: string): Promise<Outcome> =>
 export const signOut = async (): Promise<Outcome> => {
   const outcome = await post('/api/auth/sign-out', {})
   forgetSyncState()
-  return outcome
+  return announce(outcome)
 }
