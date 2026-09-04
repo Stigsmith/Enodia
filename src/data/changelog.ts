@@ -20,12 +20,13 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-04',
-    title: 'Accounts, and short links',
-    say: 'You can sign in now. It buys one thing, and the tool still works entirely without it.',
+    title: 'Accounts, short links, and your things on both devices',
+    say: 'You can sign in now. It buys two things, and the tool still works entirely without it.',
     points: [
       'Sign in, and a build you publish gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. Discord renders the long one as a wall.',
       'Viewing, building, checking and saving are all still free and still need no account. Nothing else in the tool asks who you are.',
-      'It is not a backup. Your builds are still in this browser, they are still the record, and Settings still has the export. Publishing takes a copy.',
+      'Your builds, your runs and your settings follow you between devices. Sign in on a phone and what you made on a desktop is already there. Where two devices disagree about the same build, the one changed most recently wins.',
+      'It copies rather than moves. Everything still lives in this browser, everything still works signed out, and Settings still has the export.',
       'Friends, by swapping an eight character code. You see what they publish, they see what you publish, and nobody else sees either.',
       'There is no way to search for a person, which is deliberate: it means nobody can be found who did not want to be.',
       'Forgotten your password now sends a letter that actually arrives, from Dora, who has read it and has notes.',

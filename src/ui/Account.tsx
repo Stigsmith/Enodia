@@ -139,9 +139,14 @@ export function Account() {
         <section className="ref">
           <h3 className="ref-rule">What this is for</h3>
           <p className="ref-say">
-            Publishing a build, so it gets a short link instead of a 1,588 character one.
-            That is all an account does today. It is not a backup: your builds are still
-            in this browser and Settings still has the export.
+            Two things. A build you publish gets a short link instead of a 1,588 character
+            one. And your builds, runs and settings follow you: sign in on a phone and what
+            you made on a desktop is already there.
+          </p>
+          <p className="ref-say">
+            It copies, it does not move. Everything is still in this browser and still works
+            with no account at all, signing out leaves it exactly where it is, and Settings
+            still has the export.
           </p>
         </section>
       </Page>
@@ -263,9 +268,14 @@ export function Account() {
       <section className="ref">
         <h3 className="ref-rule">What you get, and what you do not</h3>
         <p className="ref-say">
-          An account lets you publish a build so it has a short link. It does not store your
-          builds, does not sync them between devices, and is not a backup. Everything you make
-          stays in this browser either way, and Settings has the export.
+          An account gets you a short link for a build you publish, and carries your library,
+          your runs and your settings between your devices. Sign in somewhere new and what you
+          made is waiting.
+        </p>
+        <p className="ref-say">
+          It is a copy rather than a move. Everything still lives in this browser, everything
+          still works signed out, and Settings still has the export. Where two devices disagree
+          about the same thing, the one changed most recently wins.
         </p>
         <p className="ref-say">
           The only things kept are your name, your email and a signed-in session. Nothing is

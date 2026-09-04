@@ -54,7 +54,7 @@ the wiki has already done that extraction. **Facts from the game, pictures from 
    hand authored, joined on id                                             ▼
                                                                     ┌─────────────┐
   assets/  (523 images) ────────────────────────────────────────────►│  static app │
-   manifest.json, slug = join key                                    │  no server  │
+   manifest.json, slug = join key                                    │ reads local │
                                                                      └──────┬──────┘
                                 ┌──────────────┐                            │
                                 │  validator   │◄───────────────────────────┘
@@ -889,8 +889,19 @@ Build sharing is a URL fragment, compressed, no server. Phase 4 adds accounts an
 before it does.
 
 **Phase 4 has started and the accounts exist**, in `worker/`. Sharing by fragment is
-untouched and stays the default: an account is for publishing and competing, not for using
-the tool. Nothing in sections 1 through 9 changed.
+untouched and stays the default: an account is for publishing, for friends, and for having
+your things on more than one device. It is not for using the tool.
+
+**One thing in section 1 did change, and it is worth being straight about.** The diagram
+said `no server`, and section 1 was written when there was none. There is one now, and
+signing in gives it a copy of your library, your runs and your settings so a phone and a
+desktop agree. `worker/sync.ts` and `src/state/sync.ts` are the two halves.
+
+What has not changed is where the tool reads from. Every screen still reads
+`localStorage`, still works with no account and no network, and still owns the record.
+Sync copies that outward and back; it never becomes the thing being read, which is why
+signing out leaves everything exactly where it was and why the export in Settings is still
+the copy that belongs to the player rather than to this tool.
 
 ---
 

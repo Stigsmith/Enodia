@@ -283,7 +283,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
         <p className="builds-note">
           {library.length
             ? 'Pick an arm, or open one to see how it works.'
-            : 'Nothing here yet. What you make is yours, and it stays in this browser until you send it somewhere.'}
+            : 'Nothing here yet. What you make is yours, and it stays in this browser unless you sign in or send it somewhere.'}
         </p>
         <button
           type="button"
@@ -384,8 +384,9 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
       {mine.length > 0 && !warned ? (
         <aside className="keep" role="note">
           <p className="keep-say">
-            These live in this browser and nowhere else. Clearing site data takes them with it,
-            and so does a new phone.
+            These live in this browser. Clearing site data takes them with it, and so does a
+            new phone. An account keeps a copy and carries them between your devices; the
+            export is the copy that does not need one.
           </p>
           <p className="keep-do">
             {onGo ? (
