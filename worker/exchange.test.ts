@@ -115,6 +115,12 @@ describe('the shelves', () => {
    * **Nobody curates when no curator is configured**, which is the state every
    * deployment that is not this one is in. The refusal above passes for the same
    * reason, so this pins the reason rather than the symptom.
+   *
+   * `vitest.worker.config.ts` sets this binding explicitly. It used to be read
+   * from `.dev.vars`, which is gitignored and which gets a real account id in it
+   * the moment somebody wants to try curating in a browser: this test then
+   * failed on a machine and passed on every other, which is the worst way for a
+   * test to be wrong.
    */
   it('lets nobody curate when no curator is set', async () => {
     expect(env.CURATOR_USER_ID ?? '').toBe('')
