@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 2 September 2026, game build `138174`.
+Last updated 4 September 2026, game build `138174`.
 
 ---
 
@@ -12,12 +12,13 @@ Last updated 2 September 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, accounts held shut on mail |
+| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, and **accounts are open** since 4 September 2026 |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 427 in node across 24 files, and **39 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 434 in node across 25 files, and **56 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings |
 | **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
+| **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
@@ -48,6 +49,31 @@ reading real responses rather than trusting that they carried over.
 the CSP forbade exactly that, which nobody saw because the CSP was never applied. `npm run
 fonts` vendors all 38 faces into `assets/fonts/`, so the policy ships unchanged and the page
 loads nothing from anybody else. 680 KB, of which a first paint fetches two files.
+
+**Accounts are open**, and the thing that had held them shut is fixed rather than waived. An
+account you can be locked out of permanently is a trap with a nice form on it, so the flag
+stayed false until a forgotten password had a way back. It now does, end to end: the letter
+sends from `dora@enodia.me` through Resend, the link lands on a real screen, and a reset ends
+every other session because people reset a password when they think somebody else has it.
+
+**The reset flow was half built for a while and looked finished.** The form asking for a
+letter worked, the letter sent, and the link in it landed on the landing page where nothing
+happened. Somebody locked out got a letter and stayed locked out, which is worse than not
+offering reset at all because it looks like it worked. `ResetPassword` in `src/ui/Account.tsx`
+is the missing end, and it renders whatever `ACCOUNTS_LIVE` says: a token exists only because
+a letter was sent, so refusing to honour one would be the exact trap the flag guards against.
+
+**`ACCOUNTS_LIVE` opens three things and no more**: the Account screen, Friends, and the
+Publish item on a build. Exchange and Leaderboards stay as Dora's empty rooms. All three were
+driven through the interface before the flip rather than only through the API, which was worth
+the time it cost: the API had a full suite behind it and the publish button had never once
+been clicked.
+
+**Everything under `/api/` is rate limited now**, not just `/api/auth/*`. better-auth only
+ever sees its own handler, so publishing, reading a published build and every friends route
+were unlimited. `worker/limit.ts` holds four rules in its own table, and the counting is one
+SQLite upsert rather than a read and a write: D1 has no interactive transactions, and the
+two-step version let 25 simultaneous requests through a limit of 5. Measured, not assumed.
 
 **Two rounds of playtest feedback have landed since Phase 1 closed**, and they changed more
 than polish. The editor was rebuilt around two boon trays, the warnings now name what would
@@ -246,8 +272,8 @@ conditionals came on and why each of the rest did not; it fails only on the impo
 
 ## Corrections since Phase 1
 
-Three things the tool asserted that were wrong. All three are now in `CLAUDE.md` with their
-sources, because each was believed for a while and each shaped code.
+Four things the tool asserted that were wrong. Each was believed for a while and each shaped
+code or copy that shipped.
 
 **A run is about forty Exits, not twelve.** Four Regions of eight to twelve. `RoomDataN/O/P/Q`
 and `RoomDataF/G/H/I` give the structure; the per-Region count is generated rather than
@@ -261,6 +287,17 @@ from any held `ForceBoonName` without consulting the cap. A fifth god is a keeps
 **A run has four keepsakes, not one.** One at the start and a swap at the rack after each of
 the first three bosses, one `GiftRack` per Region gated on `WorldUpgradePostBossGiftRack`.
 
+**Dora does not sound like that.** Her lines here were written from an impression of her and
+came out dry, clipped and faintly formal, which is a butler. Her 278 lines in
+`Content/Game/Text/en/_NPCData_Dora.en.sjson` are warm, casual and American: she opens with
+"Hey", elides constantly, trails off mid-thought and undercuts herself. The password reset
+letter was also written to scold somebody for forgetting, until her own line ruled it out:
+"Why else would I have forgotten everything? Probably took a couple swigs from the River
+Lethe, and that was that! Clean slate." She forgot her entire life and has no standing to be
+smug at anybody about a password. Same shape as the three above: a claim about this game made
+from recall when the file was sitting right there. `src/ui/tour.ts` and `src/ui/Dora.tsx` have
+not been re-read against the transcript yet and probably carry the same fault.
+
 ---
 
 ## What I would pick up next
@@ -272,9 +309,15 @@ the honest state: placeholder builds read as recommendations, so they were cut. 
 carries `how`, `luck`, `playstyle` and `by`, and the filters derive themselves from whatever
 is added. This is the owner's, and the community's after that.
 
-**2. Run the deploy.** `wrangler.jsonc` is written, `dist/` builds clean, and every rule is
-verified under `wrangler dev`. `npm run deploy` is the whole of it, once `wrangler login` has
-run once. Netlify stays up until it is checked.
+**2. ~~Run the deploy.~~** **Done.** Live at `enodia.me` since 2 September 2026, and accounts
+opened on it on the 4th.
+
+**2a. A Cloudflare rate limiting rule at the edge.** The owner's, and a dashboard job rather
+than a code one. `worker/limit.ts` bounds what one caller can do to the database, and it
+cannot bound anything else: by the time it runs the request has already been counted against
+the daily 100k Worker invocations and has already cost a D1 write. An edge rule rejects before
+a Worker is invoked at all. It is free, and `worker/auth.ts` has said the same thing about the
+auth routes since they were written.
 
 **3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
 of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
@@ -295,13 +338,10 @@ walking `InheritFrom` itself.
 
 | What | On | Note |
 |---|---|---|
-| The Cloudflare deploy | The owner | Needs `wrangler login` once, which is a browser sign-in this cannot do. Then `npm run deploy`. Every header and cache rule is already verified under `wrangler dev` |
-| `enodia.tools` | The owner | Verified free at the registry, $23/year at cost from Cloudflare Registrar. A purchase, so it is the owner's. Nothing waits on it: the deploy is verified on `workers.dev` and the domain attaches after |
-| ~~`wrangler login`~~, ~~`wrangler d1 create`~~, ~~the secret~~, ~~the domain~~ | **Done, 2 September 2026.** Live at `enodia.me` |
-| `wrangler d1 create enodia` | The owner | Needs the login above. `wrangler.jsonc` carries a placeholder `database_id`, which `wrangler dev` ignores and a real deploy does not. Paste the id it prints |
-| `wrangler secret put BETTER_AUTH_SECRET` | The owner | Signs every session cookie. `.dev.vars` covers local. Without it in production the Worker returns 500 by design, rather than signing cookies with `undefined` |
-| A mail provider | The owner | **The one thing holding accounts shut.** Reset is written and waits on a key: `worker/email.ts` is Resend, `RESEND_API_KEY` and `MAIL_FROM` are read from secrets, and `/api/capabilities` reports whether it is configured. Owner is setting one up, expected 3 September 2026 |
-| Flipping `ACCOUNTS_LIVE` | The owner | One constant in `src/state/account.ts`, false today. It drives the account room, the menu badge, the menu note and the Publish item together. Flip it once the mail key is in. **It is a UI gate only**: `/api/auth/*` is reachable regardless, which is accepted and explained where the constant is defined |
+| ~~The Cloudflare deploy~~, ~~`wrangler login`~~, ~~`wrangler d1 create`~~, ~~`BETTER_AUTH_SECRET`~~, ~~the domain~~ | **Done, 2 September 2026.** Live at `enodia.me`. `enodia.tools` was never bought: the `.tools` name was gone and `.me` was better anyway |
+| A Cloudflare rate limiting rule | The owner | A dashboard job, and the half `worker/limit.ts` cannot do. App limits bound the database; by the time one runs, the invocation is already spent and a D1 write with it. An edge rule rejects before a Worker starts, and it is free |
+| ~~A mail provider~~ | **Done, 4 September 2026.** Resend, sending as `dora@enodia.me`. `RESEND_API_KEY` is a secret; `MAIL_FROM` moved into `wrangler.jsonc` vars because it is printed on every letter and was therefore never a secret. Resend's records sit on `send.enodia.me` so Proton's SPF at the apex never had to be edited |
+| ~~Flipping `ACCOUNTS_LIVE`~~ | **Done, 4 September 2026.** Kept as a flag rather than deleted, so turning accounts off again is one line and a deploy |
 | ~~The Ko-fi handle~~ | **Done.** `stigsmith`, live in the footer |
 | Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |

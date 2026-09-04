@@ -47,6 +47,16 @@ export const ROADMAP: Plan[] = [
     title: 'Themes, export and sharing',
     say: 'Four themes, a single export file for everything, and one build encoded in a shareable link.',
   },
+  {
+    stage: 'now',
+    title: 'Accounts and short links',
+    say: 'Sign in and a published build gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. That is all an account buys. Viewing, building and saving stay free and stay account free, and your builds still live in this browser.',
+  },
+  {
+    stage: 'now',
+    title: 'Friends',
+    say: 'Swap an eight character code and you see each other’s published builds. There is no way to search for a person, so nobody can be found who did not want to be.',
+  },
 
   // ---- next --------------------------------------------------------------
   {
@@ -84,16 +94,15 @@ export const ROADMAP: Plan[] = [
   {
     stage: 'later',
     title: 'Build exchange',
-    say: 'Sharing works one link at a time. A browsable collection would need somewhere to host builds, which means a server.',
+    say: 'Publishing exists, so the storage this needed is already here. What is missing is not the server: a browsable collection is the first thing anybody can stumble across without being handed a link, and that needs a way to deal with what turns up in it before it opens rather than after.',
+  },
+  {
+    stage: 'later',
+    title: 'Builds across your devices',
+    say: 'An account signs you in but does not carry your library with it. Everything you make is still in one browser, and the export is still the only copy that leaves it.',
   },
 
   // ---- stalled -----------------------------------------------------------
-  {
-    stage: 'waiting',
-    title: 'Public deployment',
-    say: 'The app builds to static files and runs on any static host.',
-    on: 'Needs one deployment, which is the owner’s to run.',
-  },
   {
     stage: 'waiting',
     title: 'Build quality ratings',
@@ -102,8 +111,8 @@ export const ROADMAP: Plan[] = [
   },
   {
     stage: 'waiting',
-    title: 'Accounts and sync',
-    say: 'All data is stored in one browser. Using the tool across devices requires an account, and an account requires a server.',
-    on: 'Needs a decision on whether to fund hosting.',
+    title: 'Leaderboards',
+    say: 'Not who plays best. Who has shared the most, whose builds get taken up, that sort of thing, because the tool has no way to judge the first and no business claiming it.',
+    on: 'Waiting on the exchange, which is what would give it anything to count.',
   },
 ]

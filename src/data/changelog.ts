@@ -19,6 +19,30 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-04',
+    title: 'Accounts, and short links',
+    say: 'You can sign in now. It buys one thing, and the tool still works entirely without it.',
+    points: [
+      'Sign in, and a build you publish gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. Discord renders the long one as a wall.',
+      'Viewing, building, checking and saving are all still free and still need no account. Nothing else in the tool asks who you are.',
+      'It is not a backup. Your builds are still in this browser, they are still the record, and Settings still has the export. Publishing takes a copy.',
+      'Friends, by swapping an eight character code. You see what they publish, they see what you publish, and nobody else sees either.',
+      'There is no way to search for a person, which is deliberate: it means nobody can be found who did not want to be.',
+      'Forgotten your password now sends a letter that actually arrives, from Dora, who has read it and has notes.',
+      'Resetting signs out every other session, because people reset a password when they think somebody else has it.',
+    ],
+  },
+  {
+    date: '2026-09-04',
+    title: 'The About page is gone',
+    say: 'It was saying what the front page already said.',
+    points: [
+      'Where the numbers come from moved into Help, at the top, because knowing the rules were read out of the game’s own files is the reason to trust the definitions underneath them.',
+      'The menu had both About and What this is. It has one entry now, called About, and it opens the page a first visit opens on.',
+      'The claim that nothing ever leaves your browser is gone from the few places it was still written. It was true, and publishing is the point at which it stops being.',
+    ],
+  },
+  {
     date: '2026-09-02',
     title: 'Dora',
     say: 'None of this makes the tool better. It is going in anyway.',
