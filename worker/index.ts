@@ -18,6 +18,7 @@
  *   /api/me            who is signed in
  *   /api/builds        publish one, list yours, unpublish one
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
+ *   /api/sync          everything an account carries between devices
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
  *
@@ -54,6 +55,7 @@ import {
   unfriend,
 } from './friends.ts'
 import { listMine, publish, read, unpublish } from './publish.ts'
+import { sync } from './sync.ts'
 import * as schema from './schema.ts'
 
 /**
@@ -163,6 +165,28 @@ export default {
       const found = await read(db, shared[1] as string)
       if (!found) return json({ error: 'no such build' }, 404)
       return json(found)
+    }
+
+    /**
+     * Everything an account carries between devices, in one exchange.
+     *
+     * Its own rule rather than `own`, because this is the one route a person
+     * hits without doing anything: it runs on sign-in and after edits, where
+     * every other route here is somebody pressing a button. Counting it against
+     * the same budget as reading your own list would let ordinary use of one
+     * exhaust the other.
+     */
+    if (url.pathname === '/api/sync' && request.method === 'POST') {
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session) return json({ error: 'not signed in' }, 401)
+
+      const over = await take(db, keyFor.user('sync', session.user.id), RULES.sync)
+      if (over) return tooMany(over.retryAfter)
+
+      const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+      const outcome = await sync(db, session.user.id, body)
+      if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+      return json(outcome)
     }
 
     if (url.pathname === '/api/builds' || url.pathname.startsWith('/api/builds/')) {

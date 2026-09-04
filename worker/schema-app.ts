@@ -132,6 +132,69 @@ export const friendship = sqliteTable(
 )
 
 /**
+ * Everything a signed-in account carries between devices.
+ *
+ * **One table with a `kind` column, not five tables.** Builds, runs, the bin and
+ * every setting are the same problem wearing different names: an identified
+ * thing, a blob, and when it last changed. Five tables would be five migrations,
+ * five endpoints and five merge implementations that have to agree, and the
+ * first time they disagreed would be a build resurrecting itself on a phone.
+ *
+ * `payload` is opaque here on purpose, exactly as `publishedBuild` is. The
+ * server stores what the browser packed and hands it back unread. Nothing on
+ * this side knows what a build is, which is what keeps a change to the build
+ * format from being a migration.
+ *
+ * ## Tombstones, and why `deleted` is a column rather than a `DELETE`
+ *
+ * A delete has to be a fact that syncs, not an absence. Remove the row and the
+ * next device to sync still has its copy, sees something the server does not,
+ * and helpfully puts it back. **A build that resurrects itself is worse than one
+ * that lingers**, because the first looks like the tool is broken and the second
+ * looks like you forgot. So a delete writes `deleted = true` with a fresh
+ * `modified`, which is a change like any other and wins or loses on its date.
+ *
+ * They are small and they are kept. A tombstone has to outlive any device that
+ * might still be carrying the thing it buries, and there is no way to know when
+ * that is: a phone left in a drawer for a year is exactly the case that breaks.
+ */
+export const syncItem = sqliteTable(
+  'sync_item',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    /** `build`, `run`, `bin` or `setting`. Not an enum: SQLite has none, and a
+     * new kind should not need a migration. */
+    kind: text('kind').notNull(),
+    /** The build or run id, or the setting's name. Unique within its kind. */
+    itemId: text('item_id').notNull(),
+    /** Packed by the browser, stored as text, handed back unread. */
+    payload: text('payload').notNull(),
+    /**
+     * When this last changed, epoch ms, **as the writing device saw it**.
+     *
+     * The merge is newest wins, so this decides everything, and it is a client
+     * clock rather than the server's. That is a real weakness: a device with a
+     * wrong clock wins or loses every conflict. The alternative, stamping on
+     * arrival, is worse, because two edits made offline would then be ordered by
+     * whichever device happened to reconnect first rather than by when the
+     * person actually made them.
+     */
+    modified: integer('modified').notNull(),
+    /** A tombstone. See above: a delete is a fact, not an absence. */
+    deleted: integer('deleted', { mode: 'boolean' }).notNull().default(false),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.kind, table.itemId] }),
+    /* The only read this table has: everything of mine that changed since I
+     * last asked. `userId` first because it selects, `modified` second because
+     * it ranges. */
+    index('sync_item_since_idx').on(table.userId, table.modified),
+  ],
+)
+
+/**
  * The counters behind `worker/limit.ts`, one row per key per window.
  *
  * **A table of ours rather than better-auth's `rate_limit`, and that is not
