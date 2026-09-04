@@ -159,6 +159,45 @@ export async function requestReset(email: string): Promise<Outcome> {
   return outcome
 }
 
+/**
+ * Somebody arriving from the letter, and what the URL looks like when they do.
+ *
+ * The link in the letter points at the API, not at the app:
+ * `/api/auth/reset-password/<token>?callbackURL=<here>`. better-auth checks the
+ * token exists and has not expired, **without consuming it**, and then bounces
+ * the browser to that callback with the answer on the end. It uses
+ * `URL.searchParams.set`, so it always lands as a query parameter and any
+ * fragment survives: `requestReset` asks for `/#reset` and a real arrival is
+ * `https://enodia.me/?token=...#reset`.
+ *
+ * Two possible answers and both have to be handled. A dead link is the more
+ * likely one, because the letter sits in an inbox for a day and the token lasts
+ * an hour, and somebody who clicks a dead link and sees nothing at all will
+ * assume the tool is broken rather than that they were slow.
+ */
+export type ResetArrival = { token: string } | { expired: true }
+
+export function resetInUrl(search: string): ResetArrival | null {
+  const params = new URLSearchParams(search)
+  const token = params.get('token')
+  if (token) return { token }
+  // better-auth sends INVALID_TOKEN for both expired and already used, and it
+  // is right to: telling them apart would say whether a token ever existed.
+  if (params.get('error')) return { expired: true }
+  return null
+}
+
+/**
+ * Set the new password, which is the half that was missing.
+ *
+ * The token is spent here rather than on the link, so a mail scanner following
+ * the link in the letter cannot burn it before the person reads it. That is
+ * better-auth's design and it is the right one: several mail providers fetch
+ * every URL in a message to check it for malware.
+ */
+export const completeReset = (token: string, newPassword: string): Promise<Outcome> =>
+  post('/api/auth/reset-password', { token, newPassword })
+
 export const signUp = (name: string, email: string, password: string): Promise<Outcome> =>
   post('/api/auth/sign-up/email', { name, email, password })
 

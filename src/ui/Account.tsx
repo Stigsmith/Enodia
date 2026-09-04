@@ -28,13 +28,14 @@ import { useEffect, useState } from 'react'
 
 import {
   capabilities,
+  completeReset,
   currentAccount,
   requestReset,
   signIn,
   signOut,
   signUp,
 } from '../state/account.ts'
-import type { Account as Who } from '../state/account.ts'
+import type { Account as Who, ResetArrival } from '../state/account.ts'
 import { Page } from './Pages.tsx'
 
 type Mode = 'in' | 'up' | 'forgot'
@@ -270,6 +271,150 @@ export function Account() {
           The only things kept are your name, your email and a signed-in session. Nothing is
           tracked and nothing is measured about you.
         </p>
+      </section>
+    </Page>
+  )
+}
+
+/**
+ * The other end of the letter, and the screen this whole flow was missing.
+ *
+ * Password reset was half built for a while: the form that asks for a letter
+ * worked, the letter sent, and clicking the link landed on the landing page
+ * where nothing happened. Somebody locked out got a letter and stayed locked
+ * out, which is worse than not offering reset at all, because it looks like it
+ * worked.
+ *
+ * **Rendered whatever `ACCOUNTS_LIVE` says, and that is deliberate.** A token
+ * only exists because a letter was sent, and a letter is only sent for an
+ * account that exists. Refusing to complete a reset because a flag is off would
+ * be the exact trap the flag is there to prevent.
+ *
+ * **It takes the whole screen**, like an arriving share link, because somebody
+ * who clicked a link in an email has one job and should not have to find a menu
+ * to do it.
+ *
+ * No email field. The token identifies the account, so asking would be asking
+ * for something already known, and getting it wrong would look like a failure
+ * that was not one.
+ */
+export function ResetPassword({
+  arrival,
+  onDone,
+}: {
+  arrival: ResetArrival
+  onDone: () => void
+}) {
+  const [password, setPassword] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
+
+  if ('expired' in arrival) {
+    return (
+      <Page
+        title="That link has expired"
+        standfirst="Reset links last an hour and work once. This one has been used already or it has run out."
+      >
+        <section className="ref">
+          <p className="ref-say">
+            Nothing is wrong with your account and your password has not changed. Ask for
+            another letter and use the new link when it arrives.
+          </p>
+          <button type="button" className="acct-go" onClick={onDone}>
+            Back to the tool
+          </button>
+        </section>
+      </Page>
+    )
+  }
+
+  if (done) {
+    return (
+      <Page
+        title="That is done"
+        standfirst="Your password has been changed. Every other session has been signed out."
+      >
+        <section className="ref">
+          <p className="ref-say">
+            You can sign in with the new one now. Nothing else about the account has changed,
+            and the builds in this browser were never involved.
+          </p>
+          <button type="button" className="acct-go" onClick={onDone}>
+            Sign in
+          </button>
+        </section>
+      </Page>
+    )
+  }
+
+  const go = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setBusy(true)
+    setError(null)
+
+    const outcome = await completeReset(arrival.token, password)
+    // Cleared whether it worked or not. A spent token is worth nothing, and an
+    // unspent one should not sit in the address bar to be read over a shoulder
+    // or handed to whoever the next screenshot goes to.
+    setPassword('')
+    if (!outcome.ok) {
+      setError(outcome.say)
+      setBusy(false)
+      return
+    }
+
+    /**
+     * The token leaves the address bar the moment it is spent, not when the
+     * person gets round to clicking through.
+     *
+     * Two reasons. A reload on the confirmation screen would otherwise find the
+     * token still in the URL, draw the form again, and fail with "invalid
+     * token" on a reset that had in fact worked. And a spent credential should
+     * not sit in the address bar, in the history, or in the next screenshot.
+     */
+    history.replaceState(null, '', window.location.pathname)
+
+    setDone(true)
+    setBusy(false)
+  }
+
+  return (
+    <Page
+      title="Pick a new password"
+      standfirst="The link checked out. Choose something new and you are back in."
+    >
+      <section className="ref">
+        {/* A real form, for the same reasons the sign-in one is: Enter submits,
+          * password managers offer to save, and `form-action 'none'` in
+          * `assets/_headers` means a failed script cannot post it anywhere. */}
+        <form className="acct-form" onSubmit={go}>
+          <label className="acct-field">
+            <span>New password</span>
+            <input
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            <small className="acct-hint">
+              Eight characters at least. Use a password manager, and you will not be reading
+              one of these letters again.
+            </small>
+          </label>
+
+          {error ? (
+            <p className="acct-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+
+          <button type="submit" className="acct-go" disabled={busy}>
+            {busy ? 'Working' : 'Set it'}
+          </button>
+        </form>
       </section>
     </Page>
   )

@@ -90,6 +90,21 @@ export function createAuth(
        */
       requireEmailVerification: false,
 
+      /**
+       * **A reset signs every other session out, and the default does not.**
+       *
+       * better-auth leaves `revokeSessionsOnPasswordReset` off, so a reset
+       * changes the password and leaves every existing session alive. That gets
+       * the common case backwards: people reset a password because they think
+       * somebody else has it, and the whole point is to end that person's
+       * access. A new password that leaves the intruder signed in for another
+       * week is a reset that did not reset anything.
+       *
+       * The cost is that resetting on one device signs you out on your others,
+       * which is what somebody asking for this expects to happen.
+       */
+      revokeSessionsOnPasswordReset: true,
+
       ...(canMail
         ? {
             sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
