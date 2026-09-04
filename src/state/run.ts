@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
+import { clearStamped, writeStamped } from './stamps.ts'
 
 import { olympians, offerRules, traits } from '../data/app.ts'
 import { snapshotOf } from '../engine/briefing.ts'
@@ -305,7 +306,7 @@ export function loadRun(): ActiveRun | null {
 export function saveRun(active: ActiveRun): void {
   try {
     const stored: Stored = { version: VERSION, ...active, savedAt: new Date().toISOString() }
-    window.localStorage.setItem(KEY, JSON.stringify(stored))
+    writeStamped(KEY, JSON.stringify(stored))
   } catch {
     // A run that cannot be saved is still a run that can be played.
   }
@@ -322,7 +323,10 @@ export function deadTargets(run: RunContext): Set<TraitId> {
 
 export function clearRun(): void {
   try {
-    window.localStorage.removeItem(KEY)
+    /* Ending a run is a change, not an absence. Without this a device still
+     * holding the finished run would push it back and the run would restart
+     * itself on the other machine. */
+    clearStamped(KEY)
   } catch {
     // Nothing to do, and nothing worth saying.
   }

@@ -20,6 +20,7 @@
 
 import type { SavedBuild, ShownBuild } from '../data/builds.ts'
 import { readName } from './identity.ts'
+import { buried } from './stamps.ts'
 
 const KEY = 'enodia.builds'
 const VERSION = 1
@@ -211,6 +212,10 @@ export function deleteBuild(id: string): SavedBuild[] {
   const going = all.find((one) => one.id === id)
   const next = all.filter((one) => one.id !== id)
   if (going) writeBin([{ ...going, binnedAt: new Date().toISOString() }, ...loadBin()])
+  /* Gone from the library, so the library's copy has to travel as gone. The bin
+   * gains it separately and syncs as a `bin` item of its own, which is how the
+   * undo survives the trip to another device. */
+  buried('build', id)
   write(next)
   return next
 }
@@ -257,15 +262,21 @@ export function restoreBuild(id: string): { builds: SavedBuild[]; bin: BinnedBui
   if (!found) return { builds: loadBuilds(), bin: rest }
 
   const { binnedAt: _binnedAt, ...build } = found
-  const builds = [...loadBuilds(), build]
+  /* Out of the bin, so the bin's copy is gone. The build itself carries a fresh
+   * `modified` below, which is what beats the tombstone `deleteBuild` left. */
+  buried('bin', id)
+  const builds = [...loadBuilds(), { ...build, modified: new Date().toISOString() }]
   write(builds)
   return { builds, bin: rest }
 }
 
 /** Empty the bin, or one of it. This is the one that really is the end. */
 export function emptyBin(id?: string): BinnedBuild[] {
+  const going = id ? [id] : loadBin().map((one) => one.id)
   const next = id ? loadBin().filter((one) => one.id !== id) : []
   writeBin(next)
+  // Every one of these has to travel, or another device puts them all back.
+  for (const gone of going) buried('bin', gone)
   return next
 }
 

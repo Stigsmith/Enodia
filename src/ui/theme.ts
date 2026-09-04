@@ -30,6 +30,8 @@
  * portrait screen shows only its middle.
  */
 
+import { writeStamped } from '../state/stamps.ts'
+
 export type Weather = 'dust' | 'pollen' | 'embers' | 'stars'
 
 export type Wallpaper = {
@@ -141,7 +143,7 @@ export function readTheme(): string {
 
 export function writeTheme(id: string) {
   try {
-    localStorage.setItem(THEME_KEY, id)
+    writeStamped(THEME_KEY, id)
   } catch {
     // A browser that refuses storage still gets the theme for this session.
   }
@@ -176,7 +178,7 @@ export function readWallpapers(): Record<string, string> {
 
 export function writeWallpapers(map: Record<string, string>) {
   try {
-    localStorage.setItem(WALL_KEY, JSON.stringify(map))
+    writeStamped(WALL_KEY, JSON.stringify(map))
   } catch {
     // Same as above. A default is not a failure state.
   }

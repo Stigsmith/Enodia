@@ -29,8 +29,9 @@ import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
 import { Friends } from './ui/Friends.tsx'
-import { ACCOUNTS_LIVE, resetInUrl } from './state/account.ts'
+import { ACCOUNTS_LIVE, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
+import { useSync } from './state/useSync.ts'
 import { KOFI, kofiUrl } from './data/kofi.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
@@ -136,6 +137,25 @@ export function App() {
     resetInUrl(window.location.search),
   )
 
+  /**
+   * Whether there is an account behind this browser, asked once.
+   *
+   * Only sync needs to know, and only to decide whether to bother. Everything
+   * else works identically signed in or out, which is the property worth
+   * keeping: the account adds a copy elsewhere, it does not become the source.
+   */
+  const [signedIn, setSignedIn] = useState(false)
+  useEffect(() => {
+    if (!ACCOUNTS_LIVE) return
+    let live = true
+    void currentAccount().then((who) => {
+      if (live) setSignedIn(Boolean(who))
+    })
+    return () => {
+      live = false
+    }
+  }, [])
+
   /** Walked through, so it stops being a screen and becomes a menu entry. */
   const leaveLanding = () => {
     savePrefs({ ...loadPrefs(), seenLanding: true })
@@ -162,6 +182,31 @@ export function App() {
    * owners.
    */
   const [libraryAt, setLibraryAt] = useState(0)
+
+  /**
+   * Keep this browser in step with the account.
+   *
+   * The redraw is deliberately coarse and reuses `libraryAt`, the remount key
+   * right above, which exists for exactly this class of problem: storage
+   * changing underneath a list that has already read it. Sync is that, arriving
+   * from another device rather than from a share link.
+   *
+   * The theme, the wallpapers and the frame are re-read as well, because they
+   * are the things held in state up here rather than read fresh by whoever
+   * draws them. A theme chosen on a phone should not wait for a reload.
+   *
+   * Setting them here does put them back through the effects that persist
+   * them, which would stamp an arriving change as though this device had made
+   * it. `writeStamped` is what makes that harmless: a write of the value
+   * already stored is not a change and is not stamped, so the two devices stop
+   * rather than trading the same setting forever.
+   */
+  useSync(signedIn, () => {
+    setLibraryAt((at) => at + 1)
+    setTheme(readTheme())
+    setWallpapers(readWallpapers())
+    setRing(readFrame())
+  })
 
   useEffect(() => {
     const take = () => {

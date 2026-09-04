@@ -21,6 +21,7 @@
  */
 
 import type { Snapshot } from '../engine/briefing.ts'
+import { clearStamped, writeStamped } from './stamps.ts'
 
 const KEY = 'enodia.run.snapshot'
 const VERSION = 1
@@ -75,7 +76,7 @@ export function loadTrail(): Trail {
 
 export function saveTrail(trail: Trail): void {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(trail))
+    writeStamped(KEY, JSON.stringify(trail))
   } catch {
     // A trail that cannot be saved costs the briefing, not the run.
   }
@@ -83,7 +84,7 @@ export function saveTrail(trail: Trail): void {
 
 export function clearTrail(): void {
   try {
-    window.localStorage.removeItem(KEY)
+    clearStamped(KEY)
   } catch {
     // Nothing to do, and nothing worth saying.
   }

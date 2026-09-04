@@ -7,18 +7,30 @@
  *
  * ## The gate, and where it sits
  *
- * **Viewing is free. Creating is free. Saving locally is free. An account is
- * only needed to publish.** Nothing in the tool proper asks who you are, and
- * `DESIGN.md` 1 stays true of every screen somebody actually plays with: no
- * network call at runtime, all state in `localStorage`.
+ * **Viewing is free. Creating is free. Saving locally is free.** Nothing in the
+ * tool proper asks who you are, and every screen still works with no account at
+ * all: the data is in `localStorage` and that is still where it is read from.
  *
- * The account earns itself at one measured moment. A build shared as a link
- * carries the whole build inside the link, which is why sharing works with no
- * server, and which makes that link **1,588 characters**. Discord renders that
- * as a wall, Reddit mangles it, and it will not fit in a QR code. Publishing
- * turns it into about thirty. That is the entire pitch, and it arrives when
- * somebody has a build worth sending rather than before they have anything.
+ * ## What an account buys, which is now two things
+ *
+ * **A short link.** A build shared as a link carries the whole build inside the
+ * link, which is why sharing works with no server, and which makes that link
+ * **1,588 characters**. Discord renders that as a wall, Reddit mangles it, and
+ * it will not fit in a QR code. Publishing turns it into about thirty.
+ *
+ * **Your things on your other device.** `state/sync.ts` carries the library,
+ * the bin, your runs and your settings between a phone and a desktop. This is a
+ * copy, not a move: signing out leaves everything exactly where it is, and the
+ * export in Settings is unchanged.
+ *
+ * That second one is a deliberate reversal. This file used to say an account
+ * "does not store your builds, does not sync them between devices, and is not a
+ * backup", and repeated it in four places. That was a description of a tool
+ * with no server, written when there was none, and it kept being restated as
+ * though it were a decision. It was not what the owner wanted.
  */
+
+import { forgetSyncState } from './stamps.ts'
 
 /**
  * **The switch, and it is on.**
@@ -211,4 +223,18 @@ export const signIn = (email: string, password: string): Promise<Outcome> =>
   post('/api/auth/sign-in/email', { email, password })
 
 /** An empty object, not an empty body: the endpoint requires JSON and refuses otherwise. */
-export const signOut = (): Promise<Outcome> => post('/api/auth/sign-out', {})
+/**
+ * Sign out, and forget the conversation without touching the data.
+ *
+ * **Your builds stay exactly where they are.** They were yours before the
+ * account and they are yours after it, and a sign-out that emptied the library
+ * would be the single most alarming thing this tool could do. What goes is only
+ * this device's record of what it had already told the server, so signing back
+ * in reconciles from scratch rather than assuming a conversation that may have
+ * carried on somewhere else in the meantime.
+ */
+export const signOut = async (): Promise<Outcome> => {
+  const outcome = await post('/api/auth/sign-out', {})
+  forgetSyncState()
+  return outcome
+}

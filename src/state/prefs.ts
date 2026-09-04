@@ -10,6 +10,8 @@
  * constant, because how long counts as "away" is a habit and not a fact.
  */
 
+import { writeStamped } from './stamps.ts'
+
 const KEY = 'enodia.prefs'
 const VERSION = 1
 
@@ -112,7 +114,7 @@ export function loadPrefs(): Prefs {
 
 export function savePrefs(prefs: Prefs): void {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(prefs))
+    writeStamped(KEY, JSON.stringify(prefs))
   } catch {
     // Defaults are not a failure state.
   }
