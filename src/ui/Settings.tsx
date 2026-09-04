@@ -126,8 +126,9 @@ export function Settings() {
       <section className="setting-block" data-tour="setting-export">
         <h3 className="arcana-rule">Your things</h3>
         <p className="setting-say">
-          Everything you have made lives in this browser. Nothing here is backed up anywhere, so
-          an export is the only other copy that exists.
+          Everything you have made lives in this browser. Signed in, a copy of it also follows
+          you between your devices. The export is the copy that belongs to you rather than to
+          this tool, and it is the one that survives the tool going away.
         </p>
 
         <div className="setting-row">
