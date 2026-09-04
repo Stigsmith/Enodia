@@ -12,9 +12,9 @@ Last updated 4 September 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, and **accounts are open** since 4 September 2026 |
+| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 434 in node across 25 files, and **56 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 503 in node across 27 files, and **92 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings |
 | **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -74,6 +74,27 @@ ever sees its own handler, so publishing, reading a published build and every fr
 were unlimited. `worker/limit.ts` holds four rules in its own table, and the counting is one
 SQLite upsert rather than a read and a write: D1 has no interactive transactions, and the
 two-step version let 25 simultaneous requests through a limit of 5. Measured, not assumed.
+
+**The exchange loop closes now, and it had never once run.** A copy taken off a shelf reports
+its runs back to the build it came from, so a listing can say "1 of 1 cleared" rather than
+nothing. Both halves of that were written and tested before today and the loop was still dead:
+`derivedHash` was a hash of the **packed payload**, and `duplicateBuild` rewrites the id, the
+name, the author and three timestamps on the way out, so a copy taken a second earlier already
+failed its own comparison. `reportRun` returned false every time, silently, on a path that
+shows nothing either way. It is `shapeOf` now, over the picks alone, with the reasoning in
+`src/state/exchange.ts` and an end-to-end test that fails against the old version.
+
+**And the guard that was meant to stop stale copy could not see any of it.** Both `checkVocabulary`
+and `checkRetiredClaims` read JSX text nodes off single raw lines, and the formatter wraps every
+paragraph in this app at eighty columns, so the middle of a wrapped sentence carried no angle
+bracket and produced nothing. Measured before the fix: a paragraph saying "no account", "nothing
+to install", "door", "room" and "nothing is tracked" passed with **0 failures**. Fixed, it
+immediately failed on two sentences already live in production, which is what a guard is for.
+
+**"Nothing is tracked and nothing is measured about you" is retired**, because Part 3 makes it
+false. `src/ui/Account.tsx` says what is counted instead, in both the signed-in and signed-out
+views, and Settings holds the switch that turns it off. The phrase is in `RETIRED_CLAIMS`, so
+the build refuses to ship any copy that says it again.
 
 **Two rounds of playtest feedback have landed since Phase 1 closed**, and they changed more
 than polish. The editor was rebuilt around two boon trays, the warnings now name what would

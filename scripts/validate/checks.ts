@@ -555,11 +555,82 @@ export const BANNED_WORDS: { pattern: RegExp; internal: string; use: string }[] 
 /** A line that says so opts out, for the rare place the internal word is right. */
 export const VOCAB_ESCAPE = 'enodia-vocab-ok'
 
-export type UiString = { line: number; text: string }
+export type UiString = {
+  /** where the copy starts, which is what a report points at */
+  line: number
+  /**
+   * Opening tag to closing tag, for a paragraph the formatter wrapped.
+   *
+   * Absent for anything read off a single line, where it would be `[line,
+   * line]` anyway. It is wider than `line` on purpose: `line` points at the
+   * copy so the report is useful, and this is where an escape comment is
+   * allowed to sit, which for a wrapped paragraph is the closing tag.
+   */
+  span?: [number, number]
+  text: string
+}
+
+/** Every line a string covers, so an escape anywhere across it counts. */
+function escaped(lines: string[], found: UiString, marker: string): boolean {
+  const [first, last] = found.span ?? [found.line, found.line]
+  for (let at = first; at <= last; at++) {
+    if ((lines[at - 1] ?? '').includes(marker)) return true
+  }
+  return false
+}
+
+/**
+ * JSX text nodes, read across the whole file rather than one line at a time.
+ *
+ * **This is the hole that made both guards decorative.** They read text nodes
+ * off single raw lines, and a formatter wraps a paragraph at eighty columns, so
+ * the middle lines of every wrapped sentence in the app carried no `<` and no
+ * `>` and produced nothing at all. Almost all of this tool's copy is written
+ * that way. Measured before it was fixed: a paragraph reading "This tool needs
+ * no account and there is nothing to install. Every exit is a door into the
+ * next room, and nothing is tracked about you" passed the validator with zero
+ * failures, hitting four retired claims and two banned words on the way past.
+ *
+ * Whitespace is collapsed to single spaces because that is what JSX does when
+ * it renders, so what is matched is the sentence a reader actually sees rather
+ * than the shape the formatter left it in.
+ *
+ * `masked` has comments and every quoted literal blanked out already, which is
+ * what stops a `>` inside a comment opening a run and a `<` inside a string
+ * closing one. Braces end a run, so a JSX expression is a boundary and most
+ * code cannot produce a long match.
+ */
+function textNodes(masked: string): UiString[] {
+  const out: UiString[] = []
+  for (const found of masked.matchAll(/>([^<>{}]+)</g)) {
+    const raw = found[1] ?? ''
+    const text = raw.replace(/\s+/g, ' ').trim()
+    if (!text) continue
+
+    /* Two different lines, for two different jobs. `line` counts to the first
+     * word, so the report points at the copy rather than at an opening tag a
+     * couple of lines above it. The span runs tag to tag, because that is where
+     * somebody writing an escape comment will actually put it. */
+    const opened = found.index ?? 0
+    const lead = raw.length - raw.trimStart().length
+    const at = (upto: number) => masked.slice(0, upto).split('\n').length
+    out.push({
+      line: at(opened + 1 + lead),
+      span: [at(opened), at(opened + 1 + raw.length)],
+      text,
+    })
+  }
+  return out
+}
 
 /**
  * Strings a reader could end up seeing. Deliberately generous: a false positive
  * costs one escape comment, a false negative ships "door" to a player.
+ *
+ * **HTML text nodes are still read per line**, and that gap is deliberate
+ * rather than overlooked: the only HTML the checks read is the app shell, which
+ * carries no prose, and the hand-authored placeholder page, whose findings are
+ * warnings the owner already owns. The fatal path is `src/**`, and that is TSX.
  */
 export function extractUiStrings(file: SourceFile): UiString[] {
   const out: UiString[] = []
@@ -568,6 +639,16 @@ export function extractUiStrings(file: SourceFile): UiString[] {
   let inBlockComment = false
   let inScriptOrStyle = false
   let inTemplate = false
+
+  /**
+   * The file with comments and quoted literals blanked, one entry per line.
+   *
+   * Built by the same walk that reads the literals, because that walk already
+   * knows which quote is inside a comment and which slash is inside a string.
+   * Only the newlines have to survive: line numbers are counted off them, and
+   * nothing reads a column.
+   */
+  const masked: string[] = []
 
   lines.forEach((raw, i) => {
     const line = raw
@@ -624,8 +705,10 @@ export function extractUiStrings(file: SourceFile): UiString[] {
     }
 
     // TypeScript and TSX. Walk the line so a quote inside a comment, and a
-    // slash inside a string, both behave.
+    // slash inside a string, both behave. Everything the walk swallows is
+    // blanked out of `keep`, which is what `textNodes` reads afterwards.
     let text = ''
+    let keep = ''
     for (let c = 0; c < line.length; c += 1) {
       const ch = line[c]
       const next = line[c + 1]
@@ -674,12 +757,15 @@ export function extractUiStrings(file: SourceFile): UiString[] {
         add(literal)
         continue
       }
+      keep += ch
     }
-
-    // JSX text nodes, read off the raw line. Anything between a > and a < that
-    // is not markup or an expression is copy a player reads.
-    for (const m of line.matchAll(/>([^<>{}]+)</g)) add(m[1] ?? '')
+    masked.push(keep)
   })
+
+  /* JSX text nodes, over the whole file at once rather than line by line.
+   * A wrapped paragraph is one sentence to a reader, so it has to be one
+   * string here. `textNodes` explains what that cost before it was fixed. */
+  if (file.kind === 'ts' || file.kind === 'tsx') out.push(...textNodes(masked.join('\n')))
 
   return out
 }
@@ -691,7 +777,7 @@ export function checkVocabulary(bundle: Bundle): Finding[] {
   for (const file of bundle.sources) {
     const lines = file.text.split(/\r?\n/)
     for (const found of extractUiStrings(file)) {
-      if ((lines[found.line - 1] ?? '').includes(VOCAB_ESCAPE)) continue
+      if (escaped(lines, found, VOCAB_ESCAPE)) continue
       for (const banned of BANNED_WORDS) {
         if (banned.pattern.test(found.text)) {
           hits.push({ file, line: found.line, text: found.text, use: banned.use, internal: banned.internal })
@@ -791,9 +877,27 @@ export const RETIRED_CLAIMS: {
     since: '4 September 2026',
     instead: 'runs against a build you took are counted toward that build',
   },
+  {
+    /* The other half of the same sentence, which was "Nothing is tracked and
+     * nothing is measured about you". Listed separately because either half
+     * stands on its own and somebody rewriting the paragraph will keep one. */
+    pattern: /\bnothing is measured\b/i,
+    claim: 'nothing is measured',
+    since: '4 September 2026',
+    instead: 'a run against a build you took is counted, and Settings can stop it',
+  },
 ]
 
-/** One line's own reprieve, for the case where the phrase is genuinely right. */
+/**
+ * A reprieve, for the case where the phrase is genuinely right.
+ *
+ * On the line, for a string literal. For a JSX paragraph the formatter wrapped,
+ * anywhere from the opening tag to the closing one, which in practice means a
+ * JSX comment after the closing tag. Not before the opening one: a comment
+ * there ends the text node early and the paragraph stops being read at all,
+ * which is not the same as excusing it and would quietly excuse whatever
+ * somebody writes there next.
+ */
 export const CLAIM_ESCAPE = 'retired-claim-ok'
 
 /**
@@ -819,7 +923,7 @@ export function checkRetiredClaims(bundle: Bundle): Finding[] {
   for (const file of bundle.sources) {
     const lines = file.text.split(/\r?\n/)
     for (const found of extractUiStrings(file)) {
-      if ((lines[found.line - 1] ?? '').includes(CLAIM_ESCAPE)) continue
+      if (escaped(lines, found, CLAIM_ESCAPE)) continue
 
       for (const retired of RETIRED_CLAIMS) {
         if (!retired.pattern.test(found.text)) continue

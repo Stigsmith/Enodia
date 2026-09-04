@@ -144,11 +144,12 @@ export function Account() {
             you made on a desktop is already there.
           </p>
           <p className="ref-say">
-            It copies, it does not move. Everything is still in this browser and still works
-            with no account at all, signing out leaves it exactly where it is, and Settings
-            still has the export.
+            It copies, it does not move. Everything is still in this browser, signing out
+            leaves it exactly where it is, and Settings still has the export.
           </p>
         </section>
+
+        <Counted />
       </Page>
     )
   }
@@ -278,11 +279,51 @@ export function Account() {
           about the same thing, the one changed most recently wins.
         </p>
         <p className="ref-say">
-          The only things kept are your name, your email and a signed-in session. Nothing is
-          tracked and nothing is measured about you.
+          The only things kept about you are your name, your email and a signed-in session.
         </p>
       </section>
+
+      <Counted />
     </Page>
+  )
+}
+
+/**
+ * What is counted, said in the room where somebody would look for it.
+ *
+ * **This paragraph replaced one that had gone false.** It read "Nothing is
+ * tracked and nothing is measured about you", which was true until runs started
+ * reporting back to the build they came from. The phrase is in
+ * `RETIRED_CLAIMS`, so the build now refuses to ship any copy that says it
+ * again.
+ *
+ * It is the same block signed in and signed out, because the answer is the same
+ * either way and two versions of a privacy promise is how one of them goes
+ * stale. `Settings.tsx` holds the switch itself, next to the other preferences,
+ * and this says where it is rather than putting a second copy of it here.
+ */
+function Counted() {
+  return (
+    <section className="ref">
+      <h3 className="ref-rule">What is counted</h3>
+      <p className="ref-say">
+        One thing, and only for a build you took off the exchange. A run you log against your
+        copy is counted toward the build it came from, which is where <em>38 of 61 cleared</em>
+        {' '}on a listing comes from. What travels is whether you cleared it and the Fear if you
+        did.
+      </p>
+      <p className="ref-say">
+        Your account is attached to that count so one person cannot log the same build a
+        thousand times. It is never shown to anybody, not to the person who published the
+        build and not on the listing, and there is no other counting anywhere in the tool: no
+        analytics, no third party, nothing about what you look at or how long for.
+      </p>
+      <p className="ref-say">
+        It stops the moment you change the build, because it is your build then rather than
+        theirs. And there is a switch in <strong>Settings</strong> that turns it off
+        altogether, which leaves everything else working.
+      </p>
+    </section>
   )
 }
 

@@ -126,6 +126,52 @@ export function FearStepper({
 }
 
 /**
+ * One to five, clickable, with the star you are already on clearing it.
+ *
+ * **Pulled out when the run log gained a rating**, because there were about to
+ * be two of these: one in the editor's Play panel and one in `LogRun`, with the
+ * same clearing convention, the same disabled ceiling and the same markup. Two
+ * copies of a control is how the editor and the run log end up disagreeing
+ * about what a rating means, which is the argument `ASSEMBLES` already makes
+ * for itself in `data/builds.ts`.
+ *
+ * `ceiling` is `ratingCeiling`'s answer and comes from the caller rather than
+ * being read here: this is a control, and a control that reaches for the build
+ * data is a control you cannot put on a screen that has none.
+ */
+export function Stars({
+  value,
+  onChange,
+  ceiling,
+  label = 'Rating, one to five',
+}: {
+  value: number | undefined
+  onChange: (rating: number | undefined) => void
+  /** the highest star allowed, or null for all five */
+  ceiling?: number | null
+  label?: string
+}) {
+  return (
+    <div className="editor-stars" role="group" aria-label={label}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          disabled={ceiling != null && star > ceiling}
+          aria-pressed={star <= (value ?? 0)}
+          className={star <= (value ?? 0) ? 'is-on' : ''}
+          title={star === value ? 'Clear the rating' : `${star} of 5`}
+          onClick={() => onChange(value === star ? undefined : star)}
+        >
+          <span aria-hidden="true">{star <= (value ?? 0) ? '★' : '☆'}</span>
+          <span className="visually-hidden">{star} of 5</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/**
  * The skull and the number, for anywhere that is reading rather than editing.
  *
  * Draws nothing at zero. A build nobody has taken into a Fear run has no Fear

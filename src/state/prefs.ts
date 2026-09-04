@@ -63,6 +63,25 @@ export type Prefs = {
    * once and remembers. Ten is where everyone starts.
    */
   graspLimit: number
+  /**
+   * Whether a run logged against a build you took is counted toward that build.
+   *
+   * **On by default, and that is a decision rather than an oversight.** The
+   * exchange's counts are the whole reason it is not a wall of strangers'
+   * builds with nothing to go on, and they only exist if the ordinary case
+   * reports. What is sent is one row: cleared or not, and the Fear if you
+   * cleared. Who sent it is used to stop one person counting a build a thousand
+   * times and is never shown to anybody.
+   *
+   * Off means the tool sends nothing about your runs, and everything else keeps
+   * working: you can still take builds, still log runs, still see the counts.
+   * Rating goes with it, because a rating with no run behind it is the thing
+   * `worker/exchange.ts` refuses on purpose.
+   *
+   * It syncs like every other preference, so turning it off on one device turns
+   * it off on all of them.
+   */
+  reportRuns: boolean
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -72,6 +91,7 @@ export const DEFAULT_PREFS: Prefs = {
   graspLimit: 10,
   backupWarningSeen: false,
   seenLanding: false,
+  reportRuns: true,
 }
 
 function migrate(stored: unknown): Prefs | null {
@@ -100,6 +120,14 @@ function migrate(stored: unknown): Prefs | null {
     // No version bump for an additive field.
     backupWarningSeen: record.backupWarningSeen === true,
     seenLanding: record.seenLanding === true,
+    /**
+     * The one field here that is not `=== true`, and it has to be.
+     *
+     * Absent means stored before the switch existed, and the default is on, so
+     * reading a missing field as false would silently turn reporting off for
+     * every install that already exists. Only an explicit `false` is off.
+     */
+    reportRuns: record.reportRuns !== false,
   }
 }
 

@@ -48,7 +48,7 @@ import type { Fix, FixOption, Problem } from '../engine/build-check.ts'
 import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
-import { FearStepper, Stepper } from './Fear.tsx'
+import { FearStepper, Stars, Stepper } from './Fear.tsx'
 
 /**
  * The most runs a stepper will count to.
@@ -753,23 +753,10 @@ export function BuildEditor({
             <div className="editor-field">
               <span>Rating</span>
               {/* Clicking the star you are already on clears it, which is the
-                * convention `Setup.tsx` uses for every other clearable pick. */}
-              <div className="editor-stars" role="group" aria-label="Rating, one to five">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    disabled={stars !== null && star > stars}
-                    aria-pressed={star <= (play?.rating ?? 0)}
-                    className={star <= (play?.rating ?? 0) ? 'is-on' : ''}
-                    title={star === play?.rating ? 'Clear the rating' : `${star} of 5`}
-                    onClick={() => setPlay({ rating: play?.rating === star ? undefined : star })}
-                  >
-                    <span aria-hidden="true">{star <= (play?.rating ?? 0) ? '★' : '☆'}</span>
-                    <span className="visually-hidden">{star} of 5</span>
-                  </button>
-                ))}
-              </div>
+                * convention `Setup.tsx` uses for every other clearable pick.
+                * The control is shared with `LogRun`, which asks the same
+                * question at the moment somebody has just played the build. */}
+              <Stars value={play?.rating} ceiling={stars} onChange={(rating) => setPlay({ rating })} />
               {stars !== null ? (
                 <p className="editor-hint">{repeat.hardStop} One star until it can be assembled.</p>
               ) : null}

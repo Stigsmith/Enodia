@@ -3734,6 +3734,34 @@ button.mark {
   border-color: var(--lit);
 }
 
+/* A switch, which on this screen is a checkbox and its sentence. The whole row
+   is the label, so the sentence is the hit target and not just the box. */
+.setting-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.setting-switch:hover { border-color: var(--lit-dim); }
+
+.setting-switch:focus-within {
+  border-color: var(--lit);
+}
+
+.setting-switch input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--lit);
+  cursor: pointer;
+}
+
 /* Whose build this is, when it is not yours. */
 .builds-author {
   margin: 0;
@@ -5549,7 +5577,7 @@ button.mark {
  */
 .logrun-box {
   /**
-   * 48rem, a fifth up from 40.
+   * 54rem, having been 48, having been 40.
    *
    * The title was clipping into the ornament, and scaling the panel is the fix
    * rather than more padding **because the type does not scale with it**. The
@@ -5557,9 +5585,28 @@ button.mark {
    * width, so they hold their relationship at any size; `h3` is 1.05rem and
    * stays 1.05rem. A bigger panel is therefore a proportionally smaller title,
    * which is the clearance. The owner's instinct, and the arithmetic agrees.
+   *
+   * **48 stopped being enough when the form gained a third answer and a rating**,
+   * and it went 25px past the ornament rather than up to it. Measured rather
+   * than eyeballed: `box-pause.png` paints rows 69 to 788 of 1063, so the
+   * frame's interior is 19.3% to 74.1% of the panel height, which at 48rem was
+   * 381px against 383px of content. Two pixels short of impossible, and no
+   * padding could have fixed it. At 54rem the interior is 429px.
    */
-  width: min(48rem, 100%);
+  /**
+   * **The third term is the short-window one, and it is a width.**
+   *
+   * `max-height` alone clamped the height and left the width alone, so on a
+   * 1280x800 laptop the frame was squashed to 864x736 against its own 1.104
+   * ratio: the ornament stretched sideways, the percentages stopped describing
+   * it, and the content overflowed by 21px into a scroll. Measured, not
+   * assumed. Capping the width by the viewport height instead keeps the ratio,
+   * so the frame only ever gets smaller and the paddings keep meaning what they
+   * say. 92vh of height is 101.5vh of width at this ratio.
+   */
+  width: min(54rem, 100%, 101.5vh);
   aspect-ratio: 1173 / 1063;
+  /* Belt and braces. The width cap above already keeps the height under this. */
   max-height: 92vh;
   border: 0;
   border-radius: 0;
@@ -5577,16 +5624,34 @@ button.mark {
  * frame's insets are measured in.
  *
  * The two vertical figures are divided by the 1.104 ratio first, because even
- * here a percentage is a fraction of the width: 7.1 becomes 6.4 and the 25.9
- * of the bottom fade becomes 23.5. Then clearance on all four.
+ * here a percentage is a fraction of the width: the 19.3 of the top ornament
+ * becomes 17.5 and the 25.9 of the bottom fade becomes 23.5. Then clearance on
+ * all four.
+ *
+ * **The top figure was 10.5 and should never have been.** 17.5 is where the
+ * ornament ends, so the box top has been inside it the whole time and
+ * `align-content: center` was quietly doing the work: short content floated
+ * clear, and the day the form grew the heading went straight into the skull.
+ * A padding that only holds while nothing changes is not a padding. 19 clears
+ * the ornament by 13px at 54rem and does it whatever is in here.
  */
 .logrun-inner {
   display: grid;
-  align-content: center;
+  /**
+   * `safe`, and it is the whole difference on a short window.
+   *
+   * Plain `center` centres the content even when there is more of it than
+   * there is room, which pushes it out of **both** ends: measured at 1366x768,
+   * 18px of overflow put the heading 5px above the frame's interior and the
+   * buttons 5px below it, and the half above the scroll origin cannot be
+   * scrolled back to. `safe` falls back to `start` the moment it overflows, so
+   * the form runs from the top and `overflow-y` can reach all of it.
+   */
+  align-content: safe center;
   gap: 0.45rem;
   height: 100%;
   overflow-y: auto;
-  padding: 10.5% 15% 25%;
+  padding: 19% 15% 25%;
   /* Centred throughout. On a symmetric ornamented panel anything set left
    * reads as having slipped. */
   text-align: center;
@@ -5643,7 +5708,27 @@ button.mark {
   margin: 0 auto;
 }
 
+/**
+ * Three answers, and the same argument one column over.
+ *
+ * How dependably a build comes together has three states, and putting them
+ * through the four-button grid above left "Needs luck" alone in the left
+ * column, under "Reliably", which is the stray that rule exists to prevent.
+ * Three equal columns, and wider because three labels need more room than two
+ * do: `1fr` is what makes them the same size, which is the only reason none of
+ * them looks like the odd one.
+ */
+.logrun-three {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-content: center;
+  gap: 0.35rem;
+  width: min(26rem, 100%);
+  margin: 0 auto;
+}
+
 .logrun-yesno button,
+.logrun-three button,
 .logrun-ended button {
   padding: 0.42rem 1rem 0.5rem;
   border: 0;
@@ -5661,6 +5746,7 @@ button.mark {
 }
 
 .logrun-yesno button:hover:not(.is-on),
+.logrun-three button:hover:not(.is-on),
 .logrun-ended button:hover:not(.is-on) {
   filter: brightness(1.4);
   color: var(--bone);
@@ -5669,6 +5755,7 @@ button.mark {
 /* Neither is pressed until one is: a default answer to "did you clear it" would
  * be the tool guessing at somebody's own record. */
 .logrun-yesno button.is-on,
+.logrun-three button.is-on,
 .logrun-ended button.is-on {
   color: var(--bone);
 }
@@ -5716,8 +5803,9 @@ button.mark {
   background-image: url('/shell/button-cancel-highlight.png');
 }
 
-/* Where it ended is a choice among four rather than an accept or a cancel, so
- * it takes the pressed plate the menu and the tabs use for "this one". */
+/* Both of these are a choice among several rather than an accept or a cancel,
+ * so they take the pressed plate the menu and the tabs use for "this one". */
+.logrun-three button.is-on,
 .logrun-ended button.is-on {
   background-image: url('/shell/button-highlight.png');
 }

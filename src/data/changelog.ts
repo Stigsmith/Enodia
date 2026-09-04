@@ -20,6 +20,20 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-04',
+    title: 'The build exchange, and what happens after you take one',
+    say: 'Two shelves of other people’s builds, and runs that count toward the build they came from.',
+    points: [
+      'Two shelves: builds picked by hand, and builds from people you swapped codes with. There is no shelf of everything anybody published yet, because that needs a way to report and hide a listing first.',
+      'Take a copy and it is an ordinary build of yours: your name on it, and none of somebody else’s runs.',
+      'A run you log against a copy is counted toward the build it came from, which is where “1 of 1 cleared” on a listing comes from. It stops the moment you change the build, because it is your build then rather than theirs.',
+      'Rating a build needs a run behind it, so a rating is always somebody saying how it went rather than how it read. The number of raters is always shown beside the average, because two people saying four is a different thing from two hundred.',
+      'Logging a run now asks how dependably the build came together, and keeps the answer. It used to ask and throw it away.',
+      'A switch in Settings turns the counting off. Everything else keeps working: you can still take builds, still log runs, still read the counts.',
+      'Nothing else about you is counted anywhere. No analytics, nothing about what you look at or how long for.',
+    ],
+  },
+  {
+    date: '2026-09-04',
     title: 'Accounts, short links, and your things on both devices',
     say: 'You can sign in now. It buys two things, and the tool still works entirely without it.',
     points: [
