@@ -86,41 +86,57 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
 }
 
 /**
- * The reset letter, in Dora's voice.
+ * The reset letter, in Dora's actual voice.
+ *
+ * **Checked against the game, not against an impression of it.** The first
+ * version of this was written from memory and was wrong: dry, clipped and
+ * faintly aristocratic, which is a butler rather than Dora. Her 279 lines in
+ * `Content/Game/Text/en/_NPCData_Dora.en.sjson` are warm, chatty and American.
+ * She opens with "Hey", she uses contractions and elisions, she trails off
+ * mid-thought, and she undercuts herself constantly.
+ *
+ * **She does not scold, and the source is why.** A scolding letter was the
+ * brief until her own line turned up: "Why else would I have forgotten
+ * everything? Probably took a couple swigs from the River Lethe, and that was
+ * that! Clean slate." She forgot her entire life. She has no standing to be
+ * smug at somebody about a password, and sympathy from the least organised
+ * character in the game is the better joke anyway. Her line about tracking
+ * every boon survives, but it lands as absurd rather than superior.
  *
  * **The working half is not the joke half, and the order is deliberate.** The
  * person reading this is locked out and wants one thing, so the link and the
- * expiry come first and are written plainly. The scolding is a paragraph
- * underneath, after everything they actually need. Somebody who reads the first
- * four lines and stops has lost nothing.
+ * expiry come first and stay plain. Everything after them is optional, and
+ * somebody who reads four lines and stops has lost nothing.
  *
- * Her register is the one in `src/ui/tour.ts` and `src/ui/Dora.tsx`: short
- * sentences, dry, faintly put upon, no exclamation marks. She keeps the run
- * log, which is what gives her standing to be smug about a forgotten password.
+ * **The subject line stays boring.** It is what gets typed into a search box at
+ * the worst moment, so it says what the letter is and nothing else.
  *
- * **The subject line stays plain.** It is what somebody types into a search box
- * at the worst moment, so it says what the letter is and nothing else.
- *
- * **Still plain text, still no image.** Every major client blocks remote images
- * by default, so a picture of her would be a blocked-image frame for most
- * people rather than a joke, and this is the one letter that has to survive
- * every filter: it is the only route back into an account. The voice does the
- * work instead.
+ * **Plain text, no image.** Every major client blocks remote images by default,
+ * so a picture of her would be a blocked frame for most people rather than a
+ * joke, and this is the one letter that has to clear every filter: it is the
+ * only route back into an account.
  */
 export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
   subject: 'Reset your Enodia password',
   text: [
-    'Somebody asked to reset the password on this Enodia account.',
+    'Hey. So somebody asked to reset the password on this Enodia account.',
     '',
-    'If it was you, open this and pick a new one:',
+    'If that was you, here. Pick a new one:',
     url,
     '',
-    'It works once and expires in an hour. Try not to mislay this one as well.',
+    "Works once, expires in an hour. No pressure, but... that's the window.",
     '',
-    'I keep track of every boon and every Exit you have ever taken, and I have not',
-    'lost one yet. You hang on to the passwords, though. That is clearly going well.',
+    "If it wasn't you, just ignore this. Nothing's changed, your account's fine.",
     '',
-    'If it was not you, ignore this. Nothing has changed and your account is fine.',
+    "Anyway, I'm not judging. I drank from the Lethe at some point and forgot my",
+    "entire life. Whole thing, gone. Clean slate. So, a password? That's nothing.",
+    "You're doing great.",
+    '',
+    '...I do keep track of every boon and every Exit you take, though. Every single',
+    "one of them. Not sure how come that stuck and my own name didn't. Try not to",
+    'think about it too hard.',
+    '',
+    'Dora',
     '',
     'Enodia is an unofficial fan project and is not affiliated with Supergiant Games.',
   ].join('\n'),
