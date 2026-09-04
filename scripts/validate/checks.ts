@@ -547,9 +547,9 @@ export function checkCounts(bundle: Bundle): Finding[] {
 // ---------------------------------------------------------------------------
 
 export const BANNED_WORDS: { pattern: RegExp; internal: string; use: string }[] = [
-  { pattern: /\bdoors?\b/i, internal: 'Door', use: 'Exit' },
-  { pattern: /\brooms?\b/i, internal: 'Room', use: 'Location' },
-  { pattern: /\bbiomes?\b/i, internal: 'Biome', use: 'Region' },
+  { pattern: /\b\bdoors?\b\b/i, internal: 'Door', use: 'Exit' },
+  { pattern: /\b\brooms?\b\b/i, internal: 'Room', use: 'Location' },
+  { pattern: /\b\bbiomes?\b\b/i, internal: 'Biome', use: 'Region' },
 ]
 
 /** A line that says so opts out, for the rare place the internal word is right. */
@@ -721,6 +721,151 @@ export function checkVocabulary(bundle: Bundle): Finding[] {
   }
   if (!hits.length && bundle.sources.length) {
     out.push(info('vocabulary', `${bundle.sources.length} source files carry no internal word in a UI string`))
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// 5b. Retired claims. Sentences the tool used to make and no longer may.
+// ---------------------------------------------------------------------------
+
+/**
+ * The mistake this exists to stop, which has now happened five times.
+ *
+ * A sentence that is true about the architecture gets written into copy. The
+ * architecture changes. **The sentence stays**, because nothing connects the two
+ * and the person writing the next screen has no reason to go looking. "There is
+ * no account and no server" outlived the server by weeks and was found by hand
+ * five separate times: on the About page, in Settings, in the Builds empty
+ * state, in a changelog entry, and finally on the landing page, where it was the
+ * headline under the way in.
+ *
+ * Prose in `CLAUDE.md` did not prevent any of those, because nobody is reading
+ * `CLAUDE.md` at the moment they write a sentence. A build failure is read at
+ * exactly that moment, which is the whole argument for this being here rather
+ * than in a document.
+ *
+ * **Adding to this list is part of retiring a claim.** When a promise stops
+ * being true, it goes here in the same commit that makes it false, and the build
+ * then refuses to ship until every copy of it is gone.
+ */
+export const RETIRED_CLAIMS: {
+  pattern: RegExp
+  claim: string
+  since: string
+  instead: string
+}[] = [
+  {
+    pattern: /\bno account\b/i,
+    claim: 'no account',
+    since: '4 September 2026',
+    instead: 'an account is how the tool is meant to be used, and it is free',
+  },
+  {
+    pattern: /\bnothing to install\b/i,
+    claim: 'nothing to install',
+    since: '4 September 2026',
+    instead: 'true, and it travelled with the line above, so it went too',
+  },
+  {
+    pattern: /\bno server\b/i,
+    claim: 'no server',
+    since: '2 September 2026',
+    instead: 'there is a Worker and a D1 behind /api/*',
+  },
+  {
+    pattern: /\bdoes not sync\b/i,
+    claim: 'does not sync',
+    since: '4 September 2026',
+    instead: 'state/sync.ts carries everything between devices',
+  },
+  {
+    pattern: /\b(is )?not a backup\b/i,
+    claim: 'not a backup',
+    since: '4 September 2026',
+    instead: 'an account holds a copy of your library',
+  },
+  {
+    pattern: /\bnothing is tracked\b/i,
+    claim: 'nothing is tracked',
+    since: '4 September 2026',
+    instead: 'runs against a build you took are counted toward that build',
+  },
+]
+
+/** One line's own reprieve, for the case where the phrase is genuinely right. */
+export const CLAIM_ESCAPE = 'retired-claim-ok'
+
+/**
+ * A changelog entry is a record of what shipped, and rewriting it to match the
+ * present is how a changelog stops being worth reading. So entries **dated
+ * before** a claim was retired keep their wording. Anything written after has no
+ * excuse, and this reads the dates in the file rather than exempting it whole.
+ */
+function changelogDateAt(file: SourceFile, line: number): number | null {
+  if (!file.path.endsWith('data/changelog.ts')) return null
+  const lines = file.text.split(/\r?\n/)
+  for (let at = line - 1; at >= 0; at--) {
+    const found = /date:\s*'(\d{4}-\d{2}-\d{2})'/.exec(lines[at] ?? '')
+    if (found?.[1]) return Date.parse(found[1])
+  }
+  return null
+}
+
+export function checkRetiredClaims(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  const hits: { file: SourceFile; line: number; text: string; claim: string; instead: string }[] = []
+
+  for (const file of bundle.sources) {
+    const lines = file.text.split(/\r?\n/)
+    for (const found of extractUiStrings(file)) {
+      if ((lines[found.line - 1] ?? '').includes(CLAIM_ESCAPE)) continue
+
+      for (const retired of RETIRED_CLAIMS) {
+        if (!retired.pattern.test(found.text)) continue
+
+        // A changelog entry from before the retirement is history, not a claim.
+        const dated = changelogDateAt(file, found.line)
+        if (dated !== null && dated < Date.parse(retired.since)) break
+
+        hits.push({
+          file,
+          line: found.line,
+          text: found.text,
+          claim: retired.claim,
+          instead: retired.instead,
+        })
+        break
+      }
+    }
+  }
+
+  const describe = (h: (typeof hits)[number]) =>
+    `${h.file.path}:${h.line}  "${h.claim}" was retired. ${h.instead}  ${h.text.slice(0, 60)}`
+
+  const live = hits.filter((h) => !h.file.legacy)
+  const legacy = hits.filter((h) => h.file.legacy)
+
+  if (live.length) {
+    out.push(
+      fail('retired claims', `${live.length} UI strings make a claim the tool no longer may`, [
+        ...cap(live.map(describe)),
+        `Add ${CLAIM_ESCAPE} to the line if the phrase is genuinely right in context, and say why.`,
+      ]),
+    )
+  }
+  if (legacy.length) {
+    out.push(
+      warn('retired claims', `${legacy.length} in the hand-authored page`, [
+        ...cap(legacy.map(describe)),
+        'That page predates the app and is copy the owner owns, so this reports rather than fails.',
+      ]),
+    )
+  }
+  if (!hits.length && bundle.sources.length) {
+    out.push(
+      info('retired claims', `no UI string repeats any of the ${RETIRED_CLAIMS.length} retired claims`),
+    )
   }
   return out
 }
@@ -1151,6 +1296,7 @@ export function runAllChecks(bundle: Bundle): Finding[] {
     ...checkClassification(bundle),
     ...checkCounts(bundle),
     ...checkVocabulary(bundle),
+    ...checkRetiredClaims(bundle),
     ...checkRoster(bundle),
     ...checkCurated(bundle),
     ...checkAssets(bundle),
