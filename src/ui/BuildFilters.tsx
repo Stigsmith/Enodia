@@ -6,9 +6,16 @@
  * meant to grow: at eighty builds it would have been the whole screen before a
  * single build appeared. Five dropdowns are five rows at any size.
  *
- * The cost is real and worth naming: a dropdown holds one value, so "Zeus or
- * Poseidon" is no longer expressible. `build-filter.ts` says the same thing
- * from the model's side.
+ * That cost chips their one advantage, holding several values, and it has since
+ * been paid back: `Dropdown` takes a `many` mode, so "Zeus or Poseidon" is
+ * expressible again in one row instead of nine. Fear is the exception, and
+ * `build-filter.ts` says why from the model's side.
+ *
+ * **Search is not a facet.** It narrows by text the reader typed rather than by
+ * a value the library offers, so it has no options to count and nothing to put
+ * in a dropdown. Putting it through the facet machinery would mean every option
+ * count silently answering "how many, of the ones matching your text", which is
+ * a different question from the one the counts promise.
  *
  * **The facet dropdowns are not native selects.** They show the game's own art
  * beside each option, and `<option>` cannot hold an image in any engine, so
@@ -34,6 +41,8 @@ export function BuildFilters({
   onClear,
   sort,
   onSort,
+  query,
+  onQuery,
   showing,
   total,
 }: {
@@ -42,6 +51,8 @@ export function BuildFilters({
   onClear: () => void
   sort: SortId
   onSort: (sort: SortId) => void
+  query: string
+  onQuery: (query: string) => void
   showing: number
   total: number
 }) {
@@ -50,7 +61,10 @@ export function BuildFilters({
 
   const surface = facets.filter((facet) => SURFACE_FACETS.includes(facet.id))
   const rest = facets.filter((facet) => !SURFACE_FACETS.includes(facet.id))
-  const hiddenPicks = rest.filter((facet) => facet.chosen !== null).length
+  /* `.length > 0`, not a truthiness check. `chosen` is an array now and an empty
+   * array is truthy, so the old `!== null` would have counted every facet as
+   * picked and put a badge on the disclosure permanently. */
+  const hiddenPicks = rest.filter((facet) => facet.chosen.length > 0).length
   // Partial on purpose: `facets()` drops a facet with no options, so this object
   // is missing those keys and `countSelected` is written to expect that. The
   // cast that used to be here is what let the gap through.
@@ -65,6 +79,18 @@ export function BuildFilters({
       </div>
 
       <div className="bfilter-bar">
+        {/* Type rather than pick. `search` so a phone offers the right keyboard
+          * and the browser draws its own clear affordance. */}
+        <label className="bfilter-find">
+          <span className="visually-hidden">Search builds</span>
+          <input
+            type="search"
+            value={query}
+            placeholder="Search"
+            onChange={(event) => onQuery(event.target.value)}
+          />
+        </label>
+
         <button
           type="button"
           className={`bfilter-more${open ? ' is-open' : ''}`}
@@ -100,9 +126,9 @@ export function BuildFilters({
           )}
         </p>
 
-        {picked ? (
+        {picked || query ? (
           <button type="button" className="bfilter-clear" onClick={onClear}>
-            Clear {picked}
+            {picked ? `Clear ${picked}` : 'Clear'}
           </button>
         ) : null}
       </div>
@@ -131,7 +157,12 @@ function Drop({
       label={facet.name}
       all={facet.all}
       options={facet.options}
-      chosen={facet.chosen}
+      many={facet.many}
+      held={facet.chosen}
+      /* The single-value path still reads `chosen`, and Fear is the one facet
+       * that takes it. `build-filter.ts` explains why Fear is a threshold and
+       * therefore cannot usefully hold a set. */
+      chosen={facet.chosen[0] ?? null}
       onChoose={(value) => onChoose(facet.id, value)}
     />
   )

@@ -7547,3 +7547,38 @@ p.landing-say {
   .dora-ask { grid-area: ask; }
   .landing-fine { grid-area: fine; }
 }
+
+/**
+ * The search box in the filter bar.
+ *
+ * Sits first, before the disclosure, because typing a name is the fastest way
+ * to find a build you already know you own and the facets are for the times you
+ * do not. `type="search"` for the phone keyboard and the browser's own clear
+ * control, which is better than one drawn here and is already in the tab order.
+ */
+.bfilter-find input {
+  width: 9rem;
+  padding: 0.28rem 0.5rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.78rem;
+}
+
+.bfilter-find input::placeholder {
+  color: var(--bone-faint);
+}
+
+.bfilter-find input:focus-visible {
+  outline: none;
+  border-color: var(--lit-hot);
+}
+
+/* Room to type on a wide screen, where the bar has space going spare. */
+@media (min-width: 60rem) {
+  .bfilter-find input {
+    width: 12rem;
+  }
+}
