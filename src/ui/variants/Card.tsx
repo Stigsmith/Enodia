@@ -60,11 +60,25 @@ export function Card({
   built,
   onOpen,
   first,
+  foot,
 }: {
   built: Assembled
   onOpen: (id: string) => void
   /** the one the tour points at, so it lights a card rather than the whole grid */
   first?: boolean
+  /**
+   * Anything the shelf this card is on wants under it.
+   *
+   * The library needs nothing. The exchange puts who published a build and what
+   * happened when people played it, which is a fact about the listing rather
+   * than about the build: two people can hold the same build with different
+   * counts behind it. A slot rather than a second card component, so a change
+   * to how a build is drawn cannot land on one shelf and not the other.
+   *
+   * Outside the button on purpose. A count is not a control, and a link inside
+   * a button is not a thing a browser will honour.
+   */
+  foot?: React.ReactNode
 }) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
@@ -137,6 +151,7 @@ export function Card({
           * sits on the same line however many bands are above it. */}
         <span className="bcard-say">{build.say}</span>
       </button>
+      {foot}
     </li>
   )
 }

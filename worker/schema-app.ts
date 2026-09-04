@@ -67,8 +67,104 @@ export const publishedBuild = sqliteTable(
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
   },
-  (table) => [index('published_build_userId_idx').on(table.userId)],
+  (table) => [
+    index('published_build_userId_idx').on(table.userId),
+    /* The exchange lists newest first across every account, which the userId
+     * index cannot answer. One column, and without it that listing is a scan. */
+    index('published_build_createdAt_idx').on(table.createdAt),
+  ],
 )
+
+/**
+ * What has happened to a published build, one row per person per build.
+ *
+ * **This is the whole evidence model for the exchange**, and it is deliberately
+ * counts rather than a score. The tool has committed in eight separate places to
+ * not saying whether a build is good, and it still does not: it says how many
+ * people took a build, how many runs they logged, how many of those cleared, and
+ * what they rated it. A reader draws the conclusion. Nothing here is combined
+ * into a single number, because any such number would have to weigh how fun a
+ * build is against how hard it is to assemble, and the tool has no basis for
+ * that trade. `src/engine/repeat.ts` makes the same argument at length: a build
+ * can be five stars from five thousand people and still read Not in one run.
+ *
+ * **One row per person per build, and the identity is for arithmetic only.** It
+ * is what stops one account counting a build a thousand times, and it buys an
+ * honest "12 people logged runs" that bare counters cannot. It is never returned
+ * to anybody: every read of this table aggregates. `src/ui/Account.tsx` says so
+ * in the words a reader gets.
+ *
+ * The rating lives here rather than in its own table because it is one more
+ * thing this person thinks about this build, and because rating is gated on
+ * having logged a run, which is the row next to it.
+ */
+export const exchangeStat = sqliteTable(
+  'exchange_stat',
+  {
+    buildId: text('build_id')
+      .notNull()
+      .references(() => publishedBuild.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+
+    /** When they took a copy, or null if they have only rated or played it. */
+    takenAt: integer('taken_at'),
+
+    /** Runs they logged against their copy while it still matched the original. */
+    runs: integer('runs').notNull().default(0),
+    clears: integer('clears').notNull().default(0),
+
+    /**
+     * The highest Fear they cleared it at.
+     *
+     * Only ever raised on a clear, matching `src/ui/LogRun.tsx`: dying at Fear 30
+     * is not clearing Fear 30, and counting it as one would be the tool
+     * inflating somebody's history on their behalf.
+     */
+    bestFear: integer('best_fear'),
+
+    /** One to five, null until they rate. Gated on having logged a run. */
+    rating: integer('rating'),
+
+    updated: integer('updated')
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.buildId, table.userId] }),
+    /* Every read is "everything about this build", aggregated. */
+    index('exchange_stat_build_idx').on(table.buildId),
+  ],
+)
+
+/**
+ * The owner's own shelf, and the only opinion the tool states as its own.
+ *
+ * `CLAUDE.md` draws the line where this sits: evaluations are not in the game
+ * files and must come from the owner, and an opinion is allowed when it carries
+ * a visible byline. So a pick is signed and says why in the owner's own words,
+ * and it never looks like a measurement.
+ *
+ * It is also the only shelf that works on the first day, when every count in
+ * `exchangeStat` is zero. A ranked list of nothing is not a feature.
+ *
+ * Not a column on `publishedBuild`, because curation is a fact about the shelf
+ * rather than about the build: unpicking one must not touch what its author
+ * published.
+ */
+export const curatedPick = sqliteTable('curated_pick', {
+  buildId: text('build_id')
+    .primaryKey()
+    .references(() => publishedBuild.id, { onDelete: 'cascade' }),
+
+  /** Why it is here, in the owner's words. The byline is the point. */
+  note: text('note').notNull(),
+
+  at: integer('at')
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+})
 
 /**
  * How two people become friends, and why it is a code rather than a search.

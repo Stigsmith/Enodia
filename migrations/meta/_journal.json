@@ -43,6 +43,13 @@
       "when": 1788530845240,
       "tag": "0005_noisy_sage",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1788548585158,
+      "tag": "0006_tired_valkyrie",
+      "breakpoints": true
     }
   ]
 }

@@ -262,6 +262,19 @@ export type ShownBuild = {
   /** the id this was duplicated from, or absent. Stored now, displayed later */
   derivedFrom?: string
   /**
+   * What the build looked like the moment it was taken from the exchange.
+   *
+   * A hash of the packed original, and the thing that keeps the exchange's
+   * numbers meaning something. Runs logged against a copy are reported back to
+   * the build it came from, and only while the copy is still that build: change
+   * it and this stops matching, so the reporting stops. Otherwise "38 of 61
+   * cleared" would be a claim about somebody else's work that anybody could
+   * rewrite by editing their own copy.
+   *
+   * Absent on a fork of one of your own builds, which reports nothing anywhere.
+   */
+  derivedHash?: string
+  /**
    * Who wrote it, as a name they picked in their own browser.
    *
    * **It travels, unlike `play`.** A build somebody sends you should say whose

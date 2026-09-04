@@ -168,6 +168,15 @@ export function saveBuild(build: ShownBuild, now: string = new Date().toISOStrin
 export function duplicateBuild(
   source: ShownBuild,
   now: string = new Date().toISOString(),
+  /**
+   * Where this really came from, when it came from the exchange.
+   *
+   * A build taken off a shelf carries the **published** id rather than the
+   * build's own, because that is what runs are reported against, and a hash of
+   * what it looked like at the time so the reporting can stop once the copy
+   * stops being that build. `src/state/exchange.ts` holds both halves.
+   */
+  origin?: { id: string; hash: string },
 ): { builds: SavedBuild[]; copy: SavedBuild } {
   const { play: _play, author: _author, ...rest } = source
   const mine = readName()
@@ -186,7 +195,8 @@ export function duplicateBuild(
     ...(mine ? { author: mine } : {}),
     // The name field caps at 60, and two identical names in a list help nobody.
     name: `${source.name} copy`.slice(0, 60),
-    derivedFrom: source.id,
+    derivedFrom: origin?.id ?? source.id,
+    ...(origin ? { derivedHash: origin.hash } : {}),
     created: now,
     modified: now,
     schemaVersion: BUILD_SCHEMA,

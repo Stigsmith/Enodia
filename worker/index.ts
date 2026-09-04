@@ -19,6 +19,9 @@
  *   /api/builds        publish one, list yours, unpublish one
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *   /api/sync          everything an account carries between devices
+ *   /api/exchange      the picked shelf. PUBLIC, and every item was chosen by hand
+ *   /api/exchange/friends  what the people you added have published
+ *   /api/exchange/<id>/...  take a copy, report a run, rate one, pick one
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
  *
@@ -29,9 +32,15 @@
  * hand, so it is not discovery either, and the moderation tool for it is
  * removing somebody.
  *
+ * **The exchange does not cross that line either, and it was built not to.** Its
+ * two shelves are the owner's own picks and the builds of people you added by
+ * code, so every item on it passed a human before it was listed. The shelf that
+ * would cross the line is "everything anybody published", and it is deliberately
+ * not here: it needs a way to report a listing and a way to hide one first.
+ *
  * `REQUIREMENTS.md` 5 wants moderation designed before anything discoverable
- * exists. **Leaderboards would be the first thing that crosses that line**, and
- * they are still not here.
+ * exists. **Leaderboards would still be the first thing that crosses that
+ * line**, and they are still not here.
  *
  * ## Limits
  *
@@ -44,7 +53,7 @@
 import { drizzle } from 'drizzle-orm/d1'
 
 import { createAuth } from './auth.ts'
-import { RULES, keyFor, take } from './limit.ts'
+import { RULES, keyFor, take as take_limit } from './limit.ts'
 import {
   buildsOfFriend,
   codeFor,
@@ -55,6 +64,7 @@ import {
   unfriend,
 } from './friends.ts'
 import { listMine, publish, read, unpublish } from './publish.ts'
+import { fromFriends, pick, picked, played, rate, take } from './exchange.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
 
@@ -160,7 +170,7 @@ export default {
     if (shared && request.method === 'GET') {
       // Counted before the lookup, not after. A limiter that runs once the work
       // is done has already paid for the work.
-      const over = await take(db, keyFor.address('read', request), RULES.read)
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
       if (over) return tooMany(over.retryAfter)
       const found = await read(db, shared[1] as string)
       if (!found) return json({ error: 'no such build' }, 404)
@@ -176,11 +186,90 @@ export default {
      * the same budget as reading your own list would let ordinary use of one
      * exhaust the other.
      */
+    /**
+     * The picked shelf, and the only exchange route a stranger can reach.
+     *
+     * Public because every build on it was chosen by hand and signed, so there
+     * is nothing here that arrived unread. Rate limited on the address like the
+     * other public route, because there is no account to count against.
+     */
+    if (url.pathname === '/api/exchange' && request.method === 'GET') {
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
+      return json({ builds: await picked(db) })
+    }
+
+    if (url.pathname.startsWith('/api/exchange')) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session) return json({ error: 'not signed in' }, 401)
+      const userId = session.user.id
+
+      const over = await take_limit(db, keyFor.user('own', userId), RULES.own)
+      if (over) return tooMany(over.retryAfter)
+
+      if (url.pathname === '/api/exchange/friends' && request.method === 'GET') {
+        return json({ builds: await fromFriends(db, userId) })
+      }
+
+      const one = /^\/api\/exchange\/([A-Za-z0-9]{1,32})\/(take|played|rate|pick)$/.exec(
+        url.pathname,
+      )
+      if (one && request.method === 'POST') {
+        const buildId = one[1] as string
+        const what = one[2] as string
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+
+        if (what === 'take') {
+          const outcome = await take(db, userId, buildId)
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+
+        if (what === 'played') {
+          const outcome = await played(
+            db,
+            userId,
+            buildId,
+            body.cleared === true,
+            typeof body.fear === 'number' && Number.isFinite(body.fear) ? body.fear : null,
+          )
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+
+        if (what === 'rate') {
+          const outcome = await rate(db, userId, buildId, Number(body.rating))
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+
+        /**
+         * Curating, and the one route with an owner check on it.
+         *
+         * `CURATOR_USER_ID` is a var rather than a role column because there is
+         * exactly one curator. Unset means nobody can curate, which is the right
+         * default for a deployment that is not this one.
+         */
+        if (!env.CURATOR_USER_ID || userId !== env.CURATOR_USER_ID) {
+          return json({ error: 'no such route' }, 404)
+        }
+        const outcome = await pick(
+          db,
+          buildId,
+          typeof body.note === 'string' ? body.note : null,
+        )
+        if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+        return json(outcome)
+      }
+
+      return json({ error: 'no such route' }, 404)
+    }
+
     if (url.pathname === '/api/sync' && request.method === 'POST') {
       const session = await auth.api.getSession({ headers: request.headers })
       if (!session) return json({ error: 'not signed in' }, 401)
 
-      const over = await take(db, keyFor.user('sync', session.user.id), RULES.sync)
+      const over = await take_limit(db, keyFor.user('sync', session.user.id), RULES.sync)
       if (over) return tooMany(over.retryAfter)
 
       const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
@@ -203,7 +292,7 @@ export default {
        * that a person cannot reach it and low enough to bound a script.
        */
       const rule = url.pathname === '/api/builds' && request.method === 'POST' ? 'publish' : 'own'
-      const over = await take(db, keyFor.user(rule, userId), RULES[rule])
+      const over = await take_limit(db, keyFor.user(rule, userId), RULES[rule])
       if (over) return tooMany(over.retryAfter)
 
       if (url.pathname === '/api/builds' && request.method === 'GET') {
@@ -242,7 +331,7 @@ export default {
        * here that reads on a stranger's say-so. Its own counter, for that. */
       const rule =
         url.pathname === '/api/friends/redeem' && request.method === 'POST' ? 'redeem' : 'own'
-      const over = await take(db, keyFor.user(rule, userId), RULES[rule])
+      const over = await take_limit(db, keyFor.user(rule, userId), RULES[rule])
       if (over) return tooMany(over.retryAfter)
 
       if (url.pathname === '/api/friends' && request.method === 'GET') {
