@@ -1,5 +1,5 @@
 /**
- * A run, logged in four answers, without opening the editor.
+ * A run, logged in a handful of answers, without opening the editor.
  *
  * **The common update should not be the expensive one.** Playing a build and
  * coming back to say how it went is the thing that happens most, and the only
@@ -20,13 +20,30 @@
  * The last question is where the run ended, and it is the one that is only
  * asked when it applies. Four Regions per path, which `CLAUDE.md` records and
  * `ESTIMATED_EXITS` is derived from.
+ *
+ * ## It is also where the exchange's numbers come from
+ *
+ * A build taken off a shelf reports its runs back to the build it came from,
+ * and that happens here rather than anywhere else, because here is the only
+ * place that knows whether *this* run cleared. `onLog` is handed a cumulative
+ * record and cannot tell.
+ *
+ * **The report is fire and forget and nothing on this screen waits for it.**
+ * Somebody logging a run is writing their own history; whether a tally moved on
+ * a shelf they are not looking at is not their problem, and a server that is
+ * down must not stop them recording what they did. `state/exchange.ts` decides
+ * whether to send at all: it reports only while the copy still is the build,
+ * and only while the switch in Settings is on.
  */
 
 import { useState } from 'react'
 
-import { MAX_FEAR } from '../data/builds.ts'
-import { Stepper } from './Fear.tsx'
-import type { PlayRecord, ShownBuild } from '../data/builds.ts'
+import { ASSEMBLES, MAX_FEAR } from '../data/builds.ts'
+import { olympians, traits } from '../data/app.ts'
+import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
+import { rateBuild, reportRun, reportsTo } from '../state/exchange.ts'
+import { Stars, Stepper } from './Fear.tsx'
+import type { Assembles, PlayRecord, ShownBuild } from '../data/builds.ts'
 
 /**
  * Where a run ended, by the boss that ended it.
@@ -52,11 +69,45 @@ export function LogRun({
   onClose: () => void
 }) {
   const [cleared, setCleared] = useState<boolean | null>(null)
-  const [assembled, setAssembled] = useState<boolean | null>(null)
   const [fear, setFear] = useState<number | undefined>(build.play?.fear)
   const [endedAt, setEndedAt] = useState<number | null>(null)
 
   const play = build.play
+
+  /**
+   * How dependably it comes together, and it starts where the record already is.
+   *
+   * **Three answers rather than yes and no**, which is what the question was
+   * before and what threw the answer away. `assembles` has three states, the
+   * editor offers three and the detail strip draws three, so a yes/no here
+   * would have had to invent a mapping and lose Situational on the way past.
+   * `ASSEMBLES` in `data/builds.ts` exists so those three cannot drift.
+   *
+   * Starting at what is recorded means leaving it alone keeps it, which is the
+   * right default: one unlucky run is not a reason to rewrite a judgement built
+   * over twelve.
+   */
+  const [assembles, setAssembles] = useState<Assembles | undefined>(play?.assembles)
+
+  /**
+   * Stars, capped the same way the editor caps them.
+   *
+   * A build asking for something a run cannot hand over must not be able to
+   * look like a recommendation, and that clamp lives wherever stars are
+   * offered rather than in one of the two places that offer them.
+   */
+  const ceiling = ratingCeiling(readRepeat(build, traits, olympians))
+  const [rating, setRating] = useState<number | undefined>(play?.rating)
+
+  /**
+   * The published build this one would report to, or null.
+   *
+   * **Asked rather than assumed.** Reading the two `derived` fields would say
+   * yes for a copy that has since been edited, and the hint below would promise
+   * a report the hash check then refuses. `reportsTo` is the same question the
+   * sending path asks, so what the screen says and what it does are one answer.
+   */
+  const reportTo = reportsTo(build)
 
   const save = () => {
     const runs = (play?.runs ?? 0) + 1
@@ -68,7 +119,25 @@ export function LogRun({
       // Highest cleared, so a lesser run afterwards does not undo it, and only
       // on a clear, because dying at Fear 30 is not clearing Fear 30.
       ...(cleared && fear ? { fear: Math.max(play?.fear ?? 0, fear) } : {}),
+      ...(assembles ? { assembles } : {}),
+      ...(rating ? { rating } : {}),
     })
+
+    /**
+     * Off to the build this one came from, if it came from one.
+     *
+     * Ordered, and it has to be: `worker/exchange.ts` refuses a rating with no
+     * logged run behind it, so the rating goes second and only once the run
+     * has actually landed. Unawaited, because nothing on this screen depends on
+     * either of them and `onClose` is about to run.
+     */
+    if (reportTo) {
+      void (async () => {
+        const sent = await reportRun(build, Boolean(cleared), cleared && fear ? fear : null)
+        if (sent && rating && rating !== play?.rating) await rateBuild(reportTo, rating)
+      })()
+    }
+
     onClose()
   }
 
@@ -93,7 +162,23 @@ export function LogRun({
           }}
         />
 
-        <Ask label="Did the build come together?" value={assembled} onChoose={setAssembled} />
+        {/* `logrun-three`, not the four-button row below it: three answers in a
+          * two-column grid leaves the last one alone in the left column. */}
+        <div className="editor-field">
+          <span>Did the build come together?</span>
+          <div className="logrun-three">
+            {ASSEMBLES.map((one) => (
+              <button
+                key={one.id}
+                type="button"
+                className={assembles === one.id ? 'is-on' : ''}
+                onClick={() => setAssembles(assembles === one.id ? undefined : one.id)}
+              >
+                {one.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Only on a clear, because that is the only run it can describe. */}
         {cleared ? (
@@ -126,13 +211,27 @@ export function LogRun({
           </div>
         ) : null}
 
+        <div className="editor-field">
+          <span>What would you give it?</span>
+          <Stars value={rating} ceiling={ceiling} onChange={setRating} />
+          {/* Said here rather than discovered later. A rating on a build you
+            * took is the one answer on this form that other people see, and
+            * somebody should know that before they give it three stars. */}
+          {reportTo ? (
+            <p className="editor-hint">
+              This one came off the exchange, so your stars count toward it there. Everything
+              else on this form stays here.
+            </p>
+          ) : null}
+        </div>
+
         {/* What it will write, before it writes it. Four taps is quick enough
           * to do by accident, and this is somebody's own record of their own
           * play. */}
         <p className="logrun-says">
           {cleared === null
             ? 'Answer the first one and this will say what it records.'
-            : summary(play, cleared, fear)}
+            : summary(play, cleared, fear, assembles)}
         </p>
 
         <div className="logrun-actions">
@@ -149,12 +248,33 @@ export function LogRun({
   )
 }
 
-function summary(play: PlayRecord | undefined, cleared: boolean, fear: number | undefined): string {
+function summary(
+  play: PlayRecord | undefined,
+  cleared: boolean,
+  fear: number | undefined,
+  assembles: Assembles | undefined,
+): string {
   const runs = (play?.runs ?? 0) + 1
   const clears = (play?.clears ?? 0) + (cleared ? 1 : 0)
   const was = play?.fear ?? 0
   const raised = cleared && fear && fear > was ? `, and Fear cleared up to ${fear}` : ''
-  return `${clears} of ${runs} runs cleared${raised}.`
+  /**
+   * A sentence of its own, and it has to be.
+   *
+   * The first attempt read "it comes together situational", because it
+   * lowercased the name and dropped it into a clause. Only Reliably is an
+   * adverb; the other two are not, and `ASSEMBLES` is a list of labels rather
+   * than a list of words that fit a sentence. So the label is quoted rather
+   * than conjugated.
+   *
+   * Only when it is a change. Repeating back what was already recorded reads as
+   * though this run said it, and this line is a list of what this run writes.
+   */
+  const comes =
+    assembles && assembles !== play?.assembles
+      ? ` Comes together: ${ASSEMBLES.find((one) => one.id === assembles)?.name}.`
+      : ''
+  return `${clears} of ${runs} runs cleared${raised}.${comes}`
 }
 
 /** One yes or no, with neither pressed until it is. */

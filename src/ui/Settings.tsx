@@ -1,16 +1,16 @@
 /**
- * Settings, which for now is the one thing that cannot wait: getting your work
- * out of this browser and back into another one.
+ * Settings: getting your work out of this browser, and the switches that are
+ * not something you flip while looking at what they change.
  *
- * **Nothing here is on a server.** That is the point of the tool and it is also
- * the risk: everything a person builds lives in one browser's storage, and a
- * cleared browser is the whole library gone with no way to ask for it back. So
- * the export is not a convenience, it is the only copy anyone will ever have,
- * and the screen says how long it has been since the last one.
+ * **The export is still the only copy that belongs to you.** Signing in now
+ * carries a copy between your devices, which is a real safety net and is not
+ * the same thing: it is this tool's storage either way, and a tool can go away.
+ * So the export stays the headline here and the screen says how long it has
+ * been since the last one.
  *
  * The view preferences stay in the menu rather than moving here. They are
  * things you flip while looking at the thing they change, which is a different
- * kind of setting from this one and wants a different place.
+ * kind of setting from these and wants a different place.
  */
 
 import { useRef, useState } from 'react'
@@ -26,6 +26,7 @@ import {
 } from '../state/transfer.ts'
 import type { Manifest } from '../state/transfer.ts'
 import { NAME_LIMIT, readName, writeName } from '../state/identity.ts'
+import { loadPrefs, savePrefs } from '../state/prefs.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -37,6 +38,7 @@ export function Settings() {
   const file = useRef<HTMLInputElement>(null)
 
   const [name, setName] = useState(readName)
+  const [reportRuns, setReportRuns] = useState(() => loadPrefs().reportRuns)
 
   const since = daysSince(lastExport)
   const held = describe(collect())
@@ -205,6 +207,41 @@ export function Settings() {
             </div>
           </div>
         ) : null}
+      </section>
+
+      {/* The one switch that is about other people rather than about you, so it
+        * says what it sends before it offers to stop sending it. `Account.tsx`
+        * makes the same statement at more length and points here for the
+        * control, rather than there being two of these to keep in step. */}
+      <section className="setting-block">
+        <h3 className="arcana-rule">Runs, and the exchange</h3>
+        <p className="setting-say">
+          When you take a build off the exchange and log a run against your copy, the run is
+          counted toward the build it came from. That is where <em>38 of 61 cleared</em> on a
+          listing comes from, and it is the only reason a shelf of strangers&rsquo; builds has
+          anything to go on.
+        </p>
+        <p className="setting-say">
+          What travels is whether you cleared it and the Fear if you did. Your account is
+          attached so one person cannot count a build a thousand times, and it is never shown
+          to anybody. It stops on its own once you change the build.
+        </p>
+        <label className="setting-switch">
+          <input
+            type="checkbox"
+            checked={reportRuns}
+            onChange={(event) => {
+              setReportRuns(event.target.checked)
+              savePrefs({ ...loadPrefs(), reportRuns: event.target.checked })
+            }}
+          />
+          <span>Count my runs toward builds I took</span>
+        </label>
+        <p className="setting-say">
+          {reportRuns
+            ? 'On. Turning it off sends nothing, and everything else keeps working: you can still take builds, still log runs, still read the counts.'
+            : 'Off. Nothing about your runs leaves this browser. Rating a build needs a run behind it, so ratings are off with it.'}
+        </p>
       </section>
 
       <section className="setting-block">

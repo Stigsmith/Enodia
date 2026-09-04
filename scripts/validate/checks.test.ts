@@ -388,6 +388,111 @@ describe('retired claims', () => {
   })
 })
 
+/**
+ * The hole that made both guards decorative for as long as they existed.
+ *
+ * Text nodes were read off single raw lines, and every paragraph in this app is
+ * wrapped at eighty columns by the formatter, so the middle of a wrapped
+ * sentence carried no angle bracket and produced nothing at all. Measured
+ * before the fix: the paragraph in the first test here passed with zero
+ * findings while saying four retired claims and two internal words.
+ *
+ * These are the tests that fail on the old extractor. Everything below them in
+ * `vocabulary` and `retired claims` passed both before and after, because every
+ * one of those fixtures happens to be written on one line.
+ */
+describe('copy wrapped across lines, which is how all of it is written', () => {
+  const scan = (text: string) => bundle({ sources: [source('src/ui/Test.tsx', 'tsx', text)] })
+
+  const WRAPPED = [
+    'export const A = () => (',
+    '  <p className="ref-say">',
+    '    This tool needs no account and there is nothing to install. Every exit is a',
+    '    door into the next room, and nothing is tracked about you.',
+    '  </p>',
+    ')',
+  ].join('\n')
+
+  it('catches an internal word that the line break split away from its tag', () => {
+    expect(messages(checkVocabulary(scan(WRAPPED)), 'fail')).toEqual([
+      '1 UI strings use an internal word',
+    ])
+  })
+
+  it('catches a retired claim in the same paragraph', () => {
+    const findings = checkRetiredClaims(scan(WRAPPED))
+    expect(messages(findings, 'fail')).toHaveLength(1)
+    expect(findings[0]?.detail?.[0]).toContain('"no account" was retired')
+  })
+
+  /**
+   * The claim that made this urgent. It is split by the wrap after "Nothing
+   * is", so neither half is the phrase and the join is the only way to see it.
+   */
+  it('catches a claim split down the middle by the wrap', () => {
+    const text = [
+      'export const A = () => (',
+      '  <p>',
+      '    The only things kept are your name and your email. Nothing is',
+      '    tracked and nothing is measured about you.',
+      '  </p>',
+      ')',
+    ].join('\n')
+    expect(messages(checkRetiredClaims(scan(text)), 'fail')).toHaveLength(1)
+  })
+
+  it('reports the first line of the paragraph, so the message points somewhere', () => {
+    const findings = checkVocabulary(scan(WRAPPED))
+    expect(findings[0]?.detail?.[0]).toContain("src/ui/Test.tsx:3")
+  })
+
+  /**
+   * Whitespace collapses the way JSX collapses it when it renders, so what is
+   * matched is the sentence a reader sees rather than the shape the formatter
+   * left behind.
+   */
+  it('joins the run into one sentence rather than two fragments', () => {
+    const text = ['<p>', '  Every exit is a', '  door.', '</p>'].join('\n')
+    const found = extractUiStrings(source('src/ui/Test.tsx', 'tsx', text))
+    expect(found.map((f) => f.text)).toContain('Every exit is a door.')
+  })
+
+  /** A comment between the tags is still a comment, wrapped or not. */
+  it('leaves a comment alone even when it sits between the tags', () => {
+    const text = [
+      'export const A = () => (',
+      '  <p>',
+      '    Sign in to publish.',
+      '    {/* it used to say there is no account, and that went */}',
+      '  </p>',
+      ')',
+    ].join('\n')
+    expect(messages(checkRetiredClaims(scan(text)), 'fail')).toEqual([])
+  })
+
+  /**
+   * The escape reaches across the whole element, because a wrapped paragraph
+   * has no one line to put it on. The closing tag is where it goes: a comment
+   * before the opening tag would end the text node early and excuse the
+   * paragraph by making it invisible, which is a different thing.
+   */
+  it('takes an escape on the closing tag of a wrapped paragraph', () => {
+    const said = [
+      'export const A = () => (',
+      '  <p>',
+      '    It used to promise no account and',
+      '    nothing to install.',
+      '  </p>',
+      ')',
+    ]
+    // Without it, this is two failures worth of copy.
+    expect(messages(checkRetiredClaims(scan(said.join('\n'))), 'fail')).toHaveLength(1)
+
+    said[4] = '  </p> {/* retired-claim-ok, quoting what the page used to say */}'
+    expect(messages(checkRetiredClaims(scan(said.join('\n'))), 'fail')).toEqual([])
+  })
+})
+
 describe('extractUiStrings', () => {
   it('reads a template literal that spans lines', () => {
     const text = ['const a = `first', 'second`', 'const b = 1'].join('\n')

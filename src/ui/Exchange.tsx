@@ -226,9 +226,13 @@ function Counted({ stats }: { stats: Stats }) {
         </span>
       ) : null}
       {stats.bestFear ? <span>Best Fear {stats.bestFear}</span> : null}
+      {/* Never the average on its own. `raters` is not a footnote to it: two
+        * people saying four is a different claim from two hundred saying four,
+        * and a bare 4.0 hides which one you are reading. */}
       {stats.rating !== null ? (
         <span>
-          {stats.rating} from {stats.raters}
+          ★ {stats.rating.toFixed(1)} from {stats.raters}{' '}
+          {stats.raters === 1 ? 'player' : 'players'}
         </span>
       ) : null}
     </p>
