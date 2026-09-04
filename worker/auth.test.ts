@@ -52,7 +52,20 @@ beforeEach(async () => {
 })
 
 describe('what the deployment admits to', () => {
-  it('reports no password reset when no mail provider is configured', async () => {
+  /**
+   * Half configured is the case that matters, and it is the case this now runs
+   * in. `MAIL_FROM` moved into `wrangler.jsonc` vars, so it is set here and in
+   * production whether or not anybody has bought a provider yet. Only the API
+   * key is missing, and one of the two missing has to be enough.
+   *
+   * The precondition is asserted rather than assumed: without it, removing
+   * `MAIL_FROM` from the config would leave this test passing while quietly
+   * testing nothing.
+   */
+  it('reports no password reset when only half the mail settings exist', async () => {
+    expect(env.MAIL_FROM).toBeTruthy()
+    expect(env.RESEND_API_KEY ?? '').toBe('')
+
     const response = await SELF.fetch(`${ORIGIN}/api/capabilities`)
     expect(response.status).toBe(200)
     // The UI greys out "forgotten your password" on the strength of this. If it

@@ -94,6 +94,19 @@
     }
   ],
 
+  // Not secrets, and therefore not set like them.
+  //
+  // MAIL_FROM is printed on every letter it sends, so keeping it here means a
+  // fresh deploy describes its own sender instead of depending on somebody
+  // remembering a `wrangler secret put`. The key beside it, RESEND_API_KEY, is
+  // a real secret and is NOT here: `wrangler secret put RESEND_API_KEY`.
+  //
+  // Dora rather than noreply because a reply reaches a person. worker/email.ts
+  // writes the letter in her voice for the same reason.
+  "vars": {
+    "MAIL_FROM": "Dora <dora@enodia.me>"
+  },
+
   // better-auth reaches for a few node builtins. Without this the Worker fails
   // to start rather than failing at a request, so it is not subtle.
   "compatibility_flags": ["nodejs_compat"]
