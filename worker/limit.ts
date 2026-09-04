@@ -92,6 +92,21 @@ export const RULES = {
   own: { window: 60, max: 120 },
 
   /**
+   * Syncing an account's things between devices.
+   *
+   * **The one route a person triggers without pressing anything**, so it gets
+   * its own budget rather than sharing `own`. It runs on sign-in and after
+   * edits, and ordinary use of it must not be able to exhaust the allowance for
+   * reading your own list.
+   *
+   * Higher than the others because a sync is cheap and frequent by design: a
+   * device that has been offline all day catches up in one call, and a device
+   * being used catches up after each change. Two a second sustained is far past
+   * anything a person generates and still bounded.
+   */
+  sync: { window: 60, max: 120 },
+
+  /**
    * Redeeming a friend code, which is the one guessable secret in the API.
    *
    * A code is 8 characters from a 57 character alphabet, so the space is about
