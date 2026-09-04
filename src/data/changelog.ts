@@ -24,7 +24,7 @@ export const CHANGELOG: Release[] = [
     say: 'You can sign in now. It buys two things, and the tool still works entirely without it.',
     points: [
       'Sign in, and a build you publish gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. Discord renders the long one as a wall.',
-      'Viewing, building, checking and saving are all still free and still need no account. Nothing else in the tool asks who you are.',
+      'Viewing, building, checking and saving are all still free and none of them asks who you are. An account is what gets you the rest.',
       'Your builds, your runs and your settings follow you between devices. Sign in on a phone and what you made on a desktop is already there. Where two devices disagree about the same build, the one changed most recently wins.',
       'It copies rather than moves. Everything still lives in this browser, everything still works signed out, and Settings still has the export.',
       'Friends, by swapping an eight character code. You see what they publish, they see what you publish, and nobody else sees either.',

@@ -10,7 +10,9 @@ import {
   checkProvenance,
   checkReferences,
   checkRoster,
+  checkRetiredClaims,
   checkVocabulary,
+  RETIRED_CLAIMS,
   classifyTraits,
   offerableTraits,
   extractUiStrings,
@@ -319,6 +321,70 @@ describe('vocabulary', () => {
     const findings = scan('export const A = () => <p>Ten rooms in</p>', 'tsx', true)
     expect(messages(findings, 'fail')).toEqual([])
     expect(messages(findings, 'warn')).toHaveLength(1)
+  })
+})
+
+describe('retired claims', () => {
+  const scan = (text: string, path = 'src/ui/Test.tsx') =>
+    checkRetiredClaims(bundle({ sources: [source(path, 'tsx', text)] }))
+
+  /**
+   * The check that exists because this exact sentence outlived the server by
+   * weeks and was found by hand five separate times.
+   */
+  it('fails on a retired claim in JSX text', () => {
+    const findings = scan('export const A = () => <p>No account. Nothing to install.</p>')
+    expect(messages(findings, 'fail')).toEqual(['1 UI strings make a claim the tool no longer may'])
+    expect(findings[0]?.detail?.[0]).toContain('"no account" was retired')
+    // It says what to write instead, rather than only saying no.
+    expect(findings[0]?.detail?.[0]).toContain('an account is how the tool is meant to be used')
+  })
+
+  it('fails on one in a string literal', () => {
+    expect(messages(scan('const say = "there is no server behind this"'), 'fail')).toHaveLength(1)
+  })
+
+  /**
+   * **The bug this check shipped with, kept so it cannot come back.**
+   *
+   * The patterns were first written through a script that turned `` into a
+   * literal backspace character. `String(pattern)` printed `/no account/i`,
+   * identical to a correct one, and it matched nothing at all: the guard
+   * reported a clean pass over copy that said the banned thing twice. An
+   * invisible character made a check that could only ever succeed.
+   */
+  it('actually matches the phrases it lists, which is not a given', () => {
+    for (const retired of RETIRED_CLAIMS) {
+      expect(String(retired.pattern), retired.claim).not.toMatch(/[\u0000-\u001f]/)
+      expect(retired.pattern.test(retired.claim), retired.claim).toBe(true)
+    }
+  })
+
+  it('leaves comments alone, because they discuss the history on purpose', () => {
+    const text = ['// there is no account any more', '/* no server, once */', 'const a = 1'].join('\n')
+    expect(messages(scan(text), 'fail')).toEqual([])
+  })
+
+  it('takes an escape on the line, when the phrase is genuinely right', () => {
+    const text = 'const say = "no server" // retired-claim-ok, quoting the old copy'
+    expect(messages(scan(text), 'fail')).toEqual([])
+  })
+
+  /**
+   * A changelog is a record of what shipped. Rewriting it to match the present
+   * is how it stops being worth reading, so an entry from before a claim was
+   * retired keeps its wording and one written after does not.
+   */
+  it('exempts a changelog entry older than the claim, and not a newer one', () => {
+    const old = ["  { date: '2026-09-01',", "    points: ['there is no server involved'] },"].join('\n')
+    expect(messages(scan(old, 'src/data/changelog.ts'), 'fail')).toEqual([])
+
+    const recent = ["  { date: '2026-09-03',", "    points: ['there is no server involved'] },"].join('\n')
+    expect(messages(scan(recent, 'src/data/changelog.ts'), 'fail')).toHaveLength(1)
+  })
+
+  it('says so when nothing repeats one', () => {
+    expect(messages(scan('const say = "sign in to publish"'), 'fail')).toEqual([])
   })
 })
 
