@@ -21,38 +21,44 @@
  */
 
 /**
- * **The switch. `false` until password reset exists.**
+ * **The switch, and it is on.**
  *
- * There is no mail provider, so `worker/auth.ts` sends no email, so there is no
- * verification and no way to reset a forgotten password. Everything below is
- * built and tested, and the Account room stays a Dora room until this is true.
+ * It was false for as long as there was no way back into a forgotten account,
+ * because an account somebody can be locked out of permanently is a trap with a
+ * nice form on it. That is fixed rather than waived. `dora@enodia.me` sends the
+ * letter through Resend, `ResetPassword` in `ui/Account.tsx` is the screen the
+ * link lands on, and a reset ends every other session.
  *
- * Turning it on before then means the first stranger who forgets a password is
- * locked out permanently, with nobody able to help them. That is not a bug that
- * shows up in testing; it shows up in a week, in someone else's inbox that does
- * not exist.
+ * Kept as a flag rather than deleted, so turning accounts off again is one line
+ * and a deploy rather than a hurried revert.
  *
- * Two ways to earn the flip, and the second is probably better:
+ * ## What it opens, and what it does not
  *
- * - a mail provider, and `sendResetPassword` wired into `worker/auth.ts`
- * - **Discord**, as a social provider. No password, so nothing to reset, no
- *   email to send, and it is where this audience already is
+ * Three things: the Account screen, the Friends screen, and the Publish item on
+ * a build. Build exchange and Leaderboards stay as Dora's empty rooms, so this
+ * exposes nothing half finished.
+ *
+ * **All three were driven through the interface before this was turned on**,
+ * not only through the API. Signing up returns the signed-in screen, Friends
+ * draws a real code, and Publish hands back a short link that resolves. That
+ * distinction was worth the time it cost: the API had a full test suite behind
+ * it and the publish button had never once been clicked, which is exactly the
+ * gap `DESIGN.md` 11 is about.
  *
  * ## This is a UI gate, and only a UI gate
  *
  * Being precise, because the difference matters: `/api/auth/*` is deployed and
  * reachable whatever this says. Somebody who reads the JavaScript and posts to
- * the endpoint by hand can still make an account, and would then hit the same
- * missing reset.
+ * the endpoint by hand could always make an account, and for as long as this was
+ * false they would then have hit the missing reset. That was the accepted trade
+ * and it no longer costs anything, because the reset now exists for them too.
  *
- * That is accepted rather than overlooked. The endpoints are rate limited, none
- * of them are linked from anywhere, and a person willing to curl their way into
- * an account is not the person who gets stranded by a missing reset. Closing the
- * server side too would also lock the owner out of testing their own deployment.
- * **If that trade stops looking right, the place to close it is `worker/auth.ts`,
- * not here.**
+ * The endpoints are rate limited in `worker/auth.ts` and `worker/limit.ts`
+ * rather than hidden, which is the protection that was always doing the work.
+ * **If turning this off is ever needed for real, the place to close the server
+ * side is `worker/auth.ts`, not here.**
  */
-export const ACCOUNTS_LIVE = false
+export const ACCOUNTS_LIVE = true
 
 export type Account = {
   id: string
