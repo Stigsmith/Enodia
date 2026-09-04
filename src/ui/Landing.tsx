@@ -65,12 +65,18 @@ export function Landing({ onEnter }: { onEnter: () => void }) {
           rules, and send it to somebody.
         </p>
         {/* The way in, above everything that explains it. Somebody who already
-          * knows what this is should never have to read past it. */}
+          * knows what this is should never have to read past it.
+          *
+          * It used to be followed by "No account. Nothing to install.", which
+          * was written when there was no server and stopped being the pitch the
+          * moment there was one. The tool is free and works signed out, and an
+          * account is how you use it properly: it carries your builds between
+          * devices, publishes them and holds your friends. Selling the absence
+          * of the thing that makes it good was arguing against itself. */}
         <p className="landing-go">
           <button type="button" className="landing-in" onClick={onEnter}>
             Open it
           </button>
-          <span className="landing-in-note">No account. Nothing to install.</span>
         </p>
       </header>
 

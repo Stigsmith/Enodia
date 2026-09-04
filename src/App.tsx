@@ -29,6 +29,7 @@ import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
 import { Exchange } from './ui/Exchange.tsx'
+import { You } from './ui/You.tsx'
 import { Friends } from './ui/Friends.tsx'
 import { ACCOUNTS_LIVE, ACCOUNT_CHANGED, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
@@ -348,6 +349,11 @@ export function App() {
         onEndRun={endRun}
         onShowBriefing={run ? openBriefing : undefined}
       />
+      {/* The other corner. Where you go on the left, who you are on the right,
+        * on every screen, which is the split that makes two of them worth
+        * having. `ui/You.tsx` says why it is the full convention rather than a
+        * quiet link. */}
+      {ACCOUNTS_LIVE ? <You onGo={setView} /> : null}
       <div className="app-view">{children}</div>
 
       {/* One mark, every screen, because `frame` wraps all of them. It draws

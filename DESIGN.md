@@ -751,9 +751,14 @@ it.
 a build or just a weapon. That choice feeds Setup, and Setup opens the run. Three steps in
 one direction, no branching.
 
-**The menu is one button, top left, opening a dropdown.** It holds everything that is not
-the current run: restart, browse saved builds, create a build. It covers like an overlay and
-returns you where you were, so it is never a place the run navigates to.
+**The menu is one button, top left, opening a dropdown.** It holds everywhere you can go
+that is not the current run: restart, browse saved builds, create a build. It covers like an
+overlay and returns you where you were, so it is never a place the run navigates to.
+
+**And a second button, top right, holding who you are.** Account, Friends and signing out,
+with a profile to come. The split is what makes two of them worth having rather than
+confusing: the left one is where you go, the right one is you. It is the same rule mirrored,
+same offsets and same z-index, so neither corner is a special case.
 
 > Sketched, not settled. What "pick a build" offers before the Phase 2 archetypes exist, and
 > whether weapon-only entry is its own path or simply an empty build, are open.
