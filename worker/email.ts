@@ -86,27 +86,26 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
 }
 
 /**
- * The reset letter, in Dora's actual voice.
+ * The reset letter, in Dora's voice.
  *
- * **Checked against the game, not against an impression of it.** The first
- * version of this was written from memory and was wrong: dry, clipped and
- * faintly aristocratic, which is a butler rather than Dora. Her 279 lines in
- * `Content/Game/Text/en/_NPCData_Dora.en.sjson` are warm, chatty and American.
- * She opens with "Hey", she uses contractions and elisions, she trails off
- * mid-thought, and she undercuts herself constantly.
+ * **Workshopped by the owner against her actual lines**, which is the reason it
+ * reads the way it does. The transcript is every line of hers in the game,
+ * `Content/Game/Text/en/_NPCData_Dora.en.sjson`, 278 of them. An earlier draft
+ * written from an impression of her rather than from that file came out dry and
+ * clipped, which is a butler. She is warm, casual, American, elided, and she
+ * trails off constantly.
  *
  * **She does not scold, and the source is why.** A scolding letter was the
  * brief until her own line turned up: "Why else would I have forgotten
  * everything? Probably took a couple swigs from the River Lethe, and that was
  * that! Clean slate." She forgot her entire life. She has no standing to be
- * smug at somebody about a password, and sympathy from the least organised
- * character in the game is the better joke anyway. Her line about tracking
- * every boon survives, but it lands as absurd rather than superior.
+ * smug at anybody about a password, and sympathy from the least organised
+ * character in the game is the better joke anyway.
  *
- * **The working half is not the joke half, and the order is deliberate.** The
- * person reading this is locked out and wants one thing, so the link and the
- * expiry come first and stay plain. Everything after them is optional, and
- * somebody who reads four lines and stops has lost nothing.
+ * **The working half comes first and stays plain.** The person reading this is
+ * locked out and irritated, so what happened, the link, and the expiry are the
+ * first three things. Everything after them is optional and somebody who stops
+ * reading has lost nothing.
  *
  * **The subject line stays boring.** It is what gets typed into a search box at
  * the worst moment, so it says what the letter is and nothing else.
@@ -119,25 +118,19 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
 export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
   subject: 'Reset your Enodia password',
   text: [
-    'Hey. So somebody asked to reset the password on this Enodia account.',
+    'Hey. Somebody asked to reset the password on this Enodia account.',
     '',
-    'If that was you, here. Pick a new one:',
     url,
     '',
-    "Works once, expires in an hour. No pressure, but... that's the window.",
+    "Link works once. Expires in an hour, so don't sit on it.",
     '',
-    "If it wasn't you, just ignore this. Nothing's changed, your account's fine.",
+    "Wasn't you? Then ignore this, nothing's changed. No harm done.",
     '',
-    "Anyway, I'm not judging. I drank from the Lethe at some point and forgot my",
-    "entire life. Whole thing, gone. Clean slate. So, a password? That's nothing.",
-    "You're doing great.",
+    "I forgot my whole life, so, you know. A password's nothing.",
     '',
-    '...I do keep track of every boon and every Exit you take, though. Every single',
-    "one of them. Not sure how come that stuck and my own name didn't. Try not to",
-    'think about it too hard.',
+    'Anyway...',
     '',
-    'Dora',
     '',
-    'Enodia is an unofficial fan project and is not affiliated with Supergiant Games.',
+    'Enodia is an unofficial fan project. Not affiliated with Supergiant Games.',
   ].join('\n'),
 })

@@ -27,9 +27,10 @@ import { Settings } from './ui/Settings.tsx'
 import { Changelog, Roadmap } from './ui/Pages.tsx'
 import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
-import { Account } from './ui/Account.tsx'
+import { Account, ResetPassword } from './ui/Account.tsx'
 import { Friends } from './ui/Friends.tsx'
-import { ACCOUNTS_LIVE } from './state/account.ts'
+import { ACCOUNTS_LIVE, resetInUrl } from './state/account.ts'
+import type { ResetArrival } from './state/account.ts'
 import { KOFI, kofiUrl } from './data/kofi.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
@@ -123,6 +124,17 @@ export function App() {
     }
     return 'builds'
   })
+
+  /**
+   * Somebody arriving from a password reset letter.
+   *
+   * Read once from the URL rather than watched, because this only ever arrives
+   * on a fresh load: the browser follows the link in the letter, better-auth
+   * bounces it here, and nothing in the app navigates to it afterwards.
+   */
+  const [resetting, setResetting] = useState<ResetArrival | null>(() =>
+    resetInUrl(window.location.search),
+  )
 
   /** Walked through, so it stops being a screen and becomes a menu entry. */
   const leaveLanding = () => {
@@ -301,6 +313,34 @@ export function App() {
     </HelpProvider>
     </PeekProvider>
   )
+
+  /**
+   * A password reset, before anything else on the screen.
+   *
+   * First because somebody who clicked a link in an email has exactly one job,
+   * and every other screen is in the way of it. It sits above the
+   * `ACCOUNTS_LIVE` gate on purpose: a token exists only because a letter was
+   * sent, a letter is sent only for a real account, and refusing to finish the
+   * reset because a flag is off would be the trap the flag exists to prevent.
+   *
+   * `replaceState` on the way out takes the token off the address bar, so a
+   * reload cannot replay a spent one into a confusing error and the URL is not
+   * carrying a credential around after it has been used.
+   */
+  if (resetting) {
+    return frame(
+      <div className="shell is-wide">
+        <ResetPassword
+          arrival={resetting}
+          onDone={() => {
+            history.replaceState(null, '', window.location.pathname)
+            setResetting(null)
+            setView(ACCOUNTS_LIVE ? 'account' : 'builds')
+          }}
+        />
+      </div>,
+    )
+  }
 
   /* The reading screens. Nothing on them is interactive, so they share one
    * branch and one shell rather than four of each. */
