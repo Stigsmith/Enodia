@@ -111,8 +111,8 @@ describe('counting, which is the part that lies if you get it wrong', () => {
 
   it('marks what is chosen', () => {
     const arm = firstOption('weapon')
-    expect(facet('weapon', choose(EMPTY_SELECTION, 'weapon', arm.value)).chosen).toBe(arm.value)
-    expect(facet('weapon').chosen).toBeNull()
+    expect(facet('weapon', choose(EMPTY_SELECTION, 'weapon', arm.value)).chosen).toEqual([arm.value])
+    expect(facet('weapon').chosen).toEqual([])
   })
 
   it('never drops the chosen option, even if it would count zero', () => {
@@ -131,6 +131,22 @@ describe('counting, which is the part that lies if you get it wrong', () => {
 })
 
 describe('matching', () => {
+  /**
+   * OR inside a facet, which is the question people actually have. The other
+   * reading, AND inside a facet, means "uses both gods" and is answered today
+   * by picking one and reading the list.
+   */
+  it('is OR within a facet', () => {
+    const [a, b] = PAIR
+    if (!a || !b) throw new Error('need two arms')
+
+    const both = choose(choose(EMPTY_SELECTION, 'weapon', a.weapon), 'weapon', b.weapon)
+    expect(apply(PAIR, both)).toHaveLength(2)
+
+    // And one of them alone is still one of them.
+    expect(apply(PAIR, choose(EMPTY_SELECTION, 'weapon', a.weapon))).toHaveLength(1)
+  })
+
   it('is AND across facets', () => {
     const [a, b] = PAIR
     if (!a || !b) throw new Error('need two arms')
@@ -150,33 +166,64 @@ describe('matching', () => {
   it('ignores the facet it is told to ignore', () => {
     const first = SAMPLE_BUILDS[0]
     if (!first) throw new Error('no builds')
-    const impossible = { ...EMPTY_SELECTION, aspect: 'NoSuchAspect' }
+    const impossible = { ...EMPTY_SELECTION, aspect: ['NoSuchAspect'] }
     expect(matches(first, impossible)).toBe(false)
     expect(matches(first, impossible, 'aspect')).toBe(true)
   })
 })
 
 describe('choosing', () => {
-  it('holds one value per facet and clears with null', () => {
+  it('adds, toggles off, and clears the whole facet with null', () => {
     const one = choose(EMPTY_SELECTION, 'god', 'Zeus')
-    expect(one.god).toBe('Zeus')
+    expect(one.god).toEqual(['Zeus'])
     expect(countSelected(one)).toBe(1)
-    expect(choose(one, 'god', 'Poseidon').god).toBe('Poseidon')
-    expect(choose(one, 'god', null).god).toBeNull()
+
+    // A second value joins rather than replacing. This is the whole change.
+    const two = choose(one, 'god', 'Poseidon')
+    expect(two.god).toEqual(['Zeus', 'Poseidon'])
+    // Still one facet narrowing, whatever it holds.
+    expect(countSelected(two)).toBe(1)
+
+    // Clicking a chosen option again takes it back out.
+    expect(choose(two, 'god', 'Zeus').god).toEqual(['Poseidon'])
+    expect(choose(two, 'god', null).god).toEqual([])
   })
 
-  it('clears the aspect when the arm changes under it', () => {
+  /**
+   * Fear is a threshold, so a set of them collapses to the lowest and the extra
+   * choices would be furniture. It replaces instead of accumulating.
+   */
+  it('replaces rather than accumulating on Fear', () => {
+    const one = choose(EMPTY_SELECTION, 'fear', '20')
+    expect(one.fear).toEqual(['20'])
+    expect(choose(one, 'fear', '40').fear).toEqual(['40'])
+    // And clicking the held one still clears it.
+    expect(choose(one, 'fear', '20').fear).toEqual([])
+  })
+
+  /**
+   * The dependency survived the move to sets, but its trigger changed.
+   *
+   * It used to fire when the arm *changed*, because only one could be held.
+   * Arms accumulate now, so the case that strands an aspect is dropping the arm
+   * it belongs to. An aspect whose arm is gone matches nothing and says nothing
+   * about why, which is the thing this has always been here to prevent.
+   */
+  it('clears an aspect when the arm it belongs to is dropped', () => {
     const [build, other] = PAIR
     if (!build || !other) throw new Error('need two arms')
 
-    const picked = choose(choose(EMPTY_SELECTION, 'weapon', build.weapon), 'aspect', build.aspect)
-    expect(picked.aspect).toBe(build.aspect)
+    let picked = choose(EMPTY_SELECTION, 'weapon', build.weapon)
+    picked = choose(picked, 'aspect', build.aspect)
+    expect(picked.aspect).toEqual([build.aspect])
 
-    // An aspect belongs to exactly one arm, so keeping it would show an empty
-    // list with no visible cause.
-    const moved = choose(picked, 'weapon', other.weapon)
-    expect(moved.aspect).toBeNull()
-    expect(apply(PAIR, moved).length).toBeGreaterThan(0)
+    // Add a second arm, then take the first one away.
+    picked = choose(picked, 'weapon', other.weapon)
+    const dropped = choose(picked, 'weapon', build.weapon)
+
+    expect(dropped.weapon).toEqual([other.weapon])
+    expect(dropped.aspect).toEqual([])
+    expect(apply(PAIR, dropped).length).toBeGreaterThan(0)
   })
 
   it('keeps the aspect when the arm is the one it belongs to', () => {
@@ -185,20 +232,67 @@ describe('choosing', () => {
     const picked = choose(EMPTY_SELECTION, 'aspect', build.aspect)
     const weapon = traits.get(build.aspect)?.requiredWeapon
     expect(weapon).toBeTruthy()
-    expect(choose(picked, 'weapon', weapon as string).aspect).toBe(build.aspect)
+    expect(choose(picked, 'weapon', weapon as string).aspect).toEqual([build.aspect])
   })
 
   it('keeps the aspect when the arm is cleared', () => {
     const build = SAMPLE_BUILDS[0]
     if (!build) throw new Error('no builds')
     const picked = choose(choose(EMPTY_SELECTION, 'weapon', build.weapon), 'aspect', build.aspect)
-    expect(choose(picked, 'weapon', null).aspect).toBe(build.aspect)
+    expect(choose(picked, 'weapon', null).aspect).toEqual([build.aspect])
+  })
+
+  /**
+   * Two arms chosen keeps the aspects of both.
+   *
+   * The old rule cleared the aspect whenever the arm changed, which was right
+   * when only one arm could be held. With a set, "the Blades or the Staff, and
+   * these two aspects" is expressible, and dropping an aspect whose arm is still
+   * chosen would silently answer a different question.
+   */
+  it('keeps the aspects of every arm still chosen', () => {
+    const [a, b] = PAIR
+    if (!a || !b) throw new Error('need two arms')
+
+    let picked = choose(EMPTY_SELECTION, 'weapon', a.weapon)
+    picked = choose(picked, 'aspect', a.aspect)
+    picked = choose(picked, 'weapon', b.weapon)
+
+    // Both arms held, so the first arm's aspect survives.
+    expect(picked.weapon).toEqual([a.weapon, b.weapon])
+    expect(picked.aspect).toEqual([a.aspect])
+
+    // Dropping the arm it belongs to takes it with it.
+    const dropped = choose(picked, 'weapon', a.weapon)
+    expect(dropped.weapon).toEqual([b.weapon])
+    expect(dropped.aspect).toEqual([])
   })
 })
 
 describe('sorting', () => {
-  it.each(['name', 'arm', 'gods'] as const)('%s keeps every build', (by) => {
-    expect(sortBuilds(SAMPLE_BUILDS, by)).toHaveLength(SAMPLE_BUILDS.length)
+  it.each(['name', 'arm', 'gods', 'recent', 'assemble', 'fear'] as const)(
+    '%s keeps every build',
+    (by) => {
+      expect(sortBuilds(SAMPLE_BUILDS, by)).toHaveLength(SAMPLE_BUILDS.length)
+    },
+  )
+
+  /** A build with no date sorts last rather than throwing. `ShownBuild` makes
+   * `modified` optional even though `SavedBuild` does not. */
+  it('puts an undated build last rather than failing on it', () => {
+    const dated: ShownBuild = { ...FIRST_BUILD, id: 'dated', modified: '2026-09-01T00:00:00.000Z' }
+    const undated: ShownBuild = { ...FIRST_BUILD, id: 'undated', modified: undefined, created: undefined }
+    expect(sortBuilds([undated, dated], 'recent').map((one) => one.id)).toEqual(['dated', 'undated'])
+  })
+
+  it('orders Fear cleared with the highest first', () => {
+    const at = (fear: number | undefined, id: string): ShownBuild => ({
+      ...FIRST_BUILD,
+      id,
+      play: fear === undefined ? undefined : { fear },
+    })
+    const order = sortBuilds([at(undefined, 'none'), at(30, 'high'), at(10, 'low')], 'fear')
+    expect(order.map((one) => one.id)).toEqual(['high', 'low', 'none'])
   })
 
   it('does not mutate what it is given', () => {

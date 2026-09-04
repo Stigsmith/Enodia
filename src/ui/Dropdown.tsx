@@ -41,6 +41,8 @@ export function Dropdown({
   options,
   chosen,
   onChoose,
+  many = false,
+  held,
 }: {
   label: string
   /** what the empty choice reads as */
@@ -48,6 +50,18 @@ export function Dropdown({
   options: DropdownOption[]
   chosen: string | null
   onChoose: (value: string | null) => void
+  /**
+   * Hold several at once. Off by default, so the nine single-value dropdowns in
+   * the editor were not touched to add this.
+   *
+   * In this mode `onChoose(value)` is a **toggle** and the list stays open,
+   * because picking three gods should be three clicks rather than three
+   * open-pick-close cycles. `onChoose(null)` still means clear, and still
+   * closes: that is the end of the interaction rather than a step in it.
+   */
+  many?: boolean
+  /** What is held, when `many`. Ignored otherwise. */
+  held?: readonly string[]
 }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
@@ -58,9 +72,23 @@ export function Dropdown({
 
   // The empty choice is a row like any other, so one index space covers both.
   const rows: DropdownOption[] = [{ value: '', label: all }, ...options]
-  // `?? null`, because find returns undefined for a chosen value that has
-  // dropped out of the options, and Face distinguishes null from absent.
-  const current = (chosen ? options.find((option) => option.value === chosen) : null) ?? null
+  const picked = many ? (held ?? []) : chosen ? [chosen] : []
+  const isPicked = (value: string) => (value === '' ? picked.length === 0 : picked.includes(value))
+
+  /**
+   * What the closed control says.
+   *
+   * One held value shows that value with its art, which is what the single
+   * version always did. Several cannot: three icons and three labels do not fit
+   * the button, and truncating them picks a winner arbitrarily. So it counts,
+   * and the count is the honest summary of a set.
+   */
+  const current =
+    picked.length === 1
+      ? (options.find((option) => option.value === picked[0]) ?? null)
+      : picked.length > 1
+        ? { value: '', label: `${picked.length} chosen` }
+        : null
 
   const close = useCallback(() => {
     setOpen(false)
@@ -68,15 +96,19 @@ export function Dropdown({
   }, [])
 
   const openAt = useCallback(() => {
-    const index = rows.findIndex((row) => row.value === (chosen ?? ''))
+    const first = picked[0] ?? ''
+    const index = rows.findIndex((row) => row.value === first)
     setActive(index < 0 ? 0 : index)
     setOpen(true)
-  }, [chosen, rows])
+  }, [picked, rows])
 
   const commit = (index: number) => {
     const row = rows[index]
     if (!row) return
     onChoose(row.value === '' ? null : row.value)
+    // Choosing one of several is a step, not the end of the interaction, so the
+    // list stays where it is. Clearing is the end, so it closes.
+    if (many && row.value !== '') return
     close()
     root.current?.querySelector('button')?.focus()
   }
@@ -187,16 +219,23 @@ export function Dropdown({
       </button>
 
       {open ? (
-        <ul className="bdrop-list" role="listbox" id={`${id}-list`} aria-labelledby={`${id}-label`} ref={list}>
+        <ul
+          className="bdrop-list"
+          role="listbox"
+          id={`${id}-list`}
+          aria-labelledby={`${id}-label`}
+          aria-multiselectable={many || undefined}
+          ref={list}
+        >
           {rows.map((row, index) => (
             <li
               key={row.value || '_all'}
               id={`${id}-row-${index}`}
               role="option"
-              aria-selected={row.value === (chosen ?? '')}
+              aria-selected={isPicked(row.value)}
               data-active={index === active}
               className={`bdrop-row${index === active ? ' is-active' : ''}${
-                row.value === (chosen ?? '') ? ' is-chosen' : ''
+                isPicked(row.value) ? ' is-chosen' : ''
               }`}
               /* Pointer down rather than click, so the button's own blur does
                  not close the list before the click lands, and so a touch

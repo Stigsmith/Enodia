@@ -5,20 +5,26 @@
  * to hold dozens of tested builds and then whatever the community adds, so this
  * is written against that rather than against what is on screen today.
  *
- * ## Five facets, and the first two are the ones people have
+ * ## Seven facets, and the first two are the ones people have
  *
  * **Arm, then aspect.** That is the order a player already thinks in: they pick
  * up the Sister Blades and then choose which Sister Blades. Aspect alone was
  * the wrong first question, because there are 24 of them and no useful grouping
- * without the weapon in front. Gods, keepsake and familiar are questions people
- * only sometimes have, so they live behind a disclosure.
+ * without the weapon in front. Gods, what it leans on, keepsake, familiar and
+ * Fear are questions people only sometimes have, so they live behind a
+ * disclosure.
  *
- * ## One value per facet
+ * ## More than one value per facet, except Fear
  *
- * These are dropdowns, so a facet holds one value or none. That is a real
- * constraint against the chips this replaced, which could express "Zeus or
- * Poseidon", and it buys back the vertical space chips were eating on a phone:
- * five dropdowns are five rows, twenty-eight chips were about nine.
+ * A facet holds a set. "Zeus or Poseidon" is the question people actually have,
+ * and an earlier version of this could express it with chips, lost it when the
+ * chips became dropdowns, and is getting it back without the nine rows of
+ * vertical space the chips cost on a phone.
+ *
+ * **Fear is the exception and holds one value.** It is a threshold rather than a
+ * match, so "30 or better" OR "50 or better" is just "30 or better": every
+ * build the second admits, the first already did. A control offering a choice
+ * that cannot change the answer is worse than one that does not offer it.
  *
  * ## Every facet is derived
  *
@@ -51,12 +57,38 @@ import {
   weaponById,
   weapons,
 } from '../data/app.ts'
+import { PLAYSTYLES } from '../data/builds.ts'
+import { readRepeat } from '../engine/repeat.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
-/** The five things a build can be narrowed by, in the order they are asked. */
-export type FacetId = 'weapon' | 'aspect' | 'god' | 'keepsake' | 'familiar' | 'fear'
+/** The seven things a build can be narrowed by, in the order they are asked. */
+export type FacetId =
+  | 'weapon'
+  | 'aspect'
+  | 'god'
+  | 'playstyle'
+  | 'keepsake'
+  | 'familiar'
+  | 'fear'
 
-export const FACET_ORDER: FacetId[] = ['weapon', 'aspect', 'god', 'keepsake', 'familiar', 'fear']
+export const FACET_ORDER: FacetId[] = [
+  'weapon',
+  'aspect',
+  'god',
+  'playstyle',
+  'keepsake',
+  'familiar',
+  'fear',
+]
+
+/**
+ * The one facet that holds a single value.
+ *
+ * See the header: Fear is a threshold, so a set of them collapses to its lowest
+ * member and the extra choices are furniture. Stated as data rather than as an
+ * `if` in `choose`, because three separate places have to agree about it.
+ */
+export const SINGLE: ReadonlySet<FacetId> = new Set<FacetId>(['fear'])
 
 /**
  * The Fear bands a build can be filtered by.
@@ -75,30 +107,34 @@ const FEAR_BANDS = [10, 20, 30, 40, 50] as const
 /** Weapon and aspect are on the surface. The rest unfold. */
 export const SURFACE_FACETS: FacetId[] = ['weapon', 'aspect']
 
-export type Selection = Record<FacetId, string | null>
+/** What is picked, per facet. An empty array is "not narrowing by this". */
+export type Selection = Record<FacetId, string[]>
 
 export const EMPTY_SELECTION: Selection = {
-  weapon: null,
-  aspect: null,
-  god: null,
-  keepsake: null,
-  familiar: null,
-  fear: null,
+  weapon: [],
+  aspect: [],
+  god: [],
+  playstyle: [],
+  keepsake: [],
+  familiar: [],
+  fear: [],
 }
 
 /**
  * How many facets are narrowing the list.
  *
- * **`!= null`, not `!== null`, and the difference is a bug that shipped.**
+ * **`?.length ?? 0`, and the optional chain is a bug that shipped.**
  * `facets()` drops a facet with no options, so a caller rebuilding a selection
- * out of what it returned gets an object missing those keys. `undefined` is not
- * `null`, so an empty library counted all six facets as chosen and the bar
- * offered to "Clear 6" with nothing selected.
+ * out of what it returned gets an object missing those keys. When this held
+ * `string | null` the key was `undefined`, `undefined !== null` was true, and an
+ * empty library counted every facet as chosen: the bar offered to "Clear 6" with
+ * nothing selected. The shape changed to arrays and the hazard did not, because
+ * reading `.length` off a missing key throws rather than counting wrong.
  *
- * The type says every key is present. The type was being satisfied by a cast.
+ * The type says every key is present. The type is satisfied by a cast.
  */
 export const countSelected = (selection: Partial<Selection>): number =>
-  FACET_ORDER.filter((facet) => selection[facet] != null).length
+  FACET_ORDER.filter((facet) => (selection[facet]?.length ?? 0) > 0).length
 
 export const isEmpty = (selection: Partial<Selection>): boolean => countSelected(selection) === 0
 
@@ -135,6 +171,8 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
       return [build.aspect]
     case 'god':
       return godsOf(build)
+    case 'playstyle':
+      return build.playstyle ? [build.playstyle] : []
     case 'keepsake':
       return build.keepsake ? [build.keepsake] : []
     case 'familiar':
@@ -144,12 +182,21 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
   }
 }
 
+/**
+ * **OR inside a facet, AND across them.**
+ *
+ * "Zeus or Poseidon" and "on the Sister Blades" is one question, and it is the
+ * one people ask. The other reading, AND inside a facet, would mean "uses Zeus
+ * and Poseidon both", which is a different and much rarer question: it is
+ * answered today by picking Zeus and reading the list.
+ */
 export function matches(build: ShownBuild, selection: Selection, ignore?: FacetId): boolean {
   for (const facet of FACET_ORDER) {
     if (facet === ignore) continue
-    const picked = selection[facet]
-    if (picked === null) continue
-    if (!valuesFor(build, facet).includes(picked)) return false
+    const picked = selection[facet] ?? []
+    if (picked.length === 0) continue
+    const has = valuesFor(build, facet)
+    if (!picked.some((value) => has.includes(value))) return false
   }
   return true
 }
@@ -165,7 +212,9 @@ export type Facet = {
   name: string
   /** what the empty choice reads as */
   all: string
-  chosen: string | null
+  chosen: string[]
+  /** false for Fear, which is a threshold. See `SINGLE`. */
+  many: boolean
   options: Option[]
 }
 
@@ -173,10 +222,18 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
   weapon: { name: 'Arm', all: 'Any arm' },
   aspect: { name: 'Aspect', all: 'Any aspect' },
   god: { name: 'Gods', all: 'Any god' },
+  playstyle: { name: 'Leans on', all: 'Anything' },
   keepsake: { name: 'Keepsake', all: 'Any keepsake' },
   familiar: { name: 'Familiar', all: 'Any familiar' },
   fear: { name: 'Fear cleared', all: 'Any Fear' },
 }
+
+/**
+ * What a build leans on, which is the one facet a build states in words rather
+ * than in ids. `PLAYSTYLES` is already ordered the way the game lists the moves.
+ */
+const PLAYSTYLE_NAME = new Map(PLAYSTYLES.map((one) => [one.id as string, one.name]))
+const PLAYSTYLE_RANK = new Map(PLAYSTYLES.map((one, at) => [one.id as string, at]))
 
 /**
  * A display name for a facet value.
@@ -188,6 +245,7 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
  */
 function labelFor(facet: FacetId, value: string, armChosen: boolean): string {
   if (facet === 'god') return value
+  if (facet === 'playstyle') return PLAYSTYLE_NAME.get(value) ?? value
   if (facet === 'fear') return `Fear ${value} or better`
   if (facet === 'familiar') return familiarById.get(value)?.name ?? value
   if (facet === 'weapon') {
@@ -256,6 +314,8 @@ function iconFor(facet: FacetId, value: string): string | null {
 const weaponRank = new Map(weapons.map((weapon, index) => [weapon.id, index]))
 
 function rankOf(facet: FacetId, value: string): number {
+  // The game's own move order, so Attack sits above Sprint rather than below it.
+  if (facet === 'playstyle') return PLAYSTYLE_RANK.get(value) ?? 99
   if (facet === 'weapon') return weaponRank.get(value) ?? 99
   if (facet !== 'aspect') return 0
   const weapon = traits.get(value)?.requiredWeapon
@@ -263,7 +323,10 @@ function rankOf(facet: FacetId, value: string): number {
 }
 
 export function facets(builds: readonly ShownBuild[], selection: Selection): Facet[] {
-  const armChosen = selection.weapon !== null
+  /* One arm chosen disambiguates the aspect labels. Two do not: with the Blades
+   * and the Staff both picked, six aspects are still called Aspect of Melinoe
+   * and dropping the arm from the label would make three pairs identical. */
+  const armChosen = (selection.weapon ?? []).length === 1
 
   return FACET_ORDER.map((facet) => {
     const values = new Set<string>()
@@ -272,7 +335,7 @@ export function facets(builds: readonly ShownBuild[], selection: Selection): Fac
     // Counted with this facet's own choice lifted, so a count reads as "how
     // many if I pick this instead" rather than "how many are left".
     const others = builds.filter((build) => matches(build, selection, facet))
-    const chosen = selection[facet]
+    const chosen = selection[facet] ?? []
 
     const options = [...values]
       .map((value) => ({
@@ -283,13 +346,20 @@ export function facets(builds: readonly ShownBuild[], selection: Selection): Fac
       }))
       // A dead option is dropped, except the one currently chosen: removing
       // that would silently change what is on screen.
-      .filter((option) => option.count > 0 || option.value === chosen)
+      .filter((option) => option.count > 0 || chosen.includes(option.value))
       .sort(
         (a, b) =>
           rankOf(facet, a.value) - rankOf(facet, b.value) || a.label.localeCompare(b.label),
       )
 
-    return { id: facet, name: NAMES[facet].name, all: NAMES[facet].all, chosen, options }
+    return {
+      id: facet,
+      name: NAMES[facet].name,
+      all: NAMES[facet].all,
+      chosen,
+      many: !SINGLE.has(facet),
+      options,
+    }
   })
     /**
      * A facet with nothing in it is not drawn.
@@ -304,31 +374,67 @@ export function facets(builds: readonly ShownBuild[], selection: Selection): Fac
 }
 
 /**
- * Choose a value, or clear one by passing null.
+ * Turn a value on or off. `null` clears the whole facet.
  *
- * **Choosing an arm clears the aspect**, because an aspect belongs to exactly
- * one arm and keeping a Descura aspect while switching to the Sister Blades
- * would show an empty list with no visible reason. It is the only dependency
- * between facets, and it is one-way.
+ * A toggle rather than a set, because that is what a list of checkable options
+ * does: the caller says which option was clicked and does not have to work out
+ * the resulting set. Fear replaces instead of toggling, per `SINGLE`.
+ *
+ * **Choosing arms drops aspects that belong to none of them.** An aspect belongs
+ * to exactly one arm, so keeping a Descura aspect while switching to the Sister
+ * Blades would show an empty list with no visible reason. With one arm this is
+ * the old rule; with several it keeps the aspects of every arm still chosen,
+ * which is what makes "the Blades or the Staff, these two aspects" expressible.
+ * It is still the only dependency between facets and it is still one-way.
  */
 export function choose(selection: Selection, facet: FacetId, value: string | null): Selection {
-  const next = { ...selection, [facet]: value }
-  if (facet === 'weapon' && selection.aspect !== null) {
-    const belongsTo = traits.get(selection.aspect)?.requiredWeapon ?? null
-    if (value !== null && belongsTo !== value) next.aspect = null
-    if (value === null) next.aspect = selection.aspect
+  const held = selection[facet] ?? []
+  const picked =
+    value === null
+      ? []
+      : SINGLE.has(facet)
+        ? held.includes(value)
+          ? []
+          : [value]
+        : held.includes(value)
+          ? held.filter((one) => one !== value)
+          : [...held, value]
+
+  const next = { ...selection, [facet]: picked }
+
+  if (facet === 'weapon' && (selection.aspect ?? []).length > 0 && picked.length > 0) {
+    next.aspect = (selection.aspect ?? []).filter((aspect) => {
+      const belongsTo = traits.get(aspect)?.requiredWeapon ?? null
+      return belongsTo !== null && picked.includes(belongsTo)
+    })
   }
   return next
 }
 
 /** How a library is ordered, when a reader wants it ordered rather than filtered. */
-export type SortId = 'name' | 'arm' | 'gods'
+export type SortId = 'name' | 'arm' | 'gods' | 'recent' | 'assemble' | 'fear'
 
 export const SORTS: { id: SortId; name: string }[] = [
   { id: 'name', name: 'Name' },
   { id: 'arm', name: 'Arm' },
   { id: 'gods', name: 'Gods' },
+  { id: 'recent', name: 'Recently changed' },
+  { id: 'assemble', name: 'Easiest to assemble' },
+  { id: 'fear', name: 'Fear cleared' },
 ]
+
+/**
+ * When a build last changed, as a number, or 0.
+ *
+ * `SavedBuild` requires `modified`; `ShownBuild`, which is what a browsing
+ * surface actually holds, does not. A build without one sorts last rather than
+ * throwing, which is the right answer for a sample and for anything that
+ * arrived from another install.
+ */
+const changedAt = (build: ShownBuild): number => {
+  const at = Date.parse(build.modified ?? build.created ?? '')
+  return Number.isFinite(at) ? at : 0
+}
 
 export function sortBuilds(builds: readonly ShownBuild[], by: SortId): ShownBuild[] {
   const copy = [...builds]
@@ -342,6 +448,28 @@ export function sortBuilds(builds: readonly ShownBuild[], by: SortId): ShownBuil
     case 'gods':
       return copy.sort(
         (a, b) => godsOf(a).join().localeCompare(godsOf(b).join()) || a.name.localeCompare(b.name),
+      )
+    case 'recent':
+      return copy.sort((a, b) => changedAt(b) - changedAt(a) || a.name.localeCompare(b.name))
+    /**
+     * **Easiest first, and it is not a ranking of worth.**
+     *
+     * `readRepeat` already computes what a build costs to assemble and nothing
+     * has ever ordered by it. Cost is picks needed, so ascending is easiest
+     * first. `repeat.ts` is explicit that this is not a rating: a build that is
+     * hard to put together is not a bad build, it is a hard one, and somebody
+     * sorting this way is asking a question about their evening rather than
+     * about quality.
+     */
+    case 'assemble':
+      return copy.sort(
+        (a, b) => readRepeat(a, traits, olympians).cost - readRepeat(b, traits, olympians).cost ||
+          a.name.localeCompare(b.name),
+      )
+    // Descending: the interesting end of "how far has this got" is the top.
+    case 'fear':
+      return copy.sort(
+        (a, b) => (b.play?.fear ?? 0) - (a.play?.fear ?? 0) || a.name.localeCompare(b.name),
       )
     default:
       return copy.sort((a, b) => a.name.localeCompare(b.name))

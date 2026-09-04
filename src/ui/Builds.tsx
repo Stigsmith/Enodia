@@ -65,6 +65,8 @@ const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
 export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: View) => void }) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
+  /** What was typed into the search box. Not part of `Selection`: see below. */
+  const [query, setQuery] = useState('')
   const [openId, setOpenId] = useState<string | null>(null)
   const [piece, setPiece] = useState<Piece | null>(null)
   const [logging, setLogging] = useState(false)
@@ -110,11 +112,32 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
     savePrefs({ ...loadPrefs(), buildDetail: id })
   }
 
+  /**
+   * Text narrowing, applied after the facets and before the sort.
+   *
+   * **The facets are computed on the unsearched library on purpose.** An option
+   * count promises "how many builds would I get if I picked this instead", and
+   * counting against the searched list would quietly change that to "of the
+   * ones matching what you typed", which is a different promise and a smaller
+   * number with nothing on screen explaining it.
+   *
+   * Name, the line the author wrote about it, and who wrote it. Not the boons:
+   * somebody typing "Zeus" wants the god facet, and a text match would return
+   * every build mentioning Zeus in prose alongside it.
+   */
   const bar = useMemo(() => facets(library, selection), [library, selection])
-  const shown = useMemo(
-    () => sortBuilds(apply(library, selection), sort),
-    [library, selection, sort],
-  )
+  const shown = useMemo(() => {
+    const found = apply(library, selection)
+    const needle = query.trim().toLowerCase()
+    const narrowed = needle
+      ? found.filter((build) =>
+          [build.name, build.say, build.author ?? ''].some((text) =>
+            text.toLowerCase().includes(needle),
+          ),
+        )
+      : found
+    return sortBuilds(narrowed, sort)
+  }, [library, selection, sort, query])
 
   const open = openId ? library.find((build) => build.id === openId) : null
 
@@ -356,9 +379,14 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
         onChoose={(facet: FacetId, value: string | null) =>
           setSelection((was) => choose(was, facet, value))
         }
-        onClear={() => setSelection(EMPTY_SELECTION)}
+        onClear={() => {
+          setSelection(EMPTY_SELECTION)
+          setQuery('')
+        }}
         sort={sort}
         onSort={setSort}
+        query={query}
+        onQuery={setQuery}
         showing={shown.length}
         total={library.length}
       />
