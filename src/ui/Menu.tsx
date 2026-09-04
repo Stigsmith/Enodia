@@ -21,7 +21,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { ACCOUNTS_LIVE } from '../state/account.ts'
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
@@ -145,11 +144,22 @@ export function Menu({
         },
         {
           label: 'Build exchange',
-          unbuilt: true,
-          note: 'Share and import builds. Phase 4',
+          note: 'Builds other people published, and what happened when people played them',
           here: view === 'exchange',
           action: () => {
             onGo('exchange')
+            leave()
+          },
+        },
+        /* After the exchange, because it is waiting on it: `data/roadmap.ts`
+         * says leaderboards need the exchange to have anything to count. */
+        {
+          label: 'Leaderboards',
+          unbuilt: true,
+          note: 'Phase 4',
+          here: view === 'leaderboards',
+          action: () => {
+            onGo('leaderboards')
             leave()
           },
         },
@@ -217,46 +227,19 @@ export function Menu({
             },
           ],
     },
-    {
-      title: 'You',
-      entries: [
-        /* Empty rooms rather than dead rows. See `nav.ts` for why. */
-        {
-          label: 'Account',
-          /* One constant drives the door, the badge and the note. A menu that
-           * says "not built" over a room that opens is worse than either. */
-          unbuilt: !ACCOUNTS_LIVE,
-          note: ACCOUNTS_LIVE ? 'Sign in, to publish a build with a short link' : 'Phase 4',
-          here: view === 'account',
-          action: () => {
-            onGo('account')
-            leave()
-          },
-        },
-        {
-          label: 'Friends',
-          // Same constant as the Account room, so the door and the badge cannot
-          // disagree about whether the thing exists.
-          unbuilt: !ACCOUNTS_LIVE,
-          note: ACCOUNTS_LIVE ? 'Swap codes, and see what they publish' : 'Phase 4',
-          here: view === 'friends',
-          action: () => {
-            onGo('friends')
-            leave()
-          },
-        },
-        {
-          label: 'Leaderboards',
-          unbuilt: true,
-          note: 'Phase 4',
-          here: view === 'leaderboards',
-          action: () => {
-            onGo('leaderboards')
-            leave()
-          },
-        },
-      ],
-    },
+    /**
+     * **Account and Friends are not here any more.** They live in the corner
+     * control, top right, with signing out: `src/ui/You.tsx` says why.
+     *
+     * The split is what makes two menus worth having rather than confusing.
+     * This one is where you go; that one is who you are. Mixing them was why
+     * this list had a group called "You" holding one thing that was about
+     * everybody.
+     *
+     * **Leaderboards stayed**, because it is a place about everyone rather than
+     * a fact about you, and it is a room like the exchange is a room. So it
+     * joins the rooms and the group it used to sit in dissolves.
+     */
     {
       title: 'The tool',
       entries: [

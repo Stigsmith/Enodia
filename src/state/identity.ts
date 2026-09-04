@@ -1,10 +1,16 @@
 /**
  * Who you are, which here means a name and nothing else.
  *
- * **There is no account.** No server, no sign-in, no password, nothing to
- * recover if you lose it. The name lives in this browser beside everything
- * else and it exists for one reason: a build you send somebody should say who
- * wrote it, and "somebody" is a worse answer than a name you chose.
+ * **This is not the account name.** There is an account now, with a sign-in and
+ * a password and a name of its own, and that is the one other people see: it is
+ * the byline on everything you publish. This is a label you set in Settings and
+ * the tool stamps onto builds you make, and it exists for one reason: a build
+ * you send somebody should say who wrote it, and "somebody" is a worse answer
+ * than a name you chose.
+ *
+ * That the two can disagree is a real problem and a known one. Sign up as one
+ * name, set this to another, and your builds say one thing while the exchange
+ * says another. Reconciling them is its own decision and has not been taken.
  *
  * That is worth being plain about rather than dressing up. A name stored
  * locally is not an identity anyone can verify, so nothing in the tool treats

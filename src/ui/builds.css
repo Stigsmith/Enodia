@@ -7133,11 +7133,6 @@ button.mark {
   color: var(--lit-hot);
 }
 
-.landing-in-note {
-  font-family: var(--body);
-  font-size: 0.82rem;
-  color: var(--bone-faint);
-}
 
 .landing-block h2 {
   margin: 0 0 0.5rem;

@@ -1237,6 +1237,17 @@
 
 :root {
   --nav-inset: 3.4rem;
+  /**
+   * The right-hand mirror of `--nav-inset`, for the account corner.
+   *
+   * Wider than the left because it holds a name rather than a three-bar glyph,
+   * and a name is as long as somebody's name. Capped by the control itself, so
+   * this is the space reserved rather than a promise about what fits in it.
+   *
+   * **It does not drop to zero in pane mode the way `--nav-inset` does.** The
+   * pane is on the left; the corner is where it always was.
+   */
+  --you-inset: 7rem;
 }
 
 .app {
@@ -1251,9 +1262,29 @@
   z-index: 30;
 }
 
+/**
+ * The account corner: the rule above, mirrored.
+ *
+ * Same offsets, same z-index, so the two corners behave identically and neither
+ * is a special case. 30 puts it above every page surface and below every modal,
+ * which is right: a shared build, the run log and the tour should all cover it.
+ *
+ * **Fixed rather than in flow.** `:root[data-nav='pane'] .app` is a two column
+ * grid whose children are `.menu` and `.app-view`; anything else in flow becomes
+ * a third column and breaks the pane.
+ */
+.app > .you {
+  position: fixed;
+  top: 0.7rem;
+  right: 0.8rem;
+  z-index: 30;
+}
+
 .masthead,
 .builds-top {
   padding-left: var(--nav-inset);
+  /* Both sides, so a long page heading runs under neither corner. */
+  padding-right: var(--you-inset);
 }
 
 /**
@@ -1340,7 +1371,11 @@
   align-items: center;
   gap: 1.1rem;
   flex-wrap: wrap;
-  padding: 0.7rem 1rem 0.7rem calc(1rem + var(--nav-inset));
+  /* Both corners. The run surface is capped at 60rem and centred, so on a wide
+   * screen the corner floats clear of this bar entirely and the right padding
+   * costs nothing; at 60rem and below it is what keeps the tally out from under
+   * the account control. */
+  padding: 0.7rem calc(1rem + var(--you-inset)) 0.7rem calc(1rem + var(--nav-inset));
   border-bottom: 1px solid var(--div-2);
   background: var(--ink-950);
 }
@@ -4414,4 +4449,136 @@
 
 @media (prefers-reduced-motion: reduce) {
   .menu-panel .menu-pin svg { transition: none; }
+}
+
+/* =========================================================================
+ * YOU, TOP RIGHT
+ *
+ * The account, on every screen. `src/ui/You.tsx` says why it is the full
+ * convention rather than a quiet link: the tool is better with an account and
+ * no longer pretends otherwise, so the control sits where every tool anybody
+ * already uses puts it.
+ *
+ * Everything here mirrors the menu's own furniture rather than inventing a
+ * second look. Two corners that behave identically is one thing to learn.
+ * ========================================================================= */
+
+.you-in,
+.you-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 11rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: color-mix(in oklab, var(--ink-900) 84%, transparent);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.you-in:hover,
+.you-name:hover,
+.you-name.is-open {
+  border-color: var(--lit-hot);
+}
+
+/* The first letter, which is the only avatar available: an account carries a
+ * name and nothing else to draw. */
+.you-mark {
+  display: grid;
+  place-items: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background: var(--div-2);
+  color: var(--bone);
+  font-family: var(--display);
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+/* A name is as long as somebody's name, and the corner is not negotiable. */
+.you-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/**
+ * The panel, on the menu's own plate and at the menu's own z-index.
+ *
+ * `right: 0` rather than `left: 0`, because it hangs off the right corner and a
+ * panel that opened leftward from here would run off the screen on a phone.
+ */
+.you-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 20;
+  width: min(14rem, 80vw);
+  padding: 0.5rem 0.55rem;
+  background:
+    url('/shell/sidebars.png') left top / 100% auto no-repeat,
+    var(--ink-900);
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
+}
+
+.you-as {
+  margin: 0 0 0.4rem;
+  padding: 0 0.35rem;
+  color: var(--bone-dim);
+  font-size: 0.72rem;
+}
+
+.you-as strong {
+  color: var(--bone);
+  font-weight: 400;
+}
+
+.you-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.you-panel button {
+  width: 100%;
+  padding: 0.35rem;
+  border: 0;
+  background: none;
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.you-panel button:hover,
+.you-panel button:focus-visible {
+  background: var(--div-1);
+  color: var(--lit-hot);
+}
+
+/**
+ * On a phone the name goes and the mark stays.
+ *
+ * 34rem is the app's phone rung. A name plus a menu button plus whatever a page
+ * puts in its header does not fit across 375 pixels, and the mark alone is still
+ * unmistakably the account.
+ */
+@media (max-width: 34rem) {
+  :root {
+    --you-inset: 3.4rem;
+  }
+
+  .you-text {
+    display: none;
+  }
+
+  .you-name {
+    padding: 0.3rem;
+  }
 }
