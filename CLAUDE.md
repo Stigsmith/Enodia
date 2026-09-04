@@ -212,6 +212,15 @@ the play experience cannot see.
   shipped package at 1.7.2: no `D1Database` anywhere, and its Kysely adapter carries only
   Postgres and MySQL dialects. The path is Drizzle with `provider: 'sqlite'`, and
   `transaction: false` because D1 batches rather than doing interactive transactions
+- **`wrangler deploy` can report success and not land.** Seen on 4 September 2026:
+  three consecutive deploys uploaded a growing bundle, printed a new Version ID, and
+  `wrangler deployments status` showed that version at 100%, while the running script
+  stayed on older code. The static assets updated on every one of those deploys, which
+  is what made it look fine. `wrangler deploy --dry-run --outdir` proved the bundle was
+  correct, so it was neither the code nor the bundler.
+  **`npx wrangler versions upload` then `npx wrangler versions deploy <id>@100% --yes`
+  landed the same code immediately.** So: after any Worker deploy, curl something the
+  new code changes. A version id and a 100% are not evidence that anything moved
 - **Response headers are checked with `wrangler dev`, never inferred.** The `workers`
   config in `.claude/launch.json` serves `dist/` on 8787 with `assets/_headers` actually
   applied. This matters more than it sounds: `netlify.toml`'s rules were live in nobody's
