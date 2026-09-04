@@ -19,10 +19,17 @@
  * email" screen while sending nothing is worse than one that says it cannot.
  */
 
-/** Both are set with `wrangler secret put`. Neither has a default. */
 type Mail = {
+  /** A secret, set with `wrangler secret put RESEND_API_KEY`. No default. */
   RESEND_API_KEY?: string
-  /** eg "Enodia <noreply@enodia.me>". The domain has to be verified with the provider. */
+  /**
+   * The From address, `Dora <dora@enodia.me>`.
+   *
+   * **A `var` in `wrangler.jsonc` rather than a secret**, because it is printed
+   * on every letter it sends and is therefore not one. Keeping it in the config
+   * means a fresh deploy describes its own sender, and there is one less thing
+   * to remember to set. The domain still has to be verified with the provider.
+   */
   MAIL_FROM?: string
 }
 
@@ -79,10 +86,26 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
 }
 
 /**
- * The reset letter.
+ * The reset letter, in Dora's voice.
  *
- * Written for somebody who is locked out and mildly annoyed, so it says what to
- * do first and explains second. No branding, no images, no "click here".
+ * **The working half is not the joke half, and the order is deliberate.** The
+ * person reading this is locked out and wants one thing, so the link and the
+ * expiry come first and are written plainly. The scolding is a paragraph
+ * underneath, after everything they actually need. Somebody who reads the first
+ * four lines and stops has lost nothing.
+ *
+ * Her register is the one in `src/ui/tour.ts` and `src/ui/Dora.tsx`: short
+ * sentences, dry, faintly put upon, no exclamation marks. She keeps the run
+ * log, which is what gives her standing to be smug about a forgotten password.
+ *
+ * **The subject line stays plain.** It is what somebody types into a search box
+ * at the worst moment, so it says what the letter is and nothing else.
+ *
+ * **Still plain text, still no image.** Every major client blocks remote images
+ * by default, so a picture of her would be a blocked-image frame for most
+ * people rather than a joke, and this is the one letter that has to survive
+ * every filter: it is the only route back into an account. The voice does the
+ * work instead.
  */
 export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
   subject: 'Reset your Enodia password',
@@ -92,7 +115,10 @@ export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
     'If it was you, open this and pick a new one:',
     url,
     '',
-    'The link works once and expires in an hour.',
+    'It works once and expires in an hour. Try not to mislay this one as well.',
+    '',
+    'I keep track of every boon and every Exit you have ever taken, and I have not',
+    'lost one yet. You hang on to the passwords, though. That is clearly going well.',
     '',
     'If it was not you, ignore this. Nothing has changed and your account is fine.',
     '',
