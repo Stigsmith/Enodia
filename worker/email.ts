@@ -120,6 +120,13 @@ export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
   text: [
     'Hey. Somebody asked to reset the password on this Enodia account.',
     '',
+    /* Four words, and they are the difference between a link and a bare link.
+     * Somebody who did not ask for this meets the URL before the "wasn't you"
+     * line further down, and an unqualified link at the top of an unexpected
+     * email is the shape of every phishing message anybody has ever been sent.
+     * This says what it is for before they reach it. */
+    'If that was you, here:',
+    '',
     url,
     '',
     "Link works once. Expires in an hour, so don't sit on it.",
