@@ -28,6 +28,7 @@ import { Changelog, Roadmap } from './ui/Pages.tsx'
 import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
+import { Exchange } from './ui/Exchange.tsx'
 import { Friends } from './ui/Friends.tsx'
 import { ACCOUNTS_LIVE, ACCOUNT_CHANGED, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
@@ -441,8 +442,22 @@ export function App() {
     )
   }
 
+  /**
+   * The exchange, which is no longer one of Dora's empty rooms.
+   *
+   * Above the `unbuilt` map on purpose: that map still lists the rooms that are
+   * genuinely empty, and leaving `exchange` in it with a branch above would be
+   * two places disagreeing about whether a thing exists.
+   */
+  if (screen === 'exchange') {
+    return frame(
+      <div className="shell is-wide">
+        <Exchange onGo={setView} />
+      </div>,
+    )
+  }
+
   const unbuilt: Partial<Record<View, { title: string; phase: string }>> = {
-    exchange: { title: 'Build exchange', phase: 'Phase 4' },
     account: { title: 'Account', phase: 'Phase 4' },
     friends: { title: 'Friends', phase: 'Phase 4' },
     leaderboards: { title: 'Leaderboards', phase: 'Phase 4' },

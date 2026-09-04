@@ -541,6 +541,10 @@
 
 .bcard {
   display: flex;
+  /* Column, so a card with a foot under it stacks rather than sitting beside
+   * it. The library draws no foot and is unaffected; the exchange puts the
+   * byline and the counts there. */
+  flex-direction: column;
 }
 
 /**
@@ -7581,4 +7585,83 @@ p.landing-say {
   .bfilter-find input {
     width: 12rem;
   }
+}
+
+/* ==========================================================================
+ * THE BUILD EXCHANGE
+ *
+ * The library's own grid and cards, with a foot under each one carrying what
+ * the library has no use for: who published it, and what happened when people
+ * played it. Everything here is inside `.bcard`, so a card on this shelf is the
+ * same object as a card on yours with more written under it.
+ * ========================================================================== */
+
+/* The missing third shelf, said rather than left as an absence. */
+.xchange-scope {
+  margin-bottom: 1rem;
+  color: var(--bone-dim);
+}
+
+.xchange-said {
+  margin: 0.6rem 0 0;
+  color: var(--lit-hot);
+  font-size: 0.85rem;
+}
+
+.xchange-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.55rem 0.7rem 0.7rem;
+  border-top: 1px solid var(--div-1);
+}
+
+.xchange-by {
+  margin: 0;
+  color: var(--bone-dim);
+  font-size: 0.72rem;
+}
+
+/**
+ * The owner's own words, and the only opinion the tool states as its own.
+ *
+ * Italic and quoted so it reads as somebody talking rather than as a field. It
+ * has to be impossible to mistake for one of the counts underneath it:
+ * `DESIGN.md` puts it plainly, a judgement and a sourced fact must never look
+ * equally weighed.
+ */
+.xchange-note {
+  margin: 0;
+  color: var(--bone);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+
+/**
+ * The counts.
+ *
+ * One line, wrapping, each figure its own span with a divider between. Plain
+ * type on purpose: these are tallies, and dressing them up as a score is the
+ * one thing this whole surface is built not to do.
+ */
+.xchange-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  margin: 0;
+  color: var(--bone-dim);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.xchange-counts span + span::before {
+  content: '·';
+  margin-right: 0.5rem;
+  color: var(--div-3);
+}
+
+.xchange-take {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+  font-size: 0.74rem;
 }
