@@ -990,6 +990,12 @@ button.mark {
   color: var(--bone-dim);
   font-size: 0.76rem;
   line-height: 1.3;
+  /* `.named.is-under` sizes its box off `var(--mark, 3rem)`, but `Mark` writes
+   * `--mark` on its own child, so a Poster row asking for `--mark-l` gets a box
+   * measured from the medium size. Four boon names have a word long enough to
+   * spill out of it, Executioner's Chop among them. Breaking is cheaper than
+   * plumbing the size through, and it costs nothing when the name fits. */
+  overflow-wrap: anywhere;
 }
 
 .named.is-centrepiece .named-name {
@@ -1206,10 +1212,24 @@ button.mark {
     max-width: 96rem;
     display: grid;
     grid-template-columns: 1.1fr 1fr;
+    /**
+     * Four rows, and the fourth is the fix for a real collision.
+     *
+     * `.poster-run` is worn by two sections, the five slots and Worth adding,
+     * and naming one area for both put them in the same cell. Grid does not
+     * flow explicitly placed items apart, so with `align-items: start` they
+     * drew from the same origin: measured at 1700px, 667 by 271 pixels of
+     * overlap and 17 text runs printing over each other, "The five slots" on
+     * top of "Worth adding" and every boon name on top of another one.
+     *
+     * `.constel-field.is-optional` below is the same fix for the same mistake
+     * in the other layout, and its note says the same thing.
+     */
     grid-template-areas:
       'head head'
       'centre centre'
-      'run cross';
+      'run cross'
+      'extra extra';
     gap: 0 3rem;
     align-items: start;
   }
@@ -1224,6 +1244,13 @@ button.mark {
 
   .poster-run {
     grid-area: run;
+  }
+
+  /* Its own row, under both columns. It reads as a footnote to the build rather
+   * than as a third column, which is what it is. */
+  .poster-run.is-optional {
+    grid-area: extra;
+    margin-top: 1.4rem;
   }
 
   .poster-crossroads {
