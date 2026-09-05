@@ -57,7 +57,7 @@ import {
   weaponById,
   weapons,
 } from '../data/app.ts'
-import { PLAYSTYLES } from '../data/builds.ts'
+import { MAX_FEAR, PLAYSTYLES } from '../data/builds.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -99,10 +99,12 @@ export const SINGLE: ReadonlySet<FacetId> = new Set<FacetId>(['fear'])
  * reaches, and a build at 34 answers 10, 20 and 30. Picking 30 then means
  * "cleared 30 or better" without `matches` needing to know anything new.
  *
- * Tens, and stopping at 50 because `MAX_FEAR` is 57 and a band nothing can
- * reach would be a row that never matches.
+ * Tens, and stopping below `MAX_FEAR` because a band nothing can reach would
+ * be a row that never matches. **Derived rather than typed out**, which is the
+ * point: the ceiling was 57 and hard-coded, and it is 67 once the vows are
+ * actually summed, so a literal list would have quietly lost the 60 band.
  */
-const FEAR_BANDS = [10, 20, 30, 40, 50] as const
+const FEAR_BANDS = Array.from({ length: Math.floor(MAX_FEAR / 10) }, (_, i) => (i + 1) * 10)
 
 /** Weapon and aspect are on the surface. The rest unfold. */
 export const SURFACE_FACETS: FacetId[] = ['weapon', 'aspect']

@@ -140,18 +140,17 @@ export type PlayRecord = {
 }
 
 /**
- * The most Fear a run can carry.
+ * The most Fear a run can carry. **Moved to `data/app.ts` and now summed.**
  *
- * Derived, not picked. `MetaUpgradeData` at `MetaUpgradeData.lua:1615` holds the
- * 17 vows, with 38 ranks between them, and every rank states a `Points` value.
- * 57 is the sum of all of them, which is every vow at its highest rank.
+ * It was 57 here, hard-coded, under a comment saying it was the sum of every
+ * vow rank. It is not: the sum is 67, and 57 is a number nothing in the data
+ * produces. The vows are extracted now, so the constant is arithmetic over them
+ * rather than a claim about arithmetic nobody had run.
  *
- * **The vows themselves are deliberately not extracted.** Marking which ones you
- * took is a screen of its own and nobody has asked for it; a number is enough
- * for now. If that changes, `MetaUpgradeData` is already loaded in the
- * extractor's Lua state and only needs writing out.
+ * Re-exported rather than moved outright, because a dozen call sites import it
+ * from here and `data/builds.ts` is where the shape of a build lives.
  */
-export const MAX_FEAR = 57
+export { MAX_FEAR } from './app.ts'
 
 /**
  * Clears over runs, or null when there is nothing to divide.

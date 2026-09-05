@@ -14,7 +14,7 @@ Last updated 5 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 505 in node across 27 files, and **92 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 513 in node across 28 files, and **92 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings |
 | **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -364,7 +364,23 @@ tested and abandoned. It survived up here because nothing connects a struck-out 
 the item that was resting on it, which is `CLAUDE.md` error 3 in a document rather than in
 code: a proxy for the property, never checked against the property.
 
-**5. Phase 2.** `REQUIREMENTS.md` 7.
+**5. Phase 2.** `REQUIREMENTS.md` 7. **Started, on the one part of it that needs no
+judgement.** Four of its five items are the owner's: archetypes, keepsake sequencing, hammer
+*recommendations* and Arcana ratings are all evaluation, and `CLAUDE.md` puts those with the
+person who plays the game. The fifth, "Fear is a vector, not a scalar. Keep the vow list,
+derive the total for display", is pure extraction and is done to the point of having the
+list: 17 vows over 40 ranks, in `app-data.json`, ordered by `ShrineUpgradeOrder`.
+
+**It found a wrong constant on the way.** `MAX_FEAR` was 57 under a docblock saying it was
+the sum of every vow rank. The sum is **67**, and **55** before Vow of Rivals is unlocked, so
+57 is a number this data does not produce at either end. The Fear stepper had been capped ten
+below what a player can actually clear, so anyone above 57 could not record their run. It is
+summed from the data now, the filter bands derive from it rather than being typed out, and
+`src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
+
+Still to do here: which vows a run took, rather than only the total. The list exists, the
+screen does not, and `assets/vows/` turns out to hold art for a different set of names
+entirely, matching only 4 of the 17.
 
 ---
 

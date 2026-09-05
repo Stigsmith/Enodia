@@ -1,6 +1,6 @@
 {
  "_provenance": {
-  "extractedOn": "2026-08-29",
+  "extractedOn": "2026-09-05",
   "gameVersion": "138174",
   "source": "Content/Scripts/*.lua",
   "generatedBy": "scripts/extract.mjs",
