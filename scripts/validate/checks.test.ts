@@ -476,6 +476,49 @@ describe('copy wrapped across lines, which is how all of it is written', () => {
    * before the opening tag would end the text node early and excuse the
    * paragraph by making it invisible, which is a different thing.
    */
+  /**
+   * The hand-authored page wraps its paragraphs too.
+   *
+   * Its gap was narrower than the TSX one and it took a second attempt to
+   * write a test that could see it: the html branch adds **every** line's text,
+   * not only what sits between a `>` and a `<`, so a banned single word is
+   * caught wherever it lands. What it could not see was a *phrase* broken over
+   * the wrap, which is what every retired claim is. The first test written here
+   * split "ten rooms in" so "rooms" landed alone on a line, and it passed
+   * against the unfixed code, which is how it was noticed.
+   */
+  it('joins an html paragraph the author wrapped mid-phrase', () => {
+    const said = ['<p>', '  It works with no', '  account at all.', '</p>']
+    const html = (lines: string[]) =>
+      checkRetiredClaims(bundle({ sources: [source('src/page.html', 'html', lines.join('\n'))] }))
+    expect(messages(html(said), 'fail')).toHaveLength(1)
+
+    // Neither half is the phrase on its own, which is the whole point.
+    expect(messages(html([said[1] as string]), 'fail')).toEqual([])
+    expect(messages(html([said[2] as string]), 'fail')).toEqual([])
+  })
+
+  /**
+   * Line numbers are counted off the masked copy, so a line the html branch
+   * skips has to leave a blank behind. Without that the two real findings in
+   * the legacy page reported at 101 and 232 rather than 1106 and 1362:
+   * confidently wrong, and pointing at somebody else's paragraph.
+   */
+  it('counts past a skipped script block rather than through it', () => {
+    const html = [
+      '<script>',
+      'var a = 1;',
+      'var b = 2;',
+      '</script>',
+      '<p>',
+      '  It works with no',
+      '  account at all.',
+      '</p>',
+    ].join('\n')
+    const findings = checkRetiredClaims(bundle({ sources: [source('src/page.html', 'html', html)] }))
+    expect(findings[0]?.detail?.[0]).toContain('src/page.html:6')
+  })
+
   it('takes an escape on the closing tag of a wrapped paragraph', () => {
     const said = [
       'export const A = () => (',
