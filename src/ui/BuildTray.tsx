@@ -64,6 +64,8 @@ export function BuildTray({
 }) {
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
+  /* Core picks are drawn by the Slots band, so this is everything else. */
+  const spare = built.optional.filter((piece) => !piece.slot)
   const arcana = built.crossroads.pieces.filter((piece) => piece.kind === 'arcana')
   const kit = built.crossroads.pieces.filter(
     (piece) => piece.kind !== 'arcana' && piece.kind !== 'aspect',
@@ -124,24 +126,36 @@ export function BuildTray({
         </span>
       </button>
 
-      <TrayBand label="Slots" onAdd={() => onGo('loadout', null)}>
-        {built.slots.map((entry) => (
-          <button
-            key={entry.slot}
-            type="button"
-            className={`btray-cell${entry.piece ? '' : ' is-open'}`}
-            title={entry.piece ? entry.piece.name : `${entry.name}, open`}
-            onClick={() => onGo('loadout', entry.piece)}
-          >
-            {entry.piece ? (
-              <Mark piece={entry.piece} size="2.4rem" showGlyph={false} />
-            ) : (
-              <span className="btray-empty">
-                {entry.glyph ? <img src={`/${entry.glyph}`} alt="" loading="lazy" /> : null}
-              </span>
-            )}
-          </button>
-        ))}
+      {/* The slots open the Boons tab now, because that is where they are.
+        * A cell reads the required occupant first and falls back to one held as
+        * upside, marked so the sidebar and the panel cannot disagree about a
+        * slot while both are on screen. */}
+      <TrayBand label="Slots" onAdd={() => onGo('boons', null)}>
+        {built.slots.map((entry) => {
+          const held = entry.piece ?? entry.optional
+          const spare = !entry.piece && Boolean(entry.optional)
+          return (
+            <button
+              key={entry.slot}
+              type="button"
+              className={`btray-cell${held ? '' : ' is-open'}${spare ? ' is-optional' : ''}`}
+              title={
+                held
+                  ? `${held.name}${spare ? ', worth adding rather than the build' : ''}`
+                  : `${entry.name}, open`
+              }
+              onClick={() => onGo('boons', held)}
+            >
+              {held ? (
+                <Mark piece={held} size="2.4rem" showGlyph={false} />
+              ) : (
+                <span className="btray-empty">
+                  {entry.glyph ? <img src={`/${entry.glyph}`} alt="" loading="lazy" /> : null}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </TrayBand>
 
       {rest.length ? (
@@ -151,6 +165,34 @@ export function BuildTray({
               key={piece.key}
               type="button"
               className="btray-cell"
+              onClick={() => onGo('boons', piece)}
+            >
+              <Mark piece={piece} size="2.4rem" />
+            </button>
+          ))}
+        </TrayBand>
+      ) : null}
+
+      {/**
+       * Worth adding, and **the sidebar has never drawn it.**
+       *
+       * `assemble` has computed `optional` since the field was added and only
+       * the Poster and the Constellation ever read it, so the editor's own
+       * mirror of the build silently left it out. That hid a few spare boons
+       * before; now that the list can hold core slots and hammers it would hide
+       * most of what somebody had just put there.
+       *
+       * Core picks are filtered out, because the Slots band above already draws
+       * them and marks which are upside. Drawing them twice would make one of
+       * the two look wrong.
+       */}
+      {spare.length ? (
+        <TrayBand label="Worth adding" onAdd={() => onGo('boons', null)}>
+          {spare.map((piece) => (
+            <button
+              key={piece.key}
+              type="button"
+              className="btray-cell is-optional"
               onClick={() => onGo('boons', piece)}
             >
               <Mark piece={piece} size="2.4rem" />

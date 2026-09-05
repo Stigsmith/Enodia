@@ -32,6 +32,7 @@
 import { arcanaById, familiarById, iconOf, renderOf, traits, weaponById } from '../data/app.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
+import { isHammer } from '../engine/picks.ts'
 import type { Rarity, Slot, TraitId } from '../data/types.ts'
 
 /** The game's own frames, by the rarity they mark. */
@@ -117,7 +118,15 @@ export type Assembled = {
   render: string | null
   centrepiece: Piece | null
   /** the five core slots in fixed order, occupied or not */
-  slots: { slot: Slot; name: string; glyph: string | null; piece: Piece | null }[]
+  slots: {
+    slot: Slot
+    name: string
+    glyph: string | null
+    /** the required occupant, and only ever that */
+    piece: Piece | null
+    /** what sits in this slot as upside instead, if anything */
+    optional: Piece | null
+  }[]
   crossroads: Group
   run: Group
   /** every piece in one list, for a layout that does not want the groups */
@@ -197,7 +206,10 @@ export function assemble(build: ShownBuild): Assembled {
    * build that lists Hestia's Slow Cooker as an upgrade is not a Hestia build.
    */
   const optional = (build.optional ?? []).flatMap((id) => {
-    const piece = fromTrait(id, 'boon', false)
+    /* Routed by kind, because this list is not only boons any more. A hammer
+     * built as a boon comes out with the wrong word on its hover and the wrong
+     * frame around its art, and nothing anywhere would say so. */
+    const piece = fromTrait(id, isHammer(id) ? 'hammer' : 'boon', false)
     return piece ? [{ ...piece, key: `optional:${id}`, optional: true }] : []
   })
 
@@ -249,11 +261,22 @@ export function assemble(build: ShownBuild): Assembled {
 
   // The five core slots in fixed order, whether or not the build fills them.
   // An empty one is information: it is where a player's own pick still goes.
+  /**
+   * `piece` keeps its exact meaning: the required occupant, or nothing.
+   *
+   * A core boon can sit in Worth adding now, and that is a weaker claim than
+   * being in the build. So it arrives as a field of its own rather than as a
+   * fallback on `piece`: a card, a poster and the shared PNG all read `piece`
+   * and would otherwise start saying "this build's Sprint is Blinding Rush"
+   * about something the build merely hopes for. Only the editor and its tray
+   * opt in.
+   */
   const slots = CORE_SLOTS.map((slot) => ({
     slot,
     name: slotLabel(slot),
     glyph: SLOT_GLYPH[slot] ?? null,
     piece: boons.find((piece) => piece.slot === slot) ?? null,
+    optional: optional.find((piece) => piece.slot === slot) ?? null,
   }))
 
   const core = slots.flatMap((entry) => (entry.piece ? [{ ...entry.piece, kind: 'core' as const }] : []))
