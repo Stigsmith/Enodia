@@ -151,7 +151,6 @@ export function BuildTray({
               key={piece.key}
               type="button"
               className="btray-cell"
-              title={piece.name}
               onClick={() => onGo('boons', piece)}
             >
               <Mark piece={piece} size="2.4rem" />
@@ -167,7 +166,6 @@ export function BuildTray({
               key={piece.key}
               type="button"
               className="btray-cell"
-              title={piece.name}
               onClick={() => onGo(piece.kind === 'hammer' ? 'boons' : 'loadout', piece)}
             >
               <Mark piece={piece} size="2.4rem" />
@@ -183,7 +181,6 @@ export function BuildTray({
               key={piece.key}
               type="button"
               className="btray-card"
-              title={piece.name}
               onClick={() => onGo('arcana', piece)}
             >
               {piece.icon ? <img src={`/${piece.icon}`} alt="" loading="lazy" /> : null}

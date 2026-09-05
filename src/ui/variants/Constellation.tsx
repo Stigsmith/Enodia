@@ -27,7 +27,7 @@
  */
 
 import { PlayStrip } from '../PlayStrip.tsx'
-import { Mark } from '../BuildMark.tsx'
+import { Mark, usePiecePeek } from '../BuildMark.tsx'
 import type { Assembled, Piece } from '../build-pieces.ts'
 
 /**
@@ -119,11 +119,21 @@ export function Constellation({ built, onOpen }: { built: Assembled; onOpen?: (p
         ))}
         <span className="constel-rim-div" aria-hidden="true" />
         {arcana.map((piece) => (
-          <span key={piece.key} className="constel-card" title={piece.name}>
-            {piece.icon ? <img src={`/${piece.icon}`} alt={piece.name} loading="lazy" /> : null}
-          </span>
+          <ArcanaRim key={piece.key} piece={piece} />
         ))}
       </div>
     </div>
+  )
+}
+
+/**
+ * An Arcana on the rim. Its own shape, so it is not a `Mark`, but it gets the
+ * same hover: the card is tall and painted and a square crop loses the figure.
+ */
+function ArcanaRim({ piece }: { piece: Piece }) {
+  return (
+    <span className="constel-card" {...usePiecePeek(piece)}>
+      {piece.icon ? <img src={`/${piece.icon}`} alt={piece.name} loading="lazy" /> : null}
+    </span>
   )
 }

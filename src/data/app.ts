@@ -178,7 +178,20 @@ export const arcanaById: ReadonlyMap<string, ArcanaCard> = new Map(arcana.map((c
 export const arcanaBoard: readonly (readonly string[])[] = bundle.arcanaBoard as string[][]
 
 /** The five familiars, by the id `FamiliarOrderData` lists. */
-export type Familiar = { id: string; name: string; icon: string | null }
+export type Familiar = {
+  id: string
+  name: string
+  icon: string | null
+  /**
+   * What it does, and it took finding.
+   *
+   * `HelpText` holds a familiar's name and nothing else, so this looked like
+   * data the game does not ship. `TraitText` has the descriptions, filed under
+   * the ability rather than the id: Toula's is `LastStandFamiliar`.
+   * `scripts/build-app-data.ts` holds the join.
+   */
+  text: string | null
+}
 
 export const familiars: readonly Familiar[] = bundle.familiars as Familiar[]
 

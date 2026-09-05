@@ -49,6 +49,7 @@ import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper, Stars, Stepper } from './Fear.tsx'
+import { useTraitPeek } from './BuildMark.tsx'
 
 /**
  * The most runs a stepper will count to.
@@ -196,6 +197,9 @@ export function BuildEditor({
    * reading are two separate claims rather than one number.
    */
   const stars = ratingCeiling(repeat)
+
+  /** The slate for the five core slot tiles. See `useTraitPeek`. */
+  const slotPeek = useTraitPeek()
 
   /**
    * The caveats a person has to say they have read before they can save.
@@ -584,7 +588,12 @@ export function BuildEditor({
                   type="button"
                   className={`slotbar-tile${held ? ' is-held' : ''}${openSlot === slot ? ' is-open' : ''}`}
                   aria-expanded={openSlot === slot}
-                  title={trait?.name ?? `${slotLabel(slot)}, open`}
+                  aria-label={trait?.name ?? `${slotLabel(slot)}, open`}
+                  /* The game's own slate rather than a browser tooltip with the
+                   * name in it. Pointing at your own Attack boon used to tell
+                   * you what you already knew, and the only way to see what it
+                   * did was to take it off and find it in the list again. */
+                  {...slotPeek(trait ?? null, slotLabel(slot), icon ?? null)}
                   onClick={() => setOpenSlot(openSlot === slot ? null : slot)}
                 >
                   <span className="slotbar-art">

@@ -157,6 +157,16 @@ const ICON_WORDS: Record<string, string> = {
   // \u03a9 Moves, per CLAUDE.md. The glossary calls this one "Moves", which
   // reads as a different mechanic entirely once it is inline.
   Omega: '\u03a9',
+  /**
+   * The one the glossary has an entry for and no name in.
+   *
+   * `HelpText.ManaItem_Hound` ships a `description` and no `name`, so the
+   * lookup found the record, took nothing out of it, and rendered an empty
+   * string: Hecuba "digs up Snack or in a pinch", with the second half of the
+   * pair silently missing. It is the Magick drop, and `Mana` above already
+   * says Magick rather than Mana for the same reason CLAUDE.md's table does.
+   */
+  ManaItem_Hound: 'Magick',
 }
 
 /**
@@ -743,18 +753,38 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
  */
 const arcanaBoard = (read('arcana-layout').data as unknown as string[][]).map((row) => [...row])
 
+/**
+ * The five familiars, and the third column is not guessable.
+ *
+ * **What each one does is filed under its ability, not under its id.**
+ * `HelpText[CatFamiliar]` is `{ name: 'Toula' }` and nothing else, which made
+ * this look like data the game does not ship. It does: `TraitText` holds the
+ * descriptions under `LastStandFamiliar`, `HealthFamiliar`, `CritFamiliar`,
+ * `DigFamiliar` and `DodgeFamiliar`, and the join is by the name they resolve
+ * to rather than by anything about the id.
+ *
+ * Same shape as the vow names, which are also in `TraitText` rather than
+ * `HelpText`. Reading the obvious table twice now and finding nothing twice is
+ * enough to make the rule: when a name is missing, look for it under what the
+ * thing does before concluding it is not written down.
+ *
+ * `says` goes through `describe`, so `{$Keywords.Sprint}` and
+ * `{$TooltipData.ExtractData.FamiliarDamage}` resolve exactly as they do for a
+ * boon rather than reaching a reader as markup.
+ */
 const FAMILIARS = [
-  { id: 'CatFamiliar', slug: 'cat' },
-  { id: 'FrogFamiliar', slug: 'frog' },
-  { id: 'RavenFamiliar', slug: 'raven' },
-  { id: 'HoundFamiliar', slug: 'hound' },
-  { id: 'PolecatFamiliar', slug: 'polecat' },
+  { id: 'CatFamiliar', slug: 'cat', says: 'LastStandFamiliar' },
+  { id: 'FrogFamiliar', slug: 'frog', says: 'HealthFamiliar' },
+  { id: 'RavenFamiliar', slug: 'raven', says: 'CritFamiliar' },
+  { id: 'HoundFamiliar', slug: 'hound', says: 'DigFamiliar' },
+  { id: 'PolecatFamiliar', slug: 'polecat', says: 'DodgeFamiliar' },
 ]
 
 const familiars = FAMILIARS.map((familiar) => ({
   id: familiar.id,
   name: (() => { const n = dictOf(help[familiar.id]).name; return typeof n === 'string' && n ? n : familiar.id })(),
   icon: icons.get(`familiars-${familiar.slug}-01`)?.file ?? null,
+  text: describe(familiar.says),
 }))
 
 /**
