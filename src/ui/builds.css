@@ -1618,12 +1618,19 @@ button.mark {
 }
 
 /**
- * The middle pane, on the same surface as the two rails.
+ * The middle pane, between the two that wear `sidebars.png`.
  *
- * The tray and the rail both wear `sidebars.png`, and the panel between them
- * was a flat `--ink-900` with a border, so three columns read as two of one
- * thing and one of another. It takes the same art, mirrored nowhere and dimmed,
- * with the tone carried by the same token underneath.
+ * **This docblock used to say the panel takes the same art, dimmed, and it never
+ * has.** The rule below is a gradient over `--ink-900` and there is no
+ * `::before` to carry a picture. The sentence described an intention that was
+ * either dropped or lost, and it survived because nothing connects a comment to
+ * the rule under it.
+ *
+ * A gradient is the right answer anyway, and the reason is the one the original
+ * note was reaching for: the tray and the rail are the frame and this is the
+ * page inside it. Three columns of the same lit streaks would be three frames
+ * and no page. The tone is carried by the same token underneath, which is what
+ * keeps the three reading as one surface.
  */
 .editor-panel {
   position: relative;

@@ -25,9 +25,23 @@ import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
 
+/**
+ * One row.
+ *
+ * **There was a `note` under every label and it is gone.** Every entry carried
+ * a line of flavour text, and because those wrapped to one, two or three lines
+ * the rows came out at four different heights: measured in the running app,
+ * 57, 69, 70 and 81 pixels across fourteen rows. A menu whose rows are
+ * different sizes for reasons that have nothing to do with the rows is a menu
+ * that looks broken.
+ *
+ * The owner's argument for dropping them rather than truncating them: a note is
+ * a first-time read. Once somebody has pressed a row and seen where it goes, the
+ * sentence under it is furniture. So the label has to carry the row on its own,
+ * and two of them were rewritten to do it.
+ */
 type Entry = {
   label: string
-  note: string
   /** a mark beside the label, where one says it faster than the words */
   icon?: string
   action?: () => void
@@ -126,7 +140,6 @@ export function Menu({
       entries: [
         {
           label: 'Build manager',
-          note: 'Every build, by arm and by aspect. Where the tool starts',
           here: view === 'builds',
           action: () => {
             onGo('builds')
@@ -135,7 +148,6 @@ export function Menu({
         },
         {
           label: 'Arcana',
-          note: 'The board, and which of the six free cards your set switches on',
           here: view === 'arcana',
           action: () => {
             onGo('arcana')
@@ -144,7 +156,6 @@ export function Menu({
         },
         {
           label: 'Build exchange',
-          note: 'Builds other people published, and what happened when people played them',
           here: view === 'exchange',
           action: () => {
             onGo('exchange')
@@ -156,7 +167,6 @@ export function Menu({
         {
           label: 'Leaderboards',
           unbuilt: true,
-          note: 'Phase 4',
           here: view === 'leaderboards',
           action: () => {
             onGo('leaderboards')
@@ -171,7 +181,6 @@ export function Menu({
         ? [
             {
               label: 'Back to the run',
-              note: 'The Exits you have taken and the one in front of you',
               here: view === 'run',
               action: () => {
                 onGo('run')
@@ -181,8 +190,7 @@ export function Menu({
             ...(onShowBriefing
               ? [
                   {
-                    label: 'Where you left off',
-                    note: 'What you hold, what you were chasing, and what moved',
+                    label: 'Resume briefing',
                     action: () => {
                       onShowBriefing()
                       leave()
@@ -196,10 +204,14 @@ export function Menu({
              * what was held and how far it got, tagged with which of the two it
              * was. A run ended before today was simply discarded, and a history
              * is the one thing that cannot be backfilled later.
+             *
+             * **The pair has to separate on outcome now that the notes are
+             * gone.** "End the run" and "Finished the run" would both read as
+             * endings, which is exactly the ambiguity the notes were covering,
+             * so the second says what actually happened instead.
              */
             {
-              label: 'Died here',
-              note: 'Ends the run and keeps it, with where it stopped',
+              label: 'End the run',
               icon: 'shell/location-zagreus.png',
               action: () => {
                 onEndRun('died')
@@ -207,8 +219,7 @@ export function Menu({
               },
             },
             {
-              label: 'Finished the run',
-              note: 'Reached the end. Ends it and keeps it',
+              label: 'Cleared it',
               action: () => {
                 onEndRun('finished')
                 leave()
@@ -218,7 +229,6 @@ export function Menu({
         : [
             {
               label: 'Start a run',
-              note: 'Pick an arm, an aspect and a way. Or start one from a build',
               here: view === 'setup',
               action: () => {
                 onGo('setup')
@@ -245,7 +255,6 @@ export function Menu({
       entries: [
         {
           label: 'Themes',
-          note: 'Four of them, each with its own light, weather and pictures',
           here: view === 'themes',
           action: () => {
             onGo('themes')
@@ -254,7 +263,6 @@ export function Menu({
         },
         {
           label: 'Settings',
-          note: 'Your name, how the menu sits, and getting your things out',
           here: view === 'settings',
           action: () => {
             onGo('settings')
@@ -263,7 +271,6 @@ export function Menu({
         },
         {
           label: 'Help',
-          note: 'Where the numbers come from, and what the states and bands mean',
           here: view === 'help',
           action: () => {
             onGo('help')
@@ -272,7 +279,6 @@ export function Menu({
         },
         {
           label: 'Roadmap',
-          note: 'What is here, what is coming, and what is stuck',
           here: view === 'roadmap',
           action: () => {
             onGo('roadmap')
@@ -281,7 +287,6 @@ export function Menu({
         },
         {
           label: 'Changelog',
-          note: 'What changed, newest first',
           here: view === 'changelog',
           action: () => {
             onGo('changelog')
@@ -299,7 +304,6 @@ export function Menu({
            * the landing page's own disclaimer back at you. Where the numbers
            * come from was the only part worth keeping and it is in Help. */
           label: 'About',
-          note: 'What this is, and where the name comes from',
           here: view === 'landing',
           action: () => {
             onGo('landing')
@@ -371,7 +375,6 @@ export function Menu({
                         ) : null}
                         {entry.label}
                       </span>
-                      <span className="menu-note">{entry.note}</span>
                     </button>
                   </li>
                 ))}
