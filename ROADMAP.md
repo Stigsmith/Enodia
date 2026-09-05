@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 4 September 2026, game build `138174`.
+Last updated 5 September 2026, game build `138174`.
 
 ---
 
@@ -14,7 +14,7 @@ Last updated 4 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 503 in node across 27 files, and **92 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 505 in node across 27 files, and **92 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings |
 | **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -348,8 +348,21 @@ The `feeds` tag is the largest hand-authoring job in the project and the owner's
 separate features wait on it: the briefing's centre of mass, any rule about what a boon
 actually does, and archetypes. Nothing else unlocks as much.
 
-**4. Split `traits.json` by entity type.** Mechanical, and it would let the validator stop
-walking `InheritFrom` itself.
+**4. Split `traits.json` by entity type.** Mechanical, and it would make the file readable.
+
+**Its old justification was wrong and is struck out here rather than quietly edited.** It
+said the split "would let the validator stop walking `InheritFrom` itself", and that is
+circular: the entity type a split would sort by *is* the marker the walk goes looking for.
+`ancestorsOf` at `scripts/validate/checks.ts:262` is what decides a trait is a duo, so a
+split by duo-ness would have to run the walk to know where to put anything. The second walk,
+`rosterFromLoot` at `:991`, is over `loot.json` and a change to `traits.json` cannot reach it
+at all. `scripts/validate/inheritance.test.ts` pins both: dropping the first gives 46 duos
+and 0 Hex duos instead of 37 and 9, and dropping the second gives 7 Olympians instead of 9.
+
+The same conclusion is already recorded under **Carried over** below, where the belief was
+tested and abandoned. It survived up here because nothing connects a struck-out finding to
+the item that was resting on it, which is `CLAUDE.md` error 3 in a document rather than in
+code: a proxy for the property, never checked against the property.
 
 **5. Phase 2.** `REQUIREMENTS.md` 7.
 

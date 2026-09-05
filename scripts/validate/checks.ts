@@ -627,10 +627,16 @@ function textNodes(masked: string): UiString[] {
  * Strings a reader could end up seeing. Deliberately generous: a false positive
  * costs one escape comment, a false negative ships "door" to a player.
  *
- * **HTML text nodes are still read per line**, and that gap is deliberate
- * rather than overlooked: the only HTML the checks read is the app shell, which
- * carries no prose, and the hand-authored placeholder page, whose findings are
- * warnings the owner already owns. The fatal path is `src/**`, and that is TSX.
+ * **TSX and HTML take the same route through `textNodes`**, and HTML did not at
+ * first. The gap was argued for on the grounds that the only HTML here is the
+ * app shell and the legacy page, so nothing fatal could hide in it. That is an
+ * argument from what happens to be true today about which files exist, which is
+ * the same shape as concluding an absence from a naming assumption. Both kinds
+ * wrap their paragraphs and both are now read whole.
+ *
+ * The per-line pass survives for what genuinely does not wrap: quoted literals
+ * and template literals in TS, `content:` in CSS, and the handful of HTML
+ * attributes a reader sees.
  */
 export function extractUiStrings(file: SourceFile): UiString[] {
   const out: UiString[] = []
@@ -661,17 +667,30 @@ export function extractUiStrings(file: SourceFile): UiString[] {
     if (file.kind === 'html') {
       let rest = line
 
-      // A script or style block, or a comment, carries across lines. Pick up
-      // again after the closing tag, since text after it is copy again.
+      /* A script or style block, or a comment, carries across lines. Pick up
+       * again after the closing tag, since text after it is copy again.
+       *
+       * **A skipped line still pushes an empty string.** `textNodes` counts
+       * line numbers off the newlines in `masked`, so a line that contributes
+       * nothing has to contribute a blank one: dropping it entirely reported
+       * the two findings in the legacy page at lines 101 and 232 instead of
+       * 1106 and 1362, which is a report that sends somebody to the wrong
+       * place while looking exactly as confident. */
       if (inScriptOrStyle) {
         const close = rest.match(/<\/(script|style)>/i)
-        if (!close) return
+        if (!close) {
+          masked.push('')
+          return
+        }
         inScriptOrStyle = false
         rest = rest.slice((close.index ?? 0) + close[0].length)
       }
       if (inBlockComment) {
         const close = rest.indexOf('-->')
-        if (close === -1) return
+        if (close === -1) {
+          masked.push('')
+          return
+        }
         inBlockComment = false
         rest = rest.slice(close + 3)
       }
@@ -691,11 +710,15 @@ export function extractUiStrings(file: SourceFile): UiString[] {
         rest = rest.slice(0, commentAt)
       }
 
-      // Attributes a reader sees, then every text node between the tags.
+      // Attributes a reader sees, read per line because an attribute does not
+      // wrap. The text between the tags goes to `textNodes` over the whole file
+      // instead: a hand-authored page wraps its paragraphs exactly like a
+      // formatted one, and reading them a line at a time had the same blind
+      // spot it had in TSX.
       for (const m of rest.matchAll(/\b(?:title|alt|aria-label|placeholder|content)\s*=\s*"([^"]*)"/gi)) {
         add(m[1] ?? '')
       }
-      for (const chunk of rest.replace(/<[^>]*>/g, '\u0000').split('\u0000')) add(chunk)
+      masked.push(rest)
       return
     }
 
@@ -762,10 +785,11 @@ export function extractUiStrings(file: SourceFile): UiString[] {
     masked.push(keep)
   })
 
-  /* JSX text nodes, over the whole file at once rather than line by line.
-   * A wrapped paragraph is one sentence to a reader, so it has to be one
-   * string here. `textNodes` explains what that cost before it was fixed. */
-  if (file.kind === 'ts' || file.kind === 'tsx') out.push(...textNodes(masked.join('\n')))
+  /* Text nodes, over the whole file at once rather than line by line. A
+   * wrapped paragraph is one sentence to a reader, so it has to be one string
+   * here. `textNodes` explains what that cost before it was fixed. CSS pushes
+   * nothing into `masked`, so this is a no-op there. */
+  out.push(...textNodes(masked.join('\n')))
 
   return out
 }
