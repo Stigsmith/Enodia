@@ -1316,6 +1316,20 @@
     height: 100dvh;
   }
 
+  /**
+   * The pane, which the pop-out now matches rather than the other way round.
+   *
+   * **This rule used to be the reason the two modes looked different.** It sets
+   * `background` as a shorthand, so it reset the `sidebars.png` the pop-out was
+   * wearing, and it outranks the base rule on specificity. The art is gone from
+   * both now, so all this has left to say is the geometry: a static full-height
+   * column with a seam on its right rather than a floating panel.
+   *
+   * `box-shadow` is not reset here any more. The base rule's lit edge and seam
+   * are inset and belong in both modes; only the drop shadow was ever
+   * pop-out-only, and a static pane does not cast one because it is not over
+   * anything.
+   */
   :root[data-nav='pane'] .menu-panel {
     position: static;
     width: auto;
@@ -1323,10 +1337,9 @@
     max-height: none;
     border-width: 0 1px 0 0;
     border-radius: 0;
-    box-shadow: none;
-    /* Translucent, so the wallpaper carries through the pane rather than the
-     * pane cutting a solid stripe out of it. */
-    background: color-mix(in oklab, var(--ink-900) 84%, transparent);
+    box-shadow:
+      inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
+      inset -1px 0 0 var(--div-2);
   }
 
   :root[data-nav='pane'] .app-view {
@@ -1997,27 +2010,28 @@
 
 /* Covers rather than pushes, and returns you where you were. DESIGN.md 8. */
 /**
- * The menu, on the game's own sidebar rather than on a CSS panel.
+ * The menu, on CSS rather than on the game's sidebar art.
  *
- * ## Why this art and not the save slot
+ * ## The art went, and the pinned pane had already proved the case
  *
- * The owner suggested the build card's plate for the pop-out. It is the wrong
- * shape and the file already says so: `slot-card.png` is asymmetric top to
- * bottom with an ornamented head and foot, which is why `.bcard` pins it to
- * `aspect-ratio: 425 / 630`. A menu whose height follows its content cannot
- * hold a ratio, and stretching that plate puts its ornament in the wrong place.
+ * `sidebars.png` used to back this. The docblock that argued for it claimed
+ * "both nav modes get it", and **the cascade never allowed that**: the pinned
+ * override further up this file sets `background` as a shorthand, which resets
+ * `background-image` to none and outranks this rule on specificity. So the
+ * pinned pane has been showing a translucent ink panel since the day the art
+ * landed, and only the pop-out ever wore the picture. Two modes of the same
+ * menu looking like two different things is the thing worth fixing, and the
+ * pane's version is the better of the two.
  *
- * `sidebars.png` is the other half of the same suggestion and it fits exactly.
- * It is what the editor's leftmost pane already wears, it is 380 by 1080 for a
- * ratio of 0.35 against the pinned pane's 0.30, and it is a lit left edge with
- * diagonal streaks rather than a framed box, so it covers to any height without
- * a shape to distort. Both nav modes get it, because the menu is the same menu
- * whichever way it is pinned.
+ * So the recipe is the pane's, brought here rather than the other way round: a
+ * translucent ink ground that lets the wallpaper through, and a lit left edge
+ * drawn as an inset shadow instead of as 380 by 1080 pixels of PNG. The streaks
+ * are what is lost, and they were never legible at 21rem behind text anyway.
  *
- * **The border, the radius and the ink are gone rather than layered over.** The
- * note at 2110 in this file is the reason and it is right: art with its own
- * frame, put inside a bordered box, draws a panel within a panel. The way out
- * is to delete the outer box, not to turn the art down until it stops arguing.
+ * **The border and the radius stay gone.** The note further down about art with
+ * its own frame inside a bordered box is still right, and a squared panel that
+ * runs to the edge of its own shadow is the Hades register regardless of what
+ * is painting it.
  */
 .menu-panel {
   position: absolute;
@@ -2034,10 +2048,13 @@
   padding: 0.5rem 0.55rem;
   border: 0;
   border-radius: 0;
-  background:
-    url('/shell/sidebars.png') left top / 100% auto no-repeat,
-    var(--ink-900);
-  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
+  background: color-mix(in oklab, var(--ink-900) 88%, transparent);
+  /* The lit edge the art used to carry, and a seam on the right so the panel
+   * has an edge where it meets the page. Inset, so nothing changes size. */
+  box-shadow:
+    inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
+    inset -1px 0 0 var(--div-2),
+    0 1.5rem 3rem rgb(0 0 0 / 0.55);
 }
 
 .menu-panel section + section {
@@ -2046,11 +2063,23 @@
   border-top: 1px solid var(--div-2);
 }
 
+/**
+ * The category headings, and they were already in the right face.
+ *
+ * `--display` is Spectral SC, which is what every heading in the app wears;
+ * there is no separate Greek token and Cinzel was deleted as a bad stand-in for
+ * the commercial face. So this is a size change and nothing else.
+ *
+ * **The tracking comes down as the size goes up.** 0.14em was buying legibility
+ * at 0.62rem, where small caps that tight are hard to read. At 0.82rem the
+ * letterforms carry themselves and the old tracking would read as a stretched
+ * word rather than as a heading.
+ */
 .menu-panel h2 {
-  margin: 0.2rem 0 0.25rem 0.55rem;
+  margin: 0.45rem 0 0.35rem 0.55rem;
   font-family: var(--display);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--lit);
 }
@@ -2119,106 +2148,27 @@
   font-family: var(--body);
   font-size: 0.88rem;
   color: var(--bone);
+  /**
+   * Taller than the icon, so a row with one is the same height as a row
+   * without.
+   *
+   * Dropping the notes left every row at 43px except "End the run" at 44.4,
+   * because the entry icon is 18.4px against a 14.08px font whose `normal`
+   * line box is about 17. One row a pixel out of fourteen is not visible on
+   * its own and is exactly the sort of thing that stops being one pixel the
+   * next time somebody adds an icon.
+   */
+  line-height: 1.35;
 }
 
-.menu-note {
-  font-size: 0.72rem;
-  color: var(--bone-faint);
-}
-
-/* The frame options. A swatch each, because the answer to "which frame" is
- * what it looks like, and reading nine names decides nothing. Each swatch
- * draws the same face under the same art at the same geometry the ring uses,
- * so what is in the menu is what lands on the page. */
-.menu-frames button {
-  display: grid;
-  grid-template-columns: 3.2rem 1fr;
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 0.6rem;
-  row-gap: 0;
-}
-
-.menu-frames .menu-frame-swatch {
-  grid-row: 1 / 3;
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 3.2rem;
-  height: 3.2rem;
-}
-
-.menu-frame-face {
-  width: 62%;
-  height: 62%;
-  border-radius: var(--bubble-radius, 50%);
-  object-fit: cover;
-}
-
-/* 62 percent of the swatch is the bubble, so the frame is that times its own
- * width, which is the same sum the ring does. */
-.menu-frame-art {
-  position: absolute;
-  width: calc(62% * var(--frame-width, 1.22));
-  object-fit: contain;
-  opacity: var(--frame-opacity, 1);
-  pointer-events: none;
-}
-
-/* A drawn frame has no img to place, so the swatch grows its own. */
-.menu-frame-swatch::after {
-  content: '';
-  position: absolute;
-  width: calc(62% * var(--frame-width, 1.22));
-  aspect-ratio: 1 / 1;
-  background: var(--frame-band, none);
-  -webkit-mask: var(--frame-mask, none);
-  mask: var(--frame-mask, none);
-  pointer-events: none;
-}
-
-.menu-frames button.is-on {
-  border-color: var(--lit-dim);
-  background: var(--ink-900);
-}
-
-.menu-frames button.is-on .menu-label {
-  color: var(--lit);
-}
-
-/* The wallpaper options. A swatch each, and **at full strength rather than at
- * the opacity it lands at**: the swatch is here to answer "which picture", and
- * what it looks like applied needs no swatch at all, because the menu is an
- * overlay over the live page and picking one changes the page behind it. */
-.menu-walls button {
-  display: grid;
-  grid-template-columns: 3.6rem 1fr;
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 0.6rem;
-  row-gap: 0;
-}
-
-.menu-wall-swatch {
-  grid-row: 1 / 3;
-  width: 3.6rem;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--div-3);
-  border-radius: var(--r-hair);
-  background-color: var(--ink-950);
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.menu-walls button.is-on {
-  border-color: var(--lit-dim);
-  background: var(--ink-900);
-}
-
-.menu-walls button.is-on .menu-label {
-  color: var(--lit);
-}
+/* The frame and wallpaper swatches used to live in this menu and their rules
+ * outlived the markup by a while. `Menu.tsx` records the move: a setting you
+ * cannot see the result of is a setting you have to guess at, so each went to
+ * the screen it takes effect on. Nine rules with nothing rendering them,
+ * deleted here.
+ *
+ * `.menu-chosen` and `.menu-label` are NOT dead and must stay: `Themes.tsx`
+ * and `builds.css` both borrow them. */
 
 /* Unbuilt, and saying so in the one colour reserved for it. */
 .menu-panel button.is-unbuilt {
@@ -4513,6 +4463,10 @@
  * `right: 0` rather than `left: 0`, because it hangs off the right corner and a
  * panel that opened leftward from here would run off the screen on a phone.
  */
+/* The menu's mirror, and it takes the menu's recipe. It wore `sidebars.png` for
+ * the same reason and loses it for the same one; two panels that open from
+ * opposite corners of the same chrome have to be made of the same thing. The
+ * lit edge is on the right here, because that is the side this one opens from. */
 .you-panel {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -4520,10 +4474,11 @@
   z-index: 20;
   width: min(14rem, 80vw);
   padding: 0.5rem 0.55rem;
-  background:
-    url('/shell/sidebars.png') left top / 100% auto no-repeat,
-    var(--ink-900);
-  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
+  background: color-mix(in oklab, var(--ink-900) 88%, transparent);
+  box-shadow:
+    inset -0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
+    inset 1px 0 0 var(--div-2),
+    0 1.5rem 3rem rgb(0 0 0 / 0.55);
 }
 
 .you-as {
