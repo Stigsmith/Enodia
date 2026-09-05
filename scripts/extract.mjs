@@ -360,6 +360,19 @@ const tables = {
   hero: 'HeroData',
   'arcana-cards': 'MetaUpgradeCardData',
   'arcana-layout': 'MetaUpgradeDefaultCardLayout',
+  /**
+   * The Oath of the Unseen: every vow, and the ranks each one sells.
+   *
+   * `MetaUpgradeData.lua` was already loaded for the Arcana and this table sat
+   * in the same file unwritten, which is why `MAX_FEAR = 57` was a constant
+   * with a comment instead of a number with a source. Every rank states its own
+   * `Points`, so the total is a sum rather than a claim.
+   *
+   * It holds more than the vows: the Arcana cards' own MetaUpgrade records are
+   * in here too. `scripts/build-app-data.ts` is where they are told apart, on
+   * `Ranks`, because a vow is the thing you can buy ranks of.
+   */
+  'meta-upgrades': 'MetaUpgradeData',
   'trait-rarity': 'TraitRarityData',
   'trait-elements': 'TraitElementData',
   'unit-sets': 'UnitSetData',

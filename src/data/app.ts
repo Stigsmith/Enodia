@@ -205,4 +205,53 @@ export function aspectsOf(weapon: WeaponId): Trait[] {
 }
 
 /** The build stamp the data came from, for the footer and for bug reports. */
+/** One vow of the Oath of the Unseen, and what each of its ranks costs. */
+export type Vow = {
+  id: string
+  name: string
+  icon: string | null
+  /** In order. `points` is the cost of *that* rank, not the running total. */
+  ranks: { points: number; locked?: boolean }[]
+}
+
+/**
+ * The 17 vows, in the order the shrine draws them.
+ *
+ * `scripts/build-app-data.ts` reads them out of `MetaUpgradeData` and orders
+ * them by `ShrineUpgradeOrder`, which is the list `GetMaxShrinePoints` walks.
+ */
+export const vows: readonly Vow[] = bundle.vows as Vow[]
+
+/**
+ * The most Fear a run can carry, summed rather than stated.
+ *
+ * **It was 57, hard-coded, and 57 is not a number this data produces.** The
+ * comment claimed it was "the sum of all of them", and the sum is 67. The
+ * project's own rule caught it: the constant was written from a reading of
+ * `MetaUpgradeData` that was never run.
+ *
+ * The game's answer is `ShrineLogic.GetMaxShrinePoints`, and two things in it
+ * matter. `Points` is **incremental**, because `GetTotalSpentShrinePoints` sums
+ * `Ranks[1..activeRank]`, so a maxed vow costs the sum of its ranks rather than
+ * its last one. And a rank with unmet `GameStateRequirements` is skipped, which
+ * is the whole gap between a new save and a finished one: all four Boss
+ * Difficulty ranks are gated, and they are worth 12 of the 67.
+ *
+ * **The ceiling here is the unlocked one, 67.** A cap is there to stop somebody
+ * recording an impossible number, and 55 would have stopped a real one: a
+ * player who has unlocked Vow of Rivals can genuinely clear above it, and at 57
+ * ten points of real Fear were unrecordable.
+ */
+export const MAX_FEAR: number = vows.reduce(
+  (total, vow) => total + vow.ranks.reduce((sum, rank) => sum + rank.points, 0),
+  0,
+)
+
+/** What that ceiling is before any Boss Difficulty rank has been earned. */
+export const MIN_MAX_FEAR: number = vows.reduce(
+  (total, vow) =>
+    total + vow.ranks.filter((rank) => !rank.locked).reduce((sum, rank) => sum + rank.points, 0),
+  0,
+)
+
 export const gameVersion: string = (bundle._provenance as { gameVersion?: string }).gameVersion ?? 'unknown'

@@ -1,0 +1,838 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-09-05",
+  "gameVersion": "138174",
+  "source": "Content/Scripts/*.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "luaTable": "MetaUpgradeData",
+  "sha256": "4d432f6c857f34bfe7a97fa5a879094598162c40de575166e269aa41432d21db"
+ },
+ "data": {
+  "BanUnpickedBoonsShrineUpgrade": {
+   "FlavorText": "BanUnpickedBoonsShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_UnpickedUpgrade",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 2,
+     "Points": 2
+    }
+   ]
+  },
+  "BaseMetaUpgrade": {
+   "InfoBackingAnimation": "ShrineSlotBase"
+  },
+  "BiomeSpeedShrineUpgrade": {
+   "FlavorText": "BiomeSpeedShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_BiomeSpeed",
+   "InactiveChangeValue": 9999,
+   "InactiveDisplayValue": "Text_Infinity_Symbol",
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "OnDisabledFunctionName": "DisableBiomeSpeedShrineUpgrade",
+   "Ranks": [
+    {
+     "ChangeValue": 540,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 420,
+     "Points": 2
+    },
+    {
+     "ChangeValue": 300,
+     "Points": 3
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue",
+     "UseTimeString": true
+    }
+   ]
+  },
+  "BoonManaReserveShrineUpgrade": {
+   "FlavorText": "BoonManaReserveShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_PrimeUpgrade",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "OnDisabledFunctionName": "RemoveBoonManaReserve",
+   "Ranks": [
+    {
+     "ChangeValue": 3,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 6,
+     "Points": 1
+    }
+   ]
+  },
+  "BoonSkipShrineUpgrade": {
+   "FlavorText": "BoonSkipShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_NoInvulnerability",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1,
+     "Points": 3
+    }
+   ]
+  },
+  "BossDifficultyShrineUpgrade": {
+   "FlavorText": "BossDifficultyShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_BossDifficulty",
+   "InactiveChangeValue": 0,
+   "IneligibleForCirceRemoval": true,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "RankRevealedFunctionName": "BossDifficultyShrineUpgradeRankRevealed",
+   "Ranks": [
+    {
+     "ChangeValue": 1,
+     "GameStateRequirements": [
+      {
+       "HasAny": [
+        "HecateBossGrantsShrineUpgrade01",
+        "HecateGrantsShrineUpgrade01"
+       ],
+       "Path": [
+        "GameState",
+        "TextLinesRecord"
+       ]
+      }
+     ],
+     "Points": 2
+    },
+    {
+     "ChangeValue": 2,
+     "GameStateRequirements": [
+      {
+       "PathTrue": [
+        "GameState",
+        "WorldUpgradesAdded",
+        "WorldUpgradeBossDifficultyT2"
+       ]
+      }
+     ],
+     "Points": 3
+    },
+    {
+     "ChangeValue": 3,
+     "GameStateRequirements": [
+      {
+       "PathTrue": [
+        "GameState",
+        "WorldUpgradesAdded",
+        "WorldUpgradeBossDifficultyT3"
+       ]
+      }
+     ],
+     "Points": 3
+    },
+    {
+     "ChangeValue": 4,
+     "GameStateRequirements": [
+      {
+       "PathTrue": [
+        "GameState",
+        "WorldUpgradesAdded",
+        "WorldUpgradeBossDifficultyT4"
+       ]
+      }
+     ],
+     "Points": 4
+    }
+   ],
+   "UsePluralizedForm": true,
+   "UseWideAnimations": true
+  },
+  "EnemyCountShrineUpgrade": {
+   "FlavorText": "EnemyCountShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_EnemyCount",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1.2,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.4,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.6,
+     "Points": 1
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Add": -100,
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  },
+  "EnemyDamageShrineUpgrade": {
+   "FlavorText": "EnemyDamageShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_EnemyDamage",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "OnDisabledFunctionName": "RemoveEnemyDamageShrineUpgrade",
+   "Ranks": [
+    {
+     "ChangeValue": 1.2,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.6,
+     "Points": 2
+    },
+    {
+     "ChangeValue": 2,
+     "Points": 2
+    }
+   ],
+   "SelectedVoiceLines": {
+    "Cooldowns": [
+     {
+      "Name": "MelinoeShrineUpgradeSpeech",
+      "Time": 4
+     }
+    ],
+    "PlayOnceFromTableThisRun": true,
+    "PreLineWait": 0.65,
+    "SkipAnim": true,
+    "SuccessiveChanceToPlay": 0.35,
+    "UsePlayerSource": true
+   },
+   "SimpleExtractValues": [
+    {
+     "Add": -100,
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  },
+  "EnemyEliteShrineUpgrade": {
+   "FlavorText": "EnemyEliteShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_EnemyElites",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1,
+     "Points": 2
+    },
+    {
+     "ChangeValue": 2,
+     "Points": 3
+    }
+   ]
+  },
+  "EnemyHealthShrineUpgrade": {
+   "FlavorText": "EnemyHealthShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_EnemyHealth",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1.1,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.2,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.3,
+     "Points": 1
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Add": -100,
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  },
+  "EnemyRespawnShrineUpgrade": {
+   "FlavorText": "EnemyRespawnShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_ForceSell",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 0.25,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 0.5,
+     "Points": 1
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ],
+   "SpawnForceMax": 1200,
+   "SpawnForceMin": 800,
+   "UseableDelay": 0.5
+  },
+  "EnemyShieldShrineUpgrade": {
+   "FlavorText": "EnemyShieldShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_ShieldHealth",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 2,
+     "Points": 1
+    }
+   ],
+   "SelectedVoiceLines": {
+    "Cooldowns": [
+     {
+      "Name": "MelinoeShrineUpgradeSpeech",
+      "Time": 4
+     }
+    ],
+    "PlayOnceFromTableThisRun": true,
+    "PreLineWait": 0.65,
+    "SkipAnim": true,
+    "SuccessiveChanceToPlay": 0.35,
+    "UsePlayerSource": true
+   }
+  },
+  "EnemySpeedShrineUpgrade": {
+   "FlavorText": "EnemySpeedShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_EnemySpeed",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1.2,
+     "Points": 3
+    },
+    {
+     "ChangeValue": 1.4,
+     "Points": 3
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Add": -100,
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  },
+  "HealingReductionShrineUpgrade": {
+   "FlavorText": "HealingReductionShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_HealingReduction",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 0.75,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 0.5,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 0,
+     "Points": 2
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    },
+    {
+     "NegativePercentDelta": true,
+     "NewProperty": "HealingReductionValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  },
+  "LimitGraspShrineUpgrade": {
+   "FlavorText": "LimitGraspShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_NoMetaUpgrades",
+   "IgnoredByRandomBounties": true,
+   "InactiveChangeValue": 100,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 60,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 40,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 20,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 0,
+     "Points": 2
+    }
+   ]
+  },
+  "MinibossCountShrineUpgrade": {
+   "FlavorText": "MinibossCountShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_MinibossCount",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1,
+     "Points": 2
+    }
+   ]
+  },
+  "NextBiomeEnemyShrineUpgrade": {
+   "BiomeEnemySets": {
+    "F": [
+     "FishmanMelee",
+     "FishmanMelee_Elite",
+     "FishmanRanged",
+     "FishmanRanged_Elite",
+     "FishSwarmerSquad",
+     "FishSwarmerSquad_Elite",
+     "Turtle",
+     "Turtle_Elite",
+     "WaterUnit",
+     "WaterUnit_Elite",
+     "Guard2",
+     "Guard2_Elite",
+     "Radiator2",
+     "Radiator2_Elite"
+    ],
+    "G": [
+     "BrokenHearted",
+     "BrokenHearted",
+     "BrokenHearted_Elite",
+     "Lovesick",
+     "Lovesick_Elite",
+     "Lycanthrope",
+     "Lycanthrope_Elite",
+     "Mourner",
+     "Mourner_Elite",
+     "Lamia",
+     "Lamia_Elite",
+     "FogEmitter2"
+    ],
+    "H": [
+     "GoldElemental",
+     "GoldElemental_Elite",
+     "TimeElemental",
+     "TimeElemental_Elite",
+     "SwarmerClockwork",
+     "SwarmerClockwork_Elite",
+     "ClockworkHeavyMelee",
+     "ClockworkHeavyMelee_Elite",
+     "SatyrLancer",
+     "SatyrLancer_Elite",
+     "SatyrRatCatcher",
+     "SatyrRatCatcher_Elite"
+    ],
+    "N": [
+     "Stickler",
+     "Stickler_Elite",
+     "Scimiterror",
+     "Scimiterror_Elite",
+     "Swab",
+     "Swab_Elite",
+     "Drunk",
+     "Drunk_Elite",
+     "HarpyCutter",
+     "HarpyCutter_Elite",
+     "WaterElemental",
+     "WaterElemental_Elite",
+     "Mage2",
+     "Mage2_Elite"
+    ],
+    "O": [
+     "SentryBot",
+     "SentryBot_Elite",
+     "SentryBot",
+     "SentryBot_Elite",
+     "AutomatonBeamer",
+     "AutomatonBeamer_Elite",
+     "AutomatonBeamer",
+     "AutomatonBeamer_Elite",
+     "AutomatonEnforcer",
+     "AutomatonEnforcer_Elite",
+     "AutomatonEnforcer",
+     "AutomatonEnforcer_Elite",
+     "Dragon",
+     "Dragon_Elite",
+     "Dragon",
+     "Dragon_Elite",
+     "HarpyDropper",
+     "HarpyDropper_Elite",
+     "HarpyDropper",
+     "HarpyDropper_Elite",
+     "SatyrSapper",
+     "SatyrSapper_Elite",
+     "SatyrSapper",
+     "SatyrSapper_Elite",
+     "SatyrLancer2",
+     "SatyrLancer2_Elite",
+     "SatyrCrossbow2",
+     "SatyrCrossbow2_Elite",
+     "ZombieOlympus",
+     "ZombieOlympus_Elite",
+     "ZombieOlympus",
+     "ZombieOlympus_Elite"
+    ],
+    "P": [
+     "SimpleSquad",
+     "SimpleSquad_Elite",
+     "Stalker",
+     "Stalker_Elite",
+     "Brute",
+     "Brute_Elite",
+     "Mati",
+     "Mati_Elite",
+     "DragonBurrower",
+     "DragonBurrower_Elite"
+    ]
+   },
+   "FlavorText": "NextBiomeEnemyShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_NextBiomeEnemy",
+   "InactiveChangeValue": 0,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 0.1,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 0.25,
+     "Points": 2
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ],
+   "SwapMap": {
+    "Brawler": {
+     "ActiveCapWeight": 1.3,
+     "Name": "FishmanMelee"
+    },
+    "Brawler_Elite": {
+     "ActiveCapWeight": 1.3,
+     "Name": "FishmanMelee_Elite"
+    },
+    "BrokenHearted": {
+     "Name": "SwarmerClockwork"
+    },
+    "BrokenHearted_Elite": {
+     "Name": "SwarmerClockwork_Elite"
+    },
+    "Carrion": {
+     "Name": "Scimiterror"
+    },
+    "Carrion_Elite": {
+     "Name": "Scimiterror_Elite"
+    },
+    "Dragon": {
+     "Name": "Brute"
+    },
+    "Dragon_Elite": {
+     "Name": "Brute_Elite"
+    },
+    "Drunk": {
+     "Name": "AutomatonEnforcer"
+    },
+    "Drunk_Elite": {
+     "Name": "AutomatonEnforcer_Elite"
+    },
+    "FishSwarmerSquad": {
+     "Name": "LycanSwarmer",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "FishSwarmerSquad_Elite": {
+     "Name": "LycanSwarmer_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "FishmanMelee": {
+     "Name": "Mourner",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "FishmanMelee_Elite": {
+     "Name": "Mourner_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "FishmanRanged": {
+     "Name": "Lamia",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "FishmanRanged_Elite": {
+     "Name": "Lamia_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Guard": {
+     "Name": "Guard2"
+    },
+    "Guard2": {
+     "Name": "CorruptedShadeMedium",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Guard2_Elite": {
+     "Name": "CorruptedShadeMedium_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Guard_Elite": {
+     "Name": "Guard2_Elite"
+    },
+    "HarpyCutter": {
+     "Name": "HarpyDropper"
+    },
+    "HarpyCutter_Elite": {
+     "Name": "HarpyDropper_Elite"
+    },
+    "HarpyDropper": {
+     "Name": "Stalker"
+    },
+    "HarpyDropper_Elite": {
+     "Name": "Stalker_Elite"
+    },
+    "Lamia": {
+     "Name": "SatyrLancer"
+    },
+    "Lamia_Elite": {
+     "Name": "SatyrLancer_Elite"
+    },
+    "Lovesick": {
+     "Name": "TimeElemental"
+    },
+    "Lovesick_Elite": {
+     "Name": "TimeElemental_Elite"
+    },
+    "Mage": {
+     "Name": "FishmanRanged"
+    },
+    "Mage2": {
+     "Name": "SatyrLancer2"
+    },
+    "Mage2_Elite": {
+     "Name": "SatyrLancer2_Elite"
+    },
+    "Mage_Elite": {
+     "Name": "FishmanRanged_Elite"
+    },
+    "Mourner": {
+     "Name": "ClockworkHeavyMelee"
+    },
+    "Mourner_Elite": {
+     "Name": "ClockworkHeavyMelee_Elite"
+    },
+    "Mudman": {
+     "Name": "Stickler"
+    },
+    "Mudman_Elite": {
+     "Name": "Stickler_Elite"
+    },
+    "Radiator": {
+     "Name": "Radiator2"
+    },
+    "Radiator2": {
+     "Name": "CorruptedShadeSmall",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Radiator2_Elite": {
+     "Name": "CorruptedShadeSmall_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Radiator_Elite": {
+     "Name": "Radiator2_Elite"
+    },
+    "SatyrCrossbow2": {
+     "Name": "DragonBurrower"
+    },
+    "SatyrCrossbow2_Elite": {
+     "Name": "DragonBurrower_Elite"
+    },
+    "SatyrLancer2": {
+     "Name": "Mati"
+    },
+    "SatyrLancer2_Elite": {
+     "Name": "Mati_Elite"
+    },
+    "Scimiterror": {
+     "Name": "SatyrSapper"
+    },
+    "Scimiterror_Elite": {
+     "Name": "SatyrSapper_Elite"
+    },
+    "Screamer": {
+     "Name": "FishSwarmerSquad"
+    },
+    "Screamer_Elite": {
+     "Name": "FishSwarmerSquad_Elite"
+    },
+    "SiegeVine": {
+     "Name": "Turtle"
+    },
+    "SiegeVine_Elite": {
+     "Name": "Turtle_Elite"
+    },
+    "Stickler": {
+     "Name": "AutomatonBeamer"
+    },
+    "Stickler_Elite": {
+     "Name": "AutomatonBeamer_Elite"
+    },
+    "Swab": {
+     "Name": "Dragon"
+    },
+    "Swab_Elite": {
+     "Name": "Dragon_Elite"
+    },
+    "Turtle": {
+     "Name": "DespairElemental",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Turtle_Elite": {
+     "Name": "DespairElemental_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "WaterElemental": {
+     "Name": "SentryBot"
+    },
+    "WaterElemental_Elite": {
+     "Name": "SentryBot_Elite"
+    },
+    "WaterUnit": {
+     "Name": "Lovesick",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "WaterUnit_Elite": {
+     "Name": "Lovesick_Elite",
+     "RequiredSpawnPoint": "EnemyPoint"
+    },
+    "Wisp": {
+     "Name": "Guard2"
+    },
+    "Wisp_Elite": {
+     "Name": "Guard2_Elite"
+    },
+    "Zombie": {
+     "Name": "WaterElemental"
+    },
+    "ZombieAssassin": {
+     "Name": "Drunk"
+    },
+    "ZombieAssassin_Elite": {
+     "Name": "Drunk_Elite"
+    },
+    "ZombieHeavyRanged": {
+     "Name": "HarpyCutter"
+    },
+    "ZombieHeavyRanged_Elite": {
+     "Name": "HarpyCutter_Elite"
+    },
+    "ZombieOlympus": {
+     "Name": "Simple"
+    },
+    "ZombieOlympus_Elite": {
+     "Name": "Simple_Elite"
+    },
+    "ZombieSpawner": {
+     "Name": "Swab"
+    },
+    "ZombieSpawner_Elite": {
+     "Name": "Swab_Elite"
+    },
+    "Zombie_Elite": {
+     "Name": "WaterElemental_Elite"
+    }
+   }
+  },
+  "ShopPricesShrineUpgrade": {
+   "FlavorText": "ShopPricesShrineUpgrade_Flavor",
+   "Icon": "ShrineIcon_ShopPrices",
+   "InactiveChangeValue": 1,
+   "InheritFrom": [
+    "BaseMetaUpgrade"
+   ],
+   "Ranks": [
+    {
+     "ChangeValue": 1.4,
+     "Points": 1
+    },
+    {
+     "ChangeValue": 1.8,
+     "Points": 1
+    }
+   ],
+   "SimpleExtractValues": [
+    {
+     "Add": -100,
+     "Multiply": 100,
+     "NewProperty": "DisplayValue",
+     "Property": "ChangeValue"
+    }
+   ]
+  }
+ }
+}

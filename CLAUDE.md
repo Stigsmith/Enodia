@@ -103,6 +103,7 @@ Do not restate these without the citation. Do not extend them without checking.
 | Attack and Special are **guaranteed** a place in a priority offer that would otherwise contain neither | `guaranteedSlots = {"Melee", "Secondary"}` in `GetPriorityTraits` |
 | Only **45 boons occupy a core slot**, nine per slot, one per Olympian. Everything else a god offers occupies no slot at all | `Slot` over `traits-resolved.json` |
 | The Huntress fires below **99%** Magick, not "when low" | `LowManaThreshold = 0.99` in `TraitData_MetaUpgrade.lua` |
+| **Maximum Fear is 67, and 55 before Vow of Rivals is unlocked.** 17 vows over 40 ranks. `Points` is the cost *of* a rank rather than the Fear *at* it, because `GetTotalSpentShrinePoints` sums `Ranks[1..activeRank]`; and `GetMaxShrinePoints` skips any rank with unmet `GameStateRequirements`, which is all four Boss Difficulty ranks and 12 of the 67 | `ShrineLogic.lua:408` and `:424`, `ShrineUpgradeOrder` in `ShrineData.lua:49`, pinned by `src/data/vows.test.ts` |
 
 ### What the files cannot tell you
 
@@ -122,6 +123,12 @@ the play experience cannot see.
 1. Claimed the Codex cannot track a chosen duo. It can
 2. Described an Exit as offering three boons. You pick an Exit, then the god behind it offers three
 3. Claimed a cap of four gods. It is four Olympians
+7. `MAX_FEAR = 57`, under a docblock saying it was the sum of every vow rank.
+   It is 67, or 55 before Vow of Rivals unlocks, and 57 is neither. The comment
+   described arithmetic nobody had run, and the number was unreachable in the
+   Fear stepper for a year of the project's life. **A derivation written in
+   prose is not a derivation.** It is summed from the data now, and
+   `src/data/vows.test.ts` fails if it moves
 6. Then claimed a run *allows* four Olympians, and blocked a fifth in the builder.
    `ReachedMaxGods` is real and only governs `ChooseLoot`. Eight lines later
    `RewardLogic.lua:242` replaces its answer from any held `ForceBoonName` with

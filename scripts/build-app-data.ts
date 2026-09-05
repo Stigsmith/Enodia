@@ -757,6 +757,103 @@ const familiars = FAMILIARS.map((familiar) => ({
   icon: icons.get(`familiars-${familiar.slug}-01`)?.file ?? null,
 }))
 
+/**
+ * The Oath of the Unseen: the 17 vows, in the order the shrine draws them.
+ *
+ * **The order comes from `ShrineUpgradeOrder` in `ShrineData.lua`**, not from
+ * whatever order `MetaUpgradeData` happens to iterate in, because that list is
+ * also what `GetMaxShrinePoints` walks. Anything in `MetaUpgradeData` and not
+ * in the order list is not a vow: `BaseMetaUpgrade` is the template, and it is
+ * the one record of the eighteen with no `Ranks`.
+ *
+ * `Points` is **incremental, not cumulative**, and that is the thing to get
+ * right. `ShrineLogic.GetTotalSpentShrinePoints` sums `Ranks[1..activeRank]`,
+ * so a vow at rank 3 costs the sum of its first three ranks rather than the
+ * third one's number. Reading the last rank as the vow's Fear would have been
+ * the same error as reading `GodLoot` without following `InheritFrom`.
+ */
+const SHRINE_ORDER = [
+  'EnemyDamageShrineUpgrade',
+  'EnemyHealthShrineUpgrade',
+  'EnemyShieldShrineUpgrade',
+  'EnemySpeedShrineUpgrade',
+  'EnemyCountShrineUpgrade',
+  'NextBiomeEnemyShrineUpgrade',
+  'EnemyRespawnShrineUpgrade',
+  'EnemyEliteShrineUpgrade',
+  'HealingReductionShrineUpgrade',
+  'ShopPricesShrineUpgrade',
+  'MinibossCountShrineUpgrade',
+  'BoonSkipShrineUpgrade',
+  'BiomeSpeedShrineUpgrade',
+  'LimitGraspShrineUpgrade',
+  'BoonManaReserveShrineUpgrade',
+  'BanUnpickedBoonsShrineUpgrade',
+  'BossDifficultyShrineUpgrade',
+] as const
+
+const metaUpgrades = dictOf(read('meta-upgrades').data)
+
+const vows = SHRINE_ORDER.map((id) => {
+  const record = dictOf(metaUpgrades[id])
+  const ranks = Array.isArray(record.Ranks) ? record.Ranks.map((r) => dictOf(r)) : []
+  /**
+   * The name is in `TraitText`, not `HelpText`, which is where every other
+   * screen name here comes from. Worth stating: reading the wrong table gave
+   * seventeen vows called `EnemyDamageShrineUpgrade` and it looked like the
+   * name was simply missing rather than somewhere else.
+   */
+  const name = (() => {
+    const found = dictOf(text[id]).name
+    return typeof found === 'string' && found ? found : id
+  })()
+
+  /**
+   * The art is filed under the vow's *name*, not its id.
+   *
+   * `assets/vows/` holds `pain.png`, `rivals.png` and so on, which is the last
+   * word of "Vow of Pain". Nothing about `EnemyDamageShrineUpgrade` would ever
+   * have found it, and an id-shaped slug quietly resolved to null for all
+   * seventeen.
+   */
+  const slug = name.replace(/^Vow of /, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  /**
+   * Scoped to `vows/`, the way `arcanaIcon` is scoped to `arcana/`.
+   *
+   * **Unscoped, Vow of Fangs resolved to `hammers/fangs.webp`**, a Daedalus
+   * Hammer icon, because the bare slug is claimed by two categories and the
+   * first by path wins. The validator has warned about 21 such collisions for a
+   * while; this is the first time one of them silently produced a wrong picture
+   * rather than an ambiguous one.
+   *
+   * It resolves 5 of 17 and that is the honest number. `assets/vows/` holds 19
+   * files under names like blood, forsaking and haunting, and the game's vows
+   * are Pain, Grit, Wards and so on: the two sets overlap on five. Whatever
+   * those nineteen are, most of them are not these. Forcing a join would have
+   * put confident wrong art on sixteen rows.
+   */
+  const vowIcon = (key: string): string | null => {
+    const found = icons.get(key)?.file ?? null
+    return found && found.startsWith('vows/') ? found : null
+  }
+  return {
+    id,
+    name,
+    icon: vowIcon(`vows-${slug}`) ?? vowIcon(slug),
+    /**
+     * What each rank costs, in order. The vow's own maximum is the sum.
+     *
+     * `locked` marks a rank `GetMaxShrinePoints` will not count until the save
+     * has earned it. All four of them are Boss Difficulty, and they are the
+     * whole difference between a new save's ceiling and a finished one's.
+     */
+    ranks: ranks.map((rank) => ({
+      points: typeof rank.Points === 'number' ? rank.Points : 0,
+      ...(rank.GameStateRequirements ? { locked: true } : {}),
+    })),
+  }
+})
+
 const bundle = {
   _provenance: {
     ...generated._provenance,
@@ -781,6 +878,7 @@ const bundle = {
   arcana: arcanaCards,
   arcanaBoard,
   familiars,
+  vows,
   traits: records,
 }
 
@@ -797,6 +895,17 @@ console.log(
   `  ${arcanaBoard.length}x${arcanaBoard[0]?.length ?? 0} Arcana board, ` +
     `${arcanaCards.filter((c) => Object.keys(c.requires).length).length} cards switch themselves on`,
 )
+{
+  const ranks = vows.reduce((n, vow) => n + vow.ranks.length, 0)
+  const all = vows.reduce((n, vow) => n + vow.ranks.reduce((m, r) => m + r.points, 0), 0)
+  const open = vows.reduce(
+    (n, vow) => n + vow.ranks.filter((r) => !r.locked).reduce((m, r) => m + r.points, 0),
+    0,
+  )
+  console.log(
+    `  ${vows.length} vows over ${ranks} ranks, Fear ${open} on a new save and ${all} once every rank is unlocked`,
+  )
+}
 console.log(
   `  ${arcanaCards.length} Arcana (${arcanaCards.filter((c) => c.icon).length} with art), ` +
     `${familiars.length} familiars (${familiars.filter((f) => f.icon).length} with art)`,
