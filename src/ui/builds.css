@@ -5215,6 +5215,22 @@ button.mark {
  * hundred rows, and there are more rows now, so the choice is made once and
  * stated once. It is also the only route to Worth adding without a mouse.
  */
+/**
+ * The rank number on a Worth adding chip.
+ *
+ * Without it the order is invisible, and an order nobody can see is an order
+ * nobody will keep. Mono and faint: it is a position, not a score, and the tray
+ * heading says the list is in the order you want them.
+ */
+.bsort-rank {
+  flex: none;
+  min-width: 0.9rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--bone-faint);
+  text-align: right;
+}
+
 .bsort-aim {
   display: flex;
   gap: 0.3rem;

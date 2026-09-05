@@ -106,6 +106,7 @@ export function BoonSort({
   onMove,
   slotFilter,
   onSlotFilter,
+  onReorder,
 }: {
   build: ShownBuild
   /** everything that can be sorted: every boon a god offers, and this arm's hammers */
@@ -115,6 +116,8 @@ export function BoonSort({
   /** narrow the list to one core slot, set by pressing a tile */
   slotFilter?: Slot | null
   onSlotFilter?: (slot: Slot | null) => void
+  /** put one Worth adding pick before another. See `reorderOptional` */
+  onReorder?: (id: TraitId, before: TraitId | null) => void
 }) {
   const [query, setQuery] = useState('')
   const [openGod, setOpenGod] = useState<string | null>(null)
@@ -452,7 +455,9 @@ export function BoonSort({
         <TrayBox
           tray="optional"
           label="Worth adding"
-          hint="Raises the ceiling without being the build. One boon from a god you take for nothing else still spends an Olympian slot."
+          ranked
+          onReorder={onReorder}
+          hint="In the order you want them. Raises the ceiling without being the build, and none of it is counted against the reading. One boon from a god you take for nothing else still spends an Olympian slot."
           ids={optional}
           over={over === 'optional'}
           onMove={onMove}
@@ -539,20 +544,33 @@ function TrayBox({
   hint,
   ids,
   over,
+  ranked,
   onMove,
   onDrag,
   onOver,
   onDrop,
+  onReorder,
 }: {
   tray: Tray
   label: string
   hint: string
   ids: readonly TraitId[]
   over: boolean
+  /**
+   * Whether this list's order means something.
+   *
+   * Only Worth adding is ranked. The owner's account of what it is for: three
+   * or four hammers really improve a build, some are better than others, one is
+   * much better than none, and none of them is the worst version of the build.
+   * That is a preference list, and a preference list nobody can put in order is
+   * a list that says nothing.
+   */
+  ranked?: boolean
   onMove: (id: TraitId, to: Tray | null) => void
   onDrag: (id: TraitId | null) => void
   onOver: (tray: Tray | null) => void
   onDrop: (event: React.DragEvent) => void
+  onReorder?: (id: TraitId, before: TraitId | null) => void
 }) {
   return (
     <section
@@ -571,7 +589,7 @@ function TrayBox({
         {ids.length === 0 ? (
           <p className="bsort-empty">Drag a boon here, or click one in the list.</p>
         ) : (
-          ids.map((id) => {
+          ids.map((id, at) => {
             const trait = traits.get(id)
             const rarity = rarityOf(trait?.kind ?? 'boon')
             return (
@@ -585,7 +603,31 @@ function TrayBox({
                   onDrag(id)
                 }}
                 onDragEnd={() => onDrag(null)}
+                /* In a ranked list a chip is a drop target too: dropping one on
+                 * another puts it in that place. The tray behind it still takes
+                 * a drop, which is what sends a pick to the end. */
+                {...(ranked && onReorder
+                  ? {
+                      onDragOver: (event: React.DragEvent) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                      },
+                      onDrop: (event: React.DragEvent) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        const moving = event.dataTransfer.getData('text/plain')
+                        onOver(null)
+                        onDrag(null)
+                        if (!moving) return
+                        // Dragged in from the picker or the other tray: it has
+                        // to join the list before it can be placed in it.
+                        if (!ids.includes(moving as TraitId)) onMove(moving as TraitId, tray)
+                        onReorder(moving as TraitId, id)
+                      },
+                    }
+                  : {})}
               >
+                {ranked ? <span className="bsort-rank">{at + 1}</span> : null}
                 <Face row={{ icon: iconOf.get(id) ?? null, rarity, name: trait?.name ?? id }} />
                 <span className="bsort-chip-name">{trait?.name ?? id}</span>
                 <button

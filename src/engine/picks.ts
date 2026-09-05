@@ -118,6 +118,38 @@ export function coreAt(build: ShownBuild, slot: Slot): { id: TraitId; tray: Tray
  * every build written before the field existed looks like and the two must not
  * be distinguishable.
  */
+/**
+ * Move one pick to sit before another in Worth adding.
+ *
+ * **The list is ranked, and until now the order was whatever order things were
+ * added in.** The owner's account of what Worth adding means: three or four
+ * hammers really improve a build, some are better than others, one of them is
+ * much better than none, and none of them is the worst version of the build. So
+ * it is a preference list, and a preference list nobody can reorder is a list
+ * that says nothing.
+ *
+ * Ranking only applies to `optional`. `boons` is ordered too, and that order is
+ * already meaningful in its own way, core slots first, and it is not something
+ * anybody sorts by hand.
+ *
+ * `before` of null sends the pick to the end.
+ */
+export function reorderOptional(
+  build: ShownBuild,
+  id: TraitId,
+  before: TraitId | null,
+): ShownBuild {
+  const list = build.optional ?? []
+  if (!list.includes(id) || id === before) return build
+
+  const without = list.filter((one) => one !== id)
+  const at = before === null ? without.length : without.indexOf(before)
+  if (at < 0) return build
+
+  const next = [...without.slice(0, at), id, ...without.slice(at)]
+  return { ...build, optional: next }
+}
+
 export function movePick(build: ShownBuild, id: TraitId, to: Tray | null): ShownBuild {
   const slot = coreSlotOf(id)
   const displaced = (one: TraitId) => one === id || (slot !== null && coreSlotOf(one) === slot)

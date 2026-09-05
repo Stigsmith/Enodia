@@ -14,7 +14,7 @@ import { describe, expect, it } from 'vitest'
 
 import { godPools, sources, traits } from '../data/app.ts'
 import { SAMPLE_BUILDS } from '../data/builds.fixture.ts'
-import { coreAt, coreSlotOf, hammerArm, hammerOptions, isHammer, movePick, trayOf } from './picks.ts'
+import { coreAt, coreSlotOf, hammerArm, hammerOptions, isHammer, movePick, reorderOptional, trayOf } from './picks.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import type { TraitId } from '../data/types.ts'
 
@@ -151,6 +151,41 @@ describe('routing a pick', () => {
   it('collapses optional to undefined when the last one leaves', () => {
     const held = bend({ boons: [], hammers: [], optional: [ATTACK_A] })
     expect(movePick(held, ATTACK_A, null).optional).toBeUndefined()
+  })
+})
+
+describe('ranking Worth adding', () => {
+  const three = (over: Partial<ShownBuild> = {}) =>
+    bend({ boons: [], hammers: [], optional: ['a', 'b', 'c'], ...over })
+
+  it('moves a pick to sit before another', () => {
+    expect(reorderOptional(three(), 'c', 'a').optional).toEqual(['c', 'a', 'b'])
+    expect(reorderOptional(three(), 'a', 'c').optional).toEqual(['b', 'a', 'c'])
+  })
+
+  it('sends it to the end when there is nothing to sit before', () => {
+    expect(reorderOptional(three(), 'a', null).optional).toEqual(['b', 'c', 'a'])
+  })
+
+  it('leaves the list alone for a pick it does not hold', () => {
+    expect(reorderOptional(three(), 'z', 'a').optional).toEqual(['a', 'b', 'c'])
+  })
+
+  it('leaves the list alone when a pick is dropped on itself', () => {
+    expect(reorderOptional(three(), 'b', 'b').optional).toEqual(['a', 'b', 'c'])
+  })
+
+  it('keeps every member, because a reorder is not a removal', () => {
+    const after = reorderOptional(three(), 'c', 'a').optional ?? []
+    expect([...after].sort()).toEqual(['a', 'b', 'c'])
+  })
+
+  /** It is a preference list, not the build, so nothing else may move. */
+  it('touches neither boons nor hammers', () => {
+    const held = three({ boons: [ATTACK_A], hammers: [A_HAMMER] })
+    const after = reorderOptional(held, 'c', 'a')
+    expect(after.boons).toEqual([ATTACK_A])
+    expect(after.hammers).toEqual([A_HAMMER])
   })
 })
 
