@@ -91,8 +91,13 @@ export function Poster({ built, onOpen }: { built: Assembled; onOpen?: (piece: P
         * The Olympians it would add are named with it, because one boon from a
         * god you take for nothing else still spends a slot, and that cost is
         * the thing a reader needs to weigh. */}
+      {/* `is-optional` is load bearing, not decoration. Above 100rem the poster
+        * is a named-area grid and `.poster-run` names one cell, so two sections
+        * wearing that class alone were both placed into it and drew on top of
+        * each other. The Constellation hit the same thing and its fix is the
+        * one copied here: give the band an area of its own. */}
       {built.optional.length ? (
-        <section className="poster-run" aria-label="Worth adding">
+        <section className="poster-run is-optional" aria-label="Worth adding">
           <h4 className="poster-rule">Worth adding</h4>
           <div className="poster-row">
             {built.optional.map((piece) => (
