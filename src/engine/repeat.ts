@@ -66,14 +66,33 @@ import type { GodId, Trait, TraitId, TraitIndex } from '../data/types.ts'
  * They were also chosen against the obvious alternative. `easy / medium / hard`
  * reads as how hard the *game* is, which is a claim this makes no attempt to
  * support and which would tell a new player something false.
+ *
+ * **`long-shot` was added fourth, between the player's worst word and the one
+ * that means impossible.** The first three still mirror `Assembles` exactly, so
+ * the tool's read still sits beside the player's own answer on the same scale.
+ * It exists because two things needed a word and neither of them fitted: a
+ * build asking for more picks than a run is long, and a build resting on a god
+ * the run decides about. Both are real and both happen. Calling either of them
+ * Not in one run would repeat the four-gods mistake, which is the whole reason
+ * `bandFor` below cannot return it.
  */
-export type Reach = 'reliably' | 'situational' | 'needs-luck' | 'not-in-one-run'
+export type Reach =
+  | 'reliably'
+  | 'situational'
+  | 'needs-luck'
+  | 'long-shot'
+  | 'not-in-one-run'
 
-/** The four, easiest first, with the words a reader sees. */
+/** The five, easiest first, with the words a reader sees. */
 export const REACH: { id: Reach; name: string; say: string }[] = [
   { id: 'reliably', name: 'Reliably', say: 'Asks for little enough that most runs can get there.' },
   { id: 'situational', name: 'Situational', say: 'Comes together when the offers go your way.' },
   { id: 'needs-luck', name: 'Needs luck', say: 'A lot has to land in one run.' },
+  {
+    id: 'long-shot',
+    name: 'Long shot',
+    say: 'Everything has to land, and some of it is not yours to ask for.',
+  },
   { id: 'not-in-one-run', name: 'Not in one run', say: 'Asks for more than a run is going to give.' },
 ]
 
@@ -140,17 +159,46 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
  * why `olympiansOf` does not see them and why they need naming here: a build
  * resting on one of them is resting on a god the run decides about, not you.
  *
- * **Artemis, Athena, Dionysus and Medea belong in this list and are not in it,**
- * because they are not in the trait data at all. `CLAUDE.md` records why: they
- * have no `LootData` entry, carry `TreatAsGodLootByShops` in `UnitSetData`, and
- * the extractor does not reach their pools. Nothing can put one in a build
- * today, so nothing needs to charge for one. When the extractor learns them,
- * they go here, and Athena goes here with an asterisk: she is the one encounter
- * god you can force, through `AthenaEncounterKeepsake`, whose
- * `UniqueEncounterArgs` requires `#CurrentRun.Hero.LastStands <= 0`. Zero Death
- * Defiance. A real route, and a narrow one.
+ * **The four Encounter gods are in here now, and this note used to say Medea.**
+ * It does not exist. The fourth is **Hades**, and `NPC_Hades` has been in the
+ * data since the extractor learned `UnitSetData`. The same paragraph also said
+ * the extractor does not reach their pools, which stopped being true at the
+ * same moment: all four are reached and all 33 of their traits carry a display
+ * name. Its own instruction was "when the extractor learns them, they go here",
+ * and the precondition had been met for a while with nothing to notice it.
+ *
+ * They are not gods you take at an Exit. They arrive through Encounters, which
+ * cost no Olympian slot and turn up on the run's schedule rather than yours,
+ * which is exactly what this set is for.
  */
-const UNSUMMONABLE = new Set<GodId>(['Hermes', 'Chaos'])
+const UNSUMMONABLE = new Set<GodId>([
+  'Hermes',
+  'Chaos',
+  'Artemis',
+  'Athena',
+  'Dionysus',
+  'Hades',
+])
+
+/**
+ * The gods a build cannot be planned around, as opposed to merely asked for.
+ *
+ * Holding one of these puts a floor under the reading: whatever the arithmetic
+ * says, a build resting on a god the run decides about is at best a long shot.
+ * **A floor and not a hard stop**, because a hard stop means proven unreachable
+ * and these do turn up. `CLAUDE.md` keeps a list of the times this project
+ * called something impossible that was not.
+ *
+ * **Athena is one tier kinder, and the tool says why.** She is the one
+ * Encounter you can ask for, through `AthenaEncounterKeepsake`, the Gorgon
+ * Amulet, whose `UniqueEncounterArgs` require
+ * `#CurrentRun.Hero.LastStands <= 0`. Zero Death Defiance. A reader who does
+ * not know that would see an unexplained exception, and one who does might
+ * reasonably think it is the worse deal, so the charge names the condition
+ * rather than leaving the discount unexplained.
+ */
+const ENCOUNTER = new Set<GodId>(['Artemis', 'Athena', 'Dionysus', 'Hades'])
+const FORCEABLE = new Set<GodId>(['Athena'])
 
 /**
  * Every Olympian a boon needs in the run.
@@ -361,6 +409,29 @@ export function readRepeat(
     })
   }
 
+  /**
+   * The worst the reading may be, whatever the arithmetic came to.
+   *
+   * A build resting on an Encounter god is not merely expensive: the pick is
+   * not something you can go and get. Cost alone would let a cheap build with
+   * one Dionysus boon read Reliably, which would be the tool promising
+   * something it cannot promise. Athena floors one tier kinder, because the
+   * Gorgon Amulet is a real route and the charge below says what it costs.
+   */
+  const encounters = [
+    ...new Set(
+      [...build.boons, ...(build.optional ?? [])].flatMap((id) =>
+        (traits.get(id)?.gods ?? []).filter((god) => ENCOUNTER.has(god)),
+      ),
+    ),
+  ]
+  const required = encounters.filter((god) => !FORCEABLE.has(god))
+  const floor: Reach | null = required.length
+    ? 'long-shot'
+    : encounters.length
+      ? 'needs-luck'
+      : null
+
   const hardStop =
     gods > 5
       ? `${gods} Olympians. The pool freezes at four, so ${gods - 4} of them have to be forced with keepsakes, out of the four a run gives you. That is not a build to hand somebody.`
@@ -396,13 +467,23 @@ export function readRepeat(
       (traits.get(id)?.gods ?? []).some((god) => UNSUMMONABLE.has(god)),
     )
     const legendary = from.filter((id) => traits.get(id)?.kind === 'legendary')
+    /**
+     * The one route in, named rather than left as an unexplained discount.
+     *
+     * Athena reads a tier kinder than the other three because she can be
+     * forced, and the price of forcing her is severe enough that somebody
+     * seeing only the discount would draw the wrong conclusion.
+     */
+    const athena = wandering.includes('Athena' as GodId)
     charges.push({
       id: 'unsummonable',
       cost: from.length + legendary.length * 2,
       say: `${wandering.join(' and ')} turn${wandering.length === 1 ? 's' : ''} up when the run decides, not when you do.`,
       tip: legendary.length
         ? 'A legendary from a god you cannot summon is two draws deep: the god has to appear enough times, and the right boons have to be in those offers. Good as upside, hard as a foundation.'
-        : 'Fine to hold, hard to plan around. Worth writing under the run of good luck rather than into the build.',
+        : athena
+          ? 'Athena is the one you can ask for, through the Gorgon Amulet, and only with no Death Defiance left. Everything else here arrives on the run’s schedule rather than yours.'
+          : 'Fine to hold, hard to plan around. Worth writing under the run of good luck rather than into the build.',
       traits: from,
     })
   }
@@ -436,7 +517,7 @@ export function readRepeat(
 
   const cost = charges.reduce((total, charge) => total + charge.cost, 0)
   return {
-    reach: hardStop ? 'not-in-one-run' : bandFor(cost, ceiling),
+    reach: hardStop ? 'not-in-one-run' : atWorst(bandFor(cost, ceiling), floor),
     cost,
     ceiling,
     charges,
@@ -465,7 +546,18 @@ export function readRepeat(
  *
  * Not in one run means proven unreachable, and only `hardStop` says that.
  */
+/** The worse of two readings, by the order `REACH` is written in. */
+function atWorst(reach: Reach, floor: Reach | null): Reach {
+  if (!floor) return reach
+  const at = (one: Reach) => REACH.findIndex((each) => each.id === one)
+  return at(floor) > at(reach) ? floor : reach
+}
+
 export function bandFor(cost: number, ceiling: number = ESTIMATED_EXITS): Reach {
+  /* Past the whole length of a run. The file already says the words for this
+   * two paragraphs up: Every Pair costs more than a run is long and is still
+   * assemblable, so it is a long shot and explicitly not an impossibility. */
+  if (cost > ceiling) return 'long-shot'
   if (cost > ceiling / 2) return 'needs-luck'
   if (cost > ceiling / 4) return 'situational'
   return 'reliably'

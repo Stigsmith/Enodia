@@ -35,6 +35,7 @@ import {
   familiars,
   godPools,
   olympians,
+  sources,
   traits,
   weapons,
 } from '../data/app.ts'
@@ -216,7 +217,14 @@ export function BuildEditor({
       .filter((one) => one.severity === 'notes')
       .map((one) => ({ say: one.say, fix: one.fix }))
     if (repeat.hardStop) out.push({ say: repeat.hardStop, fix: undefined })
-    else if (repeat.reach === 'needs-luck') {
+    else if (repeat.reach === 'long-shot') {
+      /* The blunter of the two, because it is the blunter claim: some of what
+       * this build asks for is not something a player can go and get. */
+      out.push({
+        say: 'This reads as a Long shot. Everything has to land and some of it is not yours to ask for, so somebody opening it should know what they are taking on.',
+        fix: undefined,
+      })
+    } else if (repeat.reach === 'needs-luck') {
       out.push({
         say: 'This reads as Needs luck. It is a real build and somebody opening it should know a lot has to land in one run.',
         fix: undefined,
@@ -311,6 +319,23 @@ export function BuildEditor({
     const offered = new Set<string>()
     for (const pool of godPools.values()) {
       for (const id of [...pool.priority, ...pool.pool]) offered.add(id)
+    }
+    /**
+     * **Chaos and the four Encounter gods, which the picker has never reached.**
+     *
+     * `godPools` is `LootData` filtered on `Speaker`, so it yields exactly ten:
+     * the nine Olympians and Hermes. Everything a run gives you that is not
+     * handed over at an Exit by a talking god falls out, which is 33 Chaos
+     * traits and 33 across Artemis, Athena, Dionysus and Hades. All 66 have had
+     * display names since the extractor learned `UnitSetData` and none of them
+     * could be put in a build.
+     *
+     * `sources` is the same data with the grouping intact, so reading it here
+     * opens all five at once. `repeat.ts` already knows what to do with them.
+     */
+    for (const source of sources) {
+      if (source.kind === 'hammer' || source.kind === 'hex') continue
+      for (const id of source.traits) offered.add(id)
     }
     for (const id of hammerOptions(build.weapon, build.aspect)) offered.add(id)
     return [...offered].filter((id) => traits.has(id))

@@ -221,13 +221,94 @@ describe('Olympians past the pool', () => {
   })
 })
 
+/**
+ * The four gods a run hands you rather than the other way round.
+ *
+ * Nothing here could be tested before, because nothing could put one of their
+ * boons in a build: all 33 shipped with no god at all, since `godsByTrait`
+ * walks `LootData` and they have no entry in it.
+ */
+describe('the gods you cannot ask for', () => {
+  /** A cheap build, so the floor is doing the work rather than the arithmetic. */
+  const cheap: Partial<ShownBuild> = {
+    boons: ['HestiaWeaponBoon', 'AphroditeSpecialBoon'],
+    centrepiece: 'HestiaWeaponBoon',
+    hex: null,
+    hammers: [],
+    optional: undefined,
+  }
+
+  it('reads as Reliably before one is added, so the floor is what moves it', () => {
+    expect(read(cheap).reach).toBe('reliably')
+  })
+
+  it('floors a build holding a Dionysus boon at Long shot', () => {
+    const said = read({ ...cheap, boons: [...cheap.boons!, 'CastLobBoon'] })
+    expect(said.reach).toBe('long-shot')
+    // A floor, not a hard stop: it happens, so it is not impossible.
+    expect(said.hardStop).toBeNull()
+    expect(ratingCeiling(said)).toBeNull()
+  })
+
+  /**
+   * Athena is one tier kinder because the Gorgon Amulet is a real route, and
+   * the charge has to say what it costs or the discount is unexplained.
+   */
+  it('floors Athena at Needs luck and names the price', () => {
+    const said = read({ ...cheap, boons: [...cheap.boons!, 'InvulnerabilityDashBoon'] })
+    expect(said.reach).toBe('needs-luck')
+    const charge = said.charges.find((one) => one.id === 'unsummonable')
+    expect(charge?.tip).toMatch(/Gorgon Amulet/)
+    expect(charge?.tip).toMatch(/Death Defiance/)
+  })
+
+  it('takes the worse floor when both are held', () => {
+    const said = read({
+      ...cheap,
+      boons: [...cheap.boons!, 'InvulnerabilityDashBoon', 'CastLobBoon'],
+    })
+    expect(said.reach).toBe('long-shot')
+  })
+
+  /** They cost no Olympian slot, which is the fact CLAUDE.md records. */
+  it('does not count one toward the Olympians', () => {
+    const said = read({ ...cheap, boons: [...cheap.boons!, 'CastLobBoon'] })
+    expect(said.perGod.map((one) => one.god)).toEqual(olympiansOf({ ...FIRST_BUILD, ...cheap }))
+  })
+
+  /**
+   * Chaos needed no new code at all. `UNSUMMONABLE` has charged for it since it
+   * was written and the charge had never fired, because nothing could put a
+   * Chaos boon in a build.
+   */
+  it('charges for Chaos, which it has always been able to and never has', () => {
+    const said = read({ ...cheap, boons: [...cheap.boons!, 'ChaosWeaponBlessing'] })
+    expect(said.charges.find((one) => one.id === 'unsummonable')?.say).toMatch(/Chaos/)
+  })
+})
+
 describe('the bands', () => {
   it('never calls a build impossible on cost alone', () => {
-    // Unlikely is not impossible, and Every Pair is the proof: it costs more
-    // than a run is long and nine of its ten targets provably fit.
-    expect(bandFor(1000, 40)).toBe('needs-luck')
-    expect(read().reach).toBe('needs-luck')
+    /**
+     * Unlikely is not impossible, and Every Pair is the proof: it costs more
+     * than a run is long and nine of its ten targets provably fit.
+     *
+     * **The assertion is what it must not be**, not what it happens to be. It
+     * used to name `needs-luck`, and adding a band past the length of a run
+     * moved it to `long-shot` without touching the claim being made here. Only
+     * `hardStop` may reach the bottom, and this is the test that says so.
+     */
+    expect(bandFor(1000, 40)).not.toBe('not-in-one-run')
+    expect(read().reach).not.toBe('not-in-one-run')
     expect(read().cost).toBeGreaterThan(read().ceiling)
+    expect(read().hardStop).toBeNull()
+  })
+
+  /** The new band, and the threshold is the file's own sentence: past a run. */
+  it('reads a build costing more than a run is long as a long shot', () => {
+    expect(bandFor(41, 40)).toBe('long-shot')
+    expect(bandFor(40, 40)).toBe('needs-luck')
+    expect(read().reach).toBe('long-shot')
   })
 
   it('reads the share of a run rather than a fixed number', () => {
@@ -274,7 +355,8 @@ describe('what it does not depend on', () => {
   })
 
   it('moves with the length of a run, since that is what it measures against', () => {
-    expect(readRepeat(FIRST_BUILD, traits, olympians, 12).reach).toBe('needs-luck')
+    // A twelve-Exit run makes this build cost more than the run is long.
+    expect(readRepeat(FIRST_BUILD, traits, olympians, 12).reach).toBe('long-shot')
     expect(readRepeat({ ...FIRST_BUILD, ...modest }, traits, olympians, 4).reach).not.toBe('reliably')
   })
 })
@@ -300,11 +382,17 @@ describe('the star ceiling, as the screens apply it', () => {
     expect(ratingCeiling(read(sixGods))).toBe(1)
   })
 
-  it('leaves a five-star Needs luck build alone', () => {
-    // The case the rule must not catch. Hard to assemble and worth chasing is a
-    // real kind of build, and the rating and the reading are separate claims.
+  it('leaves a hard-to-assemble five-star build alone', () => {
+    /**
+     * The case the rule must not catch. Hard to assemble and worth chasing is a
+     * real kind of build, and the rating and the reading are separate claims.
+     *
+     * The assertion is on the ceiling rather than on which band it lands in,
+     * because the band is not what this is about: only a hard stop caps the
+     * stars, and a long shot is not a hard stop.
+     */
     const said = read({ play: { rating: 5, runs: 40, clears: 12, assembles: 'needs-luck' } })
-    expect(said.reach).toBe('needs-luck')
+    expect(said.hardStop).toBeNull()
     expect(ratingCeiling(said)).toBeNull()
   })
 })

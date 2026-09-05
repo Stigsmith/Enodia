@@ -3844,6 +3844,13 @@ button.mark {
   color: var(--unbuilt);
 }
 
+/* A long shot is still a build somebody can end a run holding, so it takes the
+   same colour as Needs luck rather than the struck-through treatment below.
+   The word carries the difference; the styling would overstate it. */
+.stamp.is-long-shot .stamp-word {
+  color: var(--unbuilt);
+}
+
 /* The one reading that raises its voice, because it is a statement about the
  * game rather than about the build: this cannot be assembled in one run. */
 .stamp.is-not-in-one-run .stamp-word {
@@ -5222,6 +5229,17 @@ button.mark {
  * nobody will keep. Mono and faint: it is a position, not a score, and the tray
  * heading says the list is in the order you want them.
  */
+/* The divider above the gods a run decides about. A sentence rather than a
+   rule, because the fact is the point and a line would only say "different". */
+.bsort-band {
+  margin: 0.6rem 0 0.2rem;
+  padding: 0.3rem 0.45rem;
+  border-left: 2px solid var(--lit-dim);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: var(--bone-faint);
+}
+
 .bsort-rank {
   flex: none;
   min-width: 0.9rem;

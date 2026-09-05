@@ -63,6 +63,43 @@ const traits = buildTraitIndex({
   text,
 })
 
+/**
+ * Which gods offer a trait, including the four that do not offer through Exits.
+ *
+ * `godsByTrait` walks `LootData`, which is right for the nine Olympians, Hermes
+ * and Chaos and blind to everybody else. **Artemis, Athena, Dionysus and Hades
+ * have no `LootData` entry at all**: they carry `TreatAsGodLootByShops` in
+ * `UnitSetData` and arrive through Encounters, which is exactly why CLAUDE.md
+ * records that they never spend an Olympian slot.
+ *
+ * So all 33 of their traits shipped with no god at all, which meant the builder
+ * could not offer them, `repeat.ts` could not charge for them, and nothing
+ * anywhere could tell one from an ordinary boon.
+ *
+ * Read from `unit-sets.json` rather than from the `sources` array further down,
+ * which is built from the same table but not until after the trait records are
+ * emitted. Same filter, same name: `TreatAsGodLootByShops`, and the set name
+ * without its `NPC_`.
+ *
+ * **It does not make them Olympians.** `olympiansFrom` reads `LootData` and
+ * `GodLoot`, so the tally and the four-god cap are untouched. What changes is
+ * that a trait can say whose it is.
+ */
+const ENCOUNTER_GOD = new Map<string, string>()
+for (const [setName, members] of Object.entries(read('unit-sets').data)) {
+  for (const record of Object.values(dictOf(members))) {
+    const entry = dictOf(record)
+    if (entry.TreatAsGodLootByShops !== true) continue
+    for (const id of strings(entry.Traits)) ENCOUNTER_GOD.set(id, setName.replace(/^NPC_/, ''))
+  }
+}
+
+const godsFor = (trait: Trait): string[] => {
+  if (trait.gods.length) return trait.gods
+  const encounter = ENCOUNTER_GOD.get(trait.id)
+  return encounter ? [encounter] : []
+}
+
 const manifest = JSON.parse(
   readFileSync(join(ROOT, 'assets/manifest.json'), 'utf8').replace(/^﻿/, ''),
 ) as Manifest
@@ -475,7 +512,7 @@ const records = [...traits.values()]
     kind: trait.kind,
     ...(trait.slot ? { slot: trait.slot } : {}),
     ...(trait.altSlot ? { altSlot: trait.altSlot } : {}),
-    ...(trait.gods.length ? { gods: trait.gods } : {}),
+    ...(godsFor(trait).length ? { gods: godsFor(trait) } : {}),
     ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
     ...(trait.requires ? { requires: trait.requires } : {}),
     ...(aspectGate(trait.id) ? { needsAspect: aspectGate(trait.id) } : {}),
