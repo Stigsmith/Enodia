@@ -65,6 +65,19 @@ const MAX_GODS = 5
  */
 const HAMMER_GROUP = 'Daedalus Hammer'
 
+/**
+ * The gods a run decides about, which are not gods you pick at an Exit.
+ *
+ * Chaos is behind a gate you have to find and pay for. The four Encounter gods
+ * arrive through Encounters, cost no Olympian slot, and turn up on the run's
+ * schedule. Grouped away from the Olympians because the difference is the whole
+ * point: everything above the divider is something you can ask for.
+ *
+ * The same set `repeat.ts` calls `UNSUMMONABLE`, minus Hermes, who has a
+ * `LootData` entry and does appear behind an Exit.
+ */
+const WANDERING = new Set(['Chaos', 'Artemis', 'Athena', 'Dionysus', 'Hades'])
+
 /** Where a boon can live. `null` is the picker, which is neither. */
 export type Tray = 'build' | 'optional'
 
@@ -246,10 +259,16 @@ export function BoonSort({
     for (const list of map.values()) {
       list.sort((a, b) => rank(a.rarity) - rank(b.rarity) || a.name.localeCompare(b.name))
     }
-    /* Gods stay alphabetical and the two that are not gods go last. Without
-     * this "Daedalus Hammer" files between Ares and Demeter, which reads as a
-     * god nobody has heard of. */
-    const order = (key: string) => (key === HAMMER_GROUP ? 2 : key === 'Other' ? 1 : 0)
+    /**
+     * Three bands, each alphabetical inside itself.
+     *
+     * The Olympians, then the gods the run decides about, then the hammers.
+     * Without an explicit rank `localeCompare` files "Daedalus Hammer" between
+     * Ares and Demeter and Chaos between Ares and Demeter's other side, which
+     * reads as two gods nobody has heard of.
+     */
+    const order = (key: string) =>
+      key === HAMMER_GROUP ? 3 : key === 'Other' ? 2 : WANDERING.has(key) ? 1 : 0
     return [...map].sort((a, b) => order(a[0]) - order(b[0]) || a[0].localeCompare(b[0]))
   }, [found])
 
@@ -410,8 +429,17 @@ export function BoonSort({
           {flat ? (
             <Rows list={found} aim={aim} onMove={onMove} onDrag={setDragging} />
           ) : (
-            gods.map(([god, list]) => (
+            gods.map(([god, list], at) => (
               <div key={god} className="picklist-group">
+                {/* Said once, above the first of them. They cost no Olympian
+                  * slot and you cannot go and get one, and a reader who does
+                  * not know that would read these as five more gods. */}
+                {WANDERING.has(god) && !WANDERING.has(gods[at - 1]?.[0] ?? '') ? (
+                  <p className="bsort-band">
+                    These turn up when the run decides. No Olympian slot, and no
+                    way to ask.
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   className={`picklist-head${openGod === god ? ' is-open' : ''}`}
