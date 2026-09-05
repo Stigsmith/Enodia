@@ -66,6 +66,18 @@ describe('what it blocks', () => {
     expect(said.some((p) => /not an upgrade for this arm/.test(p.say))).toBe(true)
   })
 
+  /**
+   * **Proven to fail before the fix.** The loop read `build.hammers` only, so a
+   * wrong-arm hammer sitting in Worth adding saved without a word. That is the
+   * one way opening the trays to hammers could make an impossible build
+   * shippable, and it is impossible either way: an upgrade for another arm is
+   * never offered, whether the build requires it or merely hopes for it.
+   */
+  it('a hammer from another arm sitting in Worth adding', () => {
+    const said = blockers(checkBuild(bend({ optional: ['DaggerRapidAttackTrait'] })))
+    expect(said.some((p) => /not an upgrade for this arm/.test(p.say))).toBe(true)
+  })
+
   it('a centrepiece the build does not take', () => {
     const said = blockers(checkBuild(bend({ centrepiece: 'EchoBurnBoon' })))
     expect(said.some((p) => /does not take it/.test(p.say))).toBe(true)

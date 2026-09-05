@@ -22,10 +22,11 @@
  * tool telling a player they are using it wrong.
  */
 
-import { arcanaById, olympians, sources, traits } from '../data/app.ts'
+import { arcanaById, olympians, traits } from '../data/app.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from './slots.ts'
 import { requirementSets, satisfiesRequirement } from './reachability.ts'
+import { coreSlotOf, hammerArm, isHammer } from './picks.ts'
 import type { Slot, TraitId } from '../data/types.ts'
 
 export type Problem = {
@@ -120,20 +121,6 @@ export function slotMap(build: ShownBuild): Map<Slot, TraitId[]> {
 
 const name = (id: string) => traits.get(id)?.name ?? id
 
-/**
- * Which arm a Daedalus Hammer upgrade belongs to.
- *
- * **Not on the trait.** `CLAUDE.md` records that a hammer upgrade belongs to a
- * weapon through `<Weapon>HammerTrait` inheritance, and the resolved trait
- * carries neither a `weapon` nor a distinguishing `kind`: they come out as
- * plain `other`. The association survives in `sources`, which groups them into
- * one hammer entry per arm, so that is what this reads.
- */
-const HAMMER_ARM = new Map<string, string>()
-for (const source of sources) {
-  if (source.kind !== 'hammer' || !source.weapon) continue
-  for (const id of source.traits) HAMMER_ARM.set(id, source.weapon)
-}
 
 /**
  * The ways to satisfy what a trait is missing.
@@ -238,11 +225,41 @@ export function checkBuild(build: ShownBuild): Problem[] {
     })
   }
 
-  // A hammer belongs to its weapon through <Weapon>HammerTrait inheritance.
-  for (const id of build.hammers) {
-    const weapon = HAMMER_ARM.get(id)
+  /**
+   * A hammer belongs to its weapon through `<Weapon>HammerTrait` inheritance.
+   * `picks.ts` holds the lookup, because the trait itself says nothing.
+   *
+   * **Both lists, not just `build.hammers`.** A hammer can sit in `optional`
+   * now, and a hammer for another arm is impossible whether or not the build
+   * requires it. Reading one list would have let a wrong-arm optional hammer
+   * save silently, which is the one way this change could make an impossible
+   * build shippable.
+   */
+  for (const id of [...build.hammers, ...(build.optional ?? []).filter(isHammer)]) {
+    const weapon = hammerArm(id)
     if (weapon && weapon !== build.weapon) {
       out.push({ field: 'hammers', severity: 'blocks', say: `${name(id)} is not an upgrade for this arm.` })
+    }
+  }
+
+  /**
+   * The same core slot held twice, once required and once as upside.
+   *
+   * `movePick` cannot produce this: a new pick displaces whatever held the
+   * slot, in either list. A build arriving from an import or from a version
+   * that allowed it can. `notes` rather than `blocks`, because it is legal and
+   * merely probably not meant, which is the line this file draws everywhere.
+   */
+  for (const id of build.optional ?? []) {
+    const slot = coreSlotOf(id)
+    if (!slot) continue
+    const required = build.boons.find((one) => coreSlotOf(one) === slot)
+    if (required) {
+      out.push({
+        field: 'boons',
+        severity: 'notes',
+        say: `${name(id)} and ${name(required)} both take ${slotLabel(slot)}, one as the build and one as upside. Only one of them can be held.`,
+      })
     }
   }
 

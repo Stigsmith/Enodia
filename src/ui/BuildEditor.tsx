@@ -35,7 +35,6 @@ import {
   familiars,
   godPools,
   olympians,
-  sources,
   traits,
   weapons,
 } from '../data/app.ts'
@@ -49,7 +48,7 @@ import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper, Stars, Stepper } from './Fear.tsx'
-import { useTraitPeek } from './BuildMark.tsx'
+import { hammerOptions, isHammer, movePick as move } from '../engine/picks.ts'
 
 /**
  * The most runs a stepper will count to.
@@ -67,8 +66,6 @@ import { ElementPanel } from './Elements.tsx'
 import type { Tray } from './BoonSort.tsx'
 import type { TrayTarget } from './BuildTray.tsx'
 import { assemble } from './build-pieces.ts'
-import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
-import { SLOT_GLYPH } from './build-pieces.ts'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
@@ -119,23 +116,30 @@ const TAB_FOR: Record<Problem['field'], TrayTarget | 'notes'> = {
  */
 const tabFor = (field: Problem['field']): TrayTarget | 'notes' => TAB_FOR[field]
 
-const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => {
-  const filled = CORE_SLOTS.filter((slot) =>
-    build.boons.some((id) => traits.get(id)?.slot === slot),
-  ).length
-  const beyond = build.boons.filter((id) => {
-    const slot = traits.get(id)?.slot
-    return !slot || !CORE_SLOTS.includes(slot)
-  }).length
-
-  return [
-    { id: 'loadout', label: 'Loadout', count: filled },
-    { id: 'boons', label: 'Boons', count: beyond + build.hammers.length },
-    { id: 'arcana', label: 'Arcana', count: build.arcana.length },
-    { id: 'notes', label: 'Notes' },
-    { id: 'play', label: 'Play' },
-  ]
-}
+/**
+ * The five tabs, and what each one is carrying.
+ *
+ * **Boons goes first and the count moved with its subject.** Loadout used to
+ * count filled core slots, and the slots are in the picker now, so its badge
+ * would have sat at a permanent 2: the arm and the aspect always have values.
+ * A tab that says the same number forever is furniture. Notes and Play already
+ * carry none, so it simply has none.
+ *
+ * Boons counts `boons + hammers`, which is the old `beyond + filled + hammers`
+ * written honestly, and matches the "N boons" the sidebar already shows.
+ *
+ * **Worth adding is not counted, on either tab.** The count describes the
+ * build, and `optional` is by definition what the build is not. `repeat.ts`
+ * makes the same call for the same reason, and `tour.ts` says it out loud to
+ * the player.
+ */
+const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => [
+  { id: 'boons', label: 'Boons', count: build.boons.length + build.hammers.length },
+  { id: 'loadout', label: 'Before you go' },
+  { id: 'arcana', label: 'Arcana', count: build.arcana.length },
+  { id: 'notes', label: 'Notes' },
+  { id: 'play', label: 'Play' },
+]
 
 
 
@@ -197,9 +201,6 @@ export function BuildEditor({
    * reading are two separate claims rather than one number.
    */
   const stars = ratingCeiling(repeat)
-
-  /** The slate for the five core slot tiles. See `useTraitPeek`. */
-  const slotPeek = useTraitPeek()
 
   /**
    * The caveats a person has to say they have read before they can save.
@@ -285,23 +286,18 @@ export function BuildEditor({
     caveats.length === 0 ||
     (readCaveats.length === caveats.length && caveatSays.every((one) => readCaveats.includes(one)))
 
-  /** Every trait that can occupy one core slot, for that slot's dropdown. */
-  const bySlot = useMemo(() => {
-    const map = new Map<Slot, DropdownOption[]>()
-    for (const slot of CORE_SLOTS) map.set(slot, [])
-    for (const trait of traits.values()) {
-      if (trait.kind !== 'boon' || !trait.slot) continue
-      const list = map.get(trait.slot)
-      if (list) list.push(option(trait.id))
-    }
-    for (const list of map.values()) list.sort(byName)
-    return map
-  }, [])
-
 
   /**
-   * Every boon the sorter can place: what a god actually offers, minus the five
-   * core slots, which the slot bar owns.
+   * Everything the sorter can place: what a god offers, and this arm's hammers.
+   *
+   * **The five core slots are in here now.** They used to be filtered out
+   * because a dropdown on another tab owned them, and that dropdown showed a
+   * name and an icon and nothing else, so the 45 boons that matter most were
+   * the only ones you could not read the description of while choosing. They go
+   * through the same picker as everything else.
+   *
+   * **So do the hammers**, which were a flat multi-select with one destination.
+   * Their two gates travel with them inside `hammerOptions`.
    *
    * Filtered to the offer pools rather than the whole trait table, so a trait
    * no god hands out cannot be picked and the list adds up to what a run can
@@ -316,11 +312,9 @@ export function BuildEditor({
     for (const pool of godPools.values()) {
       for (const id of [...pool.priority, ...pool.pool]) offered.add(id)
     }
-    return [...offered].filter((id) => {
-      const trait = traits.get(id)
-      return trait && (!trait.slot || !CORE_SLOTS.includes(trait.slot))
-    })
-  }, [])
+    for (const id of hammerOptions(build.weapon, build.aspect)) offered.add(id)
+    return [...offered].filter((id) => traits.has(id))
+  }, [build.weapon, build.aspect])
 
   /**
    * The Arcana, with the ones this board can no longer afford marked.
@@ -365,42 +359,6 @@ export function BuildEditor({
     [],
   )
 
-  /**
-   * The hammer upgrades this build could actually be offered.
-   *
-   * A hammer's arm lives in `sources`, not on the trait, which is what
-   * `build-check.ts` records. **The aspect is a second gate and was missing.**
-   * Twenty upgrades across the six arms only appear on one aspect, so a Circe
-   * build was being offered Seth's etchings: a hammer no run on that aspect can
-   * ever hand you.
-   */
-  const hammers = useMemo(() => {
-    const entry = sources.find((one) => one.kind === 'hammer' && one.weapon === build.weapon)
-    return (entry?.traits ?? [])
-      .filter((id) => {
-        const needs = traits.get(id)?.needsAspect
-        return !needs || needs.includes(build.aspect)
-      })
-      .flatMap((id) => {
-        const trait = traits.get(id)
-        return trait
-          ? [
-              {
-                value: id,
-                label: trait.name ?? id,
-                icon: iconOf.get(id) ?? null,
-                note: trait.text ?? null,
-                // A hammer upgrade is not a boon and has no rarity, but an
-                // unframed square in a list of framed ones reads as broken
-                // rather than as different.
-                rarity: 'Common' as const,
-              },
-            ]
-          : []
-      })
-      .sort(byName)
-  }, [build.weapon, build.aspect])
-
   const aspects = useMemo(
     () => aspectsOf(build.weapon).map((trait) => option(trait.id)),
     [build.weapon],
@@ -419,7 +377,15 @@ export function BuildEditor({
    * weight and no shape; the bar is the shape, and it only stops being a bar if
    * two of them can open at once.
    */
-  const [openSlot, setOpenSlot] = useState<Slot | null>(null)
+  /**
+   * Narrow the picker to one core slot, or not.
+   *
+   * This was `openSlot`, driving a dropdown that opened under the slot bar. The
+   * bar is a readout and a drop target now, so pressing a tile filters the list
+   * you are already looking at instead of opening a second control that showed
+   * less.
+   */
+  const [slotFilter, setSlotFilter] = useState<Slot | null>(null)
 
   /**
    * Which tab is showing.
@@ -428,7 +394,7 @@ export function BuildEditor({
    * not a place in the app, and a shared link to the builder pointing at the
    * Arcana tab would be an odd thing to send somebody.
    */
-  const [tab, setTab] = useState<TrayTarget | 'notes'>('loadout')
+  const [tab, setTab] = useState<TrayTarget | 'notes'>('boons')
 
   /**
    * The control to put the cursor in once the tab has switched.
@@ -463,49 +429,28 @@ export function BuildEditor({
     field?: string | null,
   ) => {
     setTab(target)
-    setOpenSlot(piece?.slot ?? null)
+    setSlotFilter(piece?.slot ?? null)
     // `BuildTray` has no business knowing the field union, so it hands back a
     // string and the narrowing happens here, where the union lives.
     if (field) setFocusField(field as Problem['field'])
   }
 
-  const coreAt = (slot: Slot) => build.boons.find((id) => traits.get(id)?.slot === slot) ?? null
-
-  const setCore = (slot: Slot, id: string | null) => {
-    setBuild((was) => {
-      const without = was.boons.filter((one) => traits.get(one)?.slot !== slot)
-      return { ...was, boons: id ? [...without, id] : without }
-    })
-  }
-
   /**
-   * Put a boon in one tray, the other, or neither.
+   * Put a pick in one tray, the other, or neither.
    *
-   * **It always leaves both first.** That is the whole reason this replaced two
-   * toggles: a boon in the build and also in Worth adding is not a state a
-   * build can be in, and the two toggles could produce it because neither knew
-   * about the other. Removing from both before adding to one makes the bad
-   * state undescribable rather than detectable.
+   * **Three writers became one**, and the routing lives in `engine/picks.ts`
+   * rather than here. Two reasons. A hammer goes to a different list from a
+   * boon, and getting that wrong corrupts the slot map, the Olympian tally and
+   * the exchange's shape hash at once with nothing to show for it. And there
+   * are no component tests in this repo, so anything decided in this file is
+   * decided where it cannot be proven.
    */
-  const moveBoon = (id: TraitId, to: Tray | null) =>
-    setBuild((was) => {
-      const boons = was.boons.filter((one) => one !== id)
-      const optional = (was.optional ?? []).filter((one) => one !== id)
-      if (to === 'build') boons.push(id)
-      if (to === 'optional') optional.push(id)
-      return { ...was, boons, optional: optional.length ? optional : undefined }
-    })
+  const movePick = (id: TraitId, to: Tray | null) => setBuild((was) => move(was, id, to))
 
   const toggleArcana = (id: string) =>
     setBuild((was) => ({
       ...was,
       arcana: was.arcana.includes(id) ? was.arcana.filter((one) => one !== id) : [...was.arcana, id],
-    }))
-
-  const toggleHammer = (id: TraitId) =>
-    setBuild((was) => ({
-      ...was,
-      hammers: was.hammers.includes(id) ? was.hammers.filter((one) => one !== id) : [...was.hammers, id],
     }))
 
   return (
@@ -545,13 +490,20 @@ export function BuildEditor({
             }))}
             onChoose={(value) =>
               /* An aspect belongs to one arm, so changing the arm cannot keep
-                 the aspect. Same one-way dependency the filter bar has. */
-              setBuild((was) => ({
-                ...was,
-                weapon: value ?? '',
-                aspect: aspectsOf(value ?? '')[0]?.id ?? '',
-                hammers: [],
-              }))
+                 the aspect. Same one-way dependency the filter bar has.
+                 Hammers go with it, and now from both lists: a hammer can sit
+                 in Worth adding, and one for another arm is a blocker there
+                 too. */
+              setBuild((was) => {
+                const optional = (was.optional ?? []).filter((id) => !isHammer(id))
+                return {
+                  ...was,
+                  weapon: value ?? '',
+                  aspect: aspectsOf(value ?? '')[0]?.id ?? '',
+                  hammers: [],
+                  ...(optional.length ? { optional } : { optional: undefined }),
+                }
+              })
             }
           />
           <Dropdown
@@ -561,67 +513,6 @@ export function BuildEditor({
             options={aspects}
             onChoose={(value) => set('aspect', value ?? '')}
           />
-
-          {/* The five slots, drawn the way the game draws them and the way every
-            * other screen here already does: a row of tiles wearing the game's
-            * own slot glyphs when they are empty and the boon's art when they
-            * are not.
-            *
-            * They were five stacked dropdowns, which was five identical wide
-            * controls with nothing to tell them apart but their labels, and
-            * nothing about it looked like the thing it was editing. A row also
-            * shows the one fact the stack could not: how much of the build is
-            * still open, at a glance, which is the same thing the overview card
-            * shows and the reason the card draws them this way.
-            *
-            * Clicking a tile opens that slot's picker underneath. */}
-          <h3 className="editor-rule">The five slots</h3>
-          <div className="slotbar" role="group" aria-label="The five core slots">
-            {CORE_SLOTS.map((slot) => {
-              const held = coreAt(slot)
-              const trait = held ? traits.get(held) : null
-              const icon = held ? iconOf.get(held) : null
-              const glyph = SLOT_GLYPH[slot]
-              return (
-                <button
-                  key={slot}
-                  type="button"
-                  className={`slotbar-tile${held ? ' is-held' : ''}${openSlot === slot ? ' is-open' : ''}`}
-                  aria-expanded={openSlot === slot}
-                  aria-label={trait?.name ?? `${slotLabel(slot)}, open`}
-                  /* The game's own slate rather than a browser tooltip with the
-                   * name in it. Pointing at your own Attack boon used to tell
-                   * you what you already knew, and the only way to see what it
-                   * did was to take it off and find it in the list again. */
-                  {...slotPeek(trait ?? null, slotLabel(slot), icon ?? null)}
-                  onClick={() => setOpenSlot(openSlot === slot ? null : slot)}
-                >
-                  <span className="slotbar-art">
-                    {icon ? (
-                      <img src={`/${icon}`} alt="" loading="lazy" />
-                    ) : glyph ? (
-                      <img className="slotbar-glyph" src={`/${glyph}`} alt="" loading="lazy" />
-                    ) : null}
-                  </span>
-                  <span className="slotbar-slot">{slotLabel(slot)}</span>
-                  <span className="slotbar-name">{trait?.name ?? 'Open'}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {openSlot ? (
-            <Dropdown
-              label={slotLabel(openSlot)}
-              all="Open"
-              chosen={coreAt(openSlot)}
-              options={bySlot.get(openSlot) ?? []}
-              onChoose={(value) => {
-                setCore(openSlot, value)
-                setOpenSlot(null)
-              }}
-            />
-          ) : null}
 
           <h3 className="editor-rule">Before you go</h3>
           <Dropdown
@@ -648,15 +539,17 @@ export function BuildEditor({
           </TabPanel>
 
           <TabPanel id="boons" open={tab}>
-          <BoonSort build={build} options={sortable} onMove={moveBoon} />
-
-          <h3 className="editor-rule">Daedalus Hammer</h3>
-          <PickList
-            options={hammers}
-            chosen={build.hammers}
-            onToggle={toggleHammer}
-            placeholder="Search upgrades"
-            emptySays="No hammer upgrades yet."
+          {/* One picker for everything a run hands you: the five core slots,
+            * everything past them, and this arm's hammer upgrades. It used to
+            * be three controls on two tabs, and the two it replaces were the
+            * worse two. `BoonSort` holds the slot bar now, because the bar is a
+            * drop target and the drag state lives in there. */}
+          <BoonSort
+            build={build}
+            options={sortable}
+            onMove={movePick}
+            slotFilter={slotFilter}
+            onSlotFilter={setSlotFilter}
           />
 
           {/* What the build's boons add up to elementally, and what that is or

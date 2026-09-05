@@ -95,14 +95,14 @@ export const TOURS: Record<string, Step[]> = {
       say: 'Five tabs across the top, and you press them. That is how you get at everything. Here, I will show you.',
     },
     {
-      press: 'tab-loadout',
-      at: 'editor-panel',
-      say: 'Loadout. The arm, the aspect, the five slots, and what you are carrying in with you.',
-    },
-    {
       press: 'tab-boons',
       at: 'editor-panel',
-      say: 'Boons. Everything past those five slots, and the hammer if you are taking one. Two columns, and the left one is the one that matters.',
+      say: 'Boons. The five slots along the top, then everything else and this arm’s hammer upgrades, all in one list. Press a slot to see only what fits it.',
+    },
+    {
+      press: 'tab-loadout',
+      at: 'editor-panel',
+      say: 'Before you go. The arm, the aspect, and what you are carrying in with you. One of each, chosen once.',
     },
     /**
      * Why the split is worth explaining, and the fact that makes it free.

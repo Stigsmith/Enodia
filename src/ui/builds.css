@@ -4003,6 +4003,7 @@ button.mark {
 }
 
 .slotbar-tile {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: 0.2rem;
@@ -4023,6 +4024,65 @@ button.mark {
 .slotbar-tile.is-open {
   border-color: var(--lit-dim);
   background: var(--ink-900);
+}
+
+/**
+ * A slot filled from Worth adding rather than from the build.
+ *
+ * **Dashed against solid, not a colour.** It is the difference between "this
+ * build's Sprint is Blinding Rush" and "Blinding Rush would be nice if it turns
+ * up", which is the whole reason core boons can be optional at all, and a
+ * difference in claim has to survive a screenshot in either theme. Dashed is
+ * also the language this panel already speaks: `.bsort-tray` is dashed at rest
+ * and goes solid when something is over it.
+ */
+.slotbar-tile.is-optional {
+  border-style: dashed;
+  border-color: var(--div-3);
+}
+
+.slotbar-tile.is-optional .slotbar-art {
+  opacity: 0.62;
+}
+
+.slotbar-tile.is-optional .slotbar-slot {
+  color: var(--bone-faint);
+}
+
+/* Waiting for a drop it can take. Only lights for a pick that belongs in this
+ * slot, so an Attack boon over the Cast tile shows nothing. */
+.slotbar-tile.is-wanted {
+  border-style: dashed;
+  border-color: var(--lit-dim);
+}
+
+.slotbar-tile.is-over {
+  border-style: solid;
+  border-color: var(--lit);
+  background: var(--ink-900);
+}
+
+/* Empty this slot. Faint until the tile is hovered, because it is the rarer of
+   the two things you do to a filled slot: replacing is the common one. */
+.slotbar-clear {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.25rem;
+  padding: 0 0.15rem;
+  color: var(--bone-faint);
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.slotbar-tile:hover .slotbar-clear,
+.slotbar-clear:focus-visible {
+  opacity: 1;
+}
+
+.slotbar-clear:hover {
+  color: var(--bone);
 }
 
 /* Fixed, so a filled tile and an empty one are the same size and the row does
@@ -4627,12 +4687,7 @@ button.mark {
   /* The sorter splits itself into a picker and two trays, so handing it half a
    * panel and letting it halve that again gave 199px rows. It takes the width. */
   .tabpanel > .bsort,
-  .tabpanel > .slotbar,
   .tabpanel > .editor-plays,
-  /* The slot picker, which only exists while a tile is open. Reached by
-   * adjacency because `Dropdown` takes no class of its own and it is always the
-   * control immediately after the bar. */
-  .tabpanel > .slotbar + .bdrop,
   .tabpanel > .editor-field:has(textarea) {
     grid-column: 1 / -1;
   }
@@ -5016,6 +5071,18 @@ button.mark {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
   }
+
+  /**
+   * The slot bar runs across both columns, above the picker and the trays.
+   *
+   * It moved in here from another tab and landed as an ordinary grid item,
+   * which put it in the first cell and pushed the picker and the trays into a
+   * staircase. It is a header for both halves rather than a third column: it
+   * reads the trays and it is a drop target for the picker.
+   */
+  .bsort > .slotbar {
+    grid-column: 1 / -1;
+  }
 }
 
 .bsort-picker {
@@ -5124,13 +5191,69 @@ button.mark {
 }
 
 .bsort-row-note,
-.bsort-row-blocked {
+.bsort-row-blocked,
+.bsort-row-replaces {
   font-size: 0.7rem;
   line-height: 1.35;
   color: var(--bone-faint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* What pressing this row will push out. Lit rather than faint, because it is a
+ * consequence rather than a description, and it sits under the boon's own
+ * sentence so the row reads: what it is, then what it costs. */
+.bsort-row-replaces {
+  color: var(--lit-dim);
+}
+
+/**
+ * Where a click sends a row.
+ *
+ * One control for the whole list. Per-row buttons were tried and removed at two
+ * hundred rows, and there are more rows now, so the choice is made once and
+ * stated once. It is also the only route to Worth adding without a mouse.
+ */
+.bsort-aim {
+  display: flex;
+  gap: 0.3rem;
+  margin: 0.45rem 0 0.1rem;
+}
+
+.bsort-aim button {
+  flex: 1;
+  padding: 0.32rem 0.4rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-950);
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.bsort-aim button.is-on {
+  border-color: var(--lit-dim);
+  background: var(--ink-900);
+  color: var(--bone);
+}
+
+/* The slot filter, when a tile is pressed. A chip that says what it is doing
+   and clears itself, rather than a state you have to remember pressing. */
+.bsort-filter {
+  align-self: start;
+  margin: 0.35rem 0 0;
+  padding: 0.24rem 0.5rem;
+  border: 1px dashed var(--lit-dim);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--lit);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .bsort-row-blocked {

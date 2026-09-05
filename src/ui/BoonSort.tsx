@@ -34,12 +34,14 @@
 import { useMemo, useState } from 'react'
 
 import { iconOf, olympians, traits } from '../data/app.ts'
-import { olympiansOf, slotMap } from '../engine/build-check.ts'
+import { olympiansOf } from '../engine/build-check.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
-import { FRAME, PLATE } from './build-pieces.ts'
+import { FRAME, PLATE, SLOT_GLYPH } from './build-pieces.ts'
 import { ELEMENT_ICON } from './Elements.tsx'
 import type { ShownBuild } from '../data/builds.ts'
-import type { Rarity, TraitId } from '../data/types.ts'
+import type { Rarity, Slot, TraitId } from '../data/types.ts'
+import { coreAt, coreSlotOf, isHammer } from '../engine/picks.ts'
+import { useTraitPeek } from './BuildMark.tsx'
 
 const OLYMPIAN = new Set<string>(olympians)
 
@@ -53,6 +55,16 @@ const OLYMPIAN = new Set<string>(olympians)
  */
 const MAX_GODS = 5
 
+/**
+ * The heading the hammer upgrades file under.
+ *
+ * Set here rather than read off the trait, because all 92 carry
+ * `gods: ['Loot']` and a group headed "Loot" would be a Lua identifier on
+ * screen. `CLAUDE.md` has a table for exactly this: the player-facing word
+ * first, the internal one never.
+ */
+const HAMMER_GROUP = 'Daedalus Hammer'
+
 /** Where a boon can live. `null` is the picker, which is neither. */
 export type Tray = 'build' | 'optional'
 
@@ -63,6 +75,16 @@ type Row = {
   text: string | null
   rarity: Rarity
   god: string | null
+  /**
+   * The heading this row files under, which is not always its god.
+   *
+   * **All 92 hammer traits carry `gods: ['Loot']`**, so grouping by `gods[0]`
+   * the way the god rows do would head a group "Loot": a Lua identifier on
+   * screen, which is exactly what `CLAUDE.md`'s vocabulary rule exists to stop.
+   */
+  group: string
+  /** what this would push out of its core slot, when it would push something */
+  replaces: string | null
   /** the element it carries, for the 196 that carry one */
   element: string | null
   /** why this cannot be taken, when it cannot */
@@ -82,28 +104,56 @@ export function BoonSort({
   build,
   options,
   onMove,
+  slotFilter,
+  onSlotFilter,
 }: {
   build: ShownBuild
-  /** every boon that can be sorted, which is everything occupying no core slot */
+  /** everything that can be sorted: every boon a god offers, and this arm's hammers */
   options: readonly TraitId[]
-  /** move a boon to a tray, or out of both when `to` is null */
+  /** move a pick to a tray, or out of the build when `to` is null */
   onMove: (id: TraitId, to: Tray | null) => void
+  /** narrow the list to one core slot, set by pressing a tile */
+  slotFilter?: Slot | null
+  onSlotFilter?: (slot: Slot | null) => void
 }) {
   const [query, setQuery] = useState('')
   const [openGod, setOpenGod] = useState<string | null>(null)
   const [dragging, setDragging] = useState<TraitId | null>(null)
-  const [over, setOver] = useState<Tray | null>(null)
+  /** A tray, or a slot tile: seven drop targets, one piece of state. */
+  const [over, setOver] = useState<Tray | Slot | null>(null)
+  /**
+   * Where a click sends a row.
+   *
+   * **Clicking always meant "the build", and that was survivable until now.**
+   * Drag was the only route to Worth adding, so on a touch screen there was no
+   * route at all. That mattered less when optional held spare boons; it matters
+   * now that it holds core slots and hammers, which is most of what somebody
+   * would want to put there.
+   *
+   * One control for the whole list rather than a second button on every row.
+   * The docblock at the top of this file records that per-row buttons were
+   * tried and removed at two hundred rows, and there are more rows now.
+   */
+  const [aim, setAim] = useState<Tray>('build')
 
+  /** The slate a slot tile shows on hover. See `useTraitPeek`. */
+  const slotPeek = useTraitPeek()
+
+  /**
+   * The trays list everything except the five core slots, which the tiles above
+   * are the readout for. Drawing them in both places would make the tiles look
+   * decorative.
+   */
+  const notCore = (id: TraitId) => !coreSlotOf(id)
   const inBuild = useMemo(
-    () =>
-      build.boons.filter((id) => {
-        const slot = traits.get(id)?.slot
-        return !slot || !CORE_SLOTS.includes(slot)
-      }),
-    [build.boons],
+    () => [...build.boons, ...build.hammers].filter(notCore),
+    [build.boons, build.hammers],
   )
-  const optional = build.optional ?? []
-  const held = useMemo(() => new Set([...inBuild, ...optional]), [inBuild, optional])
+  const optional = useMemo(() => (build.optional ?? []).filter(notCore), [build.optional])
+  const held = useMemo(
+    () => new Set([...build.boons, ...build.hammers, ...(build.optional ?? [])]),
+    [build.boons, build.hammers, build.optional],
+  )
 
   /**
    * What each unheld boon would cost the build, and when it cannot be had.
@@ -119,7 +169,6 @@ export function BoonSort({
    * few hundred full passes on every keystroke; a set union per option is not.
    */
   const rows = useMemo((): Row[] => {
-    const slots = slotMap(build)
     const already = new Set(olympiansOf(build))
 
     return options.flatMap((id) => {
@@ -128,11 +177,22 @@ export function BoonSort({
 
       let blocked: string | null = null
 
-      // A core-slot clash, for the few sortable traits that declare one.
-      if (trait.slot && CORE_SLOTS.includes(trait.slot)) {
-        const sitting = slots.get(trait.slot)?.[0]
-        if (sitting && sitting !== id) {
-          blocked = `${traits.get(sitting)?.name ?? sitting} already holds your ${slotLabel(trait.slot)}.`
+      /**
+       * A core-slot clash is a replacement, not a refusal.
+       *
+       * This used to set `blocked`, and it was unreachable because core-slot
+       * traits were filtered out of the list entirely. Now they are the list,
+       * and blocking would leave grey rows whose only remedy is to go and empty
+       * a tile first. `movePick` displaces instead, so the row says what it
+       * will replace before it is pressed, which is what `takeFix` already does
+       * for the same reason.
+       */
+      let replaces: string | null = null
+      const slot = coreSlotOf(id)
+      if (slot) {
+        const sitting = coreAt(build, slot)
+        if (sitting && sitting.id !== id) {
+          replaces = `Replaces ${traits.get(sitting.id)?.name ?? sitting.id} in your ${slotLabel(slot)}.`
         }
       }
 
@@ -152,6 +212,8 @@ export function BoonSort({
           text: trait.text ?? null,
           rarity: rarityOf(trait.kind),
           god: trait.gods[0] ?? null,
+          group: isHammer(id) ? HAMMER_GROUP : (trait.gods[0] ?? 'Other'),
+          replaces,
           element: trait.elements?.[0] ?? null,
           blocked,
         },
@@ -160,10 +222,13 @@ export function BoonSort({
   }, [options, held, build])
 
   const term = query.trim().toLowerCase()
-  const found = useMemo(
-    () => (term ? rows.filter((one) => one.name.toLowerCase().includes(term)) : rows),
-    [rows, term],
-  )
+  const found = useMemo(() => {
+    const narrowed = term ? rows.filter((one) => one.name.toLowerCase().includes(term)) : rows
+    return slotFilter ? narrowed.filter((one) => coreSlotOf(one.id) === slotFilter) : narrowed
+  }, [rows, term, slotFilter])
+  /* A filter collapses the groups the same way a search does, because the point
+   * of narrowing to one slot is to stop opening things. */
+  const flat = Boolean(term) || Boolean(slotFilter)
 
   /**
    * Grouped by god, one open at a time, which is what made the old list usable
@@ -173,13 +238,16 @@ export function BoonSort({
   const gods = useMemo(() => {
     const map = new Map<string, Row[]>()
     for (const row of found) {
-      const key = row.god ?? 'Other'
-      map.set(key, [...(map.get(key) ?? []), row])
+      map.set(row.group, [...(map.get(row.group) ?? []), row])
     }
     for (const list of map.values()) {
       list.sort((a, b) => rank(a.rarity) - rank(b.rarity) || a.name.localeCompare(b.name))
     }
-    return [...map].sort((a, b) => a[0].localeCompare(b[0]))
+    /* Gods stay alphabetical and the two that are not gods go last. Without
+     * this "Daedalus Hammer" files between Ares and Demeter, which reads as a
+     * god nobody has heard of. */
+    const order = (key: string) => (key === HAMMER_GROUP ? 2 : key === 'Other' ? 1 : 0)
+    return [...map].sort((a, b) => order(a[0]) - order(b[0]) || a[0].localeCompare(b[0]))
   }, [found])
 
   const drop = (to: Tray) => (event: React.DragEvent) => {
@@ -190,20 +258,154 @@ export function BoonSort({
     setDragging(null)
   }
 
+  /**
+   * A tile takes a drop only from a pick that belongs in it.
+   *
+   * Read off `dragging` rather than off the drop, so the tile can refuse to
+   * light up while the pointer is still moving. Dropping a Cast boon on the
+   * Attack tile does nothing, which is better than silently putting it
+   * somewhere else.
+   */
+  const wants = (slot: Slot) => Boolean(dragging && coreSlotOf(dragging) === slot)
+  const dropOnSlot = (slot: Slot) => (event: React.DragEvent) => {
+    event.preventDefault()
+    setOver(null)
+    const id = (event.dataTransfer.getData('text/plain') || dragging) as TraitId | null
+    if (id && coreSlotOf(id) === slot) onMove(id, 'build')
+    setDragging(null)
+  }
+
   return (
     <div className="bsort">
+      {/**
+       * The five core slots, as a readout and as five more drop targets.
+       *
+       * They were on another tab, above a dropdown that showed a name and an
+       * icon and no description, so the 45 boons that matter most were the only
+       * ones you could not read while choosing. The tiles stayed because they
+       * say the one thing a list cannot: how much of the build is still open.
+       *
+       * A tile filled from Worth adding is drawn differently from one filled
+       * from the build, because those are different claims and the whole reason
+       * for this change is being able to make the weaker one.
+       */}
+      <div className="slotbar" role="group" aria-label="The five core slots">
+        {CORE_SLOTS.map((slot) => {
+          const at = coreAt(build, slot)
+          const trait = at ? traits.get(at.id) : null
+          const icon = at ? iconOf.get(at.id) : null
+          const glyph = SLOT_GLYPH[slot]
+          const spare = at?.tray === 'optional'
+          return (
+            <button
+              key={slot}
+              type="button"
+              className={`slotbar-tile${at ? ' is-held' : ''}${spare ? ' is-optional' : ''}${
+                slotFilter === slot ? ' is-open' : ''
+              }${over === slot ? ' is-over' : ''}${wants(slot) ? ' is-wanted' : ''}`}
+              aria-pressed={slotFilter === slot}
+              aria-label={
+                trait?.name
+                  ? `${trait.name}, ${slotLabel(slot)}${spare ? ', worth adding' : ''}`
+                  : `${slotLabel(slot)}, empty`
+              }
+              {...slotPeek(trait ?? null, slotLabel(slot), icon ?? null)}
+              /* Draggable when filled, which is how a required core boon is
+               * demoted: drag it off the tile onto Worth adding. Without it the
+               * only way down is to take it out and put it back. */
+              draggable={Boolean(at)}
+              onDragStart={(event) => {
+                if (!at) return
+                event.dataTransfer.setData('text/plain', at.id)
+                setDragging(at.id)
+              }}
+              onDragEnd={() => setDragging(null)}
+              onDragOver={(event) => {
+                if (!wants(slot)) return
+                event.preventDefault()
+                setOver(slot)
+              }}
+              onDragLeave={() => setOver((was) => (was === slot ? null : was))}
+              onDrop={dropOnSlot(slot)}
+              onClick={() => onSlotFilter?.(slotFilter === slot ? null : slot)}
+            >
+              <span className="slotbar-art">
+                {icon ? (
+                  <img src={`/${icon}`} alt="" loading="lazy" />
+                ) : glyph ? (
+                  <img className="slotbar-glyph" src={`/${glyph}`} alt="" loading="lazy" />
+                ) : null}
+              </span>
+              <span className="slotbar-slot">{spare ? 'Worth adding' : slotLabel(slot)}</span>
+              <span className="slotbar-name">{trait?.name ?? 'Open'}</span>
+              {/* The only way to empty a slot. The trays do not list core picks,
+                * because the tiles are their readout, so without this a filled
+                * slot could be replaced and never cleared. Five at most, so it
+                * does not run into the rule against a control on every row. */}
+              {at ? (
+                <span
+                  className="slotbar-clear"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Clear your ${slotLabel(slot)}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onMove(at.id, null)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return
+                    event.preventDefault()
+                    event.stopPropagation()
+                    onMove(at.id, null)
+                  }}
+                >
+                  &times;
+                </span>
+              ) : null}
+            </button>
+          )
+        })}
+      </div>
+
       <div className="bsort-picker">
         <input
           type="search"
           className="picklist-search"
           value={query}
-          placeholder="Search boons"
+          placeholder="Search boons, hammers"
           onChange={(event) => setQuery(event.target.value)}
         />
 
+        {/* Where a click sends a row. One control for the whole list, and the
+          * only route to Worth adding that does not need a mouse. */}
+        <div className="bsort-aim" role="group" aria-label="Where a pick goes">
+          {(['build', 'optional'] as const).map((one) => (
+            <button
+              key={one}
+              type="button"
+              className={aim === one ? 'is-on' : ''}
+              aria-pressed={aim === one}
+              onClick={() => setAim(one)}
+            >
+              {one === 'build' ? 'The build' : 'Worth adding'}
+            </button>
+          ))}
+        </div>
+
+        {slotFilter ? (
+          <button
+            type="button"
+            className="bsort-filter"
+            onClick={() => onSlotFilter?.(null)}
+          >
+            {slotLabel(slotFilter)} boons only
+            <span aria-hidden="true"> ×</span>
+          </button>
+        ) : null}
+
         <div className="bsort-scroll">
-          {term ? (
-            <Rows list={found} onMove={onMove} onDrag={setDragging} />
+          {flat ? (
+            <Rows list={found} aim={aim} onMove={onMove} onDrag={setDragging} />
           ) : (
             gods.map(([god, list]) => (
               <div key={god} className="picklist-group">
@@ -217,13 +419,19 @@ export function BoonSort({
                   {god}
                   <span className="picklist-count">{list.length}</span>
                 </button>
-                {openGod === god ? <Rows list={list} onMove={onMove} onDrag={setDragging} /> : null}
+                {openGod === god ? (
+                  <Rows list={list} aim={aim} onMove={onMove} onDrag={setDragging} />
+                ) : null}
               </div>
             ))
           )}
           {found.length === 0 ? (
             <p className="picklist-none">
-              {term ? `Nothing matches "${query}".` : 'Every boon is already sorted.'}
+              {term
+                ? `Nothing matches "${query}".`
+                : slotFilter
+                  ? `Nothing left for your ${slotLabel(slotFilter)}.`
+                  : 'Everything is already sorted.'}
             </p>
           ) : null}
         </div>
@@ -262,13 +470,17 @@ const rank = (rarity: Rarity) => (rarity === 'Legendary' ? 0 : rarity === 'Duo' 
 
 function Rows({
   list,
+  aim,
   onMove,
   onDrag,
 }: {
   list: Row[]
+  /** where a click sends this row, set once for the whole list */
+  aim: Tray
   onMove: (id: TraitId, to: Tray | null) => void
   onDrag: (id: TraitId | null) => void
 }) {
+  const where = aim === 'build' ? 'the build' : 'Worth adding'
   return (
     <div className="bsort-rows">
       {list.map((row) => (
@@ -278,8 +490,8 @@ function Rows({
           disabled={!!row.blocked}
           className={`bsort-row${row.blocked ? ' is-blocked' : ''}`}
           style={{ '--plate': `url(/${PLATE[row.rarity]})` } as React.CSSProperties}
-          title={row.blocked ?? `Add ${row.name} to the build, or drag it to either tray`}
-          onClick={() => onMove(row.id, 'build')}
+          title={row.blocked ?? `Add ${row.name} to ${where}, or drag it to either tray`}
+          onClick={() => onMove(row.id, aim)}
           draggable={!row.blocked}
           onDragStart={(event) => {
             event.dataTransfer.setData('text/plain', row.id)
@@ -305,6 +517,13 @@ function Rows({
               <span className="bsort-row-blocked">{row.blocked}</span>
             ) : row.text ? (
               <span className="bsort-row-note">{row.text}</span>
+            ) : null}
+            {/* Said before it is pressed, not reported afterwards. A core slot
+              * holds one pick, so taking this one ejects whatever is in there,
+              * and a click that silently removes something you chose is the
+              * thing this line exists to prevent. */}
+            {!row.blocked && row.replaces ? (
+              <span className="bsort-row-replaces">{row.replaces}</span>
             ) : null}
           </span>
 
