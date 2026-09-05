@@ -5483,6 +5483,61 @@ button.mark {
   color: var(--bone-dim);
 }
 
+/**
+ * The slate: a boon's hover, drawn as `PieceCard`'s body rather than as three
+ * lines of text.
+ *
+ * **The hover used to leave out the god**, which is the thing every layout
+ * around it is organised by, while the dialog one click away had always shown
+ * it. So this is that dialog's header, at hover scale: art on the left, name
+ * and a mono line of slot and gods on the right, the sentence underneath.
+ *
+ * Wider than the plain box because it now has two columns to hold, and the
+ * plate stretches to whatever it is given.
+ */
+.peek.is-slate {
+  max-width: 23rem;
+  padding: 0.7rem 0.9rem 0.8rem;
+}
+
+.peek-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.peek-art {
+  width: 2.6rem;
+  height: 2.6rem;
+  flex: none;
+  object-fit: contain;
+}
+
+.peek-titles {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+/* Slot and gods, dot separated the way `.piececard-body header p` does it, so
+ * the two descriptions of the same boon read the same. */
+.peek-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lit-hot);
+}
+
+.peek-line > span + span::before {
+  content: '\00b7';
+  margin-right: 0.5rem;
+  color: var(--bone-faint);
+}
+
 /* An Arcana the board can no longer afford. Shown and greyed rather than
  * hidden: hiding it answers "why is this not in the list" with nothing. */
 .picklist-row.is-blocked {

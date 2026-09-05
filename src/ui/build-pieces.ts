@@ -216,7 +216,7 @@ export function assemble(build: ShownBuild): Assembled {
         id: familiar.id,
         name: familiar.name,
         icon: familiar.icon,
-        text: null,
+        text: familiar.text,
         slot: null,
         slotName: null,
         glyph: null,

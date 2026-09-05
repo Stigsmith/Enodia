@@ -44,7 +44,66 @@ const peekOf = (piece: Piece): Peeked => ({
   text: piece.text,
   kind: piece.slotName ?? KIND_WORD[piece.kind] ?? null,
   boon: BOON_KINDS.has(piece.kind),
+  // Only a boon draws them, and `Peek` decides that from `boon` rather than
+  // from whether these are here, so passing them always is the simpler rule.
+  icon: piece.icon,
+  gods: piece.gods,
 })
+
+/**
+ * The hover handlers for a piece, for the places that do not draw a `Mark`.
+ *
+ * **Three things were drawn as a bare `<img>` in a `<span>` and had only a
+ * native `title`**: the Arcana on the Constellation's rim, the Arcana on an
+ * overview card, and the editor's core slot tiles. A browser tooltip is a
+ * different thing in a different place with none of the game's chrome, so the
+ * app answered "what is this" two ways depending on what you happened to point
+ * at.
+ *
+ * They cannot become `Mark`s, because each has a shape of its own: an Arcana
+ * card is tall and painted and a square crop loses the figure. So the peek
+ * comes out separately, and `peekOf` stays the single place that decides how a
+ * piece describes itself.
+ */
+export function usePiecePeek(piece: Piece) {
+  return usePeekBind()(peekOf(piece))
+}
+
+/**
+ * The same, for somewhere holding a trait rather than an assembled piece.
+ *
+ * The editor's five core slot tiles are the case: they read `traits.get(id)`
+ * straight out of the index and never build a `Piece`, and they had a native
+ * `title` with the boon's name in it and nothing else. So hovering your own
+ * Attack boon told you what you already knew and never what it does, and the
+ * only way to find out was to take it off and go back to the list.
+ *
+ * A hook returning a function, so a list can call it per row: `usePeekBind`
+ * hands back one stable binder and this wraps it, rather than being a hook that
+ * would have to run inside the loop.
+ */
+export function useTraitPeek() {
+  const bind = usePeekBind()
+  return (
+    /* `name` is nullable because `Trait.name` is: 84 of 651 traits have no
+     * display name, and a slate headed by an id would be worse than none. */
+    what: { name: string | null; text?: string | null; gods?: string[] } | null,
+    slotName: string | null,
+    icon?: string | null,
+  ) =>
+    bind(
+      what?.name
+        ? {
+            name: what.name,
+            text: what.text ?? null,
+            kind: slotName,
+            boon: true,
+            icon: icon ?? null,
+            gods: what.gods ?? [],
+          }
+        : null,
+    )
+}
 
 export function Mark({
   piece,

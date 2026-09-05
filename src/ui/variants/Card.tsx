@@ -24,11 +24,11 @@
  * every card, so a scan down a column is a scan of every build's Attack.
  */
 
-import { Mark } from '../BuildMark.tsx'
+import { Mark, usePiecePeek } from '../BuildMark.tsx'
 import { Stamp } from '../Stamp.tsx'
 import { olympians, traits } from '../../data/app.ts'
 import { readRepeat } from '../../engine/repeat.ts'
-import type { Assembled } from '../build-pieces.ts'
+import type { Assembled, Piece } from '../build-pieces.ts'
 
 /**
  * How many marks a band draws before it starts counting instead.
@@ -117,7 +117,7 @@ export function Card({
         {rest.length ? (
           <Band label="Beyond the slots">
             {rest.slice(0, BAND_CAP).map((piece) => (
-              <span key={piece.key} className="bcard-tile" title={piece.name}>
+              <span key={piece.key} className="bcard-tile">
                 <Mark piece={piece} size="var(--mark-s)" />
               </span>
             ))}
@@ -127,7 +127,7 @@ export function Card({
 
         <Band label="Before you go">
           {kit.map((piece) => (
-            <span key={piece.key} className="bcard-tile" title={piece.name}>
+            <span key={piece.key} className="bcard-tile">
               <Mark piece={piece} size="var(--mark-s)" />
             </span>
           ))}
@@ -139,9 +139,7 @@ export function Card({
         {arcana.length ? (
           <span className="bcard-arcana">
             {arcana.slice(0, ARCANA_CAP).map((piece) => (
-              <span key={piece.key} className="bcard-card" title={piece.name}>
-                {piece.icon ? <img src={`/${piece.icon}`} alt="" loading="lazy" /> : null}
-              </span>
+              <ArcanaTile key={piece.key} piece={piece} />
             ))}
             <More count={arcana.length - ARCANA_CAP} />
           </span>
@@ -167,6 +165,15 @@ function Band({ label, children }: { label: string; children: React.ReactNode })
     <span className="bcard-band">
       <span className="bcard-rule">{label}</span>
       <span className="bcard-tiles">{children}</span>
+    </span>
+  )
+}
+
+/** The same card, on an overview tile, with the same hover. */
+function ArcanaTile({ piece }: { piece: Piece }) {
+  return (
+    <span className="bcard-card" {...usePiecePeek(piece)}>
+      {piece.icon ? <img src={`/${piece.icon}`} alt="" loading="lazy" /> : null}
     </span>
   )
 }

@@ -32,6 +32,21 @@ export type Peeked = {
   kind: string | null
   /** true for a boon, which is the one thing that wears the boon plate */
   boon: boolean
+  /**
+   * The art, and the gods behind it. Drawn for a boon and nothing else.
+   *
+   * **The panel used to be three lines of text for everything.** Pointing at a
+   * boon in a build told you its name and its sentence and left out the one
+   * thing the layouts around it are organised by, which is whose boon it is.
+   * `PieceCard`, the click-through dialog, has always shown all three, so the
+   * hover was the poor relation of a thing one click away.
+   *
+   * Both are optional because a familiar and an Arcana card keep the plain box:
+   * an Arcana card has no god, and drawing an empty line where one goes reads
+   * as missing rather than as absent.
+   */
+  icon?: string | null
+  gods?: string[]
 }
 
 /**
@@ -54,8 +69,34 @@ export function Peek({ peeked, at }: { peeked: Peeked | null; at: { x: number; y
     ...(flip ? { right: window.innerWidth - at.x + 16 } : { left: at.x + 16 }),
   }
 
+  /**
+   * A boon gets the slate, everything else keeps the box.
+   *
+   * The slate is `PieceCard`'s body without the dialog around it: the art, the
+   * name, a line of slot and gods, then the sentence. Same information, same
+   * order, so pointing at a boon and clicking it do not describe it two
+   * different ways.
+   */
+  if (peeked.boon) {
+    return (
+      <div className="peek is-boon is-slate" style={style} role="tooltip">
+        <div className="peek-head">
+          {peeked.icon ? <img className="peek-art" src={`/${peeked.icon}`} alt="" /> : null}
+          <div className="peek-titles">
+            <span className="peek-name">{peeked.name}</span>
+            <span className="peek-line">
+              {peeked.kind ? <span>{peeked.kind}</span> : null}
+              {peeked.gods?.length ? <span>{peeked.gods.join(' + ')}</span> : null}
+            </span>
+          </div>
+        </div>
+        {peeked.text ? <span className="peek-text">{peeked.text}</span> : null}
+      </div>
+    )
+  }
+
   return (
-    <div className={`peek is-${peeked.boon ? 'boon' : 'other'}`} style={style} role="tooltip">
+    <div className="peek is-other" style={style} role="tooltip">
       {peeked.kind ? <span className="peek-kind">{peeked.kind}</span> : null}
       <span className="peek-name">{peeked.name}</span>
       {peeked.text ? <span className="peek-text">{peeked.text}</span> : null}
