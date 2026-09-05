@@ -93,6 +93,23 @@ describe('what a fingerprint is taken of', () => {
     )
   })
 
+  /**
+   * Worth adding is a ranked wishlist, and re-ranking is advice rather than a
+   * change to the build. A copy whose owner reorders their preferences has to
+   * keep reporting its runs; one that adds or drops a pick has not.
+   */
+  it('ignores the order of Worth adding, but not its members', () => {
+    const one = { ...BUILD, optional: ['A', 'B', 'C'] }
+    expect(shapeOf({ ...one, optional: ['C', 'A', 'B'] })).toBe(shapeOf(one))
+    expect(shapeOf({ ...one, optional: ['A', 'B'] })).not.toBe(shapeOf(one))
+    expect(shapeOf({ ...one, optional: ['A', 'B', 'C', 'D'] })).not.toBe(shapeOf(one))
+  })
+
+  it('still cares about the order of the boons, which is the build', () => {
+    const one = { ...BUILD, boons: ['A', 'B', 'C'] }
+    expect(shapeOf({ ...one, boons: ['C', 'A', 'B'] })).not.toBe(shapeOf(one))
+  })
+
   it('separates the fields, so two picks cannot swap and read the same', () => {
     const a = { ...BUILD, boons: ['AB'], optional: ['C'] }
     const b = { ...BUILD, boons: ['A'], optional: ['BC'] }

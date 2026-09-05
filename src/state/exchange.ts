@@ -121,13 +121,27 @@ export function fingerprint(text: string): string {
  */
 export function shapeOf(build: ShownBuild): string {
   const list = (ids: readonly string[] | undefined) => (ids ?? []).join(',')
+  /**
+   * Worth adding is sorted before it is hashed, and the build's boons are not.
+   *
+   * `optional` is a **ranked wishlist**: which of three hammers you would rather
+   * have first. Re-ranking it is a change to advice, not to what anybody
+   * played, so it must not stop a taken copy reporting its runs. Adding or
+   * removing one still moves the hash, which is right, because that changes
+   * what the build asks for.
+   *
+   * `boons` keeps its order, because there the order is a property of the build
+   * rather than a preference: `data/builds.ts` says core slots come first, and
+   * nobody drags those into place by hand.
+   */
+  const ranked = (ids: readonly string[] | undefined) => [...(ids ?? [])].sort().join(',')
   return [
     `weapon=${build.weapon}`,
     `aspect=${build.aspect}`,
     `playstyle=${build.playstyle ?? ''}`,
     `centrepiece=${build.centrepiece}`,
     `boons=${list(build.boons)}`,
-    `optional=${list(build.optional)}`,
+    `optional=${ranked(build.optional)}`,
     `hex=${build.hex ?? ''}`,
     `hammers=${list(build.hammers)}`,
     `keepsake=${build.keepsake ?? ''}`,

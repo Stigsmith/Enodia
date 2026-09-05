@@ -48,7 +48,7 @@ import { FixList } from './FixList.tsx'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
 import { FearStepper, Stars, Stepper } from './Fear.tsx'
-import { hammerOptions, isHammer, movePick as move } from '../engine/picks.ts'
+import { hammerOptions, isHammer, movePick as move, reorderOptional } from '../engine/picks.ts'
 
 /**
  * The most runs a stepper will count to.
@@ -447,6 +447,10 @@ export function BuildEditor({
    */
   const movePick = (id: TraitId, to: Tray | null) => setBuild((was) => move(was, id, to))
 
+  /** Put one Worth adding pick before another. `reorderOptional` says why. */
+  const reorder = (id: TraitId, before: TraitId | null) =>
+    setBuild((was) => reorderOptional(was, id, before))
+
   const toggleArcana = (id: string) =>
     setBuild((was) => ({
       ...was,
@@ -550,6 +554,7 @@ export function BuildEditor({
             onMove={movePick}
             slotFilter={slotFilter}
             onSlotFilter={setSlotFilter}
+            onReorder={reorder}
           />
 
           {/* What the build's boons add up to elementally, and what that is or
