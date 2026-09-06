@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-02",
+ "generated": "2026-09-06",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1032,
+ "count": 1034,
  "categories": [
   {
    "name": "arcana",
@@ -41,8 +41,10 @@
   },
   {
    "name": "characters",
-   "count": 27,
-   "source": "wiki"
+   "count": 28,
+   "source": "mixed",
+   "wiki": 27,
+   "game": 1
   },
   {
    "name": "duos",
@@ -115,7 +117,7 @@
   },
   {
    "name": "shell",
-   "count": 96,
+   "count": 97,
    "source": "game"
   },
   {
@@ -4239,6 +4241,14 @@
    "sourcePage": "Characters-Hades II"
   },
   {
+   "id": "charon-shop",
+   "category": "characters",
+   "file": "characters/charon-shop.png",
+   "bytes": 356610,
+   "sha256": "257b4631a063dcdc996fb0cc1d21fdf68877017ae130a56a0089f749b94b9fb4",
+   "source": "game"
+  },
+  {
    "id": "charon",
    "category": "characters",
    "file": "characters/charon.webp",
@@ -8349,6 +8359,14 @@
    "file": "shell/cloudsyncconflict.png",
    "bytes": 17742,
    "sha256": "bcaa0e46b5885d3a61635d63011afcff8d69020674350efb05735c87a05b891b",
+   "source": "game"
+  },
+  {
+   "id": "coins",
+   "category": "shell",
+   "file": "shell/coins.png",
+   "bytes": 6854,
+   "sha256": "3fde26e627239f38c7a13fce1aa99e55b2b515b8e57a9777d12a5b357f86773c",
    "source": "game"
   },
   {

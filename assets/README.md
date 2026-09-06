@@ -486,6 +486,42 @@ What it actually yielded, after extracting and checking rather than reading name
 > PNGs only **2,442** are stills; the other 9,079 are numbered animation frames. Filter on
 > `[0-9]{4}\.png$` before counting anything as a win.
 
+### Charon, and a layer that is not what its name says
+
+`Charon.pkg` is 21 MB and extracts to `extracted/charon/textures/Portraits/Charon/`
+with `deppth2 ex -s`. What is in it:
+
+| | | |
+|---|---|---|
+| `Portraits_CharonHooded_01.png` | 2169x1734, 1 MB | the full portrait, and the one worth having |
+| `CharonCoins` | 60 frames, 314x454 | **not coins** |
+| `CharonMist` | 60 frames, 706x396 | 11 MB of PNG |
+| `CharonMoonGlow` | 50 frames, 543x767 | 12 MB of PNG |
+| `CharonGlint` | 60 frames, 549x542 | |
+| `CharonWiggle1` to `4` | 15 frames each | |
+| `CharonGlowMain`, `CharonGlowEyes` | 1 frame each | |
+
+**`CharonCoins` is a glow overlay, not coin art.** A frame on its own is a purple
+blob with gold flecks: it is meant to be composited over the coins in the
+portrait, and the coins themselves are painted into the portrait. Animating it
+alone would put a purple splat on the page. The sheet was built and measured
+first, 410 KB at 62x90 frames, before that was noticed by looking at a frame.
+The still is what ships.
+
+The portrait is cropped to its own alpha and saved at 760px tall as
+**`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:
+`build-lib.ps1` deletes `.webp` and never `.png`, and `assets/characters/` is not
+one of the four directories it stays out of. Game art is `.png` throughout for
+that reason.
+
+**The figure runs off the bottom of its own frame**, which is how the game draws
+every character and why it is anchored to the bottom of the viewport rather than
+floated in a panel.
+
+The coin on the counts is `GUI/Icons/Currency`, 70x70, copied to
+`assets/shell/coins.png`. `assets/shell/selector-coin.png` was the other
+candidate and is a token on a plinth rather than a coin.
+
 Extract with [`deppth2`](https://github.com/SGG-Modding/deppth), the SGG modding
 community's tool. The `-s` flag splits individual sprites out of the atlases rather than
 dumping packed sheets:
