@@ -1336,6 +1336,8 @@
     height: 100%;
     max-height: none;
     border-width: 0 1px 0 0;
+    /* Squared here, rounded when it floats. A pinned pane is an edge of the
+     * window; a pop-out is an object over it. */
     border-radius: 0;
     box-shadow:
       inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
@@ -2042,12 +2044,22 @@
    * whatever the first group turns out to be. */
   display: flex;
   flex-direction: column;
-  width: min(21rem, 90vw);
+  /**
+   * 12.5rem, down from 21, and **the floor is the button art rather than the
+   * words.** Measured: the widest label is "Resume briefing" at 100px, and a row
+   * costs 44px of `border-image` inset from `button.png` plus 25px of icon room
+   * before any text, so 193px is as narrow as this goes without clipping. 200px
+   * leaves seven. Slimming further means giving up the plate.
+   */
+  width: min(12.5rem, 90vw);
   max-height: 70dvh;
   overflow-y: auto;
   padding: 0.5rem 0.55rem;
   border: 0;
-  border-radius: 0;
+  /* Rounded, because a floating panel is an object over the page and a squared
+   * one reads as a pane that has come loose from an edge. The pinned mode below
+   * squares it again, where it genuinely is an edge. */
+  border-radius: var(--r-soft);
   background: color-mix(in oklab, var(--ink-900) 88%, transparent);
   /* The lit edge the art used to carry, and a seam on the right so the panel
    * has an edge where it meets the page. Inset, so nothing changes size. */
@@ -2055,6 +2067,53 @@
     inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
     inset -1px 0 0 var(--div-2),
     0 1.5rem 3rem rgb(0 0 0 / 0.55);
+}
+
+/* ==========================================================================
+ * FIVE MENU FRAMES, FOR PICKING ONE. Temporary: four of these go once the
+ * owner has chosen, and the winner folds into `.menu-panel` above.
+ * ======================================================================== */
+
+/* 2. Frosted. Real blur, more of the page coming through, a hairline of light
+ *    along the top edge the way glass catches it. */
+:root[data-menuskin='2'] .menu-panel {
+  background: color-mix(in oklab, var(--ink-900) 58%, transparent);
+  backdrop-filter: blur(14px) saturate(115%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    0 1.5rem 3rem rgb(0 0 0 / 0.5);
+}
+
+/* 3. Smoked. Darker and less transparent than frosted, with a warm rim in the
+ *    lit colour rather than a white one. Closer to the game's own panels. */
+:root[data-menuskin='3'] .menu-panel {
+  background: color-mix(in oklab, var(--ink-950) 72%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent),
+    0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
+}
+
+/* 4. Etched. Frosted, plus a bevel: light along the top and left, shadow along
+ *    the bottom and right, so it reads as a pressed plate rather than a sheet. */
+:root[data-menuskin='4'] .menu-panel {
+  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
+  backdrop-filter: blur(12px) saturate(110%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.10),
+    inset -1px -1px 0 rgb(0 0 0 / 0.45),
+    inset 0 0 0 1px color-mix(in oklab, var(--lit) 14%, transparent),
+    0 1.4rem 2.8rem rgb(0 0 0 / 0.55);
+}
+
+/* 5. Veil. The most glass of the five: barely any ground of its own, a strong
+ *    blur, no rim at all. It floats on the shadow and the sheen. */
+:root[data-menuskin='5'] .menu-panel {
+  background: color-mix(in oklab, var(--ink-900) 34%, transparent);
+  backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.55);
 }
 
 .menu-panel section + section {
@@ -2076,11 +2135,23 @@
  * word rather than as a heading.
  */
 .menu-panel h2 {
-  margin: 0.45rem 0 0.35rem 0.55rem;
-  font-family: var(--display);
-  font-size: 0.82rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  margin: 0.5rem 0 0.3rem 0.5rem;
+  /**
+   * `--name`, the face the page titles wear, not `--display`.
+   *
+   * The owner asked for the font "Arcana" is set in at the top of the Arcana
+   * page, and that is `.builds-top h2`, which is `--name`: Caesar Dressing.
+   * `--display` is Spectral SC, which is what every *sub*heading uses, and a
+   * menu category is a title rather than a rule over a section.
+   *
+   * No uppercasing and no tracking. This face is already all-caps by design and
+   * has one weight, so both were fighting it: `text-transform` did nothing the
+   * letterforms were not already doing and the tracking pulled them apart.
+   */
+  font-family: var(--name);
+  font-weight: 400;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
   color: var(--lit);
 }
 
@@ -4463,22 +4534,63 @@
  * `right: 0` rather than `left: 0`, because it hangs off the right corner and a
  * panel that opened leftward from here would run off the screen on a phone.
  */
-/* The menu's mirror, and it takes the menu's recipe. It wore `sidebars.png` for
- * the same reason and loses it for the same one; two panels that open from
- * opposite corners of the same chrome have to be made of the same thing. The
- * lit edge is on the right here, because that is the side this one opens from. */
+/**
+ * The menu's mirror, and it takes the menu's recipe wholesale.
+ *
+ * Two panels that open from opposite corners of the same chrome have to be made
+ * of the same thing: same ground, same rim, same radius, same buttons. The lit
+ * edge is on the right because that is the side this one opens from. It is
+ * always a pop-out, so it is always rounded; there is no pinned mode to square
+ * it for.
+ */
 .you-panel {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
   z-index: 20;
-  width: min(14rem, 80vw);
+  width: min(12.5rem, 80vw);
   padding: 0.5rem 0.55rem;
+  border-radius: var(--r-soft);
   background: color-mix(in oklab, var(--ink-900) 88%, transparent);
   box-shadow:
     inset -0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
     inset 1px 0 0 var(--div-2),
     0 1.5rem 3rem rgb(0 0 0 / 0.55);
+}
+
+/* The skins reach this one too, mirrored where they have a side. */
+:root[data-menuskin='2'] .you-panel {
+  background: color-mix(in oklab, var(--ink-900) 58%, transparent);
+  backdrop-filter: blur(14px) saturate(115%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    0 1.5rem 3rem rgb(0 0 0 / 0.5);
+}
+
+:root[data-menuskin='3'] .you-panel {
+  background: color-mix(in oklab, var(--ink-950) 72%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent),
+    0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
+}
+
+:root[data-menuskin='4'] .you-panel {
+  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
+  backdrop-filter: blur(12px) saturate(110%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.10),
+    inset -1px -1px 0 rgb(0 0 0 / 0.45),
+    inset 0 0 0 1px color-mix(in oklab, var(--lit) 14%, transparent),
+    0 1.4rem 2.8rem rgb(0 0 0 / 0.55);
+}
+
+:root[data-menuskin='5'] .you-panel {
+  background: color-mix(in oklab, var(--ink-900) 34%, transparent);
+  backdrop-filter: blur(22px) saturate(125%);
+  box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.55);
 }
 
 .you-as {
@@ -4499,10 +4611,22 @@
   list-style: none;
 }
 
+/**
+ * The same plate the menu's rows wear.
+ *
+ * These were plain text with a hover tint while the menu three inches away
+ * pressed `button.png`. Two panels of the same chrome, opening from opposite
+ * corners, and their rows were made of different things. `border-image` rather
+ * than a background for the same reason the menu uses it: the plate is drawn in
+ * the border box, so nothing about the row's size depends on it.
+ */
 .you-panel button {
   width: 100%;
-  padding: 0.35rem;
-  border: 0;
+  border: 0 solid transparent;
+  border-width: 0.85rem 1.4rem;
+  border-image: url('/shell/button.png') 30 fill / 0.85rem 1.4rem stretch;
+  border-radius: 0;
+  padding: 0 0.2rem;
   background: none;
   color: var(--bone);
   font-family: var(--body);
@@ -4513,7 +4637,8 @@
 
 .you-panel button:hover,
 .you-panel button:focus-visible {
-  background: var(--div-1);
+  filter: brightness(1.35);
+  outline: none;
   color: var(--lit-hot);
 }
 
