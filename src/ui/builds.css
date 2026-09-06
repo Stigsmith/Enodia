@@ -3785,14 +3785,46 @@ button.mark {
 .plan {
   display: grid;
   gap: 2.2rem;
-  margin-top: 2rem;
+  margin-top: 1.3rem;
 }
 
 @media (min-width: 78rem) {
+  /**
+   * Built takes a double track, and reads in two sub-columns inside it.
+   *
+   * **Four equal tracks stopped working the moment the roadmap told the truth.**
+   * Two shipped features had been filed under Planned; correcting that made
+   * Built eight items against three, three and two, and its column ran to
+   * 1293px against 520, 416 and 372. The page went back to 1.57 screens, which
+   * is the thing this layout exists to prevent, and the three columns beside it
+   * were mostly empty while it did.
+   *
+   * The measures come out even, which is why this and not a narrower Built:
+   * at 1318px the double track is 496 and its two sub-columns are 238 each,
+   * against 248 for the single tracks. Nobody's paragraph is thinner than
+   * anybody else's.
+   *
+   * It also holds as the app ships more. Built is the stage that only grows,
+   * and a second sub-column absorbs the next several items without the page
+   * changing shape again.
+   */
   .plan {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 2fr minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     gap: 1.6rem;
     align-items: start;
+  }
+
+  /* `display: block` first: `columns` is ignored on a grid container, and this
+     list is a grid everywhere else. The row gap comes back as a margin. */
+  .plan-stage.is-now .plan-list {
+    display: block;
+    columns: 2;
+    column-gap: 1.2rem;
+  }
+
+  .plan-stage.is-now .plan-list > li {
+    break-inside: avoid;
+    margin-bottom: 0.75rem;
   }
 
   /* The line the stages sit on, so it reads as one progression rather than as
@@ -3818,7 +3850,7 @@ button.mark {
 
   .plan-stage {
     position: relative;
-    padding-top: 1.4rem;
+    padding-top: 1.1rem;
   }
 
   /* The node on the line, in the stage's own colour. */
@@ -3867,7 +3899,7 @@ button.mark {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.9rem;
+  gap: 0.75rem;
 }
 
 .plan-list > li {
@@ -3891,7 +3923,7 @@ button.mark {
 .plan-list p {
   margin: 0;
   font-size: 0.84rem;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--bone-dim);
   text-wrap: pretty;
 }
@@ -6482,7 +6514,7 @@ button.mark {
 .plan-progress {
   display: grid;
   gap: 0.4rem;
-  margin: 0 0 1.6rem;
+  margin: 0 0 1rem;
 }
 
 /**
@@ -6842,9 +6874,34 @@ button.mark {
   display: none;
 }
 
-/* Only where there is room to the right of the text without crowding it.
- * Below that she would be standing on the roadmap rather than beside it. */
-@media (min-width: 78rem) {
+/**
+ * Only where there is room for her, and **the room is mostly vertical.**
+ *
+ * She is fixed to the bottom right of the viewport and the roadmap is built to
+ * fill the screen, so the two compete for that corner. The old gate was width
+ * alone at 78rem, and width turned out to be the wrong axis: her top edge is
+ * `viewport height - 294`, while the two right-hand columns end at about 620
+ * whatever the window is doing, because their height comes from their content.
+ *
+ * Measured, counting text boxes that intersect her drawn box:
+ *
+ * | Viewport | Overlapping |
+ * |---|---|
+ * | 1280x900 | 4 |
+ * | 1360x900, 1440x900, 1520x900, 1600x900 | 2 |
+ * | 1920x900 | 1 |
+ * | 1600x950, 1600x1000, 1920x1080 | **0** |
+ *
+ * So the gate is `min-height: 58rem`, which is 928px and puts her top at 634
+ * against the columns' 620. The width gate stays because below 96rem the
+ * columns are thin enough that their content runs past her on its own.
+ *
+ * **This has a floor and it is worth knowing before anybody moves it.** Take
+ * either number down and text goes behind her, and the first thing to go is the
+ * amber line saying what a stalled item is waiting on, which is the honest half
+ * of the page.
+ */
+@media (min-width: 96rem) and (min-height: 58rem) {
   .dora-watching {
     display: grid;
     justify-items: center;
@@ -6886,18 +6943,24 @@ button.mark {
   .dora-watching {
     right: 6rem;
   }
-
-  .dora-watching-poke {
-    width: 15rem;
-  }
 }
 
 .dora-watching-poke {
   display: block;
-  /* 12rem, down from the 15 she was drawn at. The owner wanted her smaller once
-   * she started talking: a speech box above a large figure is a lot of
-   * furniture for one corner. */
-  width: 12rem;
+  /**
+   * 10rem, down from 12, down from the 15 she was drawn at. The owner wanted
+   * her smaller once she started talking: a speech box above a large figure is
+   * a lot of furniture for one corner.
+   *
+   * **The last step was measured rather than judged, and it is now load
+   * bearing.** At 12rem her drawn box was 192 by 349, and at 1600x950 that put
+   * her top at 598 with the last line of two paragraphs behind it: Boon
+   * interaction data by 73 by 21 pixels, and the Leaderboards waiting line by
+   * 60 by 15. At 10rem she is 160 by 294 and clears them. Her height is also
+   * what the `min-height` gate above is calculated from, which is why she is
+   * one size at every width now rather than growing on a wide screen.
+   */
+  width: 10rem;
   padding: 0;
   border: 0;
   background: none;

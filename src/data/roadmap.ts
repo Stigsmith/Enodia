@@ -50,7 +50,17 @@ export const ROADMAP: Plan[] = [
   {
     stage: 'now',
     title: 'Accounts and short links',
-    say: 'Sign in and a published build gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. That is all an account buys. Viewing, building and saving stay free and stay account free, and your builds still live in this browser.',
+    say: 'Sign in and a published build gets a link about thirty characters long instead of the 1,588 character one that carries the whole build inside it. It also carries your things between devices and lets a run count toward a build you took. Viewing, building and saving stay account free.',
+  },
+  {
+    stage: 'now',
+    title: 'Build exchange',
+    say: 'Two shelves of other people’s builds: ones picked by hand, and ones from people you swapped codes with. Take a copy and it is an ordinary build of yours, and a run you log against it counts toward the build it came from.',
+  },
+  {
+    stage: 'now',
+    title: 'Builds across your devices',
+    say: 'Signed in, your builds and runs follow you between devices. The newest version of each item wins, so a build edited on a phone and a different one on a desktop both survive.',
   },
   {
     stage: 'now',
@@ -72,7 +82,7 @@ export const ROADMAP: Plan[] = [
   {
     stage: 'next',
     title: 'Owner builds in the run',
-    say: 'The run counts whatever is in the library, which is now only what you have made. Picking one as the target you are playing towards is the part still missing.',
+    say: 'Starting a run already asks which build you are going for, and the run tracks it from there. What is missing is anything to choose from that is not your own: the library ships empty, so the list is whatever you have made on that aspect.',
   },
 
   // ---- planned -----------------------------------------------------------
@@ -91,16 +101,6 @@ export const ROADMAP: Plan[] = [
     title: 'Boon interaction data',
     say: 'The game states each boon’s numbers but not how boons feed each other. That has to be written by hand. Three features depend on it, including build archetypes.',
   },
-  {
-    stage: 'later',
-    title: 'Build exchange',
-    say: 'Publishing exists, so the storage this needed is already here. What is missing is not the server: a browsable collection is the first thing anybody can stumble across without being handed a link, and that needs a way to deal with what turns up in it before it opens rather than after.',
-  },
-  {
-    stage: 'later',
-    title: 'Builds across your devices',
-    say: 'An account signs you in but does not carry your library with it. Everything you make is still in one browser, and the export is still the only copy that leaves it.',
-  },
 
   // ---- stalled -----------------------------------------------------------
   {
@@ -113,6 +113,6 @@ export const ROADMAP: Plan[] = [
     stage: 'waiting',
     title: 'Leaderboards',
     say: 'Not who plays best. Who has shared the most, whose builds get taken up, that sort of thing, because the tool has no way to judge the first and no business claiming it.',
-    on: 'Waiting on the exchange, which is what would give it anything to count.',
+    on: 'Waiting on a shelf of everything published. The exchange holds a hand-picked set and your friends, and neither is a field to rank.',
   },
 ]
