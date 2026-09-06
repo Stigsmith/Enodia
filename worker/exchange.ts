@@ -56,6 +56,19 @@ export type Listing = {
   createdAt: number
   /** The owner's note, when this came off the picked shelf. */
   note?: string
+  /**
+   * Whether the person asking published it.
+   *
+   * **A boolean, computed here, and never the id.** The screen needs to know so
+   * it can say "this one is yours" rather than offering to follow you back to
+   * yourself, and `worker/exchange.test.ts` pins that user ids do not go over
+   * the wire. Answering the question without shipping the identity is the whole
+   * shape of this field.
+   *
+   * Absent on the picked shelf when nobody is signed in, because there is then
+   * nobody for it to be true of.
+   */
+  mine?: boolean
   stats: Stats
 }
 
@@ -137,10 +150,25 @@ async function statsFor(db: DB, ids: string[]): Promise<Map<string, Stats>> {
   return found
 }
 
-/** Attach counts to rows that already have their build and author. */
+/**
+ * Attach counts to rows that already have their build and author.
+ *
+ * `viewer` is who is asking, so a row can say whether it is theirs. The id is
+ * compared here and never returned: `Listing` carries a boolean, and the test
+ * at `exchange.test.ts` that pins user ids off the wire is the reason.
+ */
 async function withStats(
   db: DB,
-  rows: { id: string; name: string; payload: string; by: string | null; createdAt: Date | number; note?: string }[],
+  rows: {
+    id: string
+    name: string
+    payload: string
+    by: string | null
+    createdAt: Date | number
+    note?: string
+    userId?: string | null
+  }[],
+  viewer?: string | null,
 ): Promise<Listing[]> {
   const stats = await statsFor(db, rows.map((row) => row.id))
   return rows.map((row) => ({
@@ -152,6 +180,7 @@ async function withStats(
     by: row.by ?? 'Somebody',
     createdAt: row.createdAt instanceof Date ? row.createdAt.getTime() : Number(row.createdAt),
     ...(row.note === undefined ? {} : { note: row.note }),
+    ...(viewer && row.userId ? { mine: row.userId === viewer } : {}),
     stats: stats.get(row.id) ?? NONE,
   }))
 }
@@ -163,13 +192,14 @@ async function withStats(
  * everybody does not cross the line `REQUIREMENTS.md` 5 draws: there is nothing
  * here that arrived without being read.
  */
-export async function picked(db: DB): Promise<Listing[]> {
+export async function picked(db: DB, viewer?: string | null): Promise<Listing[]> {
   const rows = await db
     .select({
       id: publishedBuild.id,
       name: publishedBuild.name,
       payload: publishedBuild.payload,
       by: user.name,
+      userId: publishedBuild.userId,
       createdAt: publishedBuild.createdAt,
       note: curatedPick.note,
       at: curatedPick.at,
@@ -180,7 +210,7 @@ export async function picked(db: DB): Promise<Listing[]> {
     .orderBy(desc(curatedPick.at))
     .limit(PAGE)
 
-  return withStats(db, rows)
+  return withStats(db, rows, viewer)
 }
 
 /**
@@ -205,6 +235,7 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
       name: publishedBuild.name,
       payload: publishedBuild.payload,
       by: user.name,
+      userId: publishedBuild.userId,
       createdAt: publishedBuild.createdAt,
     })
     .from(publishedBuild)
@@ -213,7 +244,10 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
     .orderBy(desc(publishedBuild.createdAt))
     .limit(PAGE)
 
-  return withStats(db, rows)
+  /* Never true on this shelf: self-friendship is refused in `friends.ts`, so
+     nothing here can be yours. Passed anyway so the two shelves answer the
+     same question the same way. */
+  return withStats(db, rows, userId)
 }
 
 /**
@@ -227,18 +261,51 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
  * Taking twice is not two takes. The row already exists, so `takenAt` is left
  * where it was: the first time is the honest answer to "when did you take this".
  */
+/**
+ * Whose build it is, for the three routes that must not count an author's own.
+ *
+ * **None of them checked.** `take`, `played` and `rate` all read the row to
+ * prove it exists and none compared its `userId` to the caller, so publishing a
+ * build and then taking, playing and rating it moved its own public numbers.
+ * The owner found the first half of that by taking copies of their own build.
+ */
+async function authorOf(db: DB, buildId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ userId: publishedBuild.userId })
+    .from(publishedBuild)
+    .where(eq(publishedBuild.id, buildId))
+    .limit(1)
+  return row?.userId ?? null
+}
+
 export async function take(
   db: DB,
   userId: string,
   buildId: string,
 ): Promise<{ payload: string; name: string } | Refusal> {
   const [found] = await db
-    .select({ payload: publishedBuild.payload, name: publishedBuild.name })
+    .select({
+      payload: publishedBuild.payload,
+      name: publishedBuild.name,
+      userId: publishedBuild.userId,
+    })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, buildId))
     .limit(1)
 
   if (!found) return { status: 404, say: 'That build is not there any more.' }
+
+  /**
+   * Your own build is already yours.
+   *
+   * Refused rather than allowed-and-uncounted, because the copy is the thing
+   * that was wrong: it put a second build in your library named after the
+   * first, and doing it again made a third. The payload is still readable
+   * through `/api/b/<id>`, which is the route for reading one.
+   */
+  if (found.userId === userId) {
+    return { status: 409, say: 'That build is yours. It is already in your library.' }
+  }
 
   await db.run(sql`
     insert into exchange_stat (build_id, user_id, taken_at, updated)
@@ -269,13 +336,18 @@ export async function played(
   cleared: boolean,
   fear: number | null,
 ): Promise<{ ok: true } | Refusal> {
-  const [found] = await db
-    .select({ id: publishedBuild.id })
-    .from(publishedBuild)
-    .where(eq(publishedBuild.id, buildId))
-    .limit(1)
+  const author = await authorOf(db, buildId)
+  if (author === null) return { status: 404, say: 'That build is not there any more.' }
 
-  if (!found) return { status: 404, say: 'That build is not there any more.' }
+  /**
+   * An author's own runs do not count toward their own build.
+   *
+   * Quietly, with an ok. The run happened and it is recorded in their library;
+   * what must not happen is it moving the number a stranger reads as evidence.
+   * A refusal would make `LogRun` show an error for something the player did
+   * nothing wrong in doing.
+   */
+  if (author === userId) return { ok: true }
 
   const raise = cleared && fear !== null ? fear : null
 
@@ -309,6 +381,11 @@ export async function rate(
 ): Promise<{ ok: true } | Refusal> {
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     return { status: 400, say: 'A rating is one to five.' }
+  }
+
+  const author = await authorOf(db, buildId)
+  if (author === userId) {
+    return { status: 409, say: 'You cannot rate your own build.' }
   }
 
   const [mine] = await db

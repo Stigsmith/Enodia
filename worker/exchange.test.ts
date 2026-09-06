@@ -66,6 +66,7 @@ type Listing = {
   payload: string
   by: string
   note?: string
+  mine?: boolean
   stats: {
     takes: number
     players: number
@@ -374,3 +375,156 @@ async function curate(buildId: string, note: string) {
     .bind(buildId, note, Date.now())
     .run()
 }
+
+/**
+ * The author acting on their own build, which nothing checked.
+ *
+ * `take`, `played` and `rate` each read the row to prove it exists and none
+ * compared its owner to the caller, so publishing a build and then taking,
+ * playing and rating it moved its own public numbers. The owner found the first
+ * half of that by taking copies of their own build, then copies of those.
+ *
+ * Every assertion below was watched failing before the checks went in.
+ */
+describe('your own build', () => {
+  it('cannot be taken, because it is already yours', async () => {
+    const me = await someone('Author')
+    const id = await publish(me.cookie, 'Mine')
+
+    const refused = await post(`/api/exchange/${id}/take`, {}, { cookie: me.cookie })
+    expect(refused.status).toBe(409)
+    expect((await refused.json<{ error: string }>()).error).toMatch(/yours/i)
+  })
+
+  it('does not count the author\'s own take', async () => {
+    const me = await someone('Author')
+    const other = await someone('Reader')
+    const id = await publish(me.cookie, 'Mine')
+    await pick(drizzle(env.DB, { schema }), id, 'a note')
+
+    await post(`/api/exchange/${id}/take`, {}, { cookie: me.cookie })
+    const afterMine = (await shelf('/api/exchange'))[0]
+    expect(afterMine?.stats.takes).toBe(0)
+
+    // And a stranger's take does count, so this is a check rather than a break.
+    await post(`/api/exchange/${id}/take`, {}, { cookie: other.cookie })
+    expect((await shelf('/api/exchange'))[0]?.stats.takes).toBe(1)
+  })
+
+  it('does not count the author\'s own runs', async () => {
+    const me = await someone('Author')
+    const id = await publish(me.cookie, 'Mine')
+    await pick(drizzle(env.DB, { schema }), id, 'a note')
+
+    // Answers ok rather than refusing: the run happened, and the player did
+    // nothing wrong. It simply does not move a number a stranger reads.
+    const ran = await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 30 },
+      { cookie: me.cookie },
+    )
+    expect(ran.status).toBe(200)
+
+    const row = (await shelf('/api/exchange'))[0]
+    expect(row?.stats.runs).toBe(0)
+    expect(row?.stats.clears).toBe(0)
+    expect(row?.stats.bestFear).toBeNull()
+  })
+
+  it('cannot be rated by its author', async () => {
+    const me = await someone('Author')
+    const id = await publish(me.cookie, 'Mine')
+
+    const refused = await post(`/api/exchange/${id}/rate`, { rating: 5 }, { cookie: me.cookie })
+    expect(refused.status).toBe(409)
+    expect((await refused.json<{ error: string }>()).error).toMatch(/your own/i)
+  })
+
+  it('is marked as yours on the shelf, without saying whose', async () => {
+    const me = await someone('Author')
+    const other = await someone('Reader')
+    const id = await publish(me.cookie, 'Mine')
+    await pick(drizzle(env.DB, { schema }), id, 'a note')
+
+    const asAuthor = (await shelf('/api/exchange', me.cookie))[0]
+    expect(asAuthor?.mine).toBe(true)
+
+    const asReader = (await shelf('/api/exchange', other.cookie))[0]
+    expect(asReader?.mine).toBe(false)
+
+    // Signed out there is nobody for it to be true of, and it is simply absent.
+    const asStranger = (await shelf('/api/exchange'))[0]
+    expect(asStranger?.mine).toBeUndefined()
+
+    // And the id it was compared against never leaves the worker.
+    const raw = await (await get('/api/exchange', me.cookie)).text()
+    expect(raw).not.toContain(me.id)
+    expect(raw).not.toContain(other.id)
+  })
+})
+
+/**
+ * Replacing a listing rather than minting a second one.
+ *
+ * `publish` only ever inserted, so the same build published twice became two
+ * listings under two ids, and two docblocks claimed the opposite the whole
+ * time. Following makes this load bearing: a follower reads the author's
+ * current version, so the author needs a way to change it that does not orphan
+ * everybody on the old id.
+ */
+describe('republishing', () => {
+  it('replaces in place and counts that it happened', async () => {
+    const me = await someone('Author')
+    const id = await publish(me.cookie, 'First name')
+
+    const again = await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json', origin: ORIGIN, cookie: me.cookie },
+      body: JSON.stringify({ payload: 'Zsecondpayload', name: 'Second name' }),
+    })
+    expect(again.status).toBe(200)
+    expect(await again.json()).toEqual({ id, revision: 1 })
+
+    // One listing, not two, and the reader gets the new content.
+    const mine = await (await get('/api/builds', me.cookie)).json<{ builds: unknown[] }>()
+    expect(mine.builds).toHaveLength(1)
+
+    const read = await (await get(`/api/b/${id}`)).json<{ payload: string; name: string; revision: number }>()
+    expect(read.payload).toBe('Zsecondpayload')
+    expect(read.name).toBe('Second name')
+    expect(read.revision).toBe(1)
+  })
+
+  it('refuses somebody else\'s build the way delete does', async () => {
+    const me = await someone('Author')
+    const other = await someone('Stranger')
+    const id = await publish(me.cookie, 'Mine')
+
+    const nope = await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json', origin: ORIGIN, cookie: other.cookie },
+      body: JSON.stringify({ payload: 'Ztheirs', name: 'Theirs now' }),
+    })
+    expect(nope.status).toBe(404)
+
+    // Untouched.
+    const read = await (await get(`/api/b/${id}`)).json<{ payload: string }>()
+    expect(read.payload).toBe('Zpackedbuild')
+  })
+
+  it('applies the same size and name rules as publishing', async () => {
+    const me = await someone('Author')
+    const id = await publish(me.cookie, 'Mine')
+
+    const put = (body: unknown) =>
+      SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json', origin: ORIGIN, cookie: me.cookie },
+        body: JSON.stringify(body),
+      })
+
+    expect((await put({ payload: '', name: 'x' })).status).toBe(400)
+    expect((await put({ payload: 'Z', name: '' })).status).toBe(400)
+    expect((await put({ payload: 'Z'.repeat(17_000), name: 'x' })).status).toBe(413)
+  })
+})
