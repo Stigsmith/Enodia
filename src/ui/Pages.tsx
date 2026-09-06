@@ -18,14 +18,30 @@ import type { Stage } from '../data/roadmap.ts'
 export function Page({
   title,
   standfirst,
+  broad,
   children,
 }: {
   title: string
   standfirst: string
+  /**
+   * Lift the 44rem measure, for a page that lays itself out in columns.
+   *
+   * **Not for making paragraphs wider.** Measured on a 1600px screen, a line of
+   * body copy here was already 113 characters, well past the 45 to 75 a reader
+   * is comfortable with, so the cap was doing its job and widening it would
+   * have made these pages harder to read rather than shorter. What this is for
+   * is pages whose content is a set of columns: Help came out at 104 characters
+   * a line afterwards, and one screen instead of two.
+   *
+   * The class only lifts the cap above 78rem, where there are columns to fill.
+   * Below that the base 44rem still applies, because a wider single column is
+   * exactly the thing this is trying not to do.
+   */
+  broad?: boolean
   children: React.ReactNode
 }) {
   return (
-    <div className="page">
+    <div className={`page${broad ? ' is-broad' : ''}`}>
       <header className="builds-top">
         <h2>{title}</h2>
       </header>
@@ -39,25 +55,49 @@ export function Page({
 const when = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
 
+/**
+ * What changed, newest batch open and the rest a list of headings.
+ *
+ * **Measured at 5.53 screens of scrolling**, which was the worst page in the
+ * app by some way: seventeen batches of seven paragraph-length points, every
+ * one expanded, most of them describing something the reader read weeks ago.
+ *
+ * `<details>` rather than React state, because there is nothing to remember.
+ * The browser handles the keyboard, the ARIA and the open animation, and this
+ * page stays what the top of this file says it is: not interactive.
+ *
+ * **The one real cost is find-in-page.** Chrome opens a closed `<details>` when
+ * a search lands inside it and Firefox does not, so on Firefox a Ctrl+F for
+ * wording buried in an old batch will miss it. Every batch's date and title
+ * stay on screen, which is most of what such a search is for.
+ */
 export function Changelog() {
   return (
     <Page
       title="Changelog"
-      standfirst="What has changed in the app, newest first."
+      standfirst="What has changed in the app, newest first. The latest batch is open, and the rest open when you want them."
     >
       <ol className="log" data-tour="changelog-log">
-        {CHANGELOG.map((release) => (
+        {CHANGELOG.map((release, at) => (
           <li key={`${release.date}-${release.title}`} className="log-entry">
-            <p className="log-when">
-              <time dateTime={release.date}>{when(release.date)}</time>
-            </p>
-            <h3 className="log-title">{release.title}</h3>
-            <p className="log-say">{release.say}</p>
-            <ul className="log-points">
-              {release.points.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
+            <details className="log-fold" open={at === 0}>
+              {/* Title first, date after it and pushed to the right margin.
+                * A span rather than a paragraph for the date, because
+                * `<summary>` takes phrasing and heading content and a `<p>` is
+                * neither. */}
+              <summary className="log-head">
+                <h3 className="log-title">{release.title}</h3>
+                <span className="log-when">
+                  <time dateTime={release.date}>{when(release.date)}</time>
+                </span>
+              </summary>
+              <p className="log-say">{release.say}</p>
+              <ul className="log-points">
+                {release.points.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </details>
           </li>
         ))}
       </ol>
@@ -83,6 +123,7 @@ export function Roadmap() {
 
   return (
     <Page
+      broad
       title="Roadmap"
       standfirst="What is built, what is planned, and what is stalled. No dates: this is a side project and any date would be a guess."
     >
