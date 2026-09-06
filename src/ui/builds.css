@@ -300,9 +300,26 @@
   margin: 0;
   padding: 0.25rem;
   list-style: none;
-  border: 1px solid var(--div-4);
-  border-radius: var(--r-hair);
-  background: var(--ink-850);
+  /**
+   * The chrome's smoked glass, same recipe as `.menu-panel` in `surface.css`.
+   *
+   * It lives here rather than in that selector list because `builds.css` loads
+   * after `surface.css`, so this rule's own `background` would have quietly won
+   * and the listbox would have been the one pop-out still made of something
+   * else. Same values, stated where they cannot be overridden by accident.
+   *
+   * The border goes: the rim is an inset shadow now, which draws inside the box
+   * rather than adding to it, so the list stops growing by two pixels.
+   */
+  border: 0;
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--ink-950) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent),
+    0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
   box-shadow: 0 12px 32px -8px var(--ink-950);
 }
 

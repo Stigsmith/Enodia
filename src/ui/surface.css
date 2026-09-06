@@ -1330,6 +1330,19 @@
    * pop-out-only, and a static pane does not cast one because it is not over
    * anything.
    */
+  /**
+   * The pinned pane: the same surface, different geometry.
+   *
+   * **Only the geometry belongs here.** This rule used to restate the ground and
+   * the rim, which is how the two modes drifted apart in the first place: it set
+   * `background` as a shorthand, silently reset the art the pop-out was wearing,
+   * and outranked the base rule on specificity. Now it says where the panel sits
+   * and nothing about what it is made of.
+   *
+   * The drop shadow is dropped rather than overridden, because a pane pinned to
+   * the edge of the window is not over anything to cast one onto. The two inset
+   * lines stay: they are the rim, and the rim is the point.
+   */
   :root[data-nav='pane'] .menu-panel {
     position: static;
     width: auto;
@@ -1340,8 +1353,8 @@
      * window; a pop-out is an object over it. */
     border-radius: 0;
     box-shadow:
-      inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
-      inset -1px 0 0 var(--div-2);
+      inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
+      inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent);
   }
 
   :root[data-nav='pane'] .app-view {
@@ -2060,60 +2073,40 @@
    * one reads as a pane that has come loose from an edge. The pinned mode below
    * squares it again, where it genuinely is an edge. */
   border-radius: var(--r-soft);
-  background: color-mix(in oklab, var(--ink-900) 88%, transparent);
-  /* The lit edge the art used to carry, and a seam on the right so the panel
-   * has an edge where it meets the page. Inset, so nothing changes size. */
-  box-shadow:
-    inset 0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
-    inset -1px 0 0 var(--div-2),
-    0 1.5rem 3rem rgb(0 0 0 / 0.55);
 }
 
-/* ==========================================================================
- * FIVE MENU FRAMES, FOR PICKING ONE. Temporary: four of these go once the
- * owner has chosen, and the winner folds into `.menu-panel` above.
- * ======================================================================== */
-
-/* 2. Frosted. Real blur, more of the page coming through, a hairline of light
- *    along the top edge the way glass catches it. */
-:root[data-menuskin='2'] .menu-panel {
-  background: color-mix(in oklab, var(--ink-900) 58%, transparent);
-  backdrop-filter: blur(14px) saturate(115%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 1.5rem 3rem rgb(0 0 0 / 0.5);
-}
-
-/* 3. Smoked. Darker and less transparent than frosted, with a warm rim in the
- *    lit colour rather than a white one. Closer to the game's own panels. */
-:root[data-menuskin='3'] .menu-panel {
+/**
+ * Smoked glass: the one surface every pop-out in the chrome is made of.
+ *
+ * Chosen out of five the owner compared side by side, and the reason it won is
+ * the rim. The alternatives drew their highlight in white, which is what glass
+ * does everywhere on the web and nowhere in this game; this one draws it in
+ * `--lit`, the app's own colour, so the edge belongs to the page rather than to
+ * a design language borrowed from somewhere else.
+ *
+ * **The transparency is nearly free and that is worth knowing before anybody
+ * tunes it.** The menu opens over the page's left gutter on every screen, so
+ * there is usually wallpaper behind it rather than content, and all five looked
+ * near identical until the window was narrow enough for Arcana cards to slide
+ * underneath. So this is a rim treatment with a blur attached, not a glass
+ * effect the layout depends on.
+ *
+ * `--ink-950` rather than `--ink-900`: it is darker than the page, which is
+ * what keeps a category heading readable when there *is* art behind it. That
+ * was the reason Veil lost, at 34% ground the headings sat on card art.
+ *
+ * The prefix is for Safari, which wanted `-webkit-backdrop-filter` for years
+ * and costs one line to keep happy.
+ */
+.menu-panel,
+.you-panel {
   background: color-mix(in oklab, var(--ink-950) 72%, transparent);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow:
     inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
     inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent),
     0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
-}
-
-/* 4. Etched. Frosted, plus a bevel: light along the top and left, shadow along
- *    the bottom and right, so it reads as a pressed plate rather than a sheet. */
-:root[data-menuskin='4'] .menu-panel {
-  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
-  backdrop-filter: blur(12px) saturate(110%);
-  box-shadow:
-    inset 1px 1px 0 rgb(255 255 255 / 0.10),
-    inset -1px -1px 0 rgb(0 0 0 / 0.45),
-    inset 0 0 0 1px color-mix(in oklab, var(--lit) 14%, transparent),
-    0 1.4rem 2.8rem rgb(0 0 0 / 0.55);
-}
-
-/* 5. Veil. The most glass of the five: barely any ground of its own, a strong
- *    blur, no rim at all. It floats on the shadow and the sheen. */
-:root[data-menuskin='5'] .menu-panel {
-  background: color-mix(in oklab, var(--ink-900) 34%, transparent);
-  backdrop-filter: blur(22px) saturate(125%);
-  box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.55);
 }
 
 .menu-panel section + section {
@@ -4551,46 +4544,6 @@
   width: min(12.5rem, 80vw);
   padding: 0.5rem 0.55rem;
   border-radius: var(--r-soft);
-  background: color-mix(in oklab, var(--ink-900) 88%, transparent);
-  box-shadow:
-    inset -0.18rem 0 0 -0.06rem color-mix(in oklab, var(--lit) 34%, transparent),
-    inset 1px 0 0 var(--div-2),
-    0 1.5rem 3rem rgb(0 0 0 / 0.55);
-}
-
-/* The skins reach this one too, mirrored where they have a side. */
-:root[data-menuskin='2'] .you-panel {
-  background: color-mix(in oklab, var(--ink-900) 58%, transparent);
-  backdrop-filter: blur(14px) saturate(115%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 1.5rem 3rem rgb(0 0 0 / 0.5);
-}
-
-:root[data-menuskin='3'] .you-panel {
-  background: color-mix(in oklab, var(--ink-950) 72%, transparent);
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--lit) 22%, transparent),
-    inset 0 1px 0 color-mix(in oklab, var(--lit) 28%, transparent),
-    0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
-}
-
-:root[data-menuskin='4'] .you-panel {
-  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
-  backdrop-filter: blur(12px) saturate(110%);
-  box-shadow:
-    inset 1px 1px 0 rgb(255 255 255 / 0.10),
-    inset -1px -1px 0 rgb(0 0 0 / 0.45),
-    inset 0 0 0 1px color-mix(in oklab, var(--lit) 14%, transparent),
-    0 1.4rem 2.8rem rgb(0 0 0 / 0.55);
-}
-
-:root[data-menuskin='5'] .you-panel {
-  background: color-mix(in oklab, var(--ink-900) 34%, transparent);
-  backdrop-filter: blur(22px) saturate(125%);
-  box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.55);
 }
 
 .you-as {
