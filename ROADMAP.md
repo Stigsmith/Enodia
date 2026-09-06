@@ -396,6 +396,25 @@ below what a player can actually clear, so anyone above 57 could not record thei
 summed from the data now, the filter bands derive from it rather than being typed out, and
 `src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
 
+**The exchange follows rather than copies**, 6 September 2026. A build you take
+stays its author's: stored as an ordinary build with `by: 'community'`, refreshed against
+`/api/b/<id>` on load when the author's `revision` has moved, and forked into an owner build
+the moment you want to change it. `published_build` gained `revision` and `updated_at`, and
+`PUT /api/builds/:id` replaces in place, which two docblocks had claimed for months while
+`publish` only ever inserted.
+
+**Charon runs it now.** The exchange was the build manager with a different list behind it,
+so it says where you are: the game's own portrait, anchored to the bottom the way the art is
+drawn, with the shelf inset past him and the counts on `GUI/Icons/Currency`. Gated at 96rem
+because below that reserving his column costs a card column. `CharonCoins` turned out to be a
+glow overlay rather than coin art, which `assets/README.md` records along with the rest of
+the package.
+
+**Three routes had no author check at all.** `take`, `played` and `rate` each read the row to
+prove it existed and none compared its owner to the caller, so an author taking, playing and
+rating their own build moved its own public numbers. Eight worker tests, five watched failing
+first.
+
 **Which vows a run took is done**, 6 September 2026. `PlayRecord.vows` holds vow id to the
 rank taken; `src/engine/vows.ts` does the arithmetic and `src/ui/VowSheet.tsx` draws it as
 **its own screen inside the log dialog**, on `box-halfscreen.png`, with Back returning to
