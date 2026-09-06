@@ -50,6 +50,13 @@
       "when": 1788548585158,
       "tag": "0006_tired_valkyrie",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1788721470812,
+      "tag": "0007_wet_robin_chapel",
+      "breakpoints": true
     }
   ]
 }

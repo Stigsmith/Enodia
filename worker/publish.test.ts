@@ -117,7 +117,14 @@ describe('the short link', () => {
     // link is useless for the thing it was made for.
     const anon = await SELF.fetch(`${ORIGIN}/api/b/${id}`)
     expect(anon.status).toBe(200)
-    expect(await anon.json()).toEqual({ payload: 'Zthepayload', name: 'Shared One' })
+    // The revision travels so a follower can tell whether what it cached is
+    // still current without diffing a kilobyte of payload. Zero until the
+    // author replaces it.
+    expect(await anon.json()).toEqual({
+      payload: 'Zthepayload',
+      name: 'Shared One',
+      revision: 0,
+    })
   })
 
   it('answers 404 for an id that was never issued', async () => {

@@ -16,7 +16,7 @@
  *   /api/auth/*      handed whole to better-auth: sign up, sign in, sign out, session
  *   /api/capabilities  what this deployment can do. Public, and honest about mail
  *   /api/me            who is signed in
- *   /api/builds        publish one, list yours, unpublish one
+ *   /api/builds        publish one, list yours, replace one, unpublish one
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *   /api/sync          everything an account carries between devices
  *   /api/exchange      the picked shelf. PUBLIC, and every item was chosen by hand
@@ -63,7 +63,7 @@ import {
   rotateCode,
   unfriend,
 } from './friends.ts'
-import { listMine, publish, read, unpublish } from './publish.ts'
+import { listMine, publish, read, republish, unpublish } from './publish.ts'
 import { fromFriends, pick, picked, played, rate, take } from './exchange.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
@@ -196,7 +196,16 @@ export default {
     if (url.pathname === '/api/exchange' && request.method === 'GET') {
       const over = await take_limit(db, keyFor.address('read', request), RULES.read)
       if (over) return tooMany(over.retryAfter)
-      return json({ builds: await picked(db) })
+      /**
+       * Signed in or not, and the shelf is the same either way.
+       *
+       * The session is read only so a row can be marked as the reader's own.
+       * It is optional: this route is public, a stranger gets the shelf without
+       * one, and the mark is simply absent for them. What goes back is a
+       * boolean, never the id it was compared against.
+       */
+      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
+      return json({ builds: await picked(db, who?.user.id ?? null) })
     }
 
     if (url.pathname.startsWith('/api/exchange')) {
@@ -291,7 +300,8 @@ export default {
        * removing your own things and shares `own`, which is generous enough
        * that a person cannot reach it and low enough to bound a script.
        */
-      const rule = url.pathname === '/api/builds' && request.method === 'POST' ? 'publish' : 'own'
+      const writes = request.method === 'POST' || request.method === 'PUT'
+      const rule = url.pathname.startsWith('/api/builds') && writes ? 'publish' : 'own'
       const over = await take_limit(db, keyFor.user(rule, userId), RULES[rule])
       if (over) return tooMany(over.retryAfter)
 
@@ -307,6 +317,23 @@ export default {
       }
 
       const mine = /^\/api\/builds\/([A-Za-z0-9]{1,32})$/.exec(url.pathname)
+
+      /**
+       * Replace one of yours in place.
+       *
+       * `PUT` rather than another `POST` to the collection, because the whole
+       * point is that this addresses a listing that already exists rather than
+       * making a second one. Counted under `publish` rather than `own`: it
+       * writes a payload, so it belongs with the rule that bounds writing
+       * payloads.
+       */
+      if (mine && request.method === 'PUT') {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+        const outcome = await republish(db, userId, mine[1] as string, body)
+        if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+        return json(outcome)
+      }
+
       if (mine && request.method === 'DELETE') {
         const gone = await unpublish(db, userId, mine[1] as string)
         // Not found and not yours answer the same way, so this cannot be used

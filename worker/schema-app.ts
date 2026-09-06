@@ -17,7 +17,11 @@
  *
  * **It is not a backup.** The build in this table is a copy taken at one moment.
  * The one in the browser is still the record, still the thing being edited, and
- * still the thing the export writes. Publishing again replaces the copy.
+ * still the thing the export writes.
+ *
+ * **Publishing again replaces the copy**, which this said for months while
+ * `publish()` only ever inserted, so the same build published twice became two
+ * listings under two ids. There is a republish route now and this is true.
  *
  * ## Unlisted, not public
  *
@@ -66,6 +70,28 @@ export const publishedBuild = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
+
+    /**
+     * When the author last replaced it, and how many times they have.
+     *
+     * **These exist because following makes them mean something.** A copy is a
+     * snapshot and does not care whether its source moved; somebody following a
+     * build is reading the author's current version, so "when did this last
+     * change" is the question the relationship is built on.
+     *
+     * `revision` counts replacements rather than versions. It is not a history
+     * and there is nothing to roll back to: the owner ruled versioning out and
+     * was right that it is a confusing feature to carry for the few people who
+     * would use it. Somebody who wants a v1 and a v2 can publish two builds and
+     * say so in the names.
+     *
+     * Cheap, and measured before it was added: an integer is a 1 to 2 byte
+     * varint on a row whose payload column already averages 1.2 to 1.6 KB, so
+     * the pair is about 0.1% of a row. Ten thousand listings would cost tens of
+     * kilobytes.
+     */
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }),
+    revision: integer('revision').default(0).notNull(),
   },
   (table) => [
     index('published_build_userId_idx').on(table.userId),

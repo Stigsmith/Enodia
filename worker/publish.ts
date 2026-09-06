@@ -68,7 +68,7 @@ function shortId(): string {
   return out
 }
 
-export type Published = { id: string; name: string; createdAt: number }
+export type Published = { id: string; name: string; createdAt: number; updatedAt: number | null; revision: number }
 
 /** What a caller did wrong, in words the UI can show without rewording. */
 export type Refusal = { status: number; say: string }
@@ -115,17 +115,82 @@ export async function publish(
   return { status: 500, say: 'Could not publish that.' }
 }
 
+/**
+ * Replace a published build in place, and count that it happened.
+ *
+ * **This is what makes following mean anything.** A copy is a snapshot and does
+ * not care whether its source moved. Somebody following a build is reading the
+ * author's current version, so the author needs a way to change it that does
+ * not mint a second listing and orphan every follower on the first.
+ *
+ * Publishing the same build twice used to do exactly that: `publish` only ever
+ * inserted, so two listings existed under two ids with the same content, and
+ * `Exchange.tsx` keyed its listings by the unpacked build's internal id and
+ * collapsed them into one. Two docblocks said "publishing again replaces the
+ * copy" the whole time.
+ *
+ * **The ownership check is in the `where`**, the same reasoning `unpublish`
+ * gives below: a read then a write is a race, and D1 has no transaction to
+ * close it with. Zero rows changed means it was not theirs or is gone, and
+ * those two are deliberately not told apart.
+ *
+ * The size and name rules are the same ones `publish` applies, because a
+ * republish that could smuggle past them would be a hole in the front door.
+ */
+export async function republish(
+  db: DB,
+  userId: string,
+  id: string,
+  body: { payload?: unknown; name?: unknown },
+): Promise<{ id: string; revision: number } | Refusal> {
+  const payload = typeof body.payload === 'string' ? body.payload : ''
+  const name = typeof body.name === 'string' ? body.name.trim() : ''
+
+  if (!payload) return { status: 400, say: 'No build in that request.' }
+  if (payload.length > MAX_PAYLOAD) return { status: 413, say: 'That build is too large to publish.' }
+  if (!name) return { status: 400, say: 'A published build needs a name.' }
+  if (name.length > MAX_NAME) return { status: 400, say: 'That name is too long.' }
+
+  const result = await db
+    .update(publishedBuild)
+    .set({
+      payload,
+      name,
+      updatedAt: new Date(),
+      revision: sql`${publishedBuild.revision} + 1`,
+    })
+    .where(and(eq(publishedBuild.id, id), eq(publishedBuild.userId, userId)))
+
+  if ((result as { meta?: { changes?: number } }).meta?.changes === 0) {
+    return { status: 404, say: 'That build is not one of yours.' }
+  }
+
+  const [row] = await db
+    .select({ revision: publishedBuild.revision })
+    .from(publishedBuild)
+    .where(eq(publishedBuild.id, id))
+    .limit(1)
+
+  return { id, revision: row?.revision ?? 1 }
+}
+
 export async function listMine(db: DB, userId: string): Promise<Published[]> {
   const rows = await db
     .select({
       id: publishedBuild.id,
       name: publishedBuild.name,
       createdAt: publishedBuild.createdAt,
+      updatedAt: publishedBuild.updatedAt,
+      revision: publishedBuild.revision,
     })
     .from(publishedBuild)
     .where(eq(publishedBuild.userId, userId))
 
-  return rows.map((one) => ({ ...one, createdAt: one.createdAt.getTime() }))
+  return rows.map((one) => ({
+    ...one,
+    createdAt: one.createdAt.getTime(),
+    updatedAt: one.updatedAt ? one.updatedAt.getTime() : null,
+  }))
 }
 
 /**
@@ -144,10 +209,22 @@ export async function unpublish(db: DB, userId: string, id: string): Promise<boo
   return (result as { meta?: { changes?: number } }).meta?.changes !== 0
 }
 
-/** Public. The whole point is that somebody with the link needs no account. */
-export async function read(db: DB, id: string): Promise<{ payload: string; name: string } | null> {
+/**
+ * Public. The whole point is that somebody with the link needs no account.
+ *
+ * Carries the revision so a follower can tell whether what they are holding is
+ * current without diffing a 1.2 KB payload against the one they cached.
+ */
+export async function read(
+  db: DB,
+  id: string,
+): Promise<{ payload: string; name: string; revision: number } | null> {
   const [row] = await db
-    .select({ payload: publishedBuild.payload, name: publishedBuild.name })
+    .select({
+      payload: publishedBuild.payload,
+      name: publishedBuild.name,
+      revision: publishedBuild.revision,
+    })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, id))
   return row ?? null
