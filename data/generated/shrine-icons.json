@@ -1,0 +1,31 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-09-06",
+  "gameVersion": "138174",
+  "source": "Game/Animations/GUI_Screens_VFX.sjson",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "sha256": "f350e3093799193157c6132d6a21b1c21562cada14f209543d29354c93b18e6a"
+ },
+ "data": {
+  "ShrineIcon_EnemyElites": "VowFangs",
+  "ShrineIcon_EnemyHealth": "VowDominance",
+  "ShrineIcon_ShopPrices": "VowDestitution",
+  "ShrineIcon_ShieldHealth": "VowAegis",
+  "ShrineIcon_BossDifficulty": "VowRivals",
+  "ShrineIcon_EnemySpeed": "VowFury",
+  "ShrineIcon_EnemyDamage": "VowBlood",
+  "ShrineIcon_TrapDamage": "VowSuffering",
+  "ShrineIcon_EnemyCount": "VowCommotion",
+  "ShrineIcon_HealingReduction": "VowScars",
+  "ShrineIcon_MinibossCount": "VowShadow",
+  "ShrineIcon_NoInvulnerability": "VowBitterness",
+  "ShrineIcon_BiomeSpeed": "VowDesperation",
+  "ShrineIcon_ForceSell": "VowHaunting",
+  "ShrineIcon_RoomStartMana": "VowPanic",
+  "ShrineIcon_NoMetaUpgrades": "VowMind",
+  "ShrineIcon_NextBiomeEnemy": "VowWandering",
+  "ShrineIcon_UnpickedUpgrade": "VowForsaking",
+  "ShrineIcon_PrimeUpgrade": "VowHubris"
+ }
+}

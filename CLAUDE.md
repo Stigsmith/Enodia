@@ -373,6 +373,28 @@ folders. Silver 26.8%, jade 18.9%, gold band 15.1%, but that band is mostly parc
 shadow, and its bright quarter is pale yellow highlight rather than metal. Real brass is
 about 2.6%. `BoonSelect` is 55% silver and 0.1% gold. `--brass` stays deleted.
 
-Both errors have the same shape, and it is the shape of the `MaxGodsPerRun` mistake:
+**And a third time, on the vows.** All seventeen looked like they had almost no art. The
+join was tried on the vow's display name, so Vow of Pain went looking for `pain.png`, found
+nothing, and the note written at the time concluded that `assets/vows/` "holds art for a
+different set of names entirely": its nineteen files are called blood, dominance, aegis and
+so on, and the game's vows are Pain, Grit, Wards. Both halves of that were true and the
+conclusion was wrong. **Those nineteen files are these vows**, extracted from `GUI.pkg` under
+the sprite names.
+
+The key is one indirection away. A vow's record says `Icon = "ShrineIcon_EnemyDamage"`, which
+is an animation and not a file, and nothing in `Scripts` defines it. `Game/Animations/
+GUI_Screens_VFX.sjson` does:
+
+```
+Name = "ShrineIcon_EnemyDamage" //Blood
+InheritFrom = "BaseShrineIcon"
+FilePath = "GUI\Screens\ShrineIcons\VowBlood"
+```
+
+The game even writes the answer in a comment. Following it resolves **17 of 17**.
+`scripts/extract.mjs` writes the map to `data/generated/shrine-icons.json`.
+
+All three errors have the same shape, and it is the shape of the `MaxGodsPerRun` mistake:
 **a negative result from a search proves something about the search.** Extract, then match
-against the data. Never conclude absence from a naming assumption.
+against the data. Never conclude absence from a naming assumption, and **follow the symbol**:
+`Icon` was never a filename.

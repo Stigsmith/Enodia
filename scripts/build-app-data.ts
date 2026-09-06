@@ -861,6 +861,15 @@ const SHRINE_ORDER = [
 
 const metaUpgrades = dictOf(read('meta-upgrades').data)
 
+/**
+ * Animation name to sprite, for the vow art join below.
+ *
+ * Written by `scripts/extract.mjs` out of `Game/Animations/GUI_Screens_VFX`,
+ * because it is the only file that says which picture `ShrineIcon_EnemyDamage`
+ * actually draws, and it is not Lua so nothing else here reaches it.
+ */
+const shrineIcons = dictOf(read('shrine-icons').data) as Record<string, unknown>
+
 const vows = SHRINE_ORDER.map((id) => {
   const record = dictOf(metaUpgrades[id])
   const ranks = Array.isArray(record.Ranks) ? record.Ranks.map((r) => dictOf(r)) : []
@@ -876,51 +885,57 @@ const vows = SHRINE_ORDER.map((id) => {
   })()
 
   /**
-   * The art is filed under the vow's *name*, not its id.
+   * The art was never missing. The key was.
    *
-   * `assets/vows/` holds `pain.png`, `rivals.png` and so on, which is the last
-   * word of "Vow of Pain". Nothing about `EnemyDamageShrineUpgrade` would ever
-   * have found it, and an id-shaped slug quietly resolved to null for all
-   * seventeen.
+   * A vow's record says `Icon = "ShrineIcon_EnemyDamage"`, which is an
+   * animation name rather than a file, and `Game/Animations/GUI_Screens_VFX`
+   * is where that animation names the sprite it draws:
+   * `GUI\\Screens\\ShrineIcons\\VowBlood`. So Vow of Pain's picture is
+   * `blood.png`, and no amount of looking for `pain.png` was ever going to
+   * find it.
+   *
+   * **This is `CLAUDE.md`'s own pattern for the fourth time.** The previous
+   * note here concluded that `assets/vows/` held "art for a different set of
+   * names entirely", from the fact that its nineteen files are called blood,
+   * dominance and aegis while the game's vows are Pain, Grit and Wards. Both
+   * halves of that were true and the conclusion was wrong: those nineteen files
+   * *are* these vows, extracted from `GUI.pkg` under the sprite names, and the
+   * two sets are joined by an indirection nothing here had read. A negative
+   * result from a search proves something about the search.
+   *
+   * It resolves **17 of 17** now, and the two that used to resolve by accident,
+   * Fangs and Rivals, are the two whose sprite happens to share their name.
    */
-  const slug = name.replace(/^Vow of /, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const sprite = (() => {
+    const key = record.Icon
+    if (typeof key !== 'string') return null
+    const found = shrineIcons[key]
+    return typeof found === 'string' ? found : null
+  })()
+
   /**
-   * Scoped to `vows/`, the way `arcanaIcon` is scoped to `arcana/`.
+   * Sprite name to the slug the image library uses: `VowBlood` is `blood.png`.
    *
-   * **Unscoped, Vow of Fangs resolved to `hammers/fangs.webp`**, a Daedalus
-   * Hammer icon, because the bare slug is claimed by two categories and the
-   * first by path wins. The validator has warned about 21 such collisions for a
-   * while; this is the first time one of them silently produced a wrong picture
-   * rather than an ambiguous one.
-   *
-   * It resolves 5 of 17 and that is the honest number. `assets/vows/` holds 19
-   * files under names like blood, forsaking and haunting, and the game's vows
-   * are Pain, Grit, Wards and so on: the two sets overlap on five. Whatever
-   * those nineteen are, most of them are not these. Forcing a join would have
-   * put confident wrong art on sixteen rows.
-   *
-   * **It resolved four, not five, and Vow of Fangs was the one it lost.**
-   * `buildIconIndex` keys by slug and the first entry wins, so `icons.get`
-   * hands back `hammers/fangs.webp` and the guard above correctly refuses it.
-   * The right file, `assets/vows/fangs.png`, is in the manifest right behind it
-   * and the index has no way to ask for it. So this reads the manifest rather
-   * than the index: same slug, but the entry filed under `vows/`.
-   *
-   * The same shape as everything else in `CLAUDE.md`'s list. A guard against
-   * confidently wrong art is not a guard that finds the right art, and the
-   * comment claiming five was written from the overlap rather than from a run.
+   * Still scoped to `vows/`, because the bare slug collides. `fangs` is claimed
+   * by a Daedalus Hammer icon and `blood` and `mind` by boons, and
+   * `buildIconIndex` keys by slug with the first entry winning, so `icons.get`
+   * hands back whichever category sorts first. Three of the seventeen would
+   * have drawn a confidently wrong picture.
    */
-  const vowIcon = (key: string): string | null => {
+  const vowIcon = (name: string | null): string | null => {
+    if (!name) return null
+    const slug = name.replace(/^Vow/, '').toLowerCase()
     const found = (manifest.assets ?? []).find(
       (entry: { id?: string; file?: string }) =>
-        entry?.id === key && typeof entry.file === 'string' && entry.file.startsWith('vows/'),
+        entry?.id === slug && typeof entry.file === 'string' && entry.file.startsWith('vows/'),
     )
     return found?.file ?? null
   }
+
   return {
     id,
     name,
-    icon: vowIcon(`vows-${slug}`) ?? vowIcon(slug),
+    icon: vowIcon(sprite),
     /**
      * What each rank costs, in order. The vow's own maximum is the sum.
      *
