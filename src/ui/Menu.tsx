@@ -365,6 +365,11 @@ export function Menu({
                       /* Where you already are, which a pinned pane has to say
                          because it is on screen the whole time. */
                       aria-current={entry.here ? 'page' : undefined}
+                      /* The mark beside an unbuilt entry is a glyph drawn by
+                         CSS, so it says nothing to a screen reader and nothing
+                         on hover. It used to read "not built" in words. This is
+                         where those words went. */
+                      title={entry.unbuilt ? 'Not built yet' : undefined}
                       className={`${entry.unbuilt ? 'is-unbuilt' : ''}${entry.here ? ' is-here' : ''}`}
                       onClick={entry.action}
                       disabled={!entry.action}
