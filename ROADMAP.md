@@ -14,9 +14,9 @@ Last updated 5 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 513 in node across 28 files, and **92 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 547 in node across 29 files, and **92 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings |
-| **Build** | `dist/` is **29 MB and 664 files**, and it runs from a plain static server |
+| **Build** | `dist/` is **29 MB and 668 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -363,6 +363,24 @@ The same conclusion is already recorded under **Carried over** below, where the 
 tested and abandoned. It survived up here because nothing connects a struck-out finding to
 the item that was resting on it, which is `CLAUDE.md` error 3 in a document rather than in
 code: a proxy for the property, never checked against the property.
+
+**4a. The user-facing roadmap had gone false, and it is worth saying how it was caught.**
+`src/data/roadmap.ts` filed **Build exchange** and **Builds across your devices** under
+Planned, "Intended, but not started", while `/api/exchange` and `/api/sync` were both live and
+the exchange had its own entry in the menu a reader used to reach the page. Corrected on 6
+September 2026: both moved to Built, and three more claims went with them. "That is all an
+account buys" on Accounts and short links, which stopped being true when sync and the run
+counting arrived. "Picking one as the target you are playing towards is the part still
+missing" on Owner builds in the run, when `Setup.tsx` has a "Going for a build" step and its
+docblock opens "**It does ask which build you are going for**"; what is actually missing there
+is builds to pick, which is item 1. And Leaderboards was stalled "waiting on the exchange",
+which had shipped.
+
+**Nothing checks this file against the code**, which is why five claims drifted at once. Each
+one was a sentence that was true when written, in a file nothing imports for behaviour, so no
+test and no type could fail. Worth a validator check that at least matches a `now` item
+against something that exists, though what the check would key on is not obvious: the titles
+are prose. Filed rather than done.
 
 **5. Phase 2.** `REQUIREMENTS.md` 7. **Started, on the one part of it that needs no
 judgement.** Four of its five items are the owner's: archetypes, keepsake sequencing, hammer
