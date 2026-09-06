@@ -11,6 +11,11 @@
  * The view preferences stay in the menu rather than moving here. They are
  * things you flip while looking at the thing they change, which is a different
  * kind of setting from these and wants a different place.
+ *
+ * **The four numbers are at the top because they are what you came to read.**
+ * They were prose lines inside the blocks below, which put the only state on
+ * the page behind the paragraphs explaining it, and put the one that matters,
+ * how long since you had a copy of your own work, in grey beside a button.
  */
 
 import { useRef, useState } from 'react'
@@ -98,160 +103,194 @@ export function Settings() {
         <h2>Settings</h2>
       </header>
 
-      <section className="setting-block">
-        <h3 className="arcana-rule">Your name</h3>
-        <p className="setting-say">
-          Put on the builds you make, and it travels with one you share so the person opening it
-          knows whose it is. <strong>It is not a sign-in.</strong> It is stored in this browser,
-          nobody checks it, and two people can pick the same one.
-        </p>
-        <label className="setting-name" data-tour="setting-name">
-          <span>Name</span>
-          <input
-            type="text"
-            value={name}
-            maxLength={NAME_LIMIT}
-            placeholder="Nobody"
-            /* Written on every keystroke rather than on blur. The pinned menu
-               means you can leave this screen without the field ever losing
-               focus, and a name typed and then lost is worse than no field. */
-            onChange={(event) => {
-              setName(event.target.value)
-              writeName(event.target.value)
-            }}
-            /* Tidied when you leave it, so the field shows what was stored
-               rather than the spaces you happened to type. */
-            onBlur={() => setName(readName())}
-          />
-        </label>
-      </section>
-      <section className="setting-block" data-tour="setting-export">
-        <h3 className="arcana-rule">Your things</h3>
-        <p className="setting-say">
-          Everything you have made lives in this browser. Signed in, a copy of it also follows
-          you between your devices. The export is the copy that belongs to you rather than to
-          this tool, and it is the one that survives the tool going away.
-        </p>
-
-        <div className="setting-row">
-          <button type="button" className="quiet" onClick={exportNow}>
-            Export everything
-          </button>
-          <p className={`setting-since${since !== null && since >= 7 ? ' is-stale' : ''}`}>
-            {since === null
-              ? 'Never exported'
-              : since === 0
-                ? 'Exported today'
-                : since === 1
-                  ? 'Exported yesterday'
-                  : `Exported ${since} days ago`}
-          </p>
+      {/* The readout. Every one of these was a sentence somewhere below. */}
+      <div className="setting-stats">
+        <div className="setting-stat">
+          <strong>{held.builds}</strong>
+          <span>{held.builds === 1 ? 'build' : 'builds'}</span>
         </div>
-
-        <p className="setting-holds">
-          <strong>{held.builds}</strong> {held.builds === 1 ? 'build' : 'builds'} and{' '}
-          <strong>{held.runs}</strong> {held.runs === 1 ? 'run' : 'runs'} would go in the file.
-        </p>
-        {saidJustNow ? <p className="setting-done">{saidJustNow}</p> : null}
-      </section>
-
-      <section className="setting-block" data-tour="setting-import">
-        <h3 className="arcana-rule">From a file</h3>
-        <p className="setting-say">
-          An import <strong>replaces</strong> what is here. It is not a merge: a build this file
-          does not have, sitting next to the ones it does, is neither what was exported nor what
-          was here, and nothing could tell you which.
-        </p>
-
-        <input
-          ref={file}
-          type="file"
-          accept="application/json,.json"
-          className="visually-hidden"
-          onChange={(event) => {
-            const chosen = event.target.files?.[0]
-            if (chosen) choose(chosen)
-            event.target.value = ''
-          }}
-        />
-        <div className="setting-row">
-          <button type="button" className="quiet" onClick={() => file.current?.click()}>
-            Choose a file
-          </button>
+        <div className="setting-stat">
+          <strong>{held.runs}</strong>
+          <span>{held.runs === 1 ? 'run' : 'runs'}</span>
         </div>
+        {/* Never counts as stale, which the grey line this replaced did not do.
+          * Having never exported is the worst version of this state, not a
+          * neutral one, and it was the only one reading in the calm colour. */}
+        <div className={`setting-stat${since === null || since >= 7 ? ' is-stale' : ''}`}>
+          <strong>{since === null ? 'Never' : since === 0 ? 'Today' : since}</strong>
+          <span>
+            {since === null || since === 0
+              ? 'exported'
+              : since === 1
+                ? 'day since your export'
+                : 'days since your export'}
+          </span>
+        </div>
+        <div className={`setting-stat${reportRuns ? '' : ' is-off'}`}>
+          <strong>{reportRuns ? 'On' : 'Off'}</strong>
+          <span>runs counted toward builds you took</span>
+        </div>
+      </div>
 
-        {pending && 'error' in pending ? <p className="setting-bad">{pending.error}</p> : null}
+      {/* Two columns, and **the split is by subject rather than by height**:
+        * left is your work moving in and out of this browser, right is the two
+        * things that involve anybody else.
+        *
+        * Fixed columns rather than the CSS columns Help uses, because the
+        * import block grows a confirmation panel when you choose a file, and a
+        * balanced flow would shuffle the other blocks between columns while you
+        * were reading the question it is asking. */}
+      <div className="setting-grid">
+        <div className="setting-col">
+          <section className="setting-block">
+            <h3 className="arcana-rule">Your name</h3>
+            <p className="setting-say">
+              Put on the builds you make, and it travels with one you share so the person
+              opening it knows whose it is. <strong>It is not a sign-in.</strong> It is stored
+              in this browser, nobody checks it, and two people can pick the same one.
+            </p>
+            <label className="setting-name" data-tour="setting-name">
+              <span>Name</span>
+              <input
+                type="text"
+                value={name}
+                maxLength={NAME_LIMIT}
+                placeholder="Nobody"
+                /* Written on every keystroke rather than on blur. The pinned menu
+                   means you can leave this screen without the field ever losing
+                   focus, and a name typed and then lost is worse than no field. */
+                onChange={(event) => {
+                  setName(event.target.value)
+                  writeName(event.target.value)
+                }}
+                /* Tidied when you leave it, so the field shows what was stored
+                   rather than the spaces you happened to type. */
+                onBlur={() => setName(readName())}
+              />
+            </label>
+          </section>
 
-        {pending && 'manifest' in pending ? (
-          <div className="setting-confirm">
-            <p>
-              That file holds <strong>{pending.manifest.builds}</strong>{' '}
-              {pending.manifest.builds === 1 ? 'build' : 'builds'} and{' '}
-              <strong>{pending.manifest.runs}</strong>{' '}
-              {pending.manifest.runs === 1 ? 'run' : 'runs'}
-              {pending.manifest.exportedAt
-                ? `, exported ${new Date(pending.manifest.exportedAt).toLocaleDateString()}`
-                : ''}
-              .
+          <section className="setting-block" data-tour="setting-export">
+            <h3 className="arcana-rule">Your things</h3>
+            <p className="setting-say">
+              Everything you have made lives in this browser. Signed in, a copy of it also
+              follows you between your devices. The export is the copy that belongs to you
+              rather than to this tool, and it is the one that survives the tool going away.
             </p>
-            <p className="setting-warn">
-              Your {held.builds} {held.builds === 1 ? 'build' : 'builds'} here will be replaced.
-            </p>
-            <div className="setting-buttons">
-              <button type="button" className="setting-go" onClick={applyPending}>
-                Replace everything
+
+            <div className="setting-row">
+              <button type="button" className="quiet" onClick={exportNow}>
+                Export everything
               </button>
-              <button type="button" onClick={() => setPending(null)}>
-                Cancel
+              {/* The counts and the days sit in the readout above rather than
+                * here. This is the only line left, and it appears once. */}
+              {saidJustNow ? <p className="setting-done">{saidJustNow}</p> : null}
+            </div>
+          </section>
+
+          <section className="setting-block" data-tour="setting-import">
+            <h3 className="arcana-rule">From a file</h3>
+            <p className="setting-say">
+              An import <strong>replaces</strong> what is here. It is not a merge: a build this
+              file does not have, sitting next to the ones it does, is neither what was
+              exported nor what was here, and nothing could tell you which.
+            </p>
+
+            <input
+              ref={file}
+              type="file"
+              accept="application/json,.json"
+              className="visually-hidden"
+              onChange={(event) => {
+                const chosen = event.target.files?.[0]
+                if (chosen) choose(chosen)
+                event.target.value = ''
+              }}
+            />
+            <div className="setting-row">
+              <button type="button" className="quiet" onClick={() => file.current?.click()}>
+                Choose a file
               </button>
             </div>
-          </div>
-        ) : null}
-      </section>
 
-      {/* The one switch that is about other people rather than about you, so it
-        * says what it sends before it offers to stop sending it. `Account.tsx`
-        * makes the same statement at more length and points here for the
-        * control, rather than there being two of these to keep in step. */}
-      <section className="setting-block">
-        <h3 className="arcana-rule">Runs, and the exchange</h3>
-        <p className="setting-say">
-          When you take a build off the exchange and log a run against your copy, the run is
-          counted toward the build it came from. That is where <em>38 of 61 cleared</em> on a
-          listing comes from, and it is the only reason a shelf of strangers&rsquo; builds has
-          anything to go on.
-        </p>
-        <p className="setting-say">
-          What travels is whether you cleared it and the Fear if you did. Your account is
-          attached so one person cannot count a build a thousand times, and it is never shown
-          to anybody. It stops on its own once you change the build.
-        </p>
-        <label className="setting-switch">
-          <input
-            type="checkbox"
-            checked={reportRuns}
-            onChange={(event) => {
-              setReportRuns(event.target.checked)
-              savePrefs({ ...loadPrefs(), reportRuns: event.target.checked })
-            }}
-          />
-          <span>Count my runs toward builds I took</span>
-        </label>
-        <p className="setting-say">
-          {reportRuns
-            ? 'On. Turning it off sends nothing, and everything else keeps working: you can still take builds, still log runs, still read the counts.'
-            : 'Off. Nothing about your runs leaves this browser. Rating a build needs a run behind it, so ratings are off with it.'}
-        </p>
-      </section>
+            {pending && 'error' in pending ? <p className="setting-bad">{pending.error}</p> : null}
 
-      <section className="setting-block">
-        <h3 className="arcana-rule">Sharing one build</h3>
-        <p className="setting-say">
-          Open a build, then <strong>Share</strong> in its menu. That copies a link holding the
-          whole build, which anyone can open. It carries no rating, runs or clears: those are
-          yours and stay here.
-        </p>
-      </section>
+            {pending && 'manifest' in pending ? (
+              <div className="setting-confirm">
+                <p>
+                  That file holds <strong>{pending.manifest.builds}</strong>{' '}
+                  {pending.manifest.builds === 1 ? 'build' : 'builds'} and{' '}
+                  <strong>{pending.manifest.runs}</strong>{' '}
+                  {pending.manifest.runs === 1 ? 'run' : 'runs'}
+                  {pending.manifest.exportedAt
+                    ? `, exported ${new Date(pending.manifest.exportedAt).toLocaleDateString()}`
+                    : ''}
+                  .
+                </p>
+                <p className="setting-warn">
+                  Your {held.builds} {held.builds === 1 ? 'build' : 'builds'} here will be
+                  replaced.
+                </p>
+                <div className="setting-buttons">
+                  <button type="button" className="setting-go" onClick={applyPending}>
+                    Replace everything
+                  </button>
+                  <button type="button" onClick={() => setPending(null)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </section>
+        </div>
+
+        <div className="setting-col">
+          {/* The one switch that is about other people rather than about you, so
+            * it says what it sends before it offers to stop sending it.
+            * `Account.tsx` makes the same statement at more length and points
+            * here for the control, rather than there being two of these to keep
+            * in step. */}
+          <section className="setting-block">
+            <h3 className="arcana-rule">Runs, and the exchange</h3>
+            <p className="setting-say">
+              When you take a build off the exchange and log a run against your copy, the run
+              is counted toward the build it came from. That is where <em>38 of 61 cleared</em>{' '}
+              on a listing comes from, and it is the only reason a shelf of strangers&rsquo;
+              builds has anything to go on.
+            </p>
+            <p className="setting-say">
+              What travels is whether you cleared it and the Fear if you did. Your account is
+              attached so one person cannot count a build a thousand times, and it is never
+              shown to anybody. It stops on its own once you change the build.
+            </p>
+            <label className="setting-switch">
+              <input
+                type="checkbox"
+                checked={reportRuns}
+                onChange={(event) => {
+                  setReportRuns(event.target.checked)
+                  savePrefs({ ...loadPrefs(), reportRuns: event.target.checked })
+                }}
+              />
+              <span>Count my runs toward builds I took</span>
+            </label>
+            <p className="setting-say">
+              {reportRuns
+                ? 'On. Turning it off sends nothing, and everything else keeps working: you can still take builds, still log runs, still read the counts.'
+                : 'Off. Nothing about your runs leaves this browser. Rating a build needs a run behind it, so ratings are off with it.'}
+            </p>
+          </section>
+
+          <section className="setting-block">
+            <h3 className="arcana-rule">Sharing one build</h3>
+            <p className="setting-say">
+              Open a build, then <strong>Share</strong> in its menu. That copies a link holding
+              the whole build, which anyone can open. It carries no rating, runs or clears:
+              those are yours and stay here.
+            </p>
+          </section>
+        </div>
+      </div>
     </div>
   )
 }

@@ -3168,10 +3168,87 @@ button.mark {
   .settings { padding: 1.25rem 2rem 4rem; }
 }
 
+/**
+ * The readout: four tiles that say what this browser is holding and how long
+ * ago you last had a copy of it.
+ *
+ * `auto-fit` rather than a fixed four, because the fourth label is a sentence
+ * and the first is one word. Below about 40rem they stack to two and then to
+ * one, and each tile keeps its number legible the whole way down.
+ */
+.setting-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.setting-stat {
+  display: grid;
+  gap: 0.2rem;
+  align-content: start;
+  padding: 0.75rem 0.9rem 0.8rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.setting-stat strong {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 1.45rem;
+  line-height: 1.1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.setting-stat span {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--bone-faint);
+}
+
+/* A week without an export is worth saying in a colour, not just in words. */
+.setting-stat.is-stale strong { color: var(--unbuilt); }
+
+/* Off is a state, not a fault, so it goes quiet rather than red. */
+.setting-stat.is-off strong { color: var(--bone-faint); }
+
+/**
+ * Two columns of blocks above 78rem, and the split is written into the markup
+ * rather than balanced by the browser. `Settings.tsx` says why: the import
+ * block grows a confirmation panel, and a balanced flow would move the other
+ * blocks between columns while that question was on screen.
+ *
+ * `align-items: start` so the shorter column does not stretch its last block
+ * down to meet the taller one.
+ */
+.setting-grid {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.setting-col {
+  display: grid;
+  gap: 1.6rem;
+  align-content: start;
+}
+
+@media (min-width: 78rem) {
+  .settings { max-width: 74rem; }
+
+  .setting-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
 .setting-block {
   display: grid;
   gap: 0.7rem;
-  margin-top: 1.6rem;
+  /* Spacing comes from the column's `gap` now. A margin here would add itself
+     to that on every block after the first. */
+  margin-top: 0;
   padding: 1.1rem 1.2rem 1.3rem;
   border: 1px solid var(--div-2);
   border-radius: var(--r-soft);
@@ -3192,21 +3269,6 @@ button.mark {
   gap: 0.8rem;
 }
 
-/* How long since the last export. The whole reason this screen exists. */
-.setting-since {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 0.74rem;
-  color: var(--bone-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-/* A week without an export is worth saying in a colour, not just in words. */
-.setting-since.is-stale {
-  color: var(--unbuilt);
-}
-
-.setting-holds,
 .setting-done,
 .setting-bad {
   margin: 0;
@@ -3214,7 +3276,6 @@ button.mark {
   color: var(--bone-faint);
 }
 
-.setting-holds strong,
 .setting-confirm strong {
   font-family: var(--mono);
   font-weight: 400;
@@ -3434,6 +3495,62 @@ button.mark {
   padding: 1rem 1rem 5rem;
 }
 
+/**
+ * A page that lays itself out in columns, so the 44rem measure is the wrong
+ * cap for the page even though it is the right one for a paragraph.
+ *
+ * **Only above the breakpoint, and that is why this is not a plain rule.**
+ * Below 78rem there are no columns to fill, so a wider cap does nothing but
+ * stretch a single paragraph: measured with it unconditional, Help at 1200px
+ * ran 918px wide, around 150 characters a line. The base 44rem is right
+ * whenever the text is in one column. This lifts it only when it is in two.
+ *
+ * Where it does apply the measure barely moves. Help ran to **113 characters**
+ * a line before any of this, against the 45 to 75 a reader is comfortable with,
+ * and **104** after, at 1920px. So this does not widen text, it puts more of
+ * the page beside itself: 1.96 screens of scroll became 1.00.
+ */
+@media (min-width: 78rem) {
+  .page.is-broad {
+    max-width: 84rem;
+  }
+}
+
+/**
+ * Two columns of reference, on a screen wide enough to hold them.
+ *
+ * CSS columns rather than a grid, because the sections are different heights
+ * and there is no relationship between the one on the left and the one beside
+ * it: the browser balancing them is exactly right, and a grid would leave gaps
+ * under the short ones.
+ *
+ * `break-inside: avoid` on the section, so a heading never ends up at the foot
+ * of one column with its paragraph at the head of the next.
+ */
+@media (min-width: 78rem) {
+  .ref-cols {
+    columns: 2;
+    column-gap: 3rem;
+  }
+
+  .ref-cols > .ref {
+    break-inside: avoid;
+    /* Columns do not collapse margins the way a block flow does, so the first
+     * section in each column would otherwise sit lower than its neighbour. */
+    margin-top: 0;
+    margin-bottom: 1.8rem;
+  }
+}
+
+/* A column layout has no long tail to scroll past, so it does not need the
+   5rem of runway a single column does. That runway was most of what kept the
+   roadmap off one screen. */
+@media (min-width: 78rem) {
+  .page.is-broad {
+    padding-bottom: 1.5rem;
+  }
+}
+
 @media (min-width: 60rem) {
   .page { padding: 1.25rem 2rem 5rem; }
 }
@@ -3515,18 +3632,62 @@ button.mark {
 
 .log {
   list-style: none;
-  margin: 2rem 0 0;
+  margin: 1.6rem 0 0;
   padding: 0;
   display: grid;
-  gap: 2rem;
+  /* Tight, because a closed batch is one line. The open one takes its own room
+     back through `.log-fold[open]` below. */
+  gap: 0.85rem;
 }
 
 .log-entry {
   display: grid;
-  gap: 0.35rem;
   padding-left: 1rem;
   border-left: 1px solid var(--div-2);
 }
+
+.log-fold {
+  display: grid;
+  gap: 0.4rem;
+}
+
+/* An open batch is a block of reading rather than a line, so it takes back the
+   space the list used to give every entry. */
+.log-fold[open] {
+  margin: 0.55rem 0 1.2rem;
+}
+
+/**
+ * The heading row, which is the entire entry while it is closed.
+ *
+ * Title and date on one line, and that is most of why this page fits now:
+ * seventeen entries at two lines each is most of a screen before any prose.
+ * `baseline` rather than `center`, so the mono date sits on the title's first
+ * baseline instead of floating in the middle of it.
+ *
+ * **The date is at the right margin, and it started on the left.** A fixed
+ * 8.5rem column for it lined the titles up, which looked tidy and cost a fifth
+ * of a 44rem measure on every line of an open batch. Everything on this page
+ * now starts at the same left edge and the dates make a column on the right,
+ * where being ragged does not matter.
+ *
+ * `list-style: none` and the WebKit pseudo-element between them remove the
+ * browser's own triangle, which lands on the first line and takes no styling
+ * worth having. The one below is drawn from two borders instead.
+ */
+.log-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.log-head::-webkit-details-marker { display: none; }
+
+.log-head:hover .log-title,
+.log-head:focus-visible .log-title { color: var(--lit); }
 
 .log-when {
   margin: 0;
@@ -3535,15 +3696,53 @@ button.mark {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--bone-faint);
+  font-variant-numeric: tabular-nums;
+  /* Pushed to the far end of the row, and never wrapped: it is a stamp on the
+     entry rather than a second line of the heading. */
+  margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .log-title {
   margin: 0;
   font-family: var(--display);
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   letter-spacing: 0.02em;
   color: var(--lit-hot);
   text-wrap: balance;
+  /**
+   * Shrinkable, so a long title wraps its own text rather than wrapping as a
+   * flex item.
+   *
+   * Measured with the default `min-width: auto`: the longest titles were wider
+   * than the space left beside the date, so the whole `<h3>` dropped to the
+   * next line and started back at the entry's left edge. Two heights and two
+   * left edges, in a row whose entire job is that every entry looks the same.
+   */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Two borders and a rotation: pointing right when closed, down when open. */
+.log-title::before {
+  content: '';
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-right: 0.5rem;
+  border-right: 1px solid var(--lit-dim);
+  border-bottom: 1px solid var(--lit-dim);
+  transform: translateY(-0.1rem) rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+.log-fold[open] .log-title::before {
+  transform: translateY(-0.2rem) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log-title::before { transition: none; }
 }
 
 .log-say {
@@ -3568,10 +3767,77 @@ button.mark {
 
 /* ------------------------------------------------------------- roadmap -- */
 
+/**
+ * The four stages, stacked on a phone and **across the page on a desktop.**
+ *
+ * It was two screens of scrolling for sixteen items, and the reason is that a
+ * roadmap read top to bottom is a list rather than a shape: you cannot see that
+ * six things are built and two are stalled without scrolling past all of them.
+ *
+ * **A progress axis, not a time axis.** `data/roadmap.ts` carries no dates and
+ * says why: this is a side project and any date would be a guess. So the thing
+ * running left to right is Built, Next, Planned, Stalled, which is the order
+ * work actually moves through, and the whole plan lands on one screen.
+ *
+ * 78rem, because four columns of readable width need it: below that they get
+ * narrow enough that two-word titles start wrapping and the stack reads better.
+ */
 .plan {
   display: grid;
   gap: 2.2rem;
   margin-top: 2rem;
+}
+
+@media (min-width: 78rem) {
+  .plan {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.6rem;
+    align-items: start;
+  }
+
+  /* The line the stages sit on, so it reads as one progression rather than as
+   * four lists that happen to be side by side. Drawn behind the headings. */
+  .plan {
+    position: relative;
+  }
+
+  .plan::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0.55rem;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--lit-dim),
+      color-mix(in oklab, var(--lit) 30%, transparent) 55%,
+      transparent
+    );
+  }
+
+  .plan-stage {
+    position: relative;
+    padding-top: 1.4rem;
+  }
+
+  /* The node on the line, in the stage's own colour. */
+  .plan-stage::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 50%;
+    background: var(--ink-950);
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+
+  .plan-stage.is-now { color: var(--lit-hot); }
+  .plan-stage.is-next { color: var(--lit); }
+  .plan-stage.is-later { color: var(--bone-dim); }
+  .plan-stage.is-waiting { color: var(--unbuilt); }
 }
 
 .plan-name {
