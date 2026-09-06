@@ -43,6 +43,7 @@ import { ACCOUNTS_LIVE } from '../state/account.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { BuildFilters } from './BuildFilters.tsx'
 import { Card } from './variants/Card.tsx'
+import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
 import { Tabs } from './Tabs.tsx'
 import { assemble } from './build-pieces.ts'
@@ -61,6 +62,20 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   const [sort, setSort] = useState<SortId>('name')
   const [query, setQuery] = useState('')
   const [said, setSaid] = useState<string | null>(null)
+
+  /**
+   * The listing being read, by build id, or nothing.
+   *
+   * **Opening a build used to take a copy of it.** `Card` makes its whole face a
+   * hit target, and this screen passed `take` in as the open handler, so any
+   * click anywhere on a card put a new build in your library. There was no way
+   * to read a listing at all: no preview, no confirm, and nothing to undo. The
+   * owner found it by taking copies of their own build, and then copies of
+   * those.
+   *
+   * So opening is reading now, and taking is the button you press on purpose.
+   */
+  const [reading, setReading] = useState<string | null>(null)
 
   useEffect(() => {
     let live = true
@@ -101,10 +116,14 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
     return sortBuilds(narrowed, sort)
   }, [builds, selection, sort, query, listingOf])
 
+  /** The listing open for reading, or null. */
+  const readingRow = reading ? (listingOf.get(reading) ?? null) : null
+
   const take = async (build: ShownBuild) => {
     const listing = listingOf.get(build.id)
     if (!listing) return
     setSaid(null)
+    setReading(null)
     const outcome = await takeBuild(listing.id)
     setSaid(outcome.ok ? `${outcome.build.name} is in your builds.` : outcome.say)
   }
@@ -160,9 +179,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                 const listing = listingOf.get(build.id)
                 return (
                   <Card
-                    key={build.id}
+                    key={listing?.id ?? build.id}
                     built={assemble(build)}
-                    onOpen={() => void take(build)}
+                    onOpen={() => setReading(build.id)}
                     foot={
                       listing ? (
                         <div className="xchange-foot">
@@ -195,6 +214,34 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
           )}
         </>
       )}
+
+      {/* Reading one, which is what opening a card does now. Read only: the
+        * `Poster` takes no `onOpen`, so nothing in here can be edited, and the
+        * one button that changes anything says what it does. */}
+      {readingRow ? (
+        <div className="xchange-read" role="dialog" aria-label={readingRow.build.name}>
+          <div className="xchange-read-body">
+            <Poster built={assemble(readingRow.build)} />
+            <div className="xchange-read-foot">
+              <p className="xchange-by">by {readingRow.by}</p>
+              {readingRow.note ? <p className="xchange-note">&ldquo;{readingRow.note}&rdquo;</p> : null}
+              <Counted stats={readingRow.stats} />
+              <div className="xchange-read-actions">
+                <button
+                  type="button"
+                  className="quiet"
+                  onClick={() => void take(readingRow.build)}
+                >
+                  Take a copy
+                </button>
+                <button type="button" className="quiet" onClick={() => setReading(null)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </Page>
   )
 }

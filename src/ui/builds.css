@@ -8643,6 +8643,53 @@ p.landing-say {
   font-size: 0.85rem;
 }
 
+/**
+ * Reading a listing, which is what opening a card does now.
+ *
+ * **It used to take a copy.** `Card` makes its whole face one hit target and
+ * this screen passed `take` in as the open handler, so a click anywhere on a
+ * card put a build in your library, with no preview and nothing to undo. The
+ * owner found it by taking copies of their own build and then copies of those.
+ *
+ * The `Poster` inside is the same one the build manager draws, handed no
+ * `onOpen`, so nothing here can be edited. The overlay is `.logrun`'s shape
+ * because a dialog over the page is a dialog over the page.
+ */
+.xchange-read {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.xchange-read-body {
+  width: min(52rem, 100%);
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: 1.2rem 1.4rem 1.4rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--ink-950) 94%, transparent);
+  box-shadow: 0 1.6rem 3.2rem rgb(0 0 0 / 0.6);
+}
+
+.xchange-read-foot {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-1);
+}
+
+.xchange-read-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
 .xchange-foot {
   display: flex;
   flex-direction: column;
