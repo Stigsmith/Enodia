@@ -8741,6 +8741,23 @@ p.landing-say {
    * width and sit above the cards. Two intersections at 1600x950, none at 1920.
    */
   .xchange-shelf {
+    /**
+     * **The inset depends on whether the menu is pinned, and finding that out
+     * took the live site.** Every measurement here was taken with the pane
+     * pinned, because that is how this browser had it; signed out, the default
+     * is a pop-out and there is no menu occupying the left, so the page is
+     * centred in the whole window and starts further left. Measured at
+     * 1600x950: the shelf's box starts at 611 pinned and 475 not, a 136px
+     * difference, and his paint ends at 747 either way. Three intersections on
+     * the live site against none on localhost, from one attribute.
+     *
+     * 19rem clears it unpinned with 20px to spare. Pinned, the pane has already
+     * taken 272px of him and 12rem is enough.
+     */
+    padding-left: 19rem;
+  }
+
+  :root[data-nav='pane'] .xchange-shelf {
     padding-left: 12rem;
   }
 }
