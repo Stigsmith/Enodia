@@ -43,6 +43,9 @@ import { olympians, traits } from '../data/app.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { rateBuild, reportRun, reportsTo } from '../state/exchange.ts'
 import { Stars, Stepper } from './Fear.tsx'
+import { VowSheet } from './VowSheet.tsx'
+import { tidyVows, vowsTakenCount } from '../engine/vows.ts'
+import type { VowsTaken } from '../engine/vows.ts'
 import type { Assembles, PlayRecord, ShownBuild } from '../data/builds.ts'
 
 /**
@@ -71,6 +74,16 @@ export function LogRun({
   const [cleared, setCleared] = useState<boolean | null>(null)
   const [fear, setFear] = useState<number | undefined>(build.play?.fear)
   const [endedAt, setEndedAt] = useState<number | null>(null)
+
+  /**
+   * Which vows were on, tidied on the way in rather than trusted.
+   *
+   * What is stored came from a JSON file a person can edit and an import can
+   * carry, and a game update can retire a rank underneath it. `tidyVows` drops
+   * anything that cannot mean what it says, so the sheet and the sum it draws
+   * are always about vows that exist.
+   */
+  const [vowsTaken, setVowsTaken] = useState<VowsTaken>(() => tidyVows(build.play?.vows))
 
   const play = build.play
 
@@ -119,6 +132,18 @@ export function LogRun({
       // Highest cleared, so a lesser run afterwards does not undo it, and only
       // on a clear, because dying at Fear 30 is not clearing Fear 30.
       ...(cleared && fear ? { fear: Math.max(play?.fear ?? 0, fear) } : {}),
+      /**
+       * The vows go with the Fear they describe, or they do not go at all.
+       *
+       * `fear` is the highest ever cleared, not the last one. So a Fear 12 run
+       * logged after a Fear 30 one leaves the 30 standing, and writing this
+       * run's vows over the record would then have three vows worth 9 sitting
+       * under a number earned by five worth 30. The list is only replaced when
+       * this run is the one setting the number.
+       */
+      ...(cleared && fear && fear >= (play?.fear ?? 0)
+        ? { vows: vowsTakenCount(vowsTaken) ? vowsTaken : undefined }
+        : {}),
       ...(assembles ? { assembles } : {}),
       ...(rating ? { rating } : {}),
     })
@@ -182,14 +207,24 @@ export function LogRun({
 
         {/* Only on a clear, because that is the only run it can describe. */}
         {cleared ? (
-          <Stepper
-            label="Fear cleared"
-            value={fear}
-            onChange={setFear}
-            max={MAX_FEAR}
-            icon={{ src: '/icons/fear.png' }}
-            ofLabel={`of ${MAX_FEAR}`}
-          />
+          <>
+            <Stepper
+              label="Fear cleared"
+              value={fear}
+              onChange={setFear}
+              max={MAX_FEAR}
+              icon={{ src: '/icons/fear.png' }}
+              ofLabel={`of ${MAX_FEAR}`}
+            />
+
+            {/* Folded away, and `<details>` rather than state because there is
+              * nothing to remember. Most runs will be a number and nothing
+              * else; this is for the one somebody wants to be exact about. */}
+            <details className="logrun-vows" open={vowsTakenCount(vowsTaken) > 0}>
+              <summary>Which vows?</summary>
+              <VowSheet taken={vowsTaken} onChange={setVowsTaken} target={fear} />
+            </details>
+          </>
         ) : null}
 
         {/* Only when there is a death to place. Optional even then. */}

@@ -137,6 +137,21 @@ export type PlayRecord = {
    * Fear 20 or better.
    */
   fear?: number
+  /**
+   * Which vows were on, and how far up each one was taken.
+   *
+   * **A total is a sum with its terms thrown away.** Fear 20 under Vow of Pain,
+   * Grit and Frenzy is a different run from Fear 20 under Void, Denial and
+   * Forfeit: one makes the fight harder and the other takes the build's own
+   * pieces away. "Cleared Fear 20" says nothing about which, and a build that
+   * survives one may be exactly the build that cannot survive the other.
+   *
+   * Optional, and expected to stay optional. Most people will type the number
+   * and move on, which is fine: this is detail for a run somebody wants to be
+   * precise about, not a form to fill in. `engine/vows.ts` holds the arithmetic
+   * and says why it is the shrine's rather than ours.
+   */
+  vows?: Record<string, number>
 }
 
 /**

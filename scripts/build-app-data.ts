@@ -898,10 +898,24 @@ const vows = SHRINE_ORDER.map((id) => {
    * are Pain, Grit, Wards and so on: the two sets overlap on five. Whatever
    * those nineteen are, most of them are not these. Forcing a join would have
    * put confident wrong art on sixteen rows.
+   *
+   * **It resolved four, not five, and Vow of Fangs was the one it lost.**
+   * `buildIconIndex` keys by slug and the first entry wins, so `icons.get`
+   * hands back `hammers/fangs.webp` and the guard above correctly refuses it.
+   * The right file, `assets/vows/fangs.png`, is in the manifest right behind it
+   * and the index has no way to ask for it. So this reads the manifest rather
+   * than the index: same slug, but the entry filed under `vows/`.
+   *
+   * The same shape as everything else in `CLAUDE.md`'s list. A guard against
+   * confidently wrong art is not a guard that finds the right art, and the
+   * comment claiming five was written from the overlap rather than from a run.
    */
   const vowIcon = (key: string): string | null => {
-    const found = icons.get(key)?.file ?? null
-    return found && found.startsWith('vows/') ? found : null
+    const found = (manifest.assets ?? []).find(
+      (entry: { id?: string; file?: string }) =>
+        entry?.id === key && typeof entry.file === 'string' && entry.file.startsWith('vows/'),
+    )
+    return found?.file ?? null
   }
   return {
     id,
