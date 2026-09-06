@@ -10,6 +10,7 @@
  * constant, because how long counts as "away" is a habit and not a fact.
  */
 
+import { MAX_GRASP } from '../engine/arcana.ts'
 import { writeStamped } from './stamps.ts'
 
 const KEY = 'enodia.prefs'
@@ -59,8 +60,15 @@ export type Prefs = {
    *
    * `MetaUpgradeCostData.StartingMetaUpgradeLimit` is 10 and it rises as you
    * spend MemPoints, so it is per-save progression this tool cannot read. The
-   * Arcana page needs it to say whether a layout is affordable, so it asks
-   * once and remembers. Ten is where everyone starts.
+   * Arcana page needs it to say whether a layout is affordable, so it asks once
+   * and remembers.
+   *
+   * **It defaults to the ceiling rather than the floor, which is a change.** It
+   * was 10, on the reasoning that ten is where everyone starts. True, and
+   * nobody stays there: the owner's point is that a save reaches 30 early and
+   * spends the rest of its life at it, so starting at 10 means the board refuses
+   * most real layouts until somebody finds this and raises it. The lower number
+   * is still assignable on the Arcana page for a save that has not got there.
    */
   graspLimit: number
   /**
@@ -88,7 +96,7 @@ export const DEFAULT_PREFS: Prefs = {
   version: VERSION,
   staleAfterHours: 3,
   buildDetail: 'poster',
-  graspLimit: 10,
+  graspLimit: MAX_GRASP,
   backupWarningSeen: false,
   seenLanding: false,
   reportRuns: true,

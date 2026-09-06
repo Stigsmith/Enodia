@@ -344,11 +344,13 @@ export function BuildEditor({
   /**
    * The Arcana, with the ones this board can no longer afford marked.
    *
-   * **The editor ignored Grasp entirely** while the Arcana screen enforced it
-   * exactly, so the same rule had two answers depending on which screen you
-   * were on. Both ceilings are imported from `build-check.ts` rather than
-   * restated, so the picker's limit and the checker's failure cannot drift
-   * apart: the whole complaint was two screens giving two answers.
+   * **The editor ignored Grasp entirely** and this said the Arcana screen
+   * enforced it exactly. It did not: that screen counted the total, coloured it
+   * when it was too high, and let you carry on regardless. So the two screens
+   * did disagree, and it was the other way round from what this claimed. The
+   * board refuses a card it cannot afford now, `engine/arcana.ts` `affords`,
+   * and both screens count against the same `MAX_GRASP`, which lives there and
+   * is summed from `MetaUpgradeCostData` rather than written out twice.
    */
   const arcanaOptions = useMemo(() => {
     const spent = build.arcana.reduce((total, id) => total + (arcanaById.get(id)?.cost ?? 0), 0)

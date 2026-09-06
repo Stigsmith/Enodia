@@ -27,6 +27,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from './slots.ts'
 import { requirementSets, satisfiesRequirement } from './reachability.ts'
 import { coreSlotOf, hammerArm, isHammer } from './picks.ts'
+import { MAX_GRASP } from './arcana.ts'
 import type { Slot, TraitId } from '../data/types.ts'
 
 export type Problem = {
@@ -78,13 +79,16 @@ export type FixOption = {
 const OLYMPIAN = new Set<string>(olympians)
 
 /**
- * The most Grasp a save can reach.
+ * The most Grasp a save can reach, re-exported from the engine that owns it.
  *
- * `MetaUpgradeCostData.StartingMetaUpgradeLimit` is 10 and rises in
- * `CostIncrease` steps as MemPoints are spent. The owner reports it stops at
- * 30, which is the same number `ui/Arcana.tsx` counts against.
+ * It was written out here and again in `ui/Arcana.tsx`, both from the owner's
+ * report rather than from the file. `engine/arcana.ts` sums it out of
+ * `MetaUpgradeCostData` and says how.
+ *
+ * Imported as well as re-exported: a bare `export ... from` does not put the
+ * name in this module's own scope, and two rules below count against it.
  */
-export const MAX_GRASP = 30
+export { MAX_GRASP }
 
 /**
  * The most Arcana a build may name, and the most that still reads as advice.
@@ -303,7 +307,7 @@ export function checkBuild(build: ShownBuild): Problem[] {
    *
    * **This has been wrong twice, in opposite directions.** First it blocked
    * above five cards, on the assumption the Grasp holds five. It does not: the
-   * board has eighteen paid cards costing between 1 and 5, `MetaUpgradeCostData`
+   * board has nineteen paid cards costing between 1 and 5, `MetaUpgradeCostData`
    * starts a save at 10 and rises to 30, and six cheap cards fit inside the same
    * Grasp as two expensive ones. So the rule became a Grasp sum.
    *

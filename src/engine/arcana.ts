@@ -98,6 +98,51 @@ export function neighbours({ row, column }: Coords): Coords[] {
 
 const at = ({ row, column }: Coords): string => arcanaBoard[row]?.[column] ?? ''
 
+/**
+ * The most Grasp a save can hold, summed from the game rather than reported.
+ *
+ * `MetaUpgradeCostData` (`MetaUpgradeData.lua:29-52`) starts at
+ * `StartingMetaUpgradeLimit = 10` and lists fifteen levels, five at
+ * `CostIncrease = 2` and ten at 1. `GetMaxMetaUpgradeCost()`
+ * (`MetaUpgradeCardScreenLogic.lua:800-808`) adds exactly those, so the ceiling
+ * is 10 + 10 + 10 = **30** and the table has no sixteenth level.
+ *
+ * **Declared here and imported by everything else.** It was written out twice,
+ * in `ui/Arcana.tsx` and `engine/build-check.ts`, both from the owner's report
+ * rather than from the file. Two copies of a number is two numbers waiting to
+ * disagree.
+ */
+export const MAX_GRASP = 30
+
+/**
+ * Whether a card can be switched on inside a budget, and by how much it misses.
+ *
+ * **The budget counts paid cards only, and that is the game's rule rather than
+ * a simplification.** `MetaUpgradeLogic.lua:97-106` tallies cost only for cards
+ * with no `AutoEquipRequirements`, and every conditional resolves to `Cost = 0`,
+ * so the six that switch themselves on never spend. They still have to sit on
+ * the board for each other's positional rules, which is why this asks about a
+ * set rather than about a running total.
+ *
+ * The game refuses the same way, in three places:
+ * `MetaUpgradeCardScreenLogic.lua:1046` on equip, `:1087` on auto-equip after an
+ * unlock, and `ValidateMetaUpgradeLayout` at `:148-165`, which unequips
+ * cheapest-first when a save is loaded over its limit.
+ *
+ * **Switching a card off is never refused**, which is why this is only ever
+ * asked about adding. A board loaded over budget has to be reducible, or the
+ * only way out would be to start again.
+ */
+export type Afford = { ok: true } | { ok: false; cost: number; would: number; limit: number }
+
+export function affords(equipped: ReadonlySet<string>, id: string, limit: number): Afford {
+  const card = arcanaById.get(id)
+  if (!card || isConditional(id) || equipped.has(id)) return { ok: true }
+  const cost = card.cost ?? 0
+  const would = tally(equipped).grasp + cost
+  return would > limit ? { ok: false, cost, would, limit } : { ok: true }
+}
+
 /** What the paid cards in a set add up to, which is all the rules count. */
 export function tally(equipped: ReadonlySet<string>): {
   total: number

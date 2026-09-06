@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { arcanaBoard, arcanaById } from '../data/app.ts'
-import { coordsOf, isConditional, neighbours, resolveBoard, tally, whyOff } from './arcana.ts'
+import { MAX_GRASP, affords, coordsOf, isConditional, neighbours, resolveBoard, tally, whyOff } from './arcana.ts'
 
 /** By display name, because that is how the rules were described to me. */
 const id = (name: string): string => {
@@ -26,6 +26,105 @@ const paidAtCost = (cost: number): string[] =>
   [...arcanaById.values()]
     .filter((card) => !isConditional(card.id) && (card.cost ?? 0) === cost)
     .map((card) => card.id)
+
+/**
+ * What the cards cost, and the one that read free for the life of the project.
+ *
+ * Three records state no `Cost` and inherit one, which the game resolves at load
+ * through `ProcessDataInheritance` (`RunData.lua:1222-1224`) and the extractor
+ * did not. Two of them inherit `BaseBonusMetaUpgrade.Cost = 0` and were right by
+ * accident. **The Wayward Son inherits `BaseMetaUpgrade.Cost = 1`**, so it was
+ * free here and 1 Grasp in the game.
+ *
+ * These are pinned because a budget is about to be enforced against them, and a
+ * cap that is short by one lets through a board the game refuses.
+ */
+describe('what a card costs', () => {
+  it('reads a cost the card inherits rather than states', () => {
+    expect(costOf('The Wayward Son')).toBe(1)
+    // The two that inherit zero, so the walk is not just special-casing one id.
+    expect(costOf('Divinity')).toBe(0)
+    expect(costOf('Judgment')).toBe(0)
+  })
+
+  it('leaves no card without a cost at all', () => {
+    for (const card of arcanaById.values()) {
+      expect(card.cost, card.name).not.toBeNull()
+      expect(typeof card.cost, card.name).toBe('number')
+    }
+  })
+
+  it('comes to nineteen paid cards and 56 Grasp', () => {
+    const paid = [...arcanaById.values()].filter((card) => (card.cost ?? 0) > 0)
+    expect(paid).toHaveLength(19)
+    expect(paid.reduce((total, card) => total + (card.cost ?? 0), 0)).toBe(56)
+  })
+})
+
+/**
+ * The budget, which the board displayed and did not apply.
+ *
+ * It counted the Grasp, coloured the number when it was too high, said "More
+ * Grasp than you have", and let you carry on. Three other files claimed
+ * otherwise, one of them out loud to a first-time player.
+ */
+describe('what a board can afford', () => {
+  it('refuses a card that would go over', () => {
+    // Origination is 5. At a limit of 4 there is no room for it at all.
+    const room = affords(new Set(), id('Origination'), 4)
+    expect(room.ok).toBe(false)
+    if (!room.ok) {
+      expect(room.cost).toBe(5)
+      expect(room.would).toBe(5)
+      expect(room.limit).toBe(4)
+    }
+  })
+
+  it('allows a card that lands exactly on the limit', () => {
+    expect(affords(new Set(), id('Origination'), 5).ok).toBe(true)
+  })
+
+  it('counts what is already on', () => {
+    const held = new Set([id('Origination')]) // 5
+    // Death is 4, so the pair is 9. Eight is one short and nine is exact.
+    expect(costOf('Origination')).toBe(5)
+    expect(costOf('Death')).toBe(4)
+    expect(affords(held, id('Death'), 8).ok).toBe(false)
+    expect(affords(held, id('Death'), 9).ok).toBe(true)
+  })
+
+  /**
+   * `MetaUpgradeLogic.lua:97-106` tallies cost only for cards with no
+   * `AutoEquipRequirements`, and every conditional resolves to 0. They never
+   * spend, so they are never refused, even at a limit of nothing.
+   */
+  it('never charges a card that switches itself on', () => {
+    for (const name of ['The Fates', 'The Moon', 'The Centaur', 'The Queen', 'Judgment', 'Divinity']) {
+      expect(affords(new Set(), id(name), 0).ok, name).toBe(true)
+    }
+  })
+
+  /**
+   * A board can be over budget without anybody clicking past a refusal: a saved
+   * layout loads whole and the limit is a field you can lower. If taking a card
+   * off were refused, the only way out would be to start again.
+   */
+  it('never refuses a card that is already on', () => {
+    const held = new Set([id('Origination'), id('Death')]) // 9, well over
+    expect(affords(held, id('Origination'), 1).ok).toBe(true)
+  })
+
+  it('lets a full 30 hold what the game would hold', () => {
+    // The Centaur wants a card of every cost from 1 to 5, which is 15 at least.
+    const spread = [1, 2, 3, 4, 5].map((cost) => paidAtCost(cost)[0]!).filter(Boolean)
+    let held = new Set<string>()
+    for (const card of spread) {
+      expect(affords(held, card, MAX_GRASP).ok, card).toBe(true)
+      held = new Set([...held, card])
+    }
+    expect(resolveBoard(held).live.has(id('The Centaur'))).toBe(true)
+  })
+})
 
 describe('the board', () => {
   it('is the game\'s five by five', () => {
