@@ -83,13 +83,35 @@ export function Card({
   const { build } = built
   const rest = built.run.pieces.filter((piece) => !piece.slot)
   const arcana = built.crossroads.pieces.filter((piece) => piece.kind === 'arcana')
-  const kit = built.crossroads.pieces.filter((piece) => piece.kind !== 'arcana')
+  /**
+   * The aspect, which leads the card now rather than sitting in a band.
+   *
+   * **One mark says both things.** The card printed `built.arm`, the arm's
+   * character name, in 0.6rem mono, and put the aspect in the third band at the
+   * same size as the keepsake and the familiar beside it. So the most basic
+   * fact about a build, which arm it is for, was either a word you had to know
+   * or a picture you had to already recognise. The aspect icon is
+   * weapon-specific art: `aspects/<weapon>-<aspect>.png`, all 24 of them, so it
+   * answers which arm and which aspect at once.
+   *
+   * Pulled out of `kit` for the same reason `Poster.tsx` and
+   * `Constellation.tsx` pull it out of theirs: those two draw the render
+   * separately, and a piece drawn twice on one card reads as two pieces.
+   */
+  const aspect = built.crossroads.pieces.find((piece) => piece.kind === 'aspect') ?? null
+  const kit = built.crossroads.pieces.filter(
+    (piece) => piece.kind !== 'arcana' && piece.kind !== 'aspect',
+  )
   const read = readRepeat(build, traits, olympians)
 
   return (
     <li className="bcard" {...(first ? { 'data-tour': 'builds-card' } : {})}>
       <button type="button" className="bcard-hit" onClick={() => onOpen(build.id)}>
         <span className="bcard-head">
+          {/* No `onOpen`: this sits inside the card's own button, and a button
+            * inside a button is not a thing. `Mark` renders a span without one,
+            * and still carries the hover slate. */}
+          {aspect ? <Mark piece={aspect} size="var(--mark-arm)" showGlyph={false} /> : null}
           <span className="bcard-name">{build.name}</span>
           <span className="bcard-arm">
             {built.arm}

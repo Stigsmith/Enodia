@@ -670,9 +670,36 @@
   }
 }
 
+/**
+ * The aspect leads, and the name stacks beside it.
+ *
+ * Two columns rather than three stacked rows: the mark takes the first and
+ * spans all of them, so the name, the arm line and the stamp keep the order
+ * they had. `auto 1fr` so the mark is its own size and the name takes the rest,
+ * and `min-width: 0` on the text column so a long name wraps rather than
+ * pushing the mark out of the card.
+ *
+ * Sized in `cqi` like `--mark-s` above it, because `.bcard-hit` is a container
+ * and the card runs from 14rem to 16rem wide.
+ */
 .bcard-head {
   display: grid;
-  gap: 0.1rem;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.1rem 0.5rem;
+  --mark-arm: clamp(2rem, 21cqi, 2.8rem);
+}
+
+.bcard-head > .mark {
+  grid-row: 1 / -1;
+  align-self: center;
+}
+
+.bcard-head > .bcard-name,
+.bcard-head > .bcard-arm,
+.bcard-head > .stamp {
+  grid-column: 2;
+  min-width: 0;
 }
 
 /* The stamp sits under the arm rather than beside the name: the name is allowed
