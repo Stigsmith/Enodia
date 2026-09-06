@@ -225,6 +225,13 @@ export type Vow = {
   icon: string | null
   /** In order. `points` is the cost of *that* rank, not the running total. */
   ranks: { points: number; locked?: boolean }[]
+  /**
+   * Drawn across the bottom rather than in the grid, from the game's own
+   * `UseWideAnimations`. Exactly one vow carries it and `vows.test.ts` pins
+   * that, along with why it is the one: 12 Fear, double the next, and all four
+   * of its ranks are the gated ones.
+   */
+  wide?: boolean
 }
 
 /**

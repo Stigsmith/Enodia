@@ -83,6 +83,28 @@ describe('the ceiling', () => {
     expect(MIN_MAX_FEAR).not.toBe(57)
   })
 
+  /**
+   * The one the shrine draws across the bottom, and the three separate reasons
+   * it is that one. Pinned together because the layout rests on all of them:
+   * `VowSheet.tsx` spans and centres the wide vow, and it reads the field
+   * rather than the id so this is what stops the two drifting apart.
+   */
+  it('marks exactly one vow wide, and it is the one that earns the room', () => {
+    const wide = vows.filter((vow) => vow.wide)
+    expect(wide.map((vow) => vow.name)).toEqual(['Vow of Rivals'])
+
+    const worth = (vow: (typeof vows)[number]) => sum(vow.ranks.map((rank) => rank.points))
+    const ranked = [...vows].sort((a, b) => worth(b) - worth(a))
+    // 12 against the next highest 6, which is the whole argument for the space.
+    expect(worth(ranked[0]!)).toBe(12)
+    expect(ranked[0]?.name).toBe('Vow of Rivals')
+    expect(worth(ranked[1]!)).toBe(6)
+
+    // And every gated rank in the game is one of its four.
+    expect(vows.flatMap((vow) => vow.ranks.filter((r) => r.locked)).length).toBe(4)
+    expect(wide[0]?.ranks.filter((r) => r.locked)).toHaveLength(4)
+  })
+
   /** All four gated ranks are Boss Difficulty, and they are the whole gap. */
   it('gates exactly the Boss Difficulty ranks, worth 12', () => {
     const gated = vows.flatMap((vow) => vow.ranks.filter((r) => r.locked).map(() => vow.name))
