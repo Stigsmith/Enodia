@@ -195,8 +195,25 @@ export function duplicateBuild(
     ...(mine ? { author: mine } : {}),
     // The name field caps at 60, and two identical names in a list help nobody.
     name: `${source.name} copy`.slice(0, 60),
+    /**
+     * The two derived fields are set together, or neither is.
+     *
+     * **They used to come apart, and it produced a promise the app could not
+     * keep.** `derivedFrom` was always overwritten and `derivedHash` only when
+     * an `origin` was passed, so duplicating a build that had itself been taken
+     * off the exchange inherited the published hash through the spread while
+     * `derivedFrom` became a local `mine-<uuid>`. Nothing about the picks
+     * changed, so `reportsTo` found the hash matching and returned that local
+     * id. `LogRun` then told the player their run would count toward a build on
+     * the exchange, and posted it to a route whose id pattern the local id does
+     * not match, which 404s.
+     *
+     * The invariant `state/exchange.ts` states is that `derivedFrom` with no
+     * `derivedHash` is a fork of one of your own builds. Setting both or
+     * neither is what makes that true.
+     */
     derivedFrom: origin?.id ?? source.id,
-    ...(origin ? { derivedHash: origin.hash } : {}),
+    ...(origin ? { derivedHash: origin.hash } : { derivedHash: undefined }),
     created: now,
     modified: now,
     schemaVersion: BUILD_SCHEMA,

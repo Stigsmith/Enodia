@@ -31,7 +31,7 @@
  */
 
 import type { ShownBuild } from '../data/builds.ts'
-import { duplicateBuild } from './builds.ts'
+import { duplicateBuild, loadBuilds, newBuildId, saveBuild } from './builds.ts'
 import { loadPrefs } from './prefs.ts'
 import { unpackBuild } from './transfer.ts'
 
@@ -54,6 +54,8 @@ export type Listed = {
   createdAt: number
   /** The owner's own words, on the picked shelf only. */
   note?: string
+  /** Whether you published it. A boolean from the worker, never an id. */
+  mine?: boolean
   build: ShownBuild
   stats: Stats
 }
@@ -207,6 +209,135 @@ export type TakeOutcome = { ok: true; build: ShownBuild } | { ok: false; say: st
  * What it does carry is where it came from and what it looked like, which is
  * what lets a run you log later count toward the build you took.
  */
+/**
+ * Follow a build, which is the relationship the exchange offers now.
+ *
+ * **A follow is not a copy, and the difference is who the build belongs to.** A
+ * copy was yours the moment you took it: your name on it, editable, and frozen
+ * at the moment you pressed the button. Following leaves it the author's. Their
+ * edits reach you, nothing about it is yours to change, and the moment you want
+ * to change something you fork it and it becomes an ordinary build of yours.
+ *
+ * The owner's words for why: "I thought we were doing more of a subscription
+ * thing. You basically subscribe to somebody else's build. If they want to
+ * update it or improve it, then you seamlessly copy those improvements."
+ *
+ * **It is stored as an ordinary build with `by: 'community'`.** That member of
+ * `Provenance` has existed unused since the type was written and this is what
+ * it is for. Storing it as a build rather than as a separate followed-thing
+ * table means the library lists it, the filters narrow it, sync carries it and
+ * the run can be pointed at it, all without a second code path. What marks it
+ * is the provenance and `derivedRevision`, not a parallel store.
+ */
+export async function followBuild(id: string): Promise<TakeOutcome> {
+  let response: Response
+  try {
+    response = await fetch(`/api/b/${id}`)
+  } catch {
+    return { ok: false, say: 'Could not reach the server. Nothing here has changed.' }
+  }
+
+  if (!response.ok) return { ok: false, say: 'That build is not there any more.' }
+
+  const { payload, name, revision } = (await response.json()) as {
+    payload: string
+    name: string
+    revision?: number
+  }
+  const source = await unpackBuild(payload)
+  if (!source) return { ok: false, say: 'That build is in a format this version cannot read.' }
+
+  /**
+   * Already following it: refresh rather than add a second one.
+   *
+   * The whole reported bug was N clicks producing N builds. A follow is a
+   * relationship and you either have it or you do not.
+   */
+  const held = loadBuilds().find((one) => one.derivedFrom === id && one.by === 'community')
+
+  const followed: ShownBuild = {
+    ...source,
+    id: held?.id ?? newBuildId(),
+    by: 'community',
+    name: name || source.name,
+    derivedFrom: id,
+    // Of the picks, not of the payload. `shapeOf` says why at length.
+    derivedHash: fingerprint(shapeOf(source)),
+    derivedRevision: revision ?? 0,
+    /* Their runs are not yours. A followed build starts with no record here,
+       and anything you log against it is yours from then on. */
+    ...(held?.play ? { play: held.play } : { play: undefined }),
+  }
+
+  saveBuild(followed)
+  return { ok: true, build: followed }
+}
+
+/**
+ * Re-read every followed build, and replace the ones whose author moved.
+ *
+ * Cheap on purpose: the worker hands back a `revision` with the payload, so
+ * this compares a number rather than a kilobyte. A build that has not changed
+ * costs one request and no write.
+ *
+ * **A build the author has taken down is kept rather than deleted.** What is
+ * held is somebody's reading material, and removing it out of their library
+ * because a stranger pressed unpublish is the worse failure. It stops updating,
+ * which is all that actually changed.
+ */
+export async function refreshFollowed(): Promise<number> {
+  const followed = loadBuilds().filter((one) => one.by === 'community' && one.derivedFrom)
+  let moved = 0
+
+  for (const one of followed) {
+    try {
+      const response = await fetch(`/api/b/${one.derivedFrom}`)
+      if (!response.ok) continue
+      const { payload, name, revision } = (await response.json()) as {
+        payload: string
+        name: string
+        revision?: number
+      }
+      if ((revision ?? 0) === (one.derivedRevision ?? 0)) continue
+
+      const source = await unpackBuild(payload)
+      if (!source) continue
+      saveBuild({
+        ...source,
+        id: one.id,
+        by: 'community',
+        name: name || source.name,
+        derivedFrom: one.derivedFrom,
+        derivedHash: fingerprint(shapeOf(source)),
+        derivedRevision: revision ?? 0,
+        ...(one.play ? { play: one.play } : {}),
+      })
+      moved += 1
+    } catch {
+      // Offline, or the server is having a moment. Nothing here changes.
+    }
+  }
+  return moved
+}
+
+/**
+ * Make a followed build yours, which is what editing one does.
+ *
+ * The follow ends: one build in the library rather than two, now an ordinary
+ * owner build with your name on it. `derivedFrom` and `derivedHash` survive, so
+ * runs you log still count toward the build it came from until you change a
+ * pick, which is exactly what they mean on a copy.
+ */
+export function forkFollowed(build: ShownBuild): ShownBuild {
+  const mine: ShownBuild = {
+    ...build,
+    by: 'owner',
+    derivedRevision: undefined,
+  }
+  saveBuild(mine)
+  return mine
+}
+
 export async function takeBuild(id: string): Promise<TakeOutcome> {
   let response: Response
   try {

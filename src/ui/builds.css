@@ -8713,8 +8713,18 @@ p.landing-say {
 
 .xchange-read-actions {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.4rem;
+}
+
+/* Your own build, or one you already follow. A sentence rather than a control,
+   because there is nothing left to press. */
+.xchange-yours {
+  margin: 0.2rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--lit-dim);
 }
 
 .xchange-foot {

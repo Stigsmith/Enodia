@@ -356,3 +356,46 @@ describe('an empty library', () => {
     expect(isEmpty(rebuilt)).toBe(true)
   })
 })
+
+/**
+ * Whose build it is, which only became a question when the library started
+ * holding other people's.
+ *
+ * Following puts somebody else's build on your shelf and leaves it theirs, so
+ * "show me only mine" is a real thing to want. The facet reads `build.by`,
+ * which every build already carries.
+ */
+describe('whose', () => {
+  const LIBRARY: ShownBuild[] = [
+    { ...FIRST_BUILD, id: 'mine-1', name: 'Mine one', by: 'owner' },
+    { ...FIRST_BUILD, id: 'mine-2', name: 'Mine two', by: 'owner' },
+    { ...FIRST_BUILD, id: 'theirs', name: 'Followed', by: 'community' },
+  ]
+
+  it('offers each provenance in the reader’s words, with its count', () => {
+    const facet = facets(LIBRARY, EMPTY_SELECTION).find((one) => one.id === 'whose')
+    expect(facet).toBeTruthy()
+    expect(facet?.options.map((one) => [one.label, one.count])).toEqual([
+      ['Following', 1],
+      ['Mine', 2],
+    ])
+  })
+
+  it('narrows to yours, and to theirs', () => {
+    const mine = apply(LIBRARY, choose(EMPTY_SELECTION, 'whose', 'owner'))
+    expect(mine.map((one) => one.name)).toEqual(['Mine one', 'Mine two'])
+
+    const theirs = apply(LIBRARY, choose(EMPTY_SELECTION, 'whose', 'community'))
+    expect(theirs.map((one) => one.name)).toEqual(['Followed'])
+  })
+
+  /**
+   * `facets()` drops a facet with fewer than two options, so a library that is
+   * all yours never sees this control. Worth pinning: the alternative is a
+   * dropdown offering one choice, which is furniture.
+   */
+  it('does not appear when everything is yours', () => {
+    const allMine = LIBRARY.filter((one) => one.by === 'owner')
+    expect(facets(allMine, EMPTY_SELECTION).find((one) => one.id === 'whose')).toBeUndefined()
+  })
+})
