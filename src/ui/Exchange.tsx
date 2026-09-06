@@ -178,6 +178,12 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       title="Build exchange"
       standfirst="Builds other people published, and what happened when people played them."
     >
+      <CharonShop />
+      {/* Everything the shelf is, inset past him where he is drawn. The grid
+        * alone was not enough: the scope line and the filter bar are full width
+        * and sit above it, and at 1600x950 both crossed his box. Measured, not
+        * noticed. */}
+      <div className="xchange-shelf">
       <Tabs tabs={SHELVES} open={shelf} onOpen={setShelf} label="Which shelf" />
 
       {/* Said out loud rather than left as an absence. Two shelves presented as
@@ -283,6 +289,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
           </div>
         </div>
       ) : null}
+      </div>
     </Page>
   )
 }
@@ -306,6 +313,7 @@ function Counted({ stats }: { stats: Stats }) {
 
   return (
     <p className="xchange-counts">
+      <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
       {stats.takes ? <span>Taken {stats.takes}</span> : null}
       {stats.runs ? (
         <span>
@@ -391,5 +399,36 @@ function Relation({
     <button type="button" className="quiet xchange-take" onClick={onFollow}>
       Follow
     </button>
+  )
+}
+
+/**
+ * Charon, standing at the foot of his own shop.
+ *
+ * The exchange was the build manager with a different list behind it: same
+ * cards, same grid, same filters, and nothing on screen saying you had gone
+ * anywhere. He says it before the heading does.
+ *
+ * **Anchored to the bottom and cropped by it**, which is how the game draws
+ * every character and how this art is drawn: the portrait runs off the bottom
+ * of its own frame, so floating it in the middle of a panel would be wrong on
+ * the art's own terms. Fixed rather than scrolled, so the shelf goes past him.
+ *
+ * **He has a column rather than a corner.** `DoraWatching` is the same idea on
+ * the Roadmap and it spent a session covering text, because a page whose
+ * content fills its width has no free corner to put a figure in. Dora got a
+ * `min-height` gate; that works there because the roadmap's columns end where
+ * their content does. The exchange is a grid that fills, so the fix is to give
+ * him room instead: `.xchange-grid` is inset by his width where he is drawn,
+ * and he is not drawn where that inset would cost a card column.
+ *
+ * `aria-hidden` and `pointer-events: none`. He is scenery, and a screen reader
+ * announcing a decorative portrait between the filters and the shelf is noise.
+ */
+function CharonShop() {
+  return (
+    <div className="xchange-charon" aria-hidden="true">
+      <img src="/characters/charon-shop.png" alt="" loading="lazy" />
+    </div>
   )
 }

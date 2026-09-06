@@ -29,6 +29,7 @@ export const CHANGELOG: Release[] = [
       'A new filter, Whose, so \u201conly mine\u201d is one click. It appears once there is actually something of somebody else\u2019s to tell apart.',
       'You could take, play and rate your own published build, and all three moved its public numbers. None of that was checked. It is now: your own take is refused because the build is already yours, your own runs are recorded in your library and counted nowhere else, and you cannot rate your own build.',
       'Publishing the same build twice made two listings. There is a proper replace now, so editing and republishing updates the one people are following instead of orphaning them on the old one.',
+      'Charon runs the exchange. He stands at the foot of the shelf, out of the game\u2019s own portrait art, and the counts wear his coins. The exchange looked exactly like the build manager before, which is a poor way to tell you that none of this is yours.',
     ],
   },
   {

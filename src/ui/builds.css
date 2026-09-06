@@ -8682,6 +8682,78 @@ p.landing-say {
  * `onOpen`, so nothing here can be edited. The overlay is `.logrun`'s shape
  * because a dialog over the page is a dialog over the page.
  */
+/**
+ * Charon, at the foot of the exchange.
+ *
+ * **Bottom-anchored and cropped by the viewport**, which is how the game draws
+ * every character and how this art is drawn: `Portraits_CharonHooded_01` runs
+ * off the bottom of its own 2169x1734 frame, so a figure floating clear of the
+ * edge would be wrong on the art's own terms. Fixed, so the shelf scrolls past
+ * him rather than carrying him along.
+ *
+ * **He gets a column, not a corner.** `DoraWatching` is the same idea on the
+ * Roadmap and it spent a session covering text: a page whose content fills its
+ * width has no free corner. Dora's answer was a `min-height` gate, which works
+ * there because the roadmap's columns end where their content does. A grid
+ * fills, so this reserves room instead and hides him where reserving it would
+ * cost a card column.
+ *
+ * 96rem, and that is the arithmetic rather than a guess. `.builds-grid` is
+ * `repeat(auto-fill, minmax(14rem, 1fr))`; at 96rem the page holds five
+ * columns, so taking 15rem for him leaves four. Below that it would leave
+ * three, and a shelf is worth more than a portrait.
+ */
+.xchange-charon {
+  display: none;
+}
+
+@media (min-width: 96rem) {
+  .xchange-charon {
+    display: block;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+    /* Scenery. Nothing here is clickable and nothing here should catch a drag
+       aimed at the shelf behind it. */
+    pointer-events: none;
+  }
+
+  .xchange-charon img {
+    display: block;
+    /* Height, because a figure standing on an edge is sized by how tall it is.
+       Capped against the viewport so a short window crops him further rather
+       than pushing him up off the floor. */
+    height: min(47rem, 82dvh);
+    width: auto;
+    /* He is behind a dark page and lit from behind in the art. Left at full
+       strength he reads as a second subject; this puts him where a painted
+       backdrop sits. */
+    opacity: 0.9;
+  }
+
+  /**
+   * The floor he stands on.
+   *
+   * On the whole shelf rather than on the grid, and that was measured rather
+   * than assumed: with the inset on `.builds-grid` alone, no card touched him
+   * and the scope paragraph and the filter bar both did, because they are full
+   * width and sit above the cards. Two intersections at 1600x950, none at 1920.
+   */
+  .xchange-shelf {
+    padding-left: 12rem;
+  }
+}
+
+/* The stack of coins from `GUI/Icons/Currency`, on the counts that are the only
+   evidence this screen offers. */
+.xchange-coin {
+  width: 0.95rem;
+  height: 0.95rem;
+  vertical-align: -0.15em;
+  margin-right: 0.1rem;
+}
+
 .xchange-read {
   position: fixed;
   inset: 0;
