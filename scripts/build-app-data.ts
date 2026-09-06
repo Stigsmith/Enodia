@@ -937,6 +937,23 @@ const vows = SHRINE_ORDER.map((id) => {
     name,
     icon: vowIcon(sprite),
     /**
+     * The one vow the shrine draws across the bottom instead of in the grid.
+     *
+     * **Read from the game rather than named here.** `UseWideAnimations` is set
+     * on exactly one record in `MetaUpgradeData`, and everything about the
+     * layout follows from it: `ShrineLogic.lua:53` places that item at
+     * `ItemStartX + WideItemOffsetX`, which is 805 + 283 = 1088, and a normal
+     * row of four runs 805 to 805 + 3 * 188 = 1369 with its centre at 1087. So
+     * the game centres it under the grid, one pixel out, and gives it
+     * `ShrinePactInactiveBackingWide`, `ButtonShrineItemWide` and a 35px shift
+     * of its own icon group.
+     *
+     * Keying the UI on the field rather than on the id means a second wide vow
+     * would arrive on its own. `CLAUDE.md` error 5 is the other way round: a
+     * proxy for the property, never checked against the property.
+     */
+    wide: record.UseWideAnimations === true,
+    /**
      * What each rank costs, in order. The vow's own maximum is the sum.
      *
      * `locked` marks a rank `GetMaxShrinePoints` will not count until the save

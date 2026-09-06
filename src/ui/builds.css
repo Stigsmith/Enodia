@@ -6419,6 +6419,58 @@ button.mark {
 }
 
 /**
+ * Vow of Rivals, across the bottom and centred, because the shrine draws it
+ * that way and it is the only one it draws that way.
+ *
+ * `UseWideAnimations` is set on exactly one record in `MetaUpgradeData` and the
+ * class comes from that field rather than from the id, so a second one would
+ * arrive here on its own. `ShrineLogic.lua:53` places it at `ItemStartX +
+ * WideItemOffsetX`, 805 + 283 = 1088, and a row of four runs 805 to 1369 with
+ * its centre at 1087. One pixel. It is centred on purpose.
+ *
+ * Laid out along its length rather than stacked, which is what a wide backing
+ * is for, and it earns the room: 12 Fear against the next highest 6, and all
+ * four of its ranks are the gated ones that separate a new save's ceiling of 55
+ * from a finished one's 67.
+ */
+.vowscreen-grid > li.is-wide {
+  grid-column: 1 / -1;
+  justify-self: center;
+  justify-items: start;
+  align-items: center;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.75rem;
+  min-width: min(26rem, 100%);
+  margin-top: 0.35rem;
+  padding: 0.45rem 1.1rem 0.5rem;
+  border-color: var(--div-2);
+  background: color-mix(in oklab, var(--ink-850) 65%, transparent);
+}
+
+.vowscreen-grid > li.is-wide.is-on {
+  border-color: color-mix(in oklab, var(--lit) 46%, transparent);
+  background: color-mix(in oklab, var(--lit) 13%, transparent);
+}
+
+.vowscreen-grid > li.is-wide .vowscreen-art {
+  width: 3rem;
+  height: 3rem;
+}
+
+.vowscreen-grid > li.is-wide .vowscreen-name {
+  font-size: 0.84rem;
+  text-align: left;
+}
+
+.vowscreen-grid > li.is-wide .vowscreen-ranks { margin-top: 0; }
+
+.vowscreen-grid > li.is-wide .vowscreen-fear {
+  justify-self: end;
+  min-width: 1.4rem;
+  text-align: right;
+}
+
+/**
  * Dimmed until taken, which is what the shrine does with its own icons:
  * `ShrineData` carries `IconActiveColor = Color.White` and an inactive grey.
  * Here it is opacity rather than a colour, because these are full-colour

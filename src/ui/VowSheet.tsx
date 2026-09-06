@@ -16,12 +16,19 @@
  * shows what it comes to, and where the two disagree the screen says so and
  * leaves it alone. `coversTotal` in `engine/vows.ts` is that predicate.
  *
- * ## Four across, which is the game's own grouping
+ * ## Four across and one across the bottom, which is the shrine's own layout
  *
- * `ShrineData.ShrineUpgradeOrder` lists the seventeen in blank-line-separated
- * groups of four, with Vow of Rivals alone at the end. That is the shrine's
- * layout and this is the same one, so Rivals sitting by itself on the last row
- * is the game's arrangement rather than a grid running out of items.
+ * `ScreenData.Shrine` says `ItemsPerRow = 4`, and `ShrineUpgradeOrder` lists
+ * the seventeen in blank-line-separated groups of four with Vow of Rivals alone
+ * at the end. Rivals is also the only record in `MetaUpgradeData` carrying
+ * `UseWideAnimations`, which gives it a wide backing, a wide button and a place
+ * of its own: `ShrineLogic.lua:53` puts it at `ItemStartX + WideItemOffsetX`,
+ * 805 + 283 = 1088, against a four-item row running 805 to 1369 whose centre is
+ * 1087. The game centres it. So does this.
+ *
+ * **It earns the place.** 12 Fear, more than double the next highest, and all
+ * four of its ranks are the gated Boss Difficulty ones, which is the entire gap
+ * between a new save's ceiling of 55 and a finished one's 67.
  *
  * ## The art
  *
@@ -105,7 +112,7 @@ export function VowScreen({
 
       <ul className="vowscreen-grid">
         {rows.map(({ vow, rank, fear }) => (
-          <li key={vow.id} className={rank ? 'is-on' : ''}>
+          <li key={vow.id} className={`${rank ? 'is-on' : ''}${vow.wide ? ' is-wide' : ''}`}>
             {vow.icon ? (
               <img className="vowscreen-art" src={`/${vow.icon}`} alt="" aria-hidden="true" />
             ) : (
