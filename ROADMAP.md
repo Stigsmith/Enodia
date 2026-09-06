@@ -397,8 +397,16 @@ summed from the data now, the filter bands derive from it rather than being type
 `src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
 
 **Which vows a run took is done**, 6 September 2026. `PlayRecord.vows` holds vow id to the
-rank taken; `src/engine/vows.ts` does the arithmetic and `src/ui/VowSheet.tsx` draws it,
-folded away behind an opener on the log form and read back as a line under the play strip.
+rank taken; `src/engine/vows.ts` does the arithmetic and `src/ui/VowSheet.tsx` draws it as
+**its own screen inside the log dialog**, on `box-halfscreen.png`, with Back returning to
+the form. Read back as a line under the play strip.
+
+It was a `<details>` unfolding a bordered box inside the panel first, and the owner was
+right that it was ugly: a frame inside a frame, and it pushed the form's own buttons 17px
+through the bottom of the art. The shrine has a screen for this and the dialog borrows it.
+`box-halfscreen.png` rather than `box-pause.png` because of where it paints, measured off
+the alpha channel: the pause panel's art runs to 74.1% of its height and this one to 98.9%,
+so the interior is 84% of the panel against 55%.
 
 **The sheet does not overwrite the number, and that is the whole design.** A partial sheet
 is the normal case: somebody remembers three of the five vows they ran. If the sheet won,
@@ -410,12 +418,13 @@ The same incremental-`Points` trap lives one layer down and five of the eighteen
 watched failing against the wrong reading: `fearOfVow` returning `ranks[rank - 1].points`
 gives Vow of Pain at rank 3 a cost of 2 instead of 5 and the full sheet 34 instead of 67.
 
-The art is 5 of 17, not the 4 it was: `assets/vows/fangs.png` existed the whole time and
-`buildIconIndex` keys by slug with the first entry winning, so `icons.get('fangs')` handed
-back `hammers/fangs.webp` and the vows-scoped guard correctly refused it without ever
-finding the right one. It reads the manifest directly now. The other twelve have no art
-because `assets/vows/` holds a different set of names, so the sheet is names rather than
-icons: a grid four-seventeenths dressed reads as broken rather than sparse.
+**The art is 17 of 17, and the claim that most of it did not exist was wrong.** The join was
+being tried on the vow's display name, so Vow of Pain looked for `pain.png`. Its picture is
+`blood.png`: a vow's record says `Icon = "ShrineIcon_EnemyDamage"`, that is an animation
+rather than a file, and `Game/Animations/GUI_Screens_VFX.sjson` is where the animation names
+the sprite. `scripts/extract.mjs` writes the map to `data/generated/shrine-icons.json` and
+`build-app-data.ts` joins through it. `CLAUDE.md` carries the full note; it is the same
+shape as the `Boon_`/`Hammer_` prefix error and the gold one.
 
 **Not carried to the exchange.** A reported run sends whether it cleared and the Fear, and
 adding the vow list means a worker route and a D1 column. Worth doing, and it is the thing

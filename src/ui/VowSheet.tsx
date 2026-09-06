@@ -1,11 +1,12 @@
 /**
- * The Oath of the Unseen, as a sheet you tick.
+ * The Oath of the Unseen, as its own screen inside the log dialog.
  *
- * **Optional detail, not a form.** `Fear.tsx` argued for a number rather than a
- * vow sheet and it was right for the place it was arguing about: seventeen vows
- * over forty ranks does not belong in a row on a panel. It belongs behind an
- * opener, for the run somebody wants to be precise about, and the number stays
- * the thing you type first.
+ * **It replaces the form rather than opening under it.** The first version was
+ * a `<details>` that unfolded a bordered box in the middle of the panel, which
+ * put a second frame inside a frame and pushed the form's own buttons through
+ * the bottom of the art. A screen the shrine already has does not want to be a
+ * drawer. So this takes the whole panel, on `box-halfscreen.png`, and Back puts
+ * the form back.
  *
  * ## Why the sheet does not overwrite the number
  *
@@ -15,20 +16,25 @@
  * shows what it comes to, and where the two disagree the screen says so and
  * leaves it alone. `coversTotal` in `engine/vows.ts` is that predicate.
  *
- * ## Why numbered pips rather than a stepper each
+ * ## Four across, which is the game's own grouping
  *
- * A rank is one of two, three or four, and which one matters: Vow of Rivals at
- * rank 1 is 3 Fear and at rank 4 it is 12. Numbered buttons show the rank taken
- * and the ranks available in the same glance, and clicking the one that is
- * already on clears it, which is how `Stars` above already behaves.
+ * `ShrineData.ShrineUpgradeOrder` lists the seventeen in blank-line-separated
+ * groups of four, with Vow of Rivals alone at the end. That is the shrine's
+ * layout and this is the same one, so Rivals sitting by itself on the last row
+ * is the game's arrangement rather than a grid running out of items.
  *
- * Names, not art. Four of the seventeen have an icon and the other thirteen do
- * not, because `assets/vows/` holds art for a different set of names: a grid
- * four-seventeenths dressed reads as broken rather than sparse.
+ * ## The art
+ *
+ * All seventeen have their real icon now. They are filed under the sprite name
+ * rather than the vow name, which is why they looked missing: Vow of Pain draws
+ * `VowBlood`, and the mapping is an animation in `Game/Animations`, one
+ * indirection past the vow's own record. `scripts/build-app-data.ts` has the
+ * whole story where the join happens.
  */
 
 import { coversTotal, fearOf, setVow, tidyVows, vowSheet, vowsTakenCount } from '../engine/vows.ts'
 import type { VowsTaken } from '../engine/vows.ts'
+import { MAX_FEAR } from '../data/app.ts'
 
 /**
  * The vows behind a Fear number, for anywhere that is reading rather than
@@ -42,13 +48,15 @@ import type { VowsTaken } from '../engine/vows.ts'
  * one line, and the shrine's own screen does not repeat it either.
  */
 export function VowLine({ vows: taken }: { vows: VowsTaken | undefined }) {
-  const rows = vowSheet(tidyVows(taken)).filter((row) => row.rank > 0)
+  const held = tidyVows(taken)
+  const rows = vowSheet(held).filter((row) => row.rank > 0)
   if (!rows.length) return null
 
   return (
-    <span className="vowline" title={`${fearOf(tidyVows(taken))} Fear from ${rows.length} vows`}>
+    <span className="vowline" title={`${fearOf(held)} Fear from ${rows.length} vows`}>
       {rows.map(({ vow, rank }) => (
         <span key={vow.id} className="vowline-one">
+          {vow.icon ? <img src={`/${vow.icon}`} alt="" aria-hidden="true" /> : null}
           {vow.name.replace(/^Vow of /, '')} <strong>{rank}</strong>
         </span>
       ))}
@@ -56,14 +64,17 @@ export function VowLine({ vows: taken }: { vows: VowsTaken | undefined }) {
   )
 }
 
-export function VowSheet({
+/** The whole panel, for as long as somebody is naming vows. */
+export function VowScreen({
   taken,
   onChange,
+  onBack,
   target,
 }: {
   taken: VowsTaken
   onChange: (next: VowsTaken) => void
-  /** the Fear the run recorded, so the sheet can say when it does not match */
+  onBack: () => void
+  /** the Fear the run recorded, so the screen can say when it does not match */
   target?: number
 }) {
   const rows = vowSheet(taken)
@@ -72,33 +83,36 @@ export function VowSheet({
   const agrees = coversTotal(taken, target)
 
   return (
-    <div className="vowsheet">
-      <div className="vowsheet-top">
-        <p className="vowsheet-sum">
-          <strong>{on}</strong> {on === 1 ? 'vow' : 'vows'}, <strong>{sum}</strong> Fear
-        </p>
-        {on ? (
-          <button type="button" className="vowsheet-clear" onClick={() => onChange({})}>
-            Clear
-          </button>
-        ) : null}
-      </div>
+    <div className="vowscreen">
+      <h3>The Oath of the Unseen</h3>
 
-      {/* Said once, plainly, and it does not block anything. A sheet that does
-        * not add up to the number is incomplete rather than wrong, and the
-        * number is the one that was recorded. */}
-      {on && target !== undefined && !agrees ? (
-        <p className="vowsheet-note">
-          These come to {sum}, and the run is recorded at {target}. The number stands; the sheet
-          is however much of it you want to write down.
-        </p>
-      ) : null}
+      <p className="vowscreen-sum">
+        <img src="/icons/fear.png" alt="" aria-hidden="true" />
+        <strong>{sum}</strong>
+        <span>
+          of {MAX_FEAR}, from {on} {on === 1 ? 'vow' : 'vows'}
+        </span>
+      </p>
 
-      <ul className="vowsheet-list">
+      {/* Said once, plainly, and it blocks nothing. A sheet that does not add up
+        * to the number is incomplete rather than wrong, and the number is the
+        * one that was recorded. */}
+      <p className="vowscreen-note">
+        {on && target !== undefined && !agrees
+          ? `These come to ${sum} and the run is recorded at ${target}. The number stands.`
+          : 'Optional. The run keeps the Fear you typed either way.'}
+      </p>
+
+      <ul className="vowscreen-grid">
         {rows.map(({ vow, rank, fear }) => (
           <li key={vow.id} className={rank ? 'is-on' : ''}>
-            <span className="vowsheet-name">{vow.name}</span>
-            <span className="vowsheet-ranks" role="group" aria-label={vow.name}>
+            {vow.icon ? (
+              <img className="vowscreen-art" src={`/${vow.icon}`} alt="" aria-hidden="true" />
+            ) : (
+              <span className="vowscreen-art is-blank" aria-hidden="true" />
+            )}
+            <span className="vowscreen-name">{vow.name}</span>
+            <span className="vowscreen-ranks" role="group" aria-label={vow.name}>
               {vow.ranks.map((_, at) => {
                 const step = at + 1
                 return (
@@ -115,10 +129,21 @@ export function VowSheet({
                 )
               })}
             </span>
-            <span className="vowsheet-fear">{fear || ''}</span>
+            <span className="vowscreen-fear">{fear ? `${fear}` : ''}</span>
           </li>
         ))}
       </ul>
+
+      <div className="vowscreen-foot">
+        <button type="button" onClick={onBack}>
+          Back
+        </button>
+        {on ? (
+          <button type="button" className="vowscreen-clear" onClick={() => onChange({})}>
+            Clear all
+          </button>
+        ) : null}
+      </div>
     </div>
   )
 }

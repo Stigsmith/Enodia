@@ -487,6 +487,53 @@ for (const [fileName, sjson] of Object.entries(textFiles)) {
 }
 
 // ---------------------------------------------------------------------------
+// GUI animations, for the one join that cannot be made without them.
+//
+// A vow's record says `Icon = "ShrineIcon_EnemyDamage"`. That is an animation
+// name, not a file, and nothing in Scripts defines it: the animations live in
+// `Game/Animations/*.sjson`, where the entry names the sprite it draws.
+//
+//     Name = "ShrineIcon_EnemyDamage" //Blood
+//     InheritFrom = "BaseShrineIcon"
+//     FilePath = "GUI\Screens\ShrineIcons\VowBlood"
+//
+// **This is why sixteen of the seventeen vows looked like they had no art.**
+// `assets/vows/` holds nineteen files under names like blood, dominance and
+// aegis, and the join was being tried on the vow's display name, so Vow of Pain
+// went looking for `pain.png` and found nothing. The files were right all along
+// and the key was wrong: they are named after the sprite, and the sprite name is
+// one indirection away in a file nothing here had read.
+//
+// Only the ShrineIcon entries are written. The file holds every GUI screen
+// animation and none of the rest is joined to anything.
+// ---------------------------------------------------------------------------
+
+function readShrineIcons() {
+  let src
+  try {
+    src = readFileSync(join(GAME, 'Game/Animations/GUI_Screens_VFX.sjson'), 'utf8').replace(/^\ufeff/, '')
+  } catch {
+    return null
+  }
+  const out = {}
+  // Name to the next Name, the same walk `readText` does for Id blocks, so a
+  // FilePath is always read out of the entry that declared it.
+  const names = [...src.matchAll(/\bName\s*=\s*"(ShrineIcon_[A-Za-z]+)"/g)]
+  for (let i = 0; i < names.length; i++) {
+    const block = src.slice(names[i].index, names[i + 1]?.index ?? src.length)
+    const path = block.match(/\bFilePath\s*=\s*"([^"]+)"/)
+    if (path) out[names[i][1]] = path[1].split('\\').pop()
+  }
+  return out
+}
+
+const shrineIcons = readShrineIcons()
+if (shrineIcons) {
+  writeGenerated('shrine-icons', { source: 'Game/Animations/GUI_Screens_VFX.sjson' }, shrineIcons)
+}
+console.log(`  shrine icons: ${shrineIcons ? Object.keys(shrineIcons).length : 0} animations resolve to a sprite`)
+
+// ---------------------------------------------------------------------------
 // Stacking curves. Poms raise a trait's StackNum, and TraitLogic.GetProcessedValue
 // applies, per extra stack i:
 //

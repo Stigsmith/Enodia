@@ -43,7 +43,7 @@ import { olympians, traits } from '../data/app.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { rateBuild, reportRun, reportsTo } from '../state/exchange.ts'
 import { Stars, Stepper } from './Fear.tsx'
-import { VowSheet } from './VowSheet.tsx'
+import { VowScreen } from './VowSheet.tsx'
 import { tidyVows, vowsTakenCount } from '../engine/vows.ts'
 import type { VowsTaken } from '../engine/vows.ts'
 import type { Assembles, PlayRecord, ShownBuild } from '../data/builds.ts'
@@ -84,6 +84,17 @@ export function LogRun({
    * are always about vows that exist.
    */
   const [vowsTaken, setVowsTaken] = useState<VowsTaken>(() => tidyVows(build.play?.vows))
+
+  /**
+   * Which of the two screens this dialog is, and it is two screens rather than
+   * a form with a drawer in it.
+   *
+   * The vows opened as a bordered box inside the panel first, which put a frame
+   * inside a frame and pushed the form's own buttons 17px through the bottom of
+   * the art. The shrine has a screen for this; the dialog borrows it and Back
+   * comes home. Nothing is committed by going there, so leaving is free.
+   */
+  const [view, setView] = useState<'form' | 'vows'>('form')
 
   const play = build.play
 
@@ -174,8 +185,17 @@ export function LogRun({
         * panel itself it was measuring against the full-screen overlay and
         * coming out two and a half times too big. On a child of the panel it
         * measures against the panel, which is what the frame insets are in. */}
-      <div className="logrun-box">
+      <div className={`logrun-box${view === 'vows' ? ' is-vows' : ''}`}>
         <div className="logrun-inner">
+        {view === 'vows' ? (
+          <VowScreen
+            taken={vowsTaken}
+            onChange={setVowsTaken}
+            onBack={() => setView('form')}
+            target={fear}
+          />
+        ) : (
+        <>
         <h3>How did it go?</h3>
 
         <Ask
@@ -217,13 +237,14 @@ export function LogRun({
               ofLabel={`of ${MAX_FEAR}`}
             />
 
-            {/* Folded away, and `<details>` rather than state because there is
-              * nothing to remember. Most runs will be a number and nothing
-              * else; this is for the one somebody wants to be exact about. */}
-            <details className="logrun-vows" open={vowsTakenCount(vowsTaken) > 0}>
-              <summary>Which vows?</summary>
-              <VowSheet taken={vowsTaken} onChange={setVowsTaken} target={fear} />
-            </details>
+            {/* A way through to the shrine's screen, not a drawer on this
+              * one. Most runs will be a number and nothing else; this is for
+              * the one somebody wants to be exact about. */}
+            <button type="button" className="logrun-tovows" onClick={() => setView('vows')}>
+              {vowsTakenCount(vowsTaken)
+                ? `${vowsTakenCount(vowsTaken)} vows named`
+                : 'Name the vows'}
+            </button>
           </>
         ) : null}
 
@@ -277,6 +298,8 @@ export function LogRun({
             Never mind
           </button>
         </div>
+        </>
+        )}
         </div>
       </div>
     </div>
