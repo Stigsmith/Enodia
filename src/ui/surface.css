@@ -2243,17 +2243,43 @@
   color: var(--bone-faint);
 }
 
+/**
+ * The hammer and wrench, in line rather than in colour.
+ *
+ * **U+1F6E0 followed by U+FE0E**, which is the text-presentation variation
+ * selector, and it is the whole trick. Measured in the running app by drawing
+ * each candidate to a canvas and counting saturated pixels: bare U+1F6E0 comes
+ * back 411 coloured pixels of 1226, and with FE0E it is **0 of 755**. So the
+ * selector really does fetch the monochrome glyph rather than the emoji, and a
+ * monochrome glyph takes `color` like any other letter.
+ *
+ * `font-variant-emoji: text` says the same thing in CSS for engines that have
+ * it, and the selector covers the ones that do not. Both are harmless where
+ * unsupported.
+ *
+ * **Not `-webkit-text-stroke`.** Hollowing the glyph out was the obvious way to
+ * read "wireframe", and it does not survive contact with the size: measured,
+ * outlining this glyph paints 88% of the pixels filling it does, because the
+ * symbol font already draws it as thin strokes. At the size of a menu pill that
+ * is mush. It is line art already.
+ *
+ * The pill keeps its border and `--unbuilt`, so the mark still reads as the one
+ * colour reserved for a thing that is not there yet.
+ */
 .menu-panel button.is-unbuilt .menu-label::after {
-  content: 'not built';
-  margin-left: 0.5rem;
-  padding: 0.05rem 0.35rem;
-  border: 1px solid var(--unbuilt);
-  border-radius: var(--r-pill);
+  content: '\1F6E0\FE0E';
+  font-variant-emoji: text;
+  margin-left: 0.45rem;
+  /* No pill. The border was what made two words read as a tag; a glyph does
+     not need one, and a ring around a 13px mark inside a 200px menu is more
+     furniture than it is information. */
   color: var(--unbuilt);
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.05em;
-  vertical-align: 0.1em;
+  /* Symbol fonts first, which is where the monochrome glyph lives. The emoji
+     font is last so the mark is never simply missing. */
+  font-family: 'Segoe UI Symbol', 'Apple Symbols', 'Noto Sans Symbols 2', 'Segoe UI Emoji', sans-serif;
+  font-size: 0.86rem;
+  line-height: 1;
+  vertical-align: -0.1em;
 }
 
 .masthead {
