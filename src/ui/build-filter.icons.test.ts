@@ -16,8 +16,25 @@ import { EMPTY_SELECTION, facets } from './build-filter.ts'
 
 const bar = facets(SAMPLE_BUILDS, EMPTY_SELECTION)
 
+/**
+ * Every facet that narrows by a thing in the game draws that thing.
+ *
+ * **`whose` is the exception and it is named rather than skipped.** It narrows
+ * by where a build came from, which is a fact about the library rather than
+ * anything the game drew, so inventing a glyph for "Mine" would be this tool
+ * making up art the game never had. Listing it here means adding a second
+ * artless facet has to be a decision rather than an omission.
+ */
+const NO_ART: string[] = ['whose']
+
 describe('the icons beside filter options', () => {
   it.each(bar.map((facet) => [facet.id, facet] as const))('%s gives every option art', (_id, facet) => {
+    if (NO_ART.includes(facet.id)) {
+      for (const option of facet.options) {
+        expect(option.icon, `${facet.id}: ${option.label}`).toBeNull()
+      }
+      return
+    }
     for (const option of facet.options) {
       expect(option.icon, `${facet.id}: ${option.label}`).toBeTruthy()
     }

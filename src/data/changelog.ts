@@ -20,6 +20,19 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-06',
+    title: 'You follow a build now, rather than copying it',
+    say: 'A build you take off the exchange stays its author\u2019s, and their edits reach you.',
+    points: [
+      'Clicking a card on the exchange used to take a copy. Every click. There was no way to read a listing without duplicating it, no confirmation and nothing to undo, so it was possible to end up with copies of copies. Opening a card reads it now, and following is a button you press on purpose.',
+      'Following is not copying. The build stays the author\u2019s, it sits in your library marked as theirs, and when they improve it the new version reaches you. Following the same build twice is following it once.',
+      'Changing one is what makes it yours. A followed build has no Edit; it has \u201cMake it mine\u201d, which takes it on as an ordinary build of yours and ends the following. Runs you have logged still count toward the build it came from until you change a pick.',
+      'A new filter, Whose, so \u201conly mine\u201d is one click. It appears once there is actually something of somebody else\u2019s to tell apart.',
+      'You could take, play and rate your own published build, and all three moved its public numbers. None of that was checked. It is now: your own take is refused because the build is already yours, your own runs are recorded in your library and counted nowhere else, and you cannot rate your own build.',
+      'Publishing the same build twice made two listings. There is a proper replace now, so editing and republishing updates the one people are following instead of orphaning them on the old one.',
+    ],
+  },
+  {
+    date: '2026-09-06',
     title: 'Which vows a run took, and four pages that had stopped fitting',
     say: 'A Fear number can say what it was earned under, and the reading screens stop asking you to scroll past them.',
     points: [

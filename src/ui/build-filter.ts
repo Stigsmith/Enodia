@@ -70,6 +70,20 @@ export type FacetId =
   | 'keepsake'
   | 'familiar'
   | 'fear'
+  /**
+   * Whose build it is, which only became a question worth asking when the
+   * library started holding other people's.
+   *
+   * Following puts somebody else's build on your shelf and leaves it theirs, so
+   * "show me only mine" is a real thing to want and the owner asked for it by
+   * name. It reads `build.by`, which every build already carries, so this facet
+   * adds a control rather than a field.
+   *
+   * **It offers nothing when everything is yours**, because `facets()` drops a
+   * facet with fewer than two options. A library with no follows in it never
+   * sees this control at all.
+   */
+  | 'whose'
 
 export const FACET_ORDER: FacetId[] = [
   'weapon',
@@ -79,6 +93,7 @@ export const FACET_ORDER: FacetId[] = [
   'keepsake',
   'familiar',
   'fear',
+  'whose',
 ]
 
 /**
@@ -120,6 +135,7 @@ export const EMPTY_SELECTION: Selection = {
   keepsake: [],
   familiar: [],
   fear: [],
+  whose: [],
 }
 
 /**
@@ -181,6 +197,8 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
       return build.familiar ? [build.familiar] : []
     case 'fear':
       return FEAR_BANDS.filter((band) => (build.play?.fear ?? 0) >= band).map(String)
+    case 'whose':
+      return [build.by]
   }
 }
 
@@ -228,6 +246,14 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
   keepsake: { name: 'Keepsake', all: 'Any keepsake' },
   familiar: { name: 'Familiar', all: 'Any familiar' },
   fear: { name: 'Fear cleared', all: 'Any Fear' },
+  whose: { name: 'Whose', all: 'Anyone\u2019s' },
+}
+
+/** `Provenance` in the reader's words rather than the type's. */
+const WHOSE_NAME: Record<string, string> = {
+  owner: 'Mine',
+  community: 'Following',
+  sample: 'Samples',
 }
 
 /**
@@ -247,6 +273,7 @@ const PLAYSTYLE_RANK = new Map(PLAYSTYLES.map((one, at) => [one.id as string, at
  */
 function labelFor(facet: FacetId, value: string, armChosen: boolean): string {
   if (facet === 'god') return value
+  if (facet === 'whose') return WHOSE_NAME[value] ?? value
   if (facet === 'playstyle') return PLAYSTYLE_NAME.get(value) ?? value
   if (facet === 'fear') return `Fear ${value} or better`
   if (facet === 'familiar') return familiarById.get(value)?.name ?? value
@@ -292,6 +319,18 @@ const ARM_ICON = new Map(
 /** What to draw beside an option. Absent where the library has nothing. */
 function iconFor(facet: FacetId, value: string): string | null {
   switch (facet) {
+    /**
+     * No art, and it is the only facet with none.
+     *
+     * Every other facet narrows by a thing in the game: an arm, a god, a
+     * keepsake, a familiar, a Fear number. Each of those has a picture because
+     * the game drew one. "Mine" and "Following" are a fact about where a build
+     * came from, and inventing a glyph for that would be this tool drawing
+     * something the game never did, on a control that reads perfectly well as
+     * two words.
+     */
+    case 'whose':
+      return null
     case 'weapon':
       return ARM_ICON.get(value) ?? weaponById.get(value)?.icon ?? null
     case 'god':
@@ -371,8 +410,16 @@ export function facets(builds: readonly ShownBuild[], selection: Selection): Fac
      * list was never empty. Fear is the first facet a whole library can be
      * silent about, and a "Fear cleared" control offering no Fear to filter by
      * is a row of furniture claiming to be a choice.
+     *
+     * **`whose` needs two, and it is the only facet that does.** Every other one
+     * narrows within things a build has, and one option there still says
+     * something: an Arm control offering only Descura tells you every build you
+     * own is on the Staff. `whose` partitions the library instead, and a
+     * partition with one part is not a partition. A library with nothing
+     * followed in it would get a control whose only choice is "Mine", which is
+     * the same information as the control not being there.
      */
-    .filter((facet) => facet.options.length > 0)
+    .filter((facet) => facet.options.length > (facet.id === 'whose' ? 1 : 0))
 }
 
 /**

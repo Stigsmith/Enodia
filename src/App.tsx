@@ -31,6 +31,7 @@ import { Account, ResetPassword } from './ui/Account.tsx'
 import { Exchange } from './ui/Exchange.tsx'
 import { You } from './ui/You.tsx'
 import { Friends } from './ui/Friends.tsx'
+import { refreshFollowed } from './state/exchange.ts'
 import { ACCOUNTS_LIVE, ACCOUNT_CHANGED, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
 import { useSync } from './state/useSync.ts'
@@ -147,6 +148,22 @@ export function App() {
    * keeping: the account adds a copy elsewhere, it does not become the source.
    */
   const [signedIn, setSignedIn] = useState(false)
+  /**
+   * Re-read the builds you follow, once, on the way in.
+   *
+   * **This is what following buys over a copy.** A copy is frozen at the moment
+   * it was taken; a followed build is the author's current version, and it only
+   * is if something goes and asks. The worker hands back a `revision` with the
+   * payload, so a build that has not changed costs one request and no write.
+   *
+   * Not awaited and nothing waits for it. Somebody opening the app wants their
+   * library, not a spinner over somebody else's edits, and a server that is
+   * down must not stop them reading what they already have.
+   */
+  useEffect(() => {
+    void refreshFollowed()
+  }, [])
+
   useEffect(() => {
     if (!ACCOUNTS_LIVE) return
     let live = true

@@ -23,7 +23,19 @@
  * a build can be five stars from five thousand people and still read Not in one
  * run.
  *
- * **The action is take, not edit.** A copy becomes an ordinary build of yours.
+ * **The action is follow, and it used to be take.** A copy was frozen at the
+ * moment you pressed the button and yours to edit; a build you follow stays its
+ * author's and their edits reach you. The owner asked for it that way and was
+ * right: a build somebody else maintains is a thing to subscribe to rather than
+ * a thing to clone. Changing one forks it, and then it is an ordinary build of
+ * yours.
+ *
+ * Two bugs died with the copy. Opening a card took one, because `Card` makes
+ * its whole face a hit target and this screen passed `take` in as the open
+ * handler; and nothing stopped you taking your own build, because the worker
+ * never compared the listing's owner to the caller. N clicks made N builds, all
+ * named the same thing. A listing now says whether it is yours, and following
+ * twice is following once.
  *
  * ## Two shelves, and the missing third is said out loud
  *
@@ -37,7 +49,8 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
-import { listShelf, takeBuild } from '../state/exchange.ts'
+import { followBuild, listShelf } from '../state/exchange.ts'
+import { loadBuilds } from '../state/builds.ts'
 import type { Listed, Shelf, Stats } from '../state/exchange.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
 import type { ShownBuild } from '../data/builds.ts'
@@ -119,13 +132,45 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   /** The listing open for reading, or null. */
   const readingRow = reading ? (listingOf.get(reading) ?? null) : null
 
-  const take = async (build: ShownBuild) => {
+  /**
+   * Which published ids are already on your shelf, so a listing can say so.
+   *
+   * Read from the library rather than remembered, because following writes a
+   * build and the library is where builds live. Recomputed whenever `said`
+   * changes, which is what following sets.
+   */
+  const followed = useMemo(() => {
+    const ids = new Set<string>()
+    for (const one of loadBuilds()) {
+      if (one.by === 'community' && one.derivedFrom) ids.add(one.derivedFrom)
+    }
+    return ids
+  }, [said])
+
+  /**
+   * Follow one, which is what this screen offers instead of a copy.
+   *
+   * **It used to take a copy, and the copy was the whole problem.** A copy is
+   * frozen at the moment you press the button and yours to edit; following
+   * leaves the build its author's and brings their edits with it. The owner's
+   * reading, and the right one: a build somebody else maintains is a thing you
+   * subscribe to rather than a thing you clone.
+   *
+   * Following twice is following once. `followBuild` writes over the entry it
+   * already has rather than adding a second, which is the other half of the
+   * reported bug.
+   */
+  const follow = async (build: ShownBuild) => {
     const listing = listingOf.get(build.id)
     if (!listing) return
     setSaid(null)
     setReading(null)
-    const outcome = await takeBuild(listing.id)
-    setSaid(outcome.ok ? `${outcome.build.name} is in your builds.` : outcome.say)
+    const outcome = await followBuild(listing.id)
+    setSaid(
+      outcome.ok
+        ? `Following ${outcome.build.name}. It is in your builds, and it stays ${listing.by}'s.`
+        : outcome.say,
+    )
   }
 
   return (
@@ -193,13 +238,11 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                             <p className="xchange-note">&ldquo;{listing.note}&rdquo;</p>
                           ) : null}
                           <Counted stats={listing.stats} />
-                          <button
-                            type="button"
-                            className="quiet xchange-take"
-                            onClick={() => void take(build)}
-                          >
-                            Take a copy
-                          </button>
+                          <Relation
+                            listing={listing}
+                            following={followed.has(listing.id)}
+                            onFollow={() => void follow(build)}
+                          />
                         </div>
                       ) : null
                     }
@@ -227,13 +270,11 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
               {readingRow.note ? <p className="xchange-note">&ldquo;{readingRow.note}&rdquo;</p> : null}
               <Counted stats={readingRow.stats} />
               <div className="xchange-read-actions">
-                <button
-                  type="button"
-                  className="quiet"
-                  onClick={() => void take(readingRow.build)}
-                >
-                  Take a copy
-                </button>
+                <Relation
+                  listing={readingRow}
+                  following={followed.has(readingRow.id)}
+                  onFollow={() => void follow(readingRow.build)}
+                />
                 <button type="button" className="quiet" onClick={() => setReading(null)}>
                   Close
                 </button>
@@ -315,5 +356,40 @@ function Empty({
         </button>
       ) : null}
     </div>
+  )
+}
+
+/**
+ * What you can do with a listing: follow it, or nothing, because it is yours.
+ *
+ * Three states and one of them used to be impossible to express. The worker
+ * never told the screen whose build a listing was, so it offered "Take a copy"
+ * on the reader's own builds and the owner duly took copies of their own, and
+ * then copies of those. A listing carries `mine` now, a boolean computed in the
+ * worker against a session it never sends back.
+ */
+function Relation({
+  listing,
+  following,
+  onFollow,
+}: {
+  listing: Listed
+  following: boolean
+  onFollow: () => void
+}) {
+  if (listing.mine) {
+    return <p className="xchange-yours">This one is yours. It is already in your builds.</p>
+  }
+  if (following) {
+    return (
+      <p className="xchange-yours">
+        Following. It is in your builds, and {listing.by}&rsquo;s edits reach you.
+      </p>
+    )
+  }
+  return (
+    <button type="button" className="quiet xchange-take" onClick={onFollow}>
+      Follow
+    </button>
   )
 }

@@ -276,6 +276,18 @@ export type ShownBuild = {
   /** the id this was duplicated from, or absent. Stored now, displayed later */
   derivedFrom?: string
   /**
+   * The author's revision, when this build is one you follow.
+   *
+   * `by: 'community'` says the build is somebody else's and you are reading
+   * their current version; this says which version you have. The worker returns
+   * it on every read, so refreshing is a number comparison rather than a diff
+   * of a kilobyte of payload.
+   *
+   * Absent on your own builds and on copies, both of which are snapshots that
+   * do not care whether their source moved.
+   */
+  derivedRevision?: number
+  /**
    * What the build looked like the moment it was taken from the exchange.
    *
    * A hash of the packed original, and the thing that keeps the exchange's

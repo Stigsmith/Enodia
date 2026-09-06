@@ -42,6 +42,7 @@ import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
+import { forkFollowed } from '../state/exchange.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
@@ -210,6 +211,31 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
             {open.by === 'owner' ? (
               <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
                 Edit
+              </button>
+            ) : null}
+            {/**
+              * Changing somebody else's build is what makes it yours.
+              *
+              * A followed build has no Edit, and that is not a restriction so
+              * much as what following means: it is the author's, their edits
+              * reach you, and yours would be overwritten by the next one of
+              * theirs. So the way to change it is to stop following and take
+              * it on, which is one build in the library rather than two.
+              *
+              * `derivedFrom` and `derivedHash` survive the fork, so runs still
+              * count toward the build it came from until you change a pick.
+              */}
+            {open.by === 'community' ? (
+              <button
+                type="button"
+                className="quiet builds-edit"
+                onClick={() => {
+                  const mine = forkFollowed(open)
+                  setMine(loadBuilds())
+                  setEditing(mine)
+                }}
+              >
+                Make it mine
               </button>
             ) : null}
             <BuildMenu

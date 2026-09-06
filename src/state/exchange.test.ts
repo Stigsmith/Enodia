@@ -21,7 +21,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fingerprint, rateBuild, reportRun, reportsTo, shapeOf, takeBuild } from './exchange.ts'
 import { packBuild } from './transfer.ts'
-import { DEFAULT_PREFS, loadPrefs } from './prefs.ts'
+import { DEFAULT_PREFS, loadPrefs, savePrefs } from './prefs.ts'
+import { duplicateBuild } from './builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const BUILD: ShownBuild = {
@@ -329,5 +330,39 @@ describe('the hash itself', () => {
 
   it('differs for a one character change', () => {
     expect(fingerprint('abc')).not.toBe(fingerprint('abd'))
+  })
+})
+
+/**
+ * Duplicating a build that was itself taken off the exchange.
+ *
+ * **This promised a report it could not deliver.** `duplicateBuild` overwrote
+ * `derivedFrom` always and `derivedHash` only when handed an `origin`, so a
+ * plain Duplicate in the build manager left the published hash behind through
+ * the spread while `derivedFrom` became a local `mine-<uuid>`. Duplicating
+ * changes no picks, so the hash still matched and `reportsTo` handed back a
+ * local build id. `LogRun` showed "your stars count toward it there" and posted
+ * to `/api/exchange/mine-<uuid>/played`, which does not match the route's id
+ * pattern and 404s.
+ *
+ * Watched failing before the fix: it returned the local id rather than null.
+ */
+describe('a fork of a build you took', () => {
+  it('reports to nothing, rather than to a local id', () => {
+    window.localStorage.clear()
+    savePrefs({ ...loadPrefs(), reportRuns: true })
+
+    // Take one off the exchange the way `takeBuild` does.
+    const { copy: taken } = duplicateBuild(BUILD, '2026-09-06T00:00:00.000Z', {
+      id: 'pub1',
+      hash: fingerprint(shapeOf(BUILD)),
+    })
+    expect(reportsTo(taken)).toBe('pub1')
+
+    // Then duplicate it in the build manager, which passes no origin.
+    const { copy: fork } = duplicateBuild(taken, '2026-09-06T00:00:00.000Z')
+    expect(fork.derivedFrom).toBe(taken.id)
+    expect(fork.derivedHash).toBeUndefined()
+    expect(reportsTo(fork)).toBeNull()
   })
 })
