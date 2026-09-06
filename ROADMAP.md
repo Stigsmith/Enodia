@@ -396,9 +396,30 @@ below what a player can actually clear, so anyone above 57 could not record thei
 summed from the data now, the filter bands derive from it rather than being typed out, and
 `src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
 
-Still to do here: which vows a run took, rather than only the total. The list exists, the
-screen does not, and `assets/vows/` turns out to hold art for a different set of names
-entirely, matching only 4 of the 17.
+**Which vows a run took is done**, 6 September 2026. `PlayRecord.vows` holds vow id to the
+rank taken; `src/engine/vows.ts` does the arithmetic and `src/ui/VowSheet.tsx` draws it,
+folded away behind an opener on the log form and read back as a line under the play strip.
+
+**The sheet does not overwrite the number, and that is the whole design.** A partial sheet
+is the normal case: somebody remembers three of the five vows they ran. If the sheet won,
+their Fear 30 run would quietly become a Fear 9 one. So the typed total stands, the sheet
+says what it comes to, and where the two disagree the screen says so and changes nothing.
+`coversTotal` is that predicate and it has a test named after the case.
+
+The same incremental-`Points` trap lives one layer down and five of the eighteen tests were
+watched failing against the wrong reading: `fearOfVow` returning `ranks[rank - 1].points`
+gives Vow of Pain at rank 3 a cost of 2 instead of 5 and the full sheet 34 instead of 67.
+
+The art is 5 of 17, not the 4 it was: `assets/vows/fangs.png` existed the whole time and
+`buildIconIndex` keys by slug with the first entry winning, so `icons.get('fangs')` handed
+back `hammers/fangs.webp` and the vows-scoped guard correctly refused it without ever
+finding the right one. It reads the manifest directly now. The other twelve have no art
+because `assets/vows/` holds a different set of names, so the sheet is names rather than
+icons: a grid four-seventeenths dressed reads as broken rather than sparse.
+
+**Not carried to the exchange.** A reported run sends whether it cleared and the Fear, and
+adding the vow list means a worker route and a D1 column. Worth doing, and it is the thing
+that would let a listing say what its Fear was earned under rather than only how much.
 
 ---
 

@@ -6279,6 +6279,239 @@ button.mark {
  * do: `1fr` is what makes them the same size, which is the only reason none of
  * them looks like the odd one.
  */
+/* ==========================================================================
+ * THE VOW SHEET, behind an opener on the log form
+ *
+ * Seventeen rows and forty ranks, which is why it is folded away rather than
+ * on the panel. `VowSheet.tsx` says why it is names rather than art and why
+ * the number a person typed is still the number.
+ * ======================================================================== */
+
+/**
+ * Wider than the rest of the form, on purpose.
+ *
+ * Everything else on this panel is one question in a 26rem column. This is
+ * seventeen, and the panel is 864px across: keeping the sheet narrow would have
+ * cost two columns of height inside a dialog that has to fit on the screen.
+ */
+/**
+ * The vows behind a Fear number, read only.
+ *
+ * `flex-basis: 100%` so it takes a line of its own inside the strip rather than
+ * running on after the win rate: the rest of that row is single facts and this
+ * is a list, and a list that wraps mid-way through reads as more facts.
+ */
+.vowline {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.7rem;
+  margin-top: 0.1rem;
+  font-size: 0.68rem;
+  color: var(--bone-faint);
+}
+
+.vowline-one strong {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--lit-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.logrun-vows {
+  width: min(42rem, 100%);
+  margin: 0 auto;
+}
+
+.logrun-vows > summary {
+  padding: 0.3rem 0;
+  color: var(--lit);
+  font-size: 0.8rem;
+  cursor: pointer;
+  list-style: none;
+  text-align: center;
+}
+
+.logrun-vows > summary::-webkit-details-marker { display: none; }
+
+.logrun-vows > summary:hover { color: var(--lit-hot); }
+
+/* Drawn rather than left to the browser, the same pair of borders the
+   changelog uses, so the two openers in the app read as one control. */
+.logrun-vows > summary::after {
+  content: '';
+  display: inline-block;
+  width: 0.36rem;
+  height: 0.36rem;
+  margin-left: 0.45rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-0.14rem) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.logrun-vows[open] > summary::after {
+  transform: translateY(0.02rem) rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logrun-vows > summary::after { transition: none; }
+}
+
+.vowsheet {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  padding: 0.6rem 0.7rem 0.7rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-soft);
+  background: var(--ink-900);
+}
+
+.vowsheet-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.vowsheet-sum {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+.vowsheet-sum strong {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.vowsheet-clear {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.vowsheet-clear:hover {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+/* Not a warning. A sheet that does not add up to the number is incomplete,
+   which is the normal way somebody fills this in. */
+.vowsheet-note {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+/**
+ * Two columns above 26rem, because seventeen rows in one is a scroll inside a
+ * dialog that is already tall. The order runs down the first column and then
+ * down the second, which is the shrine's order read the way a column is read.
+ */
+.vowsheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.05rem;
+}
+
+@media (min-width: 30rem) {
+  .vowsheet-list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(9, auto);
+  }
+}
+
+/**
+ * Three columns where there is room, and it is not cosmetic.
+ *
+ * Measured inside the log dialog at 1600x950: two columns of nine made the
+ * sheet 262px tall and pushed the form's own buttons 17px past the bottom of
+ * the panel art, which has `overflow: visible` and a fixed `max-height`, so
+ * content beyond it spills rather than scrolls. Three columns of six is 6, 6
+ * and 5, and it lands back inside.
+ */
+@media (min-width: 40rem) {
+  .vowsheet-list {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(6, auto);
+  }
+}
+
+.vowsheet-list > li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.08rem 0;
+}
+
+.vowsheet-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vowsheet-list > li.is-on .vowsheet-name { color: var(--bone); }
+
+.vowsheet-ranks {
+  display: flex;
+  gap: 0.1rem;
+  flex: 0 0 auto;
+}
+
+.vowsheet-ranks button {
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.vowsheet-ranks button:hover {
+  border-color: var(--lit-dim);
+  color: var(--bone);
+}
+
+.vowsheet-ranks button.is-on {
+  border-color: var(--lit-dim);
+  background: color-mix(in oklab, var(--lit) 26%, transparent);
+  color: var(--bone);
+}
+
+/* The Fear this row costs, on a fixed width so the column of numbers lines up
+   whatever the vow's name does. */
+.vowsheet-fear {
+  flex: 0 0 1.3rem;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--lit-dim);
+  font-variant-numeric: tabular-nums;
+}
+
 .logrun-three {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

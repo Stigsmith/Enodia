@@ -20,6 +20,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { olympians, traits } from '../data/app.ts'
 import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { FearMark } from './Fear.tsx'
+import { VowLine } from './VowSheet.tsx'
 
 const STARS = [1, 2, 3, 4, 5]
 
@@ -75,6 +76,11 @@ export function PlayStrip({ build }: { build: ShownBuild }) {
       {assembles ? (
         <span className={`playstrip-assembles is-${assembles.id}`}>{assembles.name}</span>
       ) : null}
+
+      {/* The terms behind the total, on their own line because they are a list
+        * and the rest of this is a row of single facts. Draws nothing unless
+        * somebody wrote them down, which most runs will not. */}
+      <VowLine vows={play?.vows} />
     </div>
   )
 }

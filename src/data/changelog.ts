@@ -19,6 +19,18 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-06',
+    title: 'Which vows a run took, and four pages that had stopped fitting',
+    say: 'A Fear number can say what it was earned under, and the reading screens stop asking you to scroll past them.',
+    points: [
+      'Logging a cleared run can now record which vows were on and how far up each one was taken. It is folded away behind “Which vows?” and most runs will not need it: a number on its own is still a perfectly good answer.',
+      'The sheet never overwrites the number you typed. Ticking three of the five vows you actually ran is the normal way to fill this in, and if it won, a Fear 30 run would quietly become a Fear 9 one. The total stands, the sheet says what it comes to, and where they disagree the screen says so and leaves it alone.',
+      'The vows show up under a build’s runs and clears, so “cleared Fear 20” can say whether that was under Vow of Pain or Vow of Void. Those are very different runs and the number alone cannot tell them apart.',
+      'Roadmap is a timeline across the page instead of a list down it, Help reads in two columns, Settings opens with what it is holding, and the Changelog you are reading now opens on the newest batch with the rest a click away. It was five and a half screens of scrolling.',
+      'The Roadmap also had two features filed under “not started” that have been live for days: the build exchange, and your builds following you between devices.',
+    ],
+  },
+  {
     date: '2026-09-04',
     title: 'The build exchange, and what happens after you take one',
     say: 'Two shelves of other people’s builds, and runs that count toward the build they came from.',
