@@ -189,7 +189,7 @@ export const TOURS: Record<string, Step[]> = {
     { at: 'arcana-grid', say: 'The board. All of it, in the game’s own positions.' },
     {
       at: 'arcana-grasp',
-      say: 'You pay Grasp for what you pick. You do not have unlimited Grasp. I did check.',
+      say: 'You pay Grasp for what you pick, and the board will not let you overspend. Set the number to what your save actually holds. It starts at 30, which is the most anyone gets.',
     },
     {
       at: 'arcana-bases',

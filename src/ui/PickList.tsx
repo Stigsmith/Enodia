@@ -58,9 +58,9 @@ export type PickOption = {
   /**
    * Why this cannot be picked, when it cannot.
    *
-   * The Arcana tab let you keep adding past the Grasp a save holds, while the
-   * Arcana screen three clicks away enforced it exactly. Two screens disagreeing
-   * about the same rule is worse than either answer.
+   * The Arcana tab let you keep adding past the Grasp a save holds, and this
+   * said the Arcana screen three clicks away enforced it exactly. It did not.
+   * It warned and allowed. Both refuse now, against one `MAX_GRASP`.
    */
   blocked?: string | null
 }

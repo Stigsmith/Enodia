@@ -702,7 +702,45 @@ const arcanaIcon = (key: string): string | null => {
   return found && found.startsWith('arcana/') ? found : null
 }
 
-const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
+/**
+ * What a card costs, following `InheritFrom` the way the game does.
+ *
+ * **Three cards state no `Cost` and the tool read all three as free.** The game
+ * resolves it at load, `RunData.lua:1222-1224`:
+ *
+ *     for name, data in pairs( MetaUpgradeCardData ) do
+ *       data.Name = name
+ *       ProcessDataInheritance( data, MetaUpgradeCardData )
+ *
+ * `CardDraw` and `EpicRarityBoost` inherit `BaseBonusMetaUpgrade.Cost = 0`, so
+ * reading them as 0 was right by accident. **`HealthRegen`, The Wayward Son,
+ * inherits `BaseMetaUpgrade.Cost = 1`**, and every consumer here does
+ * `cost ?? 0`, so it has been free in this tool and 1 Grasp in the game. The
+ * paid total is 56 rather than the 55 this file produced, and it matters now
+ * that the board enforces a budget: a cap that is short by one is a cap that
+ * lets through a board the game refuses.
+ *
+ * Depth 1 is enough and that is checked rather than assumed: the only parents
+ * in this table are `BaseMetaUpgrade` and `BaseBonusMetaUpgrade`, and neither
+ * states an `InheritFrom` of its own. The walk still follows a chain in case
+ * that changes, and gives up rather than looping if it ever meets itself.
+ */
+const costOf = (id: string, cards: Record<string, unknown>): number | null => {
+  const seen = new Set<string>()
+  let at: string | undefined = id
+  while (at && !seen.has(at)) {
+    seen.add(at)
+    const card = dictOf(cards[at])
+    if (typeof card.Cost === 'number') return card.Cost
+    const from = card.InheritFrom
+    at = Array.isArray(from) && typeof from[0] === 'string' ? from[0] : undefined
+  }
+  return null
+}
+
+const allCards = dictOf(read('arcana-cards').data)
+
+const arcanaCards = Object.entries(allCards)
   .filter(([, record]) => {
     const card = dictOf(record)
     return !card.DebugOnly && typeof card.Image === 'string'
@@ -717,7 +755,7 @@ const arcanaCards = Object.entries(dictOf(read('arcana-cards').data))
       id,
       name,
       text: describe(id),
-      cost: typeof card.Cost === 'number' ? card.Cost : null,
+      cost: costOf(id, allCards),
       /**
        * **The lite copy first, the original as the fallback.**
        *

@@ -36,14 +36,8 @@ import { useMemo, useState } from 'react'
 
 import { arcanaBoard, arcanaById } from '../data/app.ts'
 import { ARCANA_LAYOUTS, isBlank } from '../data/arcana-layouts.ts'
-import { isConditional, resolveBoard } from '../engine/arcana.ts'
+import { MAX_GRASP, affords, isConditional, resolveBoard } from '../engine/arcana.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
-
-/**
- * `MetaUpgradeCostData` starts at 10 and rises in `CostIncrease` steps as
- * MemPoints are spent. The owner reports it tops out at 30.
- */
-const MAX_GRASP = 30
 
 export function Arcana({ onClose }: { onClose?: () => void }) {
   const [chosen, setChosen] = useState<Set<string>>(new Set())
@@ -51,16 +45,51 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
   const [copied, setCopied] = useState(false)
   /** The card under the pointer or the focus ring, and nothing else. */
   const [peek, setPeek] = useState<string | null>(null)
+  /** Why the last click did nothing, when it did nothing. */
+  const [refused, setRefused] = useState<string | null>(null)
 
   const board = useMemo(() => resolveBoard(chosen), [chosen])
   const peeked = peek ? (arcanaById.get(peek) ?? null) : null
   const over = board.grasp > grasp
 
+  /**
+   * Switch a card on or off, inside the budget.
+   *
+   * **The budget is enforced here now, and it was not before.** The board
+   * counted the Grasp, turned the number magenta when it was too high, printed
+   * "More Grasp than you have", and then let you carry on. Three other places
+   * said otherwise: `BuildEditor.tsx` and `PickList.tsx` both claimed "the
+   * Arcana screen enforced it exactly", and `tour.ts` told a first-time player
+   * "I did check." None of that was true of the code. It is now.
+   *
+   * **Taking a card off is never refused.** A board can be over budget without
+   * anybody having clicked past a refusal: a saved layout loads whole, and the
+   * limit is a field you can lower. If reducing were blocked, the only way out
+   * of an over-budget board would be to start again. The game agrees, and goes
+   * further: `ValidateMetaUpgradeLayout` unequips cheapest-first rather than
+   * refusing to load.
+   *
+   * The refusal says the number, because a card that looks merely unaffordable
+   * can be the one holding two free cards on. The Centaur wants a card of every
+   * cost from 1 to 5, which is 15 Grasp at the very least, and Divinity wants a
+   * complete row or column.
+   */
   const toggle = (id: string) => {
     // A conditional card is an outcome. Clicking one would be stating a result
     // as a cause, so they are not controls.
     if (isConditional(id)) return
     setCopied(false)
+
+    const card = arcanaById.get(id)
+    const afford = affords(chosen, id, grasp)
+    if (!afford.ok) {
+      setRefused(
+        `${card?.name} costs ${afford.cost}, and that would be ${afford.would} Grasp against your ${afford.limit}.`,
+      )
+      return
+    }
+
+    setRefused(null)
     setChosen((was) => {
       const next = new Set(was)
       if (next.has(id)) next.delete(id)
@@ -71,6 +100,7 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
 
   const setLimit = (value: number) => {
     const clamped = Math.max(1, Math.min(MAX_GRASP, value))
+    setRefused(null)
     setGrasp(clamped)
     savePrefs({ ...loadPrefs(), graspLimit: clamped })
   }
@@ -121,7 +151,9 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
                   title={
                     conditional
                       ? `${card?.name}. ${on ? 'On.' : (why ?? []).map((one) => one.say).join(' ')}`
-                      : `${card?.name}. Costs ${card?.cost ?? 0}.`
+                      : `${card?.name}. Costs ${card?.cost ?? 0}.${
+                          !on && !affords(chosen, id, grasp).ok ? ' More than you have left.' : ''
+                        }`
                   }
                 >
                   {/* The highlight belongs to the art and nothing else. It sat
@@ -191,8 +223,12 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
                   key={layout.id}
                   type="button"
                   className="arcana-base"
+                  /* A layout loads whole, over budget or not. Refusing it
+                     would make a saved board unreachable rather than merely
+                     expensive, and the reading below already says it is over. */
                   onClick={() => {
                     setCopied(false)
+                    setRefused(null)
                     setChosen(new Set(layout.cards))
                   }}
                   title={layout.say}
@@ -218,7 +254,16 @@ export function Arcana({ onClose }: { onClose?: () => void }) {
             </label>
             <span className="arcana-grasp-word">Grasp</span>
           </div>
-          {over ? <p className="arcana-over">More Grasp than you have.</p> : null}
+          {over ? (
+            <p className="arcana-over">
+              More Grasp than you have. Take something off, or raise the number.
+            </p>
+          ) : null}
+          {refused ? (
+            <p className="arcana-over" role="status">
+              {refused}
+            </p>
+          ) : null}
 
           <p className="arcana-counted">
             <strong>{board.counted}</strong> paid for, <strong>{board.live.size}</strong> free
