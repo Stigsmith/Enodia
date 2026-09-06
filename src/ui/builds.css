@@ -6325,12 +6325,43 @@ button.mark {
   width: min(62rem, 100%, 104vh);
   aspect-ratio: 1248 / 1104;
   background-image: url('/shell/box-halfscreen.png');
+  /**
+   * The type scales with the frame here, which is the thing this codebase has
+   * now written down twice as the reason a panel overflowed.
+   *
+   * The frame is a fixed-ratio picture and shrinks with the window; `1.15rem`
+   * does not. Measured at 1280x800, where the height cap takes the panel down
+   * to 832 by 736: the screen ran 68px past the padded box and the Back button
+   * sat 31px below the frame's bottom edge. Nothing was unreachable, because
+   * `align-content: safe start` scrolls from the top, but it was a scroll
+   * inside a panel that is supposed to be one screen.
+   *
+   * So the vow screen's sizes are in `cqw` against this container: 1cqw is 1%
+   * of the panel's width, the panel is 988 wide at its cap, and every number
+   * below is the rem it replaced divided by 9.88. Each one keeps a `max()`
+   * floor in rem so a very small window stops shrinking the words rather than
+   * making them unreadable.
+   */
+  container-type: inline-size;
 }
 
 .logrun-box.is-vows .logrun-inner {
-  /* 6% at the foot, not 7. Measured: at 7 the screen was 8px taller than the
-     padded box and scrolled, and the frame paints to 95% so there is room. */
-  padding: 11% 15% 6%;
+  /**
+   * 13.1% at the top, and the number is the art's rather than a guess.
+   *
+   * The title was clipping the ornament. Measuring where the frame stops being
+   * decoration and starts being flat ground: sampling the middle third of
+   * `box-halfscreen.png` row by row, the colour spread stays above 30 while the
+   * ornament is painting and drops to zero at **row 163 of 1104**, which is
+   * 14.76% of the height. Percentage padding resolves against the containing
+   * block's *width*, not its height, so that is 13.06% here. It was 11%, which
+   * put the heading 21px inside the ornament.
+   *
+   * The 21px comes back off the foot. The flat ground runs to 99.5% in that
+   * band, so 4.5% leaves the Back button well clear of the frame's lower
+   * curve without the screen having to scroll.
+   */
+  padding: 13.1% 15% 4.5%;
   align-content: safe start;
   gap: 0.3rem;
 }
@@ -6346,7 +6377,7 @@ button.mark {
   margin: 0;
   font-family: var(--name);
   font-weight: 400;
-  font-size: 1.15rem;
+  font-size: max(0.95rem, 1.86cqw);
   letter-spacing: 0.02em;
   color: var(--lit-hot);
 }
@@ -6357,20 +6388,20 @@ button.mark {
   justify-content: center;
   gap: 0.35rem;
   margin: 0;
-  font-size: 0.76rem;
+  font-size: max(0.66rem, 1.23cqw);
   color: var(--bone-faint);
 }
 
 .vowscreen-sum img {
-  width: 0.9rem;
-  height: 0.9rem;
+  width: max(0.8rem, 1.5cqw);
+  height: max(0.8rem, 1.5cqw);
   align-self: center;
 }
 
 .vowscreen-sum strong {
   font-family: var(--mono);
   font-weight: 400;
-  font-size: 1.15rem;
+  font-size: max(0.95rem, 1.86cqw);
   color: var(--bone);
   font-variant-numeric: tabular-nums;
 }
@@ -6379,7 +6410,7 @@ button.mark {
 .vowscreen-note {
   margin: 0 0 0.2rem;
   min-height: 1.1em;
-  font-size: 0.7rem;
+  font-size: max(0.62rem, 1.13cqw);
   line-height: 1.4;
   color: var(--bone-faint);
 }
@@ -6397,7 +6428,7 @@ button.mark {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem 0.6rem;
+  gap: max(0.25rem, 0.4cqw) 0.6cqw;
 }
 
 @media (max-width: 44rem) {
@@ -6408,7 +6439,7 @@ button.mark {
   display: grid;
   justify-items: center;
   gap: 0.12rem;
-  padding: 0.35rem 0.2rem 0.4rem;
+  padding: max(0.22rem, 0.35cqw) 0.2rem max(0.26rem, 0.4cqw);
   border: 1px solid transparent;
   border-radius: var(--r-soft);
 }
@@ -6453,12 +6484,12 @@ button.mark {
 }
 
 .vowscreen-grid > li.is-wide .vowscreen-art {
-  width: 3rem;
-  height: 3rem;
+  width: max(2.2rem, 4.86cqw);
+  height: max(2.2rem, 4.86cqw);
 }
 
 .vowscreen-grid > li.is-wide .vowscreen-name {
-  font-size: 0.84rem;
+  font-size: max(0.72rem, 1.36cqw);
   text-align: left;
 }
 
@@ -6477,8 +6508,8 @@ button.mark {
  * sprites rather than white masks.
  */
 .vowscreen-art {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: max(1.9rem, 4.21cqw);
+  height: max(1.9rem, 4.21cqw);
   object-fit: contain;
   opacity: 0.42;
   filter: grayscale(0.6);
@@ -6497,7 +6528,7 @@ button.mark {
 }
 
 .vowscreen-name {
-  font-size: 0.7rem;
+  font-size: max(0.6rem, 1.13cqw);
   line-height: 1.25;
   color: var(--bone-faint);
   text-align: center;
@@ -6512,15 +6543,15 @@ button.mark {
 }
 
 .vowscreen-ranks button {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: max(0.9rem, 1.7cqw);
+  height: max(0.9rem, 1.7cqw);
   padding: 0;
   border: 1px solid var(--div-3);
   border-radius: var(--r-hair);
   background: none;
   color: var(--bone-faint);
   font-family: var(--mono);
-  font-size: 0.62rem;
+  font-size: max(0.55rem, 1cqw);
   line-height: 1;
   cursor: pointer;
 }
@@ -6541,7 +6572,7 @@ button.mark {
 .vowscreen-fear {
   min-height: 1em;
   font-family: var(--mono);
-  font-size: 0.66rem;
+  font-size: max(0.58rem, 1.07cqw);
   color: var(--lit-dim);
   font-variant-numeric: tabular-nums;
 }
@@ -6554,13 +6585,13 @@ button.mark {
 }
 
 .vowscreen-foot button {
-  padding: 0.34rem 1.2rem 0.42rem;
+  padding: max(0.28rem, 0.55cqw) max(1rem, 2.1cqw) max(0.34rem, 0.68cqw);
   border: 0;
   border-radius: 0;
   background: url('/shell/button.png') center / 100% 100% no-repeat;
   color: var(--bone-dim);
   font-family: var(--body);
-  font-size: 0.76rem;
+  font-size: max(0.66rem, 1.23cqw);
   cursor: pointer;
   transition: filter 0.12s ease, color 0.12s ease;
 }
