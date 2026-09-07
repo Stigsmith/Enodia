@@ -9094,19 +9094,15 @@ p.landing-say {
  * `Material = "Unlit"` is additive, which is `screen` here.
  *
  * Every number is a percentage of the portrait, so the coins scale with him
- * rather than needing their own breakpoints. Sixty frames in one row.
+ * rather than needing their own breakpoints. Sixty frames in one row and
+ * `steps(60)`, at the game's own `PlaySpeed = 30`, which is two seconds.
  *
- * **Four seconds, and the game plays it in two. That is ours, not the
- * source's.** `PlaySpeed = 30` over `NumFrames = 60` is a two second loop, and
- * this holds each frame twice as long. The owner asked for it after the art was
- * corrected, and the measurement says there is room: at the 95 by 103 the
- * cluster is drawn at, its centre travels 5.2px in x and 5.3px in y over the
- * loop, which is 5.5% of its own width, along a path only 2.2 times its widest
- * span, so a there-and-back drift rather than a wander. The largest step
- * between two frames is 0.61px and the median is 0.27px, so holding a frame for
- * 66ms instead of 33ms cannot make it read as stepped: the picture barely moves
- * from one frame to the next either way. What it does change is that five
- * pixels of drift becomes a slow breath rather than a swirl.
+ * **Four seconds was tried and reverted.** At the 95 by 103 the cluster is drawn
+ * at, its centre travels 5.2px in x and 5.3px in y over the loop, 5.5% of its
+ * own width, along a path only 2.2 times its widest span, so a there-and-back
+ * drift rather than a wander. On those numbers half speed looked safe, and on
+ * screen it was simply too slow. The game's timing is the timing. Recorded so
+ * the same idea does not get had twice.
  *
  * 337 KB, sixty cells of 160 by 172, quantised to 128 colours with no visible
  * difference at 3x zoom, because it is purple and gold and little else.
@@ -9186,7 +9182,7 @@ p.landing-say {
    * disagreement across all sixty is 2px**, which is Lanczos spreading alpha at
    * an edge.
    */
-  animation: charon-coins 4s steps(60, jump-none) infinite;
+  animation: charon-coins 2s steps(60, jump-none) infinite;
 }
 
 @keyframes charon-coins {
