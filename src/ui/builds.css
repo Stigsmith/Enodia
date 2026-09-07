@@ -142,6 +142,35 @@
   text-transform: uppercase;
 }
 
+/**
+ * The author of a build you follow changed it.
+ *
+ * Above the build rather than beside it, because it changes what you are
+ * looking at: the picks below are the ones you followed, and somebody is
+ * offering you different ones. Lit rather than red, because nothing has gone
+ * wrong. Somebody improved their build and is asking.
+ */
+.builds-news {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--lit-dim);
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--lit) 10%, transparent);
+  color: var(--bone);
+  font-size: 0.84rem;
+}
+
+.builds-news p {
+  margin: 0;
+}
+
+.builds-news-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
 .builds-stage {
   margin-top: 1.25rem;
 }

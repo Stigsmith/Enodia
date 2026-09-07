@@ -43,7 +43,8 @@ import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
-import { forkFollowed } from '../state/exchange.ts'
+import { acceptOffer, forkFollowed } from '../state/exchange.ts'
+import { declineOffer, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
@@ -267,6 +268,25 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
             />
           </div>
         </header>
+
+        {/**
+          * What the author did to a build you follow, and what you can do about
+          * it.
+          *
+          * Only ever drawn for a substantive change: a rewritten note or a
+          * better name has already been applied, quietly, because being asked
+          * about a typo is worse than not being told. `state/exchange.ts` draws
+          * that line on the picks.
+          */}
+        <FollowNews
+          build={open}
+          onTook={() => setMine(loadBuilds())}
+          onFork={() => {
+            const mine = forkFollowed(open)
+            setMine(loadBuilds())
+            setEditing(mine)
+          }}
+        />
 
         <div className="builds-stage">
           {detail === 'constellation' ? (
@@ -791,6 +811,88 @@ function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
         {piece.text ? <p className="piececard-text">{piece.text}</p> : <p className="piececard-gap">No text.</p>}
         <button type="button" onClick={onClose}>
           Close
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The author of a build you follow changed it, or took it down.
+ *
+ * **Three answers, and two of them already existed.** Taking their version goes
+ * through `followBuild`, so there is still exactly one function that writes a
+ * follow; making it yours is the same `forkFollowed` the header already offers.
+ * Only "Keep mine" is new, and all it does is remember which revision was
+ * refused so the same one is not raised twice.
+ *
+ * A build the author has taken down has nothing to answer. It says so and stops
+ * there: the build stays in the library, it still works, and it will not change
+ * again.
+ */
+function FollowNews({
+  build,
+  onTook,
+  onFork,
+}: {
+  build: ShownBuild
+  onTook: () => void
+  onFork: () => void
+}) {
+  const [offer, setOffer] = useState(() => offerFor(build.id))
+  const [busy, setBusy] = useState(false)
+  useEffect(() => setOffer(offerFor(build.id)), [build.id])
+
+  if (!offer) return null
+
+  if (offer.kind === 'takenDown') {
+    return (
+      <p className="builds-news">
+        {build.author ?? 'The author'} has taken this off the exchange. It stays here and it
+        still works, and it will not change again.
+      </p>
+    )
+  }
+
+  /* Said no to this one already. Kept quiet until the author moves again. */
+  if (offer.declined === offer.revision) return null
+
+  return (
+    <div className="builds-news">
+      <p>
+        {build.author ?? 'The author'} has changed this build. Not the words: the picks are
+        different, so it is not the build you followed.
+      </p>
+      <div className="builds-news-answers">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true)
+            void acceptOffer(build).then((outcome) => {
+              setBusy(false)
+              if (!outcome.ok) return
+              setOffer(null)
+              onTook()
+            })
+          }}
+        >
+          Take their version
+        </button>
+        <button
+          type="button"
+          className="quiet"
+          onClick={() => {
+            declineOffer(build.id)
+            setOffer(offerFor(build.id))
+          }}
+        >
+          Keep mine
+        </button>
+        {/* For somebody who wants these picks for good. It ends the follow,
+          * which is the honest outcome: you are not reading their build now. */}
+        <button type="button" className="quiet" onClick={onFork}>
+          Make it mine
         </button>
       </div>
     </div>
