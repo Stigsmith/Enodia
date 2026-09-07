@@ -35,7 +35,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
-import { publishBuild } from '../state/publish.ts'
+import { publishBuild, republishBuild, takeDownBuild } from '../state/publish.ts'
 import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
@@ -43,7 +43,7 @@ import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
-import { acceptOffer, forkFollowed } from '../state/exchange.ts'
+import { acceptOffer, forkFollowed, republishChangesTheBuild } from '../state/exchange.ts'
 import { declineOffer, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -254,6 +254,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
             ) : null}
             <BuildMenu
               build={open}
+              onListed={() => setMine(loadBuilds())}
               onDuplicate={() => {
                 const { builds, copy } = duplicateBuild(open)
                 setMine(builds)
@@ -538,11 +539,21 @@ function BuildMenu({
   build,
   onDuplicate,
   onDelete,
+  onListed,
   onGo,
 }: {
   build: ShownBuild
   onDuplicate: () => void
   onDelete: () => void
+  /**
+   * The listing changed, so the library has to be read again.
+   *
+   * `publishBuild` stamps `publishedAs` on the build in storage, and without
+   * this the menu goes on holding the copy it was rendered with and offers
+   * Publish for a build that is already published. Caught by publishing one and
+   * watching the menu not change.
+   */
+  onListed: () => void
   onGo?: (view: View) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -593,6 +604,63 @@ function BuildMenu({
 
       {open ? (
         <div className="bmenu-panel" role="menu">
+          {/**
+            * Before a republish that replaces the build rather than its
+            * write-up.
+            *
+            * It says what will actually happen rather than asking to confirm,
+            * and the recommended answer is first: publish this as a second
+            * build, which costs the author nothing and costs their followers
+            * nothing either. Replacing is still there, one press away, because
+            * it is a legitimate thing to want.
+            *
+            * `republishChangesTheBuild` decides, and the request uses the same
+            * function, so this cannot warn on a rule the server does not apply.
+            */}
+          {published === 'warn' ? (
+            <div className="bmenu-warn" role="alertdialog" aria-label="This replaces the build">
+              <p>
+                <strong>This is a different build now, not a reworded one.</strong> The picks
+                have changed since you published it.
+              </p>
+              <p>
+                Everybody following it will be asked rather than updated, and the listing starts
+                again from no runs and no rating. What it earned so far stays visible, marked as
+                being from before the change.
+              </p>
+              <div className="bmenu-warn-answers">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPublished('working')
+                    void publishBuild(build).then((outcome) => {
+                      setPublished(outcome.ok ? 'Published as a second build' : outcome.say)
+                      if (outcome.ok) onListed()
+                    })
+                  }}
+                >
+                  Publish this as a second build
+                </button>
+                <button
+                  type="button"
+                  className="quiet"
+                  onClick={() => {
+                    setPublished('working')
+                    void republishBuild(build).then((outcome) => {
+                      setPublished(outcome.ok ? 'Replaced' : outcome.say)
+                      if (outcome.ok) onListed()
+                    })
+                  }}
+                >
+                  Replace it anyway
+                </button>
+                <button type="button" className="quiet" onClick={() => setPublished(null)}>
+                  Never mind
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           {/* A whole build in a link, with no server behind it. DESIGN.md 9.
               The menu stays open so the copied line can be read. */}
           <button
@@ -629,7 +697,62 @@ function BuildMenu({
             * thing an account buys, which is why the item sits here, next to
             * the thing it improves, rather than on a screen of its own.
             */}
-          {ACCOUNTS_LIVE ? (
+          {/**
+            * A build that is already published gets different verbs.
+            *
+            * Update replaces what people are reading. Take it down removes it
+            * from the shelves and leaves the link answering for anybody who
+            * already has it, which is why it is not called Delete: nothing is
+            * destroyed and saying so would be a lie about somebody else's runs.
+            *
+            * **The warning is the point of this whole batch.** Republishing a
+            * build whose picks have moved starts the listing's counts again and
+            * asks everybody following it, so the author is told before it lands
+            * and offered the gentler option first.
+            */}
+          {ACCOUNTS_LIVE && build.publishedAs ? (
+            <>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  if (republishChangesTheBuild(build)) return setPublished('warn')
+                  setPublished('working')
+                  void republishBuild(build).then((outcome) => {
+                    setPublished(outcome.ok ? 'Updated' : outcome.say)
+                    if (outcome.ok) onListed()
+                  })
+                }}
+              >
+                <span className="bmenu-label">Update the published copy</span>
+                <span className="bmenu-note">
+                  {published === 'working'
+                    ? 'Updating'
+                    : published && published !== 'warn'
+                      ? published
+                      : 'Replaces what people following it are reading'}
+                </span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setPublished('working')
+                  void takeDownBuild(build.publishedAs as string).then((ok) =>
+                    setPublished(ok ? 'Taken off the exchange' : 'That did not work.'),
+                  )
+                  onListed()
+                }}
+              >
+                <span className="bmenu-label">Take it down</span>
+                <span className="bmenu-note">
+                  Off the shelves. The link keeps working for anybody who has it
+                </span>
+              </button>
+            </>
+          ) : null}
+
+          {ACCOUNTS_LIVE && !build.publishedAs ? (
             <button
               type="button"
               role="menuitem"
@@ -642,6 +765,7 @@ function BuildMenu({
                     setPublished(outcome.say)
                     return
                   }
+                  onListed()
                   navigator.clipboard?.writeText(outcome.link).then(
                     () => setPublished('Short link copied'),
                     () => setPublished(outcome.link),

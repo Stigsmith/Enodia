@@ -25,6 +25,7 @@ import {
   followBuild,
   listShelf,
   refreshFollowed,
+  republishChangesTheBuild,
   rateBuild,
   reportRun,
   reportsTo,
@@ -445,6 +446,26 @@ describe('whether a listing is one of yours', () => {
     expect(row).toBeDefined()
     expect(row && 'mine' in row).toBe(false)
   })
+
+  /**
+   * The counts an earlier version of the build earned.
+   *
+   * Beside `stats` on the wire, not inside it. This was declared inside `Stats`
+   * first and `shelfAt` dropped it exactly the way it dropped `mine`, which is
+   * the second time one field has been lost between the response and the screen
+   * for want of a line here. Hence a test for the carrying rather than for the
+   * arithmetic, which the worker suite already covers.
+   */
+  it('carries what earlier versions earned, which the worker sends beside the counts', async () => {
+    const before = { takes: 1, runs: 6, clears: 4, bestFear: 42, rating: 5, raters: 1 }
+    const row = await shelfOf({ before })
+    expect(row?.before).toEqual(before)
+  })
+
+  it('leaves that absent for a build nobody has changed', async () => {
+    const row = await shelfOf({})
+    expect(row && 'before' in row).toBe(false)
+  })
 })
 
 /**
@@ -620,5 +641,42 @@ describe('an author changing a build you follow', () => {
 
     expect(out).toEqual({ moved: 0, offered: 0, down: 0 })
     expect(loadBuilds().find((one) => one.id === held.id)?.derivedRevision).toBe(1)
+  })
+})
+
+/**
+ * Whether replacing a listing replaces the build or only its write-up.
+ *
+ * The author is warned before the first, because it starts the listing's counts
+ * again and asks everybody following it. The screen and the request read this
+ * same function, so a dialog cannot warn on one rule while the server applies
+ * another.
+ */
+describe('what republishing would do', () => {
+  const published = (over: Partial<ShownBuild> = {}): ShownBuild => ({
+    ...BUILD,
+    publishedAs: 'KmUkC9VotY',
+    publishedHash: fingerprint(shapeOf(BUILD)),
+    ...over,
+  })
+
+  it('says no for a rewritten note or a new name', () => {
+    expect(republishChangesTheBuild(published({ say: 'Different words.', name: 'New name' }))).toBe(
+      false,
+    )
+  })
+
+  it('says yes for a changed pick', () => {
+    expect(republishChangesTheBuild(published({ boons: ['ZeusWeaponBoon'] }))).toBe(true)
+  })
+
+  it('says no for a build that was never published', () => {
+    expect(republishChangesTheBuild(BUILD)).toBe(false)
+  })
+
+  /* Published before the shape was recorded. Nothing to compare, so nothing to
+     claim: warning on a guess would be worse than not warning. */
+  it('says no when there is no recorded shape to compare against', () => {
+    expect(republishChangesTheBuild({ ...BUILD, publishedAs: 'KmUkC9VotY' })).toBe(false)
   })
 })

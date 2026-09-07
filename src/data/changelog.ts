@@ -20,6 +20,19 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-07',
+    title: 'Nobody else can rewrite a build in your library',
+    say: 'What following means when the person you follow changes their mind.',
+    points: [
+      'You could follow your own build, which put a second copy of it in your library marked as somebody else’s. Your own listings say so now and offer no Follow button, and following one through a raw link is refused as well.',
+      'When somebody changes a build you follow, what reaches you depends on what they changed. A better note or a clearer name simply arrives. A change to the picks is a different build, so it waits: you are told, and you choose between their version and the one you have. It used to overwrite yours without asking.',
+      'Taking a build down no longer destroys it. It leaves the shelves so nobody new finds it, and everything else stays: the link still opens for anybody who has it, it stays in the library of everybody following it, and every run and rating people logged against it survives. It used to delete all of that.',
+      'If an author replaces a build with a substantially different one, the listing’s counts start again, and what the old version earned stays visible as being from before the change. Four stars from forty people is a claim about the build those forty played.',
+      'And the author is warned before that happens, with the gentler option offered first: publish it as a second build instead of replacing the one people are following.',
+      'Authors can now update or take down what they published, from the build itself. The server had told anybody with fifty published builds to “unpublish one first” since publishing existed, with no way to do it.',
+    ],
+  },
+  {
+    date: '2026-09-07',
     title: 'Escape closes things, and the coins are the right size',
     say: 'Two the owner caught by using it.',
     points: [

@@ -46,17 +46,17 @@ export type Stats = {
   bestFear: number | null
   rating: number | null
   raters: number
-  /**
-   * What earlier versions of this build earned, when the author has replaced
-   * the picks and somebody had already played or rated what was there before.
-   *
-   * Absent is the normal case, and means there is nothing to say rather than
-   * nothing to count. **No `players`**: that is a distinct-people claim, and
-   * folding several versions would count somebody who played two of them twice.
-   * The worker omits it for that reason and this mirrors it.
-   */
-  before?: Omit<Stats, 'players' | 'before'>
 }
+
+/**
+ * What earlier versions of a build earned, when its author replaced the picks
+ * and somebody had already played or rated what was there before.
+ *
+ * **No `players`.** That is a distinct-people claim, and folding versions
+ * together would count somebody who played two of them twice. The worker omits
+ * it for that reason and this mirrors it.
+ */
+export type Before = Omit<Stats, 'players'>
 
 /** One build on a shelf, unpacked and ready for the ordinary filters. */
 export type Listed = {
@@ -70,6 +70,15 @@ export type Listed = {
   mine?: boolean
   build: ShownBuild
   stats: Stats
+  /**
+   * Beside `stats` rather than inside it, because that is where the worker puts
+   * it and a type that disagrees with the wire is a field that never arrives.
+   *
+   * It was declared inside `Stats` first and `shelfAt` silently dropped it,
+   * which is exactly what happened to `mine` above. Caught by looking at a
+   * listing that should have had one.
+   */
+  before?: Before
 }
 
 export type Shelf = 'picked' | 'friends'
@@ -93,6 +102,7 @@ type Wire = {
    */
   mine?: boolean
   stats: Stats
+  before?: Before
 }
 
 /**
@@ -212,6 +222,7 @@ async function shelfAt(path: string): Promise<Listed[]> {
       // is. Defaulting that to false would have the screen say "not yours" when
       // what it means is that it never asked.
       ...(row.mine === undefined ? {} : { mine: row.mine }),
+      ...(row.before === undefined ? {} : { before: row.before }),
       // The server's name is authoritative for the listing: it is what the
       // author published under, and the packed build could say anything.
       build: { ...build, name: row.name },
@@ -468,6 +479,27 @@ export async function acceptOffer(build: ShownBuild): Promise<TakeOutcome> {
   const outcome = await followBuild(offer.from)
   if (outcome.ok) clearOffer(build.id)
   return outcome
+}
+
+/**
+ * Would republishing this replace the build rather than the write-up?
+ *
+ * True when the picks have moved since it was published, which is the moment
+ * the listing's counts start again and everybody following it gets asked
+ * instead of updated. The author is told before that happens, and the same
+ * answer decides both the warning and what the server does with it.
+ *
+ * **One function, so the screen and the request cannot disagree**, which is the
+ * argument `reportsTo` makes above about `LogRun`. A dialog that warns on a
+ * different rule from the one the server applies is worse than no dialog.
+ *
+ * False for a build that has never been published, because there is nothing to
+ * replace, and false when it has no recorded shape, which is a build published
+ * before that was stamped: no basis to claim anything changed.
+ */
+export function republishChangesTheBuild(build: ShownBuild): boolean {
+  if (!build.publishedAs || !build.publishedHash) return false
+  return fingerprint(shapeOf(build)) !== build.publishedHash
 }
 
 /**
