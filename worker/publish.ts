@@ -52,11 +52,16 @@ const shapeIn = (body: { shape?: unknown }): string =>
  * Per account, and the only thing bounding total storage.
  *
  * better-auth's rate limiter covers `/api/auth/*` and nothing else, so it caps
- * how many accounts can exist but not what one account can write. Fifty is far
- * past what anybody publishes and still bounded. **A Cloudflare rate limiting
- * rule at the edge is the better answer** and is the owner's to add.
+ * how many accounts can exist but not what one account can write. **A
+ * Cloudflare rate limiting rule at the edge is the better answer** and is the
+ * owner's to add.
+ *
+ * A hundred on the owner's call, raised from fifty now that a taken-down
+ * listing no longer occupies a slot. Cheap at this size: the payload column
+ * averages 1.2 to 1.6 KB, so a full account is around 160 KB, and D1's free
+ * tier is measured in gigabytes.
  */
-const MAX_PER_USER = 50
+const MAX_PER_USER = 100
 
 /**
  * No `0`, `O`, `1`, `l` or `I`. These ids get read aloud and typed by hand

@@ -38,7 +38,7 @@ import { useSync } from './state/useSync.ts'
 import { KOFI, kofiUrl } from './data/kofi.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
-import { openPublished, publishedInUrl } from './state/publish.ts'
+import { openPublished, publishedInUrl, reconnectPublished } from './state/publish.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
 import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
@@ -174,6 +174,22 @@ export function App() {
      */
     void refreshFollowed().then((out) => {
       if (out.moved > 0) setLibraryAt((was) => was + 1)
+    })
+
+    /**
+     * And reconnect any listing whose build has lost track of it.
+     *
+     * Everything published before `publishedAs` existed is in that state, and
+     * so is anything published from a browser you no longer have. An orphaned
+     * listing cannot be updated or taken down, holds one of the account's
+     * slots, and turns Publish on the build it came from into a second listing.
+     *
+     * Unawaited beside the refresh above, and for the same reason: neither is
+     * worth a spinner over somebody else's library, and neither failing should
+     * stop the page.
+     */
+    void reconnectPublished().then((joined) => {
+      if (joined > 0) setLibraryAt((was) => was + 1)
     })
   }, [])
 

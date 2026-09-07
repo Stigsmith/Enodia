@@ -83,10 +83,10 @@ describe('what a published build costs to store', () => {
    * limiter covers `/api/auth/*` and nothing else, so it caps how many accounts
    * can exist but not what one of them can write.
    */
-  it('refuses the fifty-first', async () => {
+  it('refuses the hundred and first', async () => {
     const { cookie, id } = await someone()
 
-    const values = Array.from({ length: 50 }, (_, at) => `('cap${String(at).padStart(6, '0')}','${id}','Zx','Seeded')`)
+    const values = Array.from({ length: 100 }, (_, at) => `('cap${String(at).padStart(6, '0')}','${id}','Zx','Seeded')`)
     await env.DB.prepare(`insert into published_build (id,user_id,payload,name) values ${values.join(',')}`).run()
 
     const response = await publish(cookie, 'One too many')
@@ -275,7 +275,7 @@ describe('the publish cap', () => {
     /* Seeded rather than published, the way the fifty-first test above does it:
        fifty real publishes would hit the rate limiter long before the cap. */
     const values = Array.from(
-      { length: 50 },
+      { length: 100 },
       (_, at) => `('down${String(at).padStart(6, '0')}','${id}','Zx','Seeded')`,
     )
     await env.DB.prepare(
