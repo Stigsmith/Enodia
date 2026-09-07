@@ -569,12 +569,25 @@ own pixels. The placement in `builds.css` follows from that: the crop box
 and the 760/1694 that made `charon-shop.png`, giving **left 39.052%, top
 42.237%, width 17.350% and height 18.890%** of that portrait.
 
-**What the animation actually does, measured rather than guessed.** The cluster
-of coins swirls: its centroid travels 4.2px in each axis over the loop, at a
-median 0.27px per frame with no step larger than 0.61, and the seam from frame 60
-back to frame 1 is 0.31px, so the loop is smooth and closes cleanly. That motion
-is the animation and not an artefact. It was reported as wandering when the
-cluster was drawn a quarter too small, which is the scale error above.
+**What the animation actually does, measured rather than guessed.** At the 95 by
+103 CSS pixels the cluster is drawn at, its centroid travels 5.2px in x and 5.3px
+in y over the loop, which is 5.5% of its own width. The path is only 2.2 times
+its widest span, so it is a there-and-back drift rather than a wander. The median
+step between frames is 0.27px with none larger than 0.61, the seam from frame 60
+back to frame 1 is 0.31px, and brightness holds between 87% and 100% of peak. So
+the loop is smooth, closes cleanly and does not flicker. That motion is the
+animation and not an artefact. It was reported as wandering when the cluster was
+drawn a quarter too small, which is the scale error above.
+
+**The one number on Charon that is ours rather than the game's: the loop runs
+over four seconds and the game plays it in two.** `PlaySpeed = 30` over
+`NumFrames = 60` is two seconds. The owner asked for half speed once the art was
+corrected, and the measurement says there is room for it: the largest step
+between two frames is 0.61px, so holding a frame for 66ms instead of 33ms cannot
+make it read as stepped. Five pixels of drift becomes a slow breath rather than a
+swirl. `src/ui/charon-coins.test.ts` pins the four seconds, so that a later pass
+aiming at fidelity does not quietly undo a decision thinking it is fixing a
+mistake.
 
 The portrait is cropped to its own alpha and saved at 760px tall as
 **`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:
