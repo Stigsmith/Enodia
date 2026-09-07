@@ -260,3 +260,35 @@ describe('whose build it is', () => {
     expect((await SELF.fetch(`${ORIGIN}/api/b/${id}`)).status).toBe(404)
   })
 })
+
+/**
+ * The cap counts what is on the shelves, not what has ever existed.
+ *
+ * A taken-down row stays forever by design, so counting it would turn a limit
+ * on how much you publish into a permanent ceiling: fifty builds, take them all
+ * down, and you can never publish again. The refusal telling you to take one
+ * down would then be advice that does not work, which is worse than no advice.
+ */
+describe('the publish cap', () => {
+  it('frees a slot when a build is taken down', async () => {
+    const { cookie, id } = await someone()
+    /* Seeded rather than published, the way the fifty-first test above does it:
+       fifty real publishes would hit the rate limiter long before the cap. */
+    const values = Array.from(
+      { length: 50 },
+      (_, at) => `('down${String(at).padStart(6, '0')}','${id}','Zx','Seeded')`,
+    )
+    await env.DB.prepare(
+      `insert into published_build (id,user_id,payload,name) values ${values.join(',')}`,
+    ).run()
+
+    expect((await publish(cookie, 'One too many')).status).toBe(409)
+
+    await SELF.fetch(`${ORIGIN}/api/builds/down000000`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie },
+    })
+
+    expect((await publish(cookie, 'Now there is room')).status).toBe(201)
+  })
+})

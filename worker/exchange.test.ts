@@ -302,6 +302,42 @@ describe('the counts, which are the only evidence there is', () => {
 
     const body = await (await get('/api/exchange')).text()
     expect(body).not.toContain(player.id)
+    expect(body).not.toContain(curator.id)
+  })
+
+  /**
+   * The same check, over the fields added since it was written.
+   *
+   * `mine` and `before` are both answers computed from rows this table owns,
+   * and the shape token is stored per person per version. None of that may
+   * carry an identity out. A new column near this table is the exact place
+   * somebody adds one without noticing.
+   */
+  it('says nothing about who, through any of the newer fields', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    /* Published with a shape, so the run below lands on it rather than being
+       treated as a run against a version that is not current. */
+    const made = await post(
+      '/api/builds',
+      { payload: 'Zpackedbuild', name: 'Watched', shape: 'aaa' },
+      { cookie: author.cookie },
+    )
+    const id = (await made.json<{ id: string }>()).id
+    await curate(id, 'a pick')
+    await post(`/api/exchange/${id}/played`, { cleared: true, fear: 12, shape: 'aaa' }, { cookie: player.cookie })
+    await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'PUT',
+      headers: { origin: ORIGIN, cookie: author.cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ payload: 'Zother', name: 'Watched', shape: 'bbb' }),
+    })
+
+    const body = await (await get('/api/exchange', author.cookie)).text()
+    expect(body).not.toContain(player.id)
+    expect(body).not.toContain(author.id)
+    // The listing does say `before`, which is the point of the republish above:
+    // this asserts it says so without saying whose.
+    expect(body).toContain('"before"')
   })
 })
 

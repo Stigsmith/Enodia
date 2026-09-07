@@ -44,7 +44,7 @@ import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
 import { acceptOffer, forkFollowed, republishChangesTheBuild } from '../state/exchange.ts'
-import { declineOffer, offerFor } from '../state/offers.ts'
+import { declineOffer, loadOffers, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
@@ -121,6 +121,23 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
    * wanting it.
    */
   const [detail, setDetail] = useState<BuildDetail>(() => loadPrefs().buildDetail)
+
+  /**
+   * Followed builds with something waiting, recomputed whenever the library is.
+   *
+   * A declined offer is not waiting: saying no once should not leave a line on
+   * the screen forever. `refreshFollowed` raises it again if the author moves
+   * again, which is the only thing that should bring it back.
+   */
+  const waiting = useMemo(() => {
+    const offers = loadOffers()
+    return mine
+      .filter((one) => {
+        const offer = offers[one.id]
+        return offer?.kind === 'changed' && offer.declined !== offer.revision
+      })
+      .map((one) => one.id)
+  }, [mine])
 
   const chooseDetail = (id: BuildDetail) => {
     setDetail(id)
@@ -383,6 +400,24 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
         * Deleting used to be the end of a build: one browser, no server, and a
         * mis-click was final. The confirm step stops the accident and not the
         * change of mind an hour later. */}
+      {/**
+        * Somebody changed a build you follow, said once, above the shelf.
+        *
+        * Without this the whole thing is undiscoverable: the answer lives on
+        * the build's own screen, and nothing would tell you there was a build
+        * worth opening. Same idiom as the bin line below, which is already the
+        * pattern for a thing only mentioned when there is something in it.
+        */}
+      {waiting.length ? (
+        <p className="builds-binline builds-waiting">
+          <button type="button" onClick={() => setOpenId(waiting[0] as string)}>
+            {waiting.length === 1
+              ? 'One build you follow has changed'
+              : `${waiting.length} builds you follow have changed`}
+          </button>
+        </p>
+      ) : null}
+
       {bin.length ? (
         <p className="builds-binline">
           <button type="button" onClick={() => setShowBin((was) => !was)}>

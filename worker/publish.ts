@@ -18,7 +18,7 @@
  * account's behalf. None of them are guesses about what a person needs.
  */
 
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
 import { publishedBuild } from './schema-app.ts'
@@ -107,15 +107,27 @@ export async function publish(
   if (!name) return { status: 400, say: 'A published build needs a name.' }
   if (name.length > MAX_NAME) return { status: 400, say: 'That name is too long.' }
 
+  /**
+   * **Live rows only.** A taken-down row stays forever by design, so counting
+   * it would turn a limit on how much you publish into a permanent ceiling:
+   * publish fifty, take them all down, and never publish again. The refusal
+   * below tells you to take one down, so it had better be true that taking one
+   * down helps.
+   *
+   * The storage those tombstones occupy is real and unbounded in principle. It
+   * is a payload column averaging 1.2 to 1.6 KB, so fifty of them is under
+   * 100 KB an account, and the answer if that ever matters is a second and
+   * higher cap on total rows rather than counting the dead against the living.
+   */
   const [row] = await db
     .select({ count: sql<number>`count(*)` })
     .from(publishedBuild)
-    .where(eq(publishedBuild.userId, userId))
+    .where(and(eq(publishedBuild.userId, userId), isNull(publishedBuild.takenDownAt)))
 
   if ((row?.count ?? 0) >= MAX_PER_USER) {
     return {
       status: 409,
-      say: `You have ${MAX_PER_USER} published builds, which is the limit. Unpublish one first.`,
+      say: `You have ${MAX_PER_USER} builds on the exchange, which is the limit. Take one down first.`,
     }
   }
 

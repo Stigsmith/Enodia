@@ -7179,6 +7179,12 @@ button.mark {
  * itself is a row of furniture about a thing that has not happened.
  * ---------------------------------------------------------------------- */
 
+/* The same line as the bin, lit rather than quiet, because it is somebody
+   waiting on an answer rather than a drawer you forgot about. */
+.builds-waiting button {
+  color: var(--lit);
+}
+
 .builds-binline {
   margin: 0.6rem 0 0;
 }
