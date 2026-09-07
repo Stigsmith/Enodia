@@ -460,9 +460,18 @@ the coin layer used its own stated 0.8. The coins shipped at four fifths of thei
 about 10px out of place, 76 by 82 where they should be 95 by 103. Same rule as `InheritFrom`
 in `TraitData`, different file format, now `CLAUDE.md` error 8.
 
-The swirl itself is real and was measured before being blamed: the cluster's centroid travels
-4.2px per axis over the loop, median 0.27px a frame, no step over 0.61, and a 0.31px seam, so
-it closes cleanly. Composited offline and looked at, rather than reasoned about.
+The swirl itself is real and was measured before being blamed. At the 95 by 103 the cluster is
+drawn at, its centroid travels 5.2px in x and 5.3px in y over the loop, 5.5% of its own width,
+along a path 2.2 times its widest span, so a there-and-back drift rather than a wander. Median
+step 0.27px, none over 0.61, seam 0.31px, brightness 87% to 100% of peak. Composited offline
+and looked at, rather than reasoned about.
+
+**And then slowed on purpose, which is the one number on Charon that is not the game's.** The
+loop runs over four seconds where `PlaySpeed = 30` over sixty frames is two. The owner's call
+once the art was right, and the measurement says it is safe: the largest step between frames
+is 0.61px, so a 66ms hold cannot look stepped where a 33ms one did not.
+`src/ui/charon-coins.test.ts` pins the four seconds so a later pass aiming at fidelity does not
+undo a decision thinking it is fixing a mistake.
 
 **What cannot be rebuilt, stated rather than attempted.** The portrait in the game also draws
 `CharonMist`, `CharonMoonGlow`, `CharonGlint`, `CharonGlowMain`, `CharonGlowEyes` and four
