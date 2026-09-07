@@ -218,3 +218,27 @@ describe('how long since the last export', () => {
     expect(collect(store()).data['enodia.exportedAt']).toBe('2026-09-01T10:00:00.000Z')
   })
 })
+
+/**
+ * A share link must not carry a claim on a listing.
+ *
+ * `shareable` is what goes in a URL fragment and what `packBuild` sends to the
+ * server, so anything left in it travels to whoever opens the link. `play` was
+ * already stripped because it is your record and not theirs. `publishedAs` and
+ * `publishedHash` are a stronger case: they say this build is the one behind a
+ * particular listing, and a stranger's copy offering to replace what your
+ * followers read is the failure this whole batch exists to prevent.
+ */
+describe('what a share link is not allowed to carry', () => {
+  it('strips the published id and its shape along with play', () => {
+    const out = shareable({
+      ...FIRST_BUILD,
+      play: { runs: 3, clears: 1 },
+      publishedAs: 'KmUkC9VotY',
+      publishedHash: 'abc123',
+    })
+    expect(out.play).toBeUndefined()
+    expect(out.publishedAs).toBeUndefined()
+    expect(out.publishedHash).toBeUndefined()
+  })
+})

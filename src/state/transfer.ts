@@ -174,9 +174,18 @@ const fromBase64Url = (text: string): Uint8Array<ArrayBuffer> => {
   return bytes
 }
 
-/** What actually goes in the link: the build, minus what is personal to here. */
+/**
+ * What actually goes in the link: the build, minus what is personal to here.
+ *
+ * `play` is your record of playing it and means nothing in somebody else's
+ * library. `publishedAs` and `publishedHash` are stronger than that: they are a
+ * claim on a listing, and a link carrying them would hand the person who opened
+ * it a build that offers to replace what your followers are reading. This
+ * function is also what `packBuild` sends to the server, so stripping here is
+ * what keeps them off the wire entirely.
+ */
 export function shareable(build: ShownBuild): ShownBuild {
-  const { play: _play, ...rest } = build
+  const { play: _play, publishedAs: _publishedAs, publishedHash: _publishedHash, ...rest } = build
   return rest
 }
 
