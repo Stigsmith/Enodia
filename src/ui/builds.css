@@ -719,7 +719,7 @@
      both land in row one instead of spanning. Measured: the mark's full height
      went into the first track, the second track added its own 10px on top, and
      the row was 11px taller than the tallest thing in it. */
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   align-items: center;
   /* Fills the button, so the reading lands on the right margin and the readings
      down a long shelf line up as a column. Without it the head is only as wide
@@ -1003,6 +1003,39 @@
   font-size: 0.6rem;
   letter-spacing: 0.04em;
   color: var(--bone-faint);
+}
+
+/**
+ * How a build has actually gone, under the arm line on the card.
+ *
+ * Mono like the arm above it, because these are counted facts and the card's
+ * display face is for names. Dot separated by the same rule as the gods line,
+ * which is the idiom this card already uses for a list of small facts.
+ */
+.bcard-played {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--bone-dim);
+}
+
+.bcard-played span + span::before {
+  content: '\00b7';
+  margin: 0 0.35rem;
+  color: var(--div-4);
+}
+
+/* In a row it is a third line under the name, so it sits beside the arm rather
+   than under it and the row keeps its 51px. */
+.is-list .bcard-head > .bcard-played {
+  grid-column: 2;
+  grid-row: 3;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .bcard-gods::before {

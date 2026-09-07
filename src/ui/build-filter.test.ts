@@ -399,3 +399,57 @@ describe('whose', () => {
     expect(facets(allMine, EMPTY_SELECTION).find((one) => one.id === 'whose')).toBeUndefined()
   })
 })
+
+/**
+ * Filtering by what a build has actually done.
+ *
+ * Two facets rather than one, because a rate and a count answer different
+ * questions and combining them would be the tool weighing "reliable" against
+ * "proven" on the reader's behalf. One clear from one run is a hundred per
+ * cent; nine from thirty is thirty and worth far more.
+ */
+describe('narrowing by how a build has gone', () => {
+  const played = (id: string, play: ShownBuild['play']): ShownBuild => ({
+    ...SAMPLE_BUILDS[0]!,
+    id,
+    name: id,
+    play,
+  })
+
+  const shelf = [
+    played('never', undefined),
+    played('tried', { runs: 4, clears: 0 }),
+    played('sometimes', { runs: 10, clears: 3, fear: 20 }),
+    played('often', { runs: 12, clears: 9, fear: 30 }),
+    played('perfect', { runs: 1, clears: 1 }),
+  ]
+
+  const narrowed = (selection: Partial<Selection>) =>
+    shelf.filter((build) => matches(build, { ...EMPTY_SELECTION, ...selection })).map((b) => b.id)
+
+  it('counts clears as a threshold, so three means three or more', () => {
+    expect(narrowed({ cleared: ['3'] })).toEqual(['sometimes', 'often'])
+  })
+
+  it('treats a build nobody has run as answering no rate at all', () => {
+    // Not a zero rate. Nobody has tried it, which is a different fact, and
+    // filing it as "never clears" would be the tool inventing a result.
+    expect(narrowed({ rate: ['25'] })).not.toContain('never')
+    expect(narrowed({ rate: ['25'] })).not.toContain('tried')
+  })
+
+  it('keeps a one-from-one at every band, because that is what its runs say', () => {
+    expect(narrowed({ rate: ['100'] })).toEqual(['perfect'])
+    expect(narrowed({ rate: ['50'] })).toEqual(['often', 'perfect'])
+  })
+
+  it('answers both at once, which is how you ask for reliable and proven', () => {
+    expect(narrowed({ rate: ['50'], cleared: ['5'] })).toEqual(['often'])
+  })
+
+  it('offers the bands as a ladder rather than alphabetically', () => {
+    const bar = facets(shelf, EMPTY_SELECTION)
+    const rate = bar.find((facet) => facet.id === 'rate')
+    expect(rate?.options.map((one) => one.value)).toEqual(['25', '50', '75', '100'])
+  })
+})

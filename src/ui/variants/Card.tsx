@@ -28,6 +28,8 @@ import { Mark, usePiecePeek } from '../BuildMark.tsx'
 import { Stamp } from '../Stamp.tsx'
 import { olympians, traits } from '../../data/app.ts'
 import { readRepeat } from '../../engine/repeat.ts'
+import { winRate } from '../../data/builds.ts'
+import type { PlayRecord } from '../../data/builds.ts'
 import type { Assembled, Piece } from '../build-pieces.ts'
 
 /**
@@ -117,6 +119,8 @@ export function Card({
             {built.arm}
             {built.gods.length ? <span className="bcard-gods">{built.gods.join(' + ')}</span> : null}
           </span>
+          {/* How it has actually gone, when it has gone at all. */}
+          <Played play={build.play} />
           {/* The word only. The reasons live in the builder, where somebody can
             * act on them; here it is one more thing to sort a shelf by. */}
           <Stamp read={read} size="small" />
@@ -173,6 +177,35 @@ export function Card({
       </button>
       {foot}
     </li>
+  )
+}
+
+/**
+ * What this build has actually done, in one line.
+ *
+ * **Nothing at all for a build nobody has run**, which is most of a new
+ * library. A row of zeroes is a verdict, and "0 of 0 cleared" would read as a
+ * build that fails rather than one nobody has tried. `Counted` on the exchange
+ * makes the same argument about the same shape.
+ *
+ * **The rate never appears without its denominator.** One clear from one run is
+ * a hundred per cent and means almost nothing; nine from thirty means a great
+ * deal more and is a smaller number. Writing "7 of 12" first and the percentage
+ * after is what keeps the second honest, and it is the rule this project
+ * applies to every average it draws, including the rating on a listing.
+ */
+function Played({ play }: { play?: PlayRecord }) {
+  const runs = play?.runs ?? 0
+  if (runs <= 0) return null
+  const rate = winRate(play)
+  return (
+    <span className="bcard-played">
+      <span>
+        {play?.clears ?? 0} of {runs} cleared
+      </span>
+      {rate === null ? null : <span>{Math.round(rate * 100)}%</span>}
+      {play?.fear ? <span>Fear {play.fear}</span> : null}
+    </span>
   )
 }
 
