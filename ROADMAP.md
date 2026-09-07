@@ -433,8 +433,37 @@ drawn box and any row or any piece of shelf chrome, at 1280, 1600 and 1920, pinn
 the box, 59 of the 60 steps painted thousands of box-widths off the sheet and nothing at all
 appeared. One frame in sixty was ever drawn. `steps(60, jump-none)` from `0%` to `100%` lands
 on `k/59` exactly, checked by pausing the animation and reading 0%, 50.8475% and 98.3051% for
-frames 0, 30 and 58. `assets/README.md` carries both wrong readings of this layer, because
-they are different mistakes.
+frames 0, 30 and 58.
+
+**Then the sheet itself, which is a third mistake and not the second one again.** With the
+stepping fixed the coins wandered around his palm. The sixty extracted PNGs are each the
+full 314x454 canvas with the frame already placed on it, so they arrive aligned; the first
+sheet fitted each frame to its cell instead of cropping all sixty to one box. Measured: its
+vertical scale was consistent at 0.362 to 0.366 while its horizontal placement moved about
+twice as far as the source does, and 41 of 60 frames were clipped at a cell edge. Rebuilt
+from the union of every frame's alpha plus a pixel of margin, and checked frame by frame
+against the source, worst disagreement **2px**. On screen the vertical wander is down from
+**8.9px to 4.1**, against the source's own 2.7.
+
+**And he sometimes did not appear at all.** The portrait carried `loading="lazy"` while
+`.xchange-charon` takes its width from that image, so before it loaded the box was zero wide
+and sat exactly on the right edge of the window, where the lazy loader saw an off-screen
+element and declined to fetch it, which kept the box zero wide. Caught by measuring
+`complete` and `naturalWidth` two seconds after load against a plain `new Image()` for the
+same path. It is not deferred now and `aspect-ratio: 768 / 760` gives the box its shape
+before the bytes arrive.
+
+`assets/README.md` carries all three wrong readings of this layer, because they are three
+different mistakes, and `src/ui/charon-coins.test.ts` pins two of them: 41 of 60 frames flush
+to a cell edge against a limit of 15, and the exact old step put back failing that assertion
+alone.
+
+**Escape closes what is on top, 7 September 2026.** `src/ui/escape.ts` is `useEscape(active,
+close)`, on `document` because nothing here traps focus, and it stands aside for an Escape
+that `defaultPrevented` says something nearer the keyboard already answered. Wired into the
+four dialogs that had nothing: the exchange's listing, `PieceCard`, `Shared` and `LogRun`,
+where it means Back on the vow screen and Close on the form. `Tour`, `Menu`, `You`,
+`Dropdown` and the build manager's More menu already had their own and keep them.
 
 **Three routes had no author check at all.** `take`, `played` and `rate` each read the row to
 prove it existed and none compared its owner to the caller, so an author taking, playing and

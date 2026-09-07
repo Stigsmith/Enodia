@@ -61,6 +61,7 @@ import { Card } from './variants/Card.tsx'
 import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
 import { Tabs } from './Tabs.tsx'
+import { useEscape } from './escape.ts'
 import { assemble } from './build-pieces.ts'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
@@ -148,6 +149,10 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       : found
     return sortBuilds(narrowed, sort)
   }, [builds, selection, sort, query, listingOf])
+
+  /* Escape closes the listing. It is read-only, so there is nothing here to
+     lose by leaving, and this is the screen the owner asked for it on. */
+  useEscape(reading !== null, () => setReading(null))
 
   /** What the shelf is showing, once the count is known. */
   const density: BuildDensity = chosenDensity ?? (rows.length > 12 ? 'list' : 'cards')
@@ -463,7 +468,18 @@ function Relation({
 function CharonShop() {
   return (
     <div className="xchange-charon" aria-hidden="true">
-      <img className="xchange-charon-art" src="/characters/charon-shop.png" alt="" loading="lazy" />
+      {/**
+        * **Not lazy, and that was a deadlock rather than a preference.** The
+        * wrapper is `position: fixed; right: 0` and takes its width from this
+        * image, so before the image loads the box is zero wide and sits exactly
+        * on the right edge of the window. The lazy loader then sees an element
+        * that is not on screen and does not fetch it, which keeps the box zero
+        * wide. Caught by measuring: `complete` false and `naturalWidth` 0 two
+        * seconds after load, while a plain `new Image()` for the same path
+        * returned 768 by 760 immediately. He is the largest thing on this screen
+        * and is above the fold by construction, so there was nothing to defer.
+        */}
+      <img className="xchange-charon-art" src="/characters/charon-shop.png" alt="" />
       {/* The coins, over his open palm, where the game puts them. Its own
         * element rather than part of the picture, because it is sixty frames
         * and an additive blend. `builds.css` has the arithmetic. */}

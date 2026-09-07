@@ -9028,6 +9028,11 @@ p.landing-say {
      */
     height: min(34rem, 62dvh);
     width: auto;
+    /* The file's own 768 by 760, stated so the wrapper has a width on the first
+       frame rather than after the image decodes. Without it the coins, which
+       are positioned as a percentage of that width, start at zero wide and
+       snap into place. */
+    aspect-ratio: 768 / 760;
     /* He is behind a dark page and lit from behind in the art. Left at full
        strength he reads as a second subject; this puts him where a painted
        backdrop sits. */
@@ -9097,10 +9102,17 @@ p.landing-say {
  */
 .xchange-coins {
   position: absolute;
-  left: 41.377%;
-  top: 44.970%;
-  width: 12.891%;
-  height: 15.658%;
+  /**
+   * Derived, not nudged. `assets/README.md` carries the arithmetic: the two
+   * layers' offsets and scales out of `GUI_Portraits_VFX.sjson`, both sprites
+   * centre-anchored on their `originalSize`, mapped through the crop and the
+   * 760/1694 scale that made `charon-shop.png`. The four numbers are the coin
+   * sheet's own crop box expressed as a fraction of that portrait.
+   */
+  left: 40.442%;
+  top: 43.554%;
+  width: 13.880%;
+  height: 15.112%;
   background: url('/characters/charon-coins.png') 0 0 / 6000% 100% no-repeat;
   mix-blend-mode: screen;
   /**
@@ -9121,6 +9133,22 @@ p.landing-say {
    * across a closed range including both ends, which is that series and no
    * rounding. Plain `steps(60)` would emit `k/60`, a fifty-ninth of a frame out
    * on every frame but the first.
+   *
+   * **And then the sheet itself was wrong, which is a third mistake and not the
+   * second one again.** With the stepping fixed the coins visibly jumped
+   * around. The sixty extracted PNGs are each the full 314x454 canvas with the
+   * frame already placed on it, so they arrive aligned; the first sheet did not
+   * keep that. Measured against the source, its vertical scale was consistent
+   * at 0.362 to 0.366 while its horizontal placement moved about twice as far
+   * as the source does, and every frame's content ran into the right edge of
+   * its cell where the source frames stop as much as 24px short. So the frames
+   * were being fitted to the cell rather than cropped to a shared box.
+   *
+   * It is one box now, the union of all sixty frames' alpha plus a pixel of
+   * margin, and every frame is cropped to it and scaled by the same factor on
+   * both axes. Checked frame by frame against the source: **the worst
+   * disagreement across all sixty is 2px**, which is Lanczos spreading alpha at
+   * an edge.
    */
   animation: charon-coins 2s steps(60, jump-none) infinite;
 }

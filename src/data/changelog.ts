@@ -20,6 +20,16 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-07',
+    title: 'Escape closes things, and the coins stop jumping',
+    say: 'Two small ones the owner caught by using it.',
+    points: [
+      'Escape closes what is on top. The listing on the exchange, a boon’s card, a build somebody shared with you and the run log all opened over the page with no way out but the mouse. On the run log it means Back while you are naming vows and Close on the form, because leaving from in there would throw away the answer you were part way through giving. An Escape that a menu has already answered is left alone, so one keystroke never closes two things.',
+      'The coins in Charon’s hand wandered around his palm. The sprite sheet was built by fitting each of the sixty frames to its cell instead of cropping all sixty to one box, so every frame sat somewhere slightly different and 41 of them were clipped at the edge. Rebuilt from one box: the wander is down from 8.9 pixels to 4.1, which is what the animation actually does, and nothing is cut off.',
+      'He also failed to appear at all sometimes. The portrait was marked as deferrable, and it is positioned by its own width, so before it loaded it sat exactly off the right edge of the window, where the browser decided it was not worth loading. It is not deferred now.',
+    ],
+  },
+  {
+    date: '2026-09-07',
     title: 'A shelf that can hold hundreds, and Charon out of the way of it',
     say: 'The exchange showed one very large card at a time. It shows a list now, and the list is the point.',
     points: [
