@@ -180,9 +180,29 @@ export function Help() {
           </p>
           <p className="ref-say">
             You <strong>follow</strong> a build rather than copying it. It stays the person who
-            made it, it sits in your library marked as theirs, and when they improve it their
-            version reaches you. Changing anything about it is what makes it yours: that forks
-            it into an ordinary build of your own and ends the following.
+            made it and it sits in your library marked as theirs. Changing anything about it is
+            what makes it yours: that forks it into an ordinary build of your own and ends the
+            following.
+          </p>
+          <p className="ref-say">
+            When they change it, what reaches you depends on what they changed. A better note or
+            a clearer name simply arrives, because being asked about a typo is worse than not
+            being told. A change to the <strong>picks</strong> is a different build, so that one
+            waits: you are told, you can see what they did, and you choose between their version
+            and the one you have. Nothing anybody else does rewrites a build in your library
+            without you.
+          </p>
+          <p className="ref-say">
+            Taking a build down removes it from these shelves so nobody new finds it. It does not
+            delete it: if you already follow it, it stays in your library and goes on working,
+            and the link keeps opening for anybody who has it. The runs and ratings people logged
+            against it stay too.
+          </p>
+          <p className="ref-say">
+            If an author replaces a build with a substantially different one, its counts start
+            again. What the old version earned is still shown, marked as being from before the
+            change, because forty people rating the build that used to be here is true and is not
+            a claim about this one.
           </p>
           <p className="ref-say">
             The numbers under a listing are counts and never a score. How many people took it,

@@ -2973,6 +2973,44 @@ button.mark {
   background: var(--ink-900);
 }
 
+/**
+ * Before replacing a published build with a different one.
+ *
+ * Inside the menu rather than over the screen, because it is the answer to the
+ * item that was just pressed and a modal would lose that thread. It is the one
+ * thing in this menu that is not a list item, so it is boxed and it comes
+ * first.
+ *
+ * Warm rather than lit: this is not an error and nobody has done anything
+ * wrong, but it is the one action here that changes something in other people's
+ * libraries.
+ */
+.bmenu-warn {
+  margin: 0 0 0.4rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--warn-dim, var(--div-4));
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--ink-850) 85%, transparent);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bone);
+}
+
+.bmenu-warn p {
+  margin: 0 0 0.5rem;
+}
+
+.bmenu-warn p:last-of-type {
+  margin-bottom: 0;
+}
+
+.bmenu-warn-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+}
+
 .bmenu-label {
   font-family: var(--body);
   font-size: 0.86rem;

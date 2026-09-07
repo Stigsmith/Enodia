@@ -53,7 +53,7 @@ import { followBuild, listShelf } from '../state/exchange.ts'
 import { loadBuilds } from '../state/builds.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
-import type { Listed, Shelf, Stats } from '../state/exchange.ts'
+import type { Before, Listed, Shelf, Stats } from '../state/exchange.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -283,7 +283,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                              * what makes it allowed. */
                             <p className="xchange-note">&ldquo;{listing.note}&rdquo;</p>
                           ) : null}
-                          <Counted stats={listing.stats} />
+                          <Counted stats={listing.stats} {...(listing.before ? { before: listing.before } : {})} />
                           <Relation
                             listing={listing}
                             following={followed.has(listing.id)}
@@ -314,7 +314,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             <div className="xchange-read-foot">
               <p className="xchange-by">by {readingRow.by}</p>
               {readingRow.note ? <p className="xchange-note">&ldquo;{readingRow.note}&rdquo;</p> : null}
-              <Counted stats={readingRow.stats} />
+              <Counted stats={readingRow.stats} {...(readingRow.before ? { before: readingRow.before } : {})} />
               <div className="xchange-read-actions">
                 <Relation
                   listing={readingRow}
@@ -346,10 +346,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
  * Draws nothing at all for a build nobody has touched, which on a new shelf is
  * every build. A row of zeroes reads as a verdict.
  */
-function Counted({ stats }: { stats: Stats }) {
+function Counted({ stats, before }: { stats: Stats; before?: Before }) {
   const anything =
     stats.takes > 0 || stats.runs > 0 || stats.raters > 0 || stats.bestFear !== null
-  const before = stats.before
   if (!anything && !before) return null
 
   return (
