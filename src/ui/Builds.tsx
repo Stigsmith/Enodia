@@ -47,6 +47,7 @@ import { forkFollowed } from '../state/exchange.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
+import { useEscape } from './escape.ts'
 import type { Piece } from './build-pieces.ts'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
@@ -771,6 +772,9 @@ function SampleTag({ full = false }: { full?: boolean }) {
  * in arrangement.
  */
 function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
+  /* It only ever tells you what a boon does, so leaving it costs nothing. */
+  useEscape(true, onClose)
+
   return (
     <div className="piececard" role="dialog" aria-label={piece.name}>
       <div className="piececard-body">

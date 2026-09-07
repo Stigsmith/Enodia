@@ -529,8 +529,36 @@ which is the frame series. Verified by pausing the animation and reading the
 computed position at three times: 0%, 50.8475% and 98.3051%, which are frames 0,
 30 and 58 to the digit.
 
-The sheet ships as **`assets/characters/charon-coins.png`, 184 KB**, quantised to
-128 colours from 1077 KB with no visible difference at the size it is drawn.
+**And then the sheet was wrong too, which is a third mistake rather than the
+second one again.** With the stepping fixed the coins visibly jumped around.
+Every one of the sixty extracted PNGs is the full 314x454 canvas with the frame
+already placed on it, so they arrive aligned and all a sheet has to do is crop
+them all to one box. The first sheet did not: measured against the source, its
+vertical scale was consistent at 0.362 to 0.366 while its horizontal placement
+moved about twice as far as the source does, and every frame's content ran into
+the right edge of its cell where the source frames stop as much as 24px short.
+The frames had been fitted to the cell.
+
+Rebuilt from the union of all sixty frames' alpha, `(18, 28)` to `(315, 348)`,
+which is 297 by 320 including a pixel of margin so no frame can bleed into its
+neighbour when a step rounds to a device pixel. Every frame is cropped to that
+one box and scaled by the same factor on both axes. Checked frame by frame
+against the source: the worst disagreement across all sixty is **2px**, which is
+Lanczos spreading alpha at an edge. On screen the vertical wander went from
+**8.9px to 4.1px** against the source's own 2.7, and the count of clipped frames
+from 41 to none.
+
+The sheet ships as **`assets/characters/charon-coins.png`, 337 KB**, sixty cells
+of 160 by 172, quantised to 128 colours. It is 153 KB larger than the broken one
+because the cells are half again as tall: 172 is a real 2x for the 82px the
+element draws at, where 119 was not. `src/ui/charon-coins.test.ts` pins both
+mistakes.
+
+The placement in `builds.css` is derived from the numbers above rather than
+nudged: the crop box mapped through the coin layer's scale and offset, the
+portrait's offset, the trim at `(297, 40)` and the 760/1694 that made
+`charon-shop.png`, giving left 40.442%, top 43.554%, width 13.880% and height
+15.112% of that portrait.
 
 The portrait is cropped to its own alpha and saved at 760px tall as
 **`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:

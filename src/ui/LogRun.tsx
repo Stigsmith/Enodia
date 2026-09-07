@@ -44,6 +44,7 @@ import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { rateBuild, reportRun, reportsTo } from '../state/exchange.ts'
 import { Stars, Stepper } from './Fear.tsx'
 import { VowScreen } from './VowSheet.tsx'
+import { useEscape } from './escape.ts'
 import { tidyVows, vowsTakenCount } from '../engine/vows.ts'
 import type { VowsTaken } from '../engine/vows.ts'
 import type { Assembles, PlayRecord, ShownBuild } from '../data/builds.ts'
@@ -95,6 +96,17 @@ export function LogRun({
    * comes home. Nothing is committed by going there, so leaving is free.
    */
   const [view, setView] = useState<'form' | 'vows'>('form')
+
+  /**
+   * Escape means Back on the vow screen and Close on the form.
+   *
+   * It has to mean the nearer of the two, because the vow screen is a screen
+   * rather than a drawer: Escape taking you out of the dialog from in there
+   * would throw away the answer you were part way through giving, and the way
+   * out of the vows is Back. Nothing is committed either way, and the form's
+   * own Escape does what Cancel does.
+   */
+  useEscape(true, () => (view === 'vows' ? setView('form') : onClose()))
 
   const play = build.play
 
