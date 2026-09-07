@@ -8,6 +8,7 @@
  * A `fail` finding fails the build. A `warn` is printed and does not.
  */
 
+import { ROADMAP } from '../../src/data/roadmap.ts'
 import { aspectIconKeys, buildIconIndex, resolveIcon } from '../../src/data/icons.ts'
 import type { IconOverrides } from '../../src/data/icons.ts'
 import type { Bundle, Finding, SourceFile } from './types.ts'
@@ -1430,5 +1431,87 @@ export function runAllChecks(bundle: Bundle): Finding[] {
     ...checkAssets(bundle),
     ...checkControlChars(bundle),
     ...checkCharset(bundle),
+    ...checkRoadmap(bundle),
   ]
+}
+
+// ---------------------------------------------------------------------------
+// 12. The user-facing roadmap, held to the code it describes.
+// ---------------------------------------------------------------------------
+
+/**
+ * Every roadmap entry names a file, and the file's existence must match the
+ * stage.
+ *
+ * **`src/data/roadmap.ts` has gone false twice and nothing could tell.** It
+ * says what the tool does, nothing imports it for behaviour, so no test and no
+ * type can fail when a claim stops being true. The first round put the exchange
+ * and device sync under "Intended, but not started" while both were live; the
+ * correction for that is item 4a in `ROADMAP.md`. Within a day of it, the
+ * exchange gained following, offers, takedowns and per-version counts, and the
+ * entry still described taking a copy.
+ *
+ * The rule is symmetric, and the second half is the one that keeps catching
+ * things: **a built thing's file must exist, and a planned one's must not.**
+ * Something shipping without its entry moving is the exact failure both times.
+ *
+ * It reads `bundle.sources`, which already holds every non-test file under
+ * `src/`, so this check needed no new plumbing. That is also why a proof has to
+ * be a path under `src/`: a claim resting on a file the validator cannot see
+ * would pass for the wrong reason.
+ *
+ * **A null proof is allowed and has to be argued for**, because some claims are
+ * not about whether a file exists. "The library ships empty" is about the
+ * contents of `SAMPLE_BUILDS`. "Whether a build is strong is not in any file"
+ * is a standing refusal that no file will ever prove. Those carry `why`, so an
+ * unprovable entry is a decision rather than an omission, the same shape as
+ * `NO_ART` in `build-filter.icons.test.ts`.
+ */
+export function checkRoadmap(bundle: Bundle): Finding[] {
+  const out: Finding[] = []
+  const has = new Set(bundle.sources.map((file) => file.path))
+
+  for (const entry of ROADMAP) {
+    if (entry.proof === null) {
+      if (!entry.why?.trim()) {
+        out.push(
+          fail('roadmap', `"${entry.title}" has no proof and no reason given for having none`),
+        )
+      }
+      continue
+    }
+
+    if (!entry.proof.startsWith('src/')) {
+      out.push(
+        fail(
+          'roadmap',
+          `"${entry.title}" names ${entry.proof}, which is outside src/ and so outside what this check can see`,
+        ),
+      )
+      continue
+    }
+
+    const exists = has.has(entry.proof)
+    if (entry.stage === 'now' && !exists) {
+      out.push(
+        fail('roadmap', `"${entry.title}" is listed as built, but ${entry.proof} does not exist`),
+      )
+    }
+    if (entry.stage !== 'now' && exists) {
+      out.push(
+        fail(
+          'roadmap',
+          `"${entry.title}" is listed as ${entry.stage}, but ${entry.proof} exists. Built things belong under "now"`,
+        ),
+      )
+    }
+  }
+
+  if (!out.length) {
+    const proven = ROADMAP.filter((one) => one.proof !== null).length
+    out.push(
+      info('roadmap', `${proven} of ${ROADMAP.length} roadmap entries prove their stage, ${ROADMAP.length - proven} argue why they cannot`),
+    )
+  }
+  return out
 }
