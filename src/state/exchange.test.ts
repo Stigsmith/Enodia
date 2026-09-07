@@ -21,6 +21,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   fingerprint,
+  followBuild,
   listShelf,
   rateBuild,
   reportRun,
@@ -30,7 +31,7 @@ import {
 } from './exchange.ts'
 import { packBuild } from './transfer.ts'
 import { DEFAULT_PREFS, loadPrefs, savePrefs } from './prefs.ts'
-import { duplicateBuild } from './builds.ts'
+import { duplicateBuild, loadBuilds } from './builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const BUILD: ShownBuild = {
@@ -433,5 +434,52 @@ describe('whether a listing is one of yours', () => {
     const row = await shelfOf({})
     expect(row).toBeDefined()
     expect(row && 'mine' in row).toBe(false)
+  })
+})
+
+/**
+ * You cannot follow your own build.
+ *
+ * The shelf covers this now that `mine` reaches it, but the shelf is not the
+ * only door: `/api/b/:id` takes no session, so a raw link to your own listing
+ * would hand it straight back to you and following it would put a second copy
+ * of your own build in your library, marked as somebody else's.
+ *
+ * The check has to be local, because the server genuinely does not know who is
+ * asking on that route. `publishedAs` is what makes it possible at all.
+ */
+describe('following a build of your own', () => {
+  it('refuses, rather than making a second copy of it', async () => {
+    window.localStorage.setItem(
+      'enodia.builds',
+      JSON.stringify({
+        version: 1,
+        builds: [{ ...BUILD, id: 'mine-original', publishedAs: 'KmUkC9VotY' }],
+      }),
+    )
+    const seen = stubFetch(() => ({ body: {} }))
+
+    const outcome = await followBuild('KmUkC9VotY')
+
+    expect(outcome.ok).toBe(false)
+    expect(seen).toHaveLength(0)
+    expect(JSON.parse(window.localStorage.getItem('enodia.builds') ?? '{}').builds).toHaveLength(1)
+  })
+
+  it('still follows somebody else\u2019s', async () => {
+    const payload = await packBuild(BUILD)
+    window.localStorage.setItem(
+      'enodia.builds',
+      JSON.stringify({
+        version: 1,
+        builds: [{ ...BUILD, id: 'mine-original', publishedAs: 'SomethingElse' }],
+      }),
+    )
+    stubFetch(() => ({ body: { payload, name: 'Killer Current', revision: 0 } }))
+
+    const outcome = await followBuild('KmUkC9VotY')
+
+    expect(outcome.ok).toBe(true)
+    expect(loadBuilds()).toHaveLength(2)
   })
 })

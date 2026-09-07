@@ -178,7 +178,23 @@ export function duplicateBuild(
    */
   origin?: { id: string; hash: string },
 ): { builds: SavedBuild[]; copy: SavedBuild } {
-  const { play: _play, author: _author, ...rest } = source
+  /**
+   * `publishedAs` and `publishedHash` go out with `play` and `author`, and for
+   * the sharpest reason of the four.
+   *
+   * They say "this build is the one behind that listing". A copy that inherited
+   * them would offer to update the published copy and replace the original with
+   * the duplicate. That is the `derivedFrom` failure below, one field along: a
+   * field meaning "I am the original" riding a spread into something that is
+   * not.
+   */
+  const {
+    play: _play,
+    author: _author,
+    publishedAs: _publishedAs,
+    publishedHash: _publishedHash,
+    ...rest
+  } = source
   const mine = readName()
   const copy: SavedBuild = {
     ...rest,

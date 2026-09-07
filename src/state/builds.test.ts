@@ -292,3 +292,28 @@ describe('the bin', () => {
     expect(window.localStorage.getItem('enodia.bin')).toBeTruthy()
   })
 })
+
+/**
+ * A duplicate must not inherit a claim on somebody's listing.
+ *
+ * `publishedAs` says "this build is the one behind that listing, and updating
+ * it replaces what people are following". A copy that inherited it would offer
+ * exactly that, and replacing the original with a copy is not something anybody
+ * asked for.
+ *
+ * **This is the same failure as the `derivedFrom` bug recorded above**, one
+ * field along: a field that means "I am the original" travelling through a
+ * spread into something that is not. Written as a test rather than trusted to
+ * the docblock, because the docblock existed the last time too.
+ */
+describe('duplicating a build that is published', () => {
+  it('carries neither the published id nor its shape', () => {
+    window.localStorage.setItem(
+      KEY,
+      store([oldShape({ publishedAs: 'KmUkC9VotY', publishedHash: 'abc123' })]),
+    )
+    const { copy } = duplicateBuild(loadBuilds()[0]!)
+    expect(copy.publishedAs).toBeUndefined()
+    expect(copy.publishedHash).toBeUndefined()
+  })
+})

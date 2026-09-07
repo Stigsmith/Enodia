@@ -263,9 +263,13 @@ export type ShownBuild = {
 
   // --- Identity. Written by `state/builds.ts`, never by a form. ------------
   //
-  // All four are optional on `ShownBuild` because the eight samples carry none
+  // Every one is optional on `ShownBuild` because the eight samples carry none
   // and do not need any. `SavedBuild` below is the type that has been through
   // the migration, and it requires them.
+  //
+  // The two `published*` fields are the exception to the heading: they are
+  // written by `state/publish.ts`, which is the only place that knows the
+  // answer. Same rule otherwise, no form ever writes one.
 
   /** ISO, when the build was first written. Never changes */
   created?: string
@@ -290,8 +294,14 @@ export type ShownBuild = {
   /**
    * What the build looked like the moment it was taken from the exchange.
    *
-   * A hash of the packed original, and the thing that keeps the exchange's
-   * numbers meaning something. Runs logged against a copy are reported back to
+   * **A hash of `shapeOf`, which is the picks and not the prose.** This line
+   * used to say "a hash of the packed original", which was true when it was
+   * written and stopped being true when `shapeOf` arrived: renaming a build or
+   * rewriting its notes does not move this, and that is exactly the property
+   * the follow offer in `state/exchange.ts` now rests on.
+   *
+   * It is the thing that keeps the exchange's numbers meaning something. Runs
+   * logged against a copy are reported back to
    * the build it came from, and only while the copy is still that build: change
    * it and this stops matching, so the reporting stops. Otherwise "38 of 61
    * cleared" would be a claim about somebody else's work that anybody could
@@ -313,6 +323,34 @@ export type ShownBuild = {
    * ordinary save. Editing somebody's build does not make it yours.
    */
   author?: string
+  /**
+   * The short id this build of yours is published under, or absent.
+   *
+   * **The library had no way to know a build was published at all**, because
+   * `publishBuild` wrote nothing back. Three things needed it: the author
+   * cannot be offered "update the published copy" for a listing nobody has
+   * connected to a build, the exchange cannot refuse to let you follow your own
+   * build through a raw link, and nothing could tell the counts on a listing
+   * which build in your library they belong to.
+   *
+   * Written only by `state/publish.ts`, and **stripped from duplicates and from
+   * share links**. A copy that inherited this would offer to replace the
+   * original listing with the copy, which is the same failure `derivedFrom` and
+   * `derivedHash` already caused once and which `state/builds.ts` records at
+   * length.
+   */
+  publishedAs?: string
+  /**
+   * The shape it had when it was last published, for the same `shapeOf` hash
+   * `derivedHash` uses.
+   *
+   * This is what lets the republish warning fire without asking the server
+   * anything: both sides of the comparison are here in the browser. Equal means
+   * the edit was prose and republishing is quiet; different means the build
+   * itself changed, which resets the listing's counts and asks everybody
+   * following it, and the author is told that before it happens.
+   */
+  publishedHash?: string
 }
 
 /**

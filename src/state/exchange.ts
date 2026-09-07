@@ -246,6 +246,28 @@ export type TakeOutcome = { ok: true; build: ShownBuild } | { ok: false; say: st
  * is the provenance and `derivedRevision`, not a parallel store.
  */
 export async function followBuild(id: string): Promise<TakeOutcome> {
+  /**
+   * Not your own, and the check is local because it cannot be anywhere else.
+   *
+   * `take` refuses this on the server (`worker/exchange.ts:306`) and the shelf
+   * refuses it on the screen now that `mine` reaches it, but neither covers a
+   * raw `/b/<id>` link: that route takes no session, so the server does not
+   * know who is asking and will hand you your own build back. Following it
+   * would put a second copy of your own build in your library marked as
+   * somebody else's, which is what the owner hit.
+   *
+   * Before the request, so a refusal costs nothing. The sentence is the
+   * worker's own, because two ways of saying it is one too many.
+   *
+   * **Known hole, stated rather than papered over:** a build published before
+   * `publishedAs` existed carries no stamp, so its own author can still follow
+   * a raw link to it. The shelf catches that case with `mine`, and the outcome
+   * is one harmless duplicate rather than anything destructive.
+   */
+  if (loadBuilds().some((one) => one.publishedAs === id)) {
+    return { ok: false, say: 'That build is yours. It is already in your library.' }
+  }
+
   let response: Response
   try {
     response = await fetch(`/api/b/${id}`)

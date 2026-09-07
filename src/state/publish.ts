@@ -23,9 +23,25 @@
  */
 
 import type { ShownBuild } from '../data/builds.ts'
+import { saveBuild } from './builds.ts'
+import { fingerprint, shapeOf } from './exchange.ts'
 import { packBuild, unpackBuild } from './transfer.ts'
 
-export type Published = { id: string; name: string; createdAt: number }
+/**
+ * One of your listings, as `worker/publish.ts listMine` returns it.
+ *
+ * `revision` and `updatedAt` were being returned by the worker and thrown away
+ * here before anything on this side could act on them. They are what an author
+ * needs to see: which version people are reading, and when it last moved.
+ */
+export type Published = {
+  id: string
+  name: string
+  createdAt: number
+  revision: number
+  /** null when it has never been republished. */
+  updatedAt: number | null
+}
 
 export type PublishOutcome = { ok: true; id: string; link: string } | { ok: false; say: string }
 
@@ -54,6 +70,19 @@ async function readError(response: Response): Promise<string> {
   }
 }
 
+/**
+ * Publish, and **stamp the local build with what came back**.
+ *
+ * The stamp is the whole reason this function writes to the library at all. Two
+ * things need it and neither can get it from the server: the author cannot be
+ * offered "update the published copy" for a listing nothing connects to a
+ * build, and the exchange cannot refuse to let you follow your own build,
+ * because `/api/b/:id` takes no session and will happily hand you your own.
+ *
+ * This module is the only writer of both fields, the way `reportRun` is the
+ * only sender of a run. A second writer forgets one of them, and the pair
+ * coming apart is a failure this codebase has already had once.
+ */
 export async function publishBuild(build: ShownBuild): Promise<PublishOutcome> {
   try {
     const response = await fetch('/api/builds', {
@@ -63,10 +92,22 @@ export async function publishBuild(build: ShownBuild): Promise<PublishOutcome> {
     })
     if (!response.ok) return { ok: false, say: await readError(response) }
     const { id } = (await response.json()) as { id: string }
+    stamp(build, id)
     return { ok: true, id, link: linkTo(id) }
   } catch {
     return { ok: false, say: 'Could not reach the server. Your build is untouched.' }
   }
+}
+
+/**
+ * Record on the build which listing it is behind, and what shape it went up as.
+ *
+ * Deliberately after the request rather than optimistically before it: a build
+ * that thinks it is published when it is not would offer to update a listing
+ * that does not exist.
+ */
+function stamp(build: ShownBuild, id: string): void {
+  saveBuild({ ...build, publishedAs: id, publishedHash: fingerprint(shapeOf(build)) })
 }
 
 export async function myPublished(): Promise<Published[]> {
@@ -80,9 +121,55 @@ export async function myPublished(): Promise<Published[]> {
   }
 }
 
-export async function unpublishBuild(id: string): Promise<boolean> {
+/**
+ * Replace what people are reading, and restamp the shape it now has.
+ *
+ * The shape goes up with it as an opaque token, which is how the server splits
+ * a listing's counts across versions without ever reading the payload. See
+ * `worker/publish.ts`.
+ */
+export async function republishBuild(build: ShownBuild): Promise<PublishOutcome> {
+  if (!build.publishedAs) return { ok: false, say: 'That build is not published.' }
+  try {
+    const response = await fetch(`/api/builds/${build.publishedAs}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        payload: await packBuild(build),
+        name: build.name,
+        shape: fingerprint(shapeOf(build)),
+      }),
+    })
+    if (!response.ok) return { ok: false, say: await readError(response) }
+    stamp(build, build.publishedAs)
+    return { ok: true, id: build.publishedAs, link: linkTo(build.publishedAs) }
+  } catch {
+    return { ok: false, say: 'Could not reach the server. Your build is untouched.' }
+  }
+}
+
+/**
+ * Take a listing off the shelves. **Not a delete**, on purpose.
+ *
+ * The row stays and the link keeps working for anybody who already has it,
+ * marked as taken down. Destroying it would take every run anybody logged
+ * against it, every rating, and the curator's note with it, and it would empty
+ * the build out of the library of everyone following it. `worker/publish.ts`
+ * carries the rest of the argument.
+ */
+export async function takeDownBuild(id: string): Promise<boolean> {
   try {
     const response = await fetch(`/api/builds/${id}`, { method: 'DELETE' })
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+/** The other half of taking one down, and a separate verb rather than a toggle. */
+export async function putBackBuild(id: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/builds/${id}/restore`, { method: 'POST' })
     return response.ok
   } catch {
     return false
