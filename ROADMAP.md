@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 5 September 2026, game build `138174`.
+Last updated 8 September 2026, game build `138174`.
 
 ---
 
@@ -14,9 +14,9 @@ Last updated 5 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 547 in node across 29 files, and **92 inside workerd** against a real D1. `npm test` runs both |
-| **Validator** | 0 failures, 3 warnings |
-| **Build** | `dist/` is **29 MB and 668 files**, and it runs from a plain static server |
+| **Tests** | 620 in node across 32 files, and **115 inside workerd** against a real D1. `npm test` runs both |
+| **Validator** | 0 failures, 3 warnings, across 10 checks |
+| **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -71,7 +71,7 @@ been clicked.
 
 **Everything under `/api/` is rate limited now**, not just `/api/auth/*`. better-auth only
 ever sees its own handler, so publishing, reading a published build and every friends route
-were unlimited. `worker/limit.ts` holds four rules in its own table, and the counting is one
+were unlimited. `worker/limit.ts` holds five rules in its own table, and the counting is one
 SQLite upsert rather than a read and a write: D1 has no interactive transactions, and the
 two-step version let 25 simultaneous requests through a limit of 5. Measured, not assumed.
 
@@ -111,7 +111,7 @@ The sequence is fixed in `DESIGN.md` 10. Status only here.
 | Step | What | State |
 |---:|---|---|
 | 1 | Extractor, Lua to `data/generated` | **Done.** 63 files, zero failures, deterministic: a re-run against the same build changes nothing but the date |
-| 2 | Validator wired into prebuild | **Done.** 8 checks. `npm run build` stops on a broken reference, and it has caught two of mine |
+| 2 | Validator wired into prebuild | **Done.** 10 checks. `npm run build` stops on a broken reference, and it has caught two of mine |
 | 3 | Asset join, every trait has an icon or a recorded gap | **Done.** 310 of 310 offerable traits and 24 of 24 aspects have art, zero gaps |
 | 4 | `engine/slots.ts` and the type layer | **Done.** Inheritance resolved, the lockout encoded, 22 tests |
 | 5 | `engine/reachability.ts` | **Done.** Four states, bands, god priority, and it runs against the real 47 targets |
@@ -355,7 +355,7 @@ said the split "would let the validator stop walking `InheritFrom` itself", and 
 circular: the entity type a split would sort by *is* the marker the walk goes looking for.
 `ancestorsOf` at `scripts/validate/checks.ts:262` is what decides a trait is a duo, so a
 split by duo-ness would have to run the walk to know where to put anything. The second walk,
-`rosterFromLoot` at `:991`, is over `loot.json` and a change to `traits.json` cannot reach it
+`rosterFromLoot` at `:1015`, is over `loot.json` and a change to `traits.json` cannot reach it
 at all. `scripts/validate/inheritance.test.ts` pins both: dropping the first gives 46 duos
 and 0 Hex duos instead of 37 and 9, and dropping the second gives 7 Olympians instead of 9.
 
@@ -363,6 +363,24 @@ The same conclusion is already recorded under **Carried over** below, where the 
 tested and abandoned. It survived up here because nothing connects a struck-out finding to
 the item that was resting on it, which is `CLAUDE.md` error 3 in a document rather than in
 code: a proxy for the property, never checked against the property.
+
+**4a is done, and it had to be done twice.** `src/data/roadmap.ts` went false again within a
+day of the correction below: the exchange gained following, offers, takedowns and per-version
+counts while the entry still said "Take a copy and it is an ordinary build of yours". A
+stranded docblock in `src/state/exchange.ts` was still describing the copy path too, and
+`takeBuild` had quietly lost every caller.
+
+So each entry now names a **proof**, one path under `src/`, and `checkRoadmap` holds it to the
+stage: a built thing's file must exist, and a planned one's must not. The second half is the
+one that keeps catching things, because the failure both times was something shipping without
+its entry moving. Four entries cannot be proved that way, and each carries a `why` instead, so
+an unprovable claim is a decision rather than an omission. Watched failing in all three
+directions: a shipped feature filed as planned, an unbuilt one filed as built, and a null
+proof with no argument for it.
+
+It cost no plumbing. `validate.ts` already reads every non-test file under `src/`, which is
+also why a proof has to live there: a claim resting on a file the validator cannot see would
+pass for the wrong reason.
 
 **4a. The user-facing roadmap had gone false, and it is worth saying how it was caught.**
 `src/data/roadmap.ts` filed **Build exchange** and **Builds across your devices** under
@@ -628,10 +646,13 @@ These are real and none of them block step 2.
 
 **Assets**
 
-- ~~144 of 579 trait icons unmatched~~. **Closed for the set that matters:** 306 of the
-  310 traits a run can offer have art. The remaining 4 are Daedalus Hammer upgrades that
-  are in neither the game package nor the wiki scrape, and they are recorded in
-  `data/curated/icons.json` so the build stays honest about them
+- ~~144 of 579 trait icons unmatched~~, and ~~306 of the 310 traits a run can offer~~.
+  **Closed outright: 310 of 310, zero gaps recorded**, which is what the validator
+  prints and what the table at the top of this file has said for a while. The four
+  Daedalus Hammer upgrades that were missing were the `Hammer_` prefix mistake in
+  `CLAUDE.md`, not absent art. This line said 306 for long enough to contradict its own
+  status table, which is the same drift `src/data/roadmap.ts` had and now has a check
+  against
 - ~~Aspect numbering in `assets/aspects/` unverified~~. **Resolved by matching pictures,
   not by assuming.** 24 game icons plus 23 wiki renders, all named by aspect. The Black
   Coat's base render is unusable and is the one real gap left

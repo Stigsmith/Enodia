@@ -19,6 +19,18 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-08',
+    title: 'Two half-finished things, and a roadmap that had gone out of date',
+    say: 'Found by reading yesterday’s plan back against the code rather than by anybody hitting them.',
+    points: [
+      'The number of people who have taken a build had been frozen since following replaced copying, because nothing was left that counted one. Following tells the exchange now, so it moves again, and it is labelled for what it counts: followed by, rather than taken.',
+      'You could start following a build its author had taken off the exchange, if you had the link. Reading one is still the point of the link; starting to follow something that will never change again is not.',
+      'Taking a listing down had no way back. Put it back existed and nothing could reach it, and the menu offered Take it down for a build already off the shelves, because this side had no idea which state it was in. It knows now, including when the takedown happened on another device.',
+      'This page said the exchange still worked the old way: take a copy and it is yours. It has said following for two days. It also said nothing about what following protects you from, or about being able to update and take down what you published, so there was no way to learn either existed.',
+      'And a check now holds this page to the code. Every entry names a file: a built thing’s has to exist and a planned one’s has to not, so something shipping without its entry moving fails the build. That is how this went out of date twice.',
+    ],
+  },
+  {
     date: '2026-09-07',
     title: 'Nobody else can rewrite a build in your library',
     say: 'What following means when the person you follow changes their mind.',
