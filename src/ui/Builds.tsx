@@ -35,7 +35,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
-import { publishBuild, republishBuild, takeDownBuild } from '../state/publish.ts'
+import { publishBuild, putBackBuild, republishBuild, takeDownBuild } from '../state/publish.ts'
 import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
@@ -768,22 +768,50 @@ function BuildMenu({
                       : 'Replaces what people following it are reading'}
                 </span>
               </button>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setPublished('working')
-                  void takeDownBuild(build.publishedAs as string).then((ok) =>
-                    setPublished(ok ? 'Taken off the exchange' : 'That did not work.'),
-                  )
-                  onListed()
-                }}
-              >
-                <span className="bmenu-label">Take it down</span>
-                <span className="bmenu-note">
-                  Off the shelves. The link keeps working for anybody who has it
-                </span>
-              </button>
+              {/**
+                * One verb or the other, never both, and never the wrong one.
+                *
+                * `putBackBuild` had no caller at all when Take it down shipped,
+                * so a listing could be taken down and never restored, and the
+                * menu went on offering Take it down for a build already down
+                * because nothing on this side knew which state it was in.
+                * `publishedDown` is what it knows now.
+                */}
+              {build.publishedDown ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setPublished('working')
+                    void putBackBuild(build.publishedAs as string).then((ok) => {
+                      setPublished(ok ? 'Back on the exchange' : 'That did not work.')
+                      onListed()
+                    })
+                  }}
+                >
+                  <span className="bmenu-label">Put it back</span>
+                  <span className="bmenu-note">
+                    On the shelves again, with the note and the counts it had
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setPublished('working')
+                    void takeDownBuild(build.publishedAs as string).then((ok) => {
+                      setPublished(ok ? 'Taken off the exchange' : 'That did not work.')
+                      onListed()
+                    })
+                  }}
+                >
+                  <span className="bmenu-label">Take it down</span>
+                  <span className="bmenu-note">
+                    Off the shelves. The link keeps working for anybody who has it
+                  </span>
+                </button>
+              )}
             </>
           ) : null}
 

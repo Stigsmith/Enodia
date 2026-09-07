@@ -236,9 +236,11 @@ describe('what a share link is not allowed to carry', () => {
       play: { runs: 3, clears: 1 },
       publishedAs: 'KmUkC9VotY',
       publishedHash: 'abc123',
+      publishedDown: true,
     })
     expect(out.play).toBeUndefined()
     expect(out.publishedAs).toBeUndefined()
     expect(out.publishedHash).toBeUndefined()
+    expect(out.publishedDown).toBeUndefined()
   })
 })

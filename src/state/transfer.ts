@@ -185,7 +185,13 @@ const fromBase64Url = (text: string): Uint8Array<ArrayBuffer> => {
  * what keeps them off the wire entirely.
  */
 export function shareable(build: ShownBuild): ShownBuild {
-  const { play: _play, publishedAs: _publishedAs, publishedHash: _publishedHash, ...rest } = build
+  const {
+    play: _play,
+    publishedAs: _publishedAs,
+    publishedHash: _publishedHash,
+    publishedDown: _publishedDown,
+    ...rest
+  } = build
   return rest
 }
 

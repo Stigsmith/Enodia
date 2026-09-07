@@ -169,3 +169,55 @@ describe('reconnecting a listing published before the stamp existed', () => {
     expect(vi.mocked(fetch).mock.calls).toHaveLength(1)
   })
 })
+
+/**
+ * Whether a listing is on the shelves, kept on the build that owns it.
+ *
+ * Take it down shipped without this and it was half a feature: `putBackBuild`
+ * had no caller anywhere, so a listing could be taken down and never restored,
+ * and the menu offered Take it down for a build already down because nothing on
+ * this side knew which state it was in.
+ */
+describe('knowing whether your listing is on the shelves', () => {
+  it('records it when you take one down, and clears it when you put it back', async () => {
+    shelve([mine({ publishedAs: 'KmUkC9VotY', publishedHash: 'abc' })])
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{"ok":true}', { status: 200 })))
+
+    const { takeDownBuild, putBackBuild } = await import('./publish.ts')
+
+    await takeDownBuild('KmUkC9VotY')
+    expect(loadBuilds()[0]?.publishedDown).toBe(true)
+
+    await putBackBuild('KmUkC9VotY')
+    expect(loadBuilds()[0]?.publishedDown).toBe(false)
+  })
+
+  /* The flag can go stale without this browser doing anything: take a listing
+     down on a laptop and the phone has to be told. */
+  it('catches up with a takedown made somewhere else', async () => {
+    shelve([mine({ publishedAs: 'KmUkC9VotY', publishedHash: 'abc' })])
+    stubServer([{ id: 'KmUkC9VotY', name: 'Whatever' }], {})
+    vi.mocked(fetch).mockImplementationOnce(
+      async () =>
+        new Response(
+          JSON.stringify({
+            builds: [
+              {
+                id: 'KmUkC9VotY',
+                name: 'Whatever',
+                createdAt: 0,
+                revision: 0,
+                updatedAt: null,
+                takenDownAt: 1788600000000,
+              },
+            ],
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    )
+
+    await reconnect()
+
+    expect(loadBuilds()[0]?.publishedDown).toBe(true)
+  })
+})

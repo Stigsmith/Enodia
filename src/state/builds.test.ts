@@ -310,10 +310,13 @@ describe('duplicating a build that is published', () => {
   it('carries neither the published id nor its shape', () => {
     window.localStorage.setItem(
       KEY,
-      store([oldShape({ publishedAs: 'KmUkC9VotY', publishedHash: 'abc123' })]),
+      store([
+        oldShape({ publishedAs: 'KmUkC9VotY', publishedHash: 'abc123', publishedDown: true }),
+      ]),
     )
     const { copy } = duplicateBuild(loadBuilds()[0]!)
     expect(copy.publishedAs).toBeUndefined()
     expect(copy.publishedHash).toBeUndefined()
+    expect(copy.publishedDown).toBeUndefined()
   })
 })

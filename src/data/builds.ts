@@ -351,6 +351,20 @@ export type ShownBuild = {
    * following it, and the author is told that before it happens.
    */
   publishedHash?: string
+  /**
+   * Whether that listing is currently off the shelves.
+   *
+   * **Take it down was built without this and the result was half a feature.**
+   * `putBackBuild` had no caller at all, so a listing could be taken down and
+   * never restored, and the menu went on offering "Take it down" for a build
+   * already down, because nothing on this side knew.
+   *
+   * Absent means live, which is the common case and the right default for a
+   * build that has never been published. Refreshed by
+   * `state/publish.ts reconcilePublished` on the same request that reconnects
+   * orphans, so it costs nothing extra.
+   */
+  publishedDown?: boolean
 }
 
 /**
