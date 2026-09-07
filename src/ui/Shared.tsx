@@ -15,7 +15,7 @@
 import { arcanaById, iconOf, olympians, traits, weapons } from '../data/app.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
-import { useEscape } from './escape.ts'
+import { useBackdrop, useEscape } from './escape.ts'
 import { readName, sharedLine } from '../state/identity.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -49,6 +49,7 @@ export function Shared({
   /* The same as “Not now”, which is the button sitting next to it. The build
      is still in the link it arrived on, so nothing is destroyed by leaving. */
   useEscape(true, onDismiss)
+  const backdrop = useBackdrop(onDismiss)
 
   const weapon = weapons.find((one) => one.id === build.weapon)
   const aspect = build.aspect ? traits.get(build.aspect) : null
@@ -59,7 +60,12 @@ export function Shared({
   })
 
   return (
-    <div className="shared" role="dialog" aria-label="A build someone shared with you">
+    <div
+      className="shared"
+      role="dialog"
+      aria-label="A build someone shared with you"
+      {...backdrop}
+    >
       <div className="shared-card">
         <p className="shared-eyebrow">{sharedLine(build.author, readName())}</p>
         {takenDown ? (

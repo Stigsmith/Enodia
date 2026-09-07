@@ -61,7 +61,7 @@ import { Card } from './variants/Card.tsx'
 import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
 import { Tabs } from './Tabs.tsx'
-import { useEscape } from './escape.ts'
+import { useBackdrop, useEscape } from './escape.ts'
 import { assemble } from './build-pieces.ts'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
@@ -153,6 +153,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   /* Escape closes the listing. It is read-only, so there is nothing here to
      lose by leaving, and this is the screen the owner asked for it on. */
   useEscape(reading !== null, () => setReading(null))
+  /* The dim around the listing. Same answer as Escape, and it is read only, so
+     there is nothing here to lose by leaving. */
+  const backdrop = useBackdrop(() => setReading(null))
 
   /** What the shelf is showing, once the count is known. */
   const density: BuildDensity = chosenDensity ?? (rows.length > 12 ? 'list' : 'cards')
@@ -308,7 +311,12 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
         * `Poster` takes no `onOpen`, so nothing in here can be edited, and the
         * one button that changes anything says what it does. */}
       {readingRow ? (
-        <div className="xchange-read" role="dialog" aria-label={readingRow.build.name}>
+        <div
+          className="xchange-read"
+          role="dialog"
+          aria-label={readingRow.build.name}
+          {...backdrop}
+        >
           <div className="xchange-read-body">
             <Poster built={assemble(readingRow.build)} />
             <div className="xchange-read-foot">

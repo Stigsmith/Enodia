@@ -48,7 +48,7 @@ import { declineOffer, loadOffers, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
-import { useEscape } from './escape.ts'
+import { useBackdrop, useEscape } from './escape.ts'
 import type { Piece } from './build-pieces.ts'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
@@ -953,9 +953,10 @@ function SampleTag({ full = false }: { full?: boolean }) {
 function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
   /* It only ever tells you what a boon does, so leaving it costs nothing. */
   useEscape(true, onClose)
+  const backdrop = useBackdrop(onClose)
 
   return (
-    <div className="piececard" role="dialog" aria-label={piece.name}>
+    <div className="piececard" role="dialog" aria-label={piece.name} {...backdrop}>
       <div className="piececard-body">
         <header>
           {piece.icon ? <img src={`/${piece.icon}`} alt="" /> : null}
