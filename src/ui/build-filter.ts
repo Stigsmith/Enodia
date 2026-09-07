@@ -57,7 +57,7 @@ import {
   weaponById,
   weapons,
 } from '../data/app.ts'
-import { MAX_FEAR, PLAYSTYLES } from '../data/builds.ts'
+import { MAX_FEAR, PLAYSTYLES, winRate } from '../data/builds.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -70,6 +70,23 @@ export type FacetId =
   | 'keepsake'
   | 'familiar'
   | 'fear'
+  /**
+   * How often it has actually come off, as two questions rather than one.
+   *
+   * `cleared` is how many clears it has, and `rate` is what share of its runs
+   * those were. Both are thresholds in the same sense Fear is: nobody wants
+   * the builds with exactly seven clears.
+   *
+   * **They are separate on purpose.** One clear from one run is 100 per cent
+   * and means almost nothing; nine from thirty is 30 per cent and means a
+   * great deal more. A single combined control would have to weigh those
+   * against each other, which is the kind of composite `engine/repeat.ts`
+   * argues at length the tool must not invent. Two controls let the reader do
+   * the weighing, and picking both is the honest way to ask "reliable, and
+   * proven".
+   */
+  | 'cleared'
+  | 'rate'
   /**
    * Whose build it is, which only became a question worth asking when the
    * library started holding other people's.
@@ -93,6 +110,8 @@ export const FACET_ORDER: FacetId[] = [
   'keepsake',
   'familiar',
   'fear',
+  'cleared',
+  'rate',
   'whose',
 ]
 
@@ -103,7 +122,7 @@ export const FACET_ORDER: FacetId[] = [
  * member and the extra choices are furniture. Stated as data rather than as an
  * `if` in `choose`, because three separate places have to agree about it.
  */
-export const SINGLE: ReadonlySet<FacetId> = new Set<FacetId>(['fear'])
+export const SINGLE: ReadonlySet<FacetId> = new Set<FacetId>(['fear', 'cleared', 'rate'])
 
 /**
  * The Fear bands a build can be filtered by.
@@ -121,6 +140,27 @@ export const SINGLE: ReadonlySet<FacetId> = new Set<FacetId>(['fear'])
  */
 const FEAR_BANDS = Array.from({ length: Math.floor(MAX_FEAR / 10) }, (_, i) => (i + 1) * 10)
 
+/**
+ * How many clears, as thresholds.
+ *
+ * Starts at one, because "has this ever worked" is the question people actually
+ * ask first and a build with one clear is categorically different from a build
+ * with none. The rest are the round numbers a library realistically reaches;
+ * there is no point offering a band nothing can satisfy.
+ */
+const CLEAR_BANDS = [1, 3, 5, 10, 25]
+
+/**
+ * What share of runs cleared, as thresholds, held as whole percents.
+ *
+ * **Every band is shown with its own denominator on the card**, which is the
+ * rule this project applies to every average it draws: a rate is never offered
+ * without the count it is a rate of. Filtering to "half or better" and finding
+ * a build that cleared one run of two is not the filter lying, and the card
+ * says "1 of 2" right there.
+ */
+const RATE_BANDS = [25, 50, 75, 100]
+
 /** Weapon and aspect are on the surface. The rest unfold. */
 export const SURFACE_FACETS: FacetId[] = ['weapon', 'aspect']
 
@@ -135,6 +175,8 @@ export const EMPTY_SELECTION: Selection = {
   keepsake: [],
   familiar: [],
   fear: [],
+  cleared: [],
+  rate: [],
   whose: [],
 }
 
@@ -197,6 +239,15 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
       return build.familiar ? [build.familiar] : []
     case 'fear':
       return FEAR_BANDS.filter((band) => (build.play?.fear ?? 0) >= band).map(String)
+    case 'cleared':
+      return CLEAR_BANDS.filter((band) => (build.play?.clears ?? 0) >= band).map(String)
+    case 'rate': {
+      /* Null means never run, which answers no band. A build with no runs is
+         not a build with a bad rate, and must not be filed as one. */
+      const rate = winRate(build.play)
+      if (rate === null) return []
+      return RATE_BANDS.filter((band) => Math.round(rate * 100) >= band).map(String)
+    }
     case 'whose':
       return [build.by]
   }
@@ -246,6 +297,8 @@ const NAMES: Record<FacetId, { name: string; all: string }> = {
   keepsake: { name: 'Keepsake', all: 'Any keepsake' },
   familiar: { name: 'Familiar', all: 'Any familiar' },
   fear: { name: 'Fear cleared', all: 'Any Fear' },
+  cleared: { name: 'Clears', all: 'Any number' },
+  rate: { name: 'How often it clears', all: 'Any rate' },
   whose: { name: 'Whose', all: 'Anyone\u2019s' },
 }
 
@@ -276,6 +329,19 @@ function labelFor(facet: FacetId, value: string, armChosen: boolean): string {
   if (facet === 'whose') return WHOSE_NAME[value] ?? value
   if (facet === 'playstyle') return PLAYSTYLE_NAME.get(value) ?? value
   if (facet === 'fear') return `Fear ${value} or better`
+  if (facet === 'cleared') {
+    return value === '1' ? 'Cleared at least once' : `${value} clears or more`
+  }
+  /* Said as a share rather than a percent, because these are the four rounds
+     people mean and "three runs in four" reads as a claim about runs, which is
+     what it is. 100 is not "always": it is every run so far. */
+  if (facet === 'rate') {
+    return (
+      { '25': 'One run in four', '50': 'Half its runs', '75': 'Three runs in four', '100': 'Every run so far' }[
+        value
+      ] ?? `${value}% or better`
+    )
+  }
   if (facet === 'familiar') return familiarById.get(value)?.name ?? value
   if (facet === 'weapon') {
     const weapon = weaponById.get(value)
@@ -330,6 +396,16 @@ function iconFor(facet: FacetId, value: string): string | null {
      * two words.
      */
     case 'whose':
+    /**
+     * And these two, for the same reason one step further out.
+     *
+     * `fear` above has art because Fear is a thing in the game with a shrine
+     * and an icon. How many times a build cleared, and how often it does, are
+     * facts about a person's own runs. The game never drew those because the
+     * game does not know them.
+     */
+    case 'cleared':
+    case 'rate':
       return null
     case 'weapon':
       return ARM_ICON.get(value) ?? weaponById.get(value)?.icon ?? null
@@ -358,6 +434,15 @@ function rankOf(facet: FacetId, value: string): number {
   // The game's own move order, so Attack sits above Sprint rather than below it.
   if (facet === 'playstyle') return PLAYSTYLE_RANK.get(value) ?? 99
   if (facet === 'weapon') return weaponRank.get(value) ?? 99
+  /**
+   * The threshold facets read in order of the threshold, not of the label.
+   *
+   * Their values are numbers held as strings, so the default comparison sorts
+   * them by their words: "Every run so far" landed above "One run in four",
+   * which is a ladder presented in an order that is not a ladder. Fear escaped
+   * this because its labels happen to sort the same way its numbers do.
+   */
+  if (facet === 'fear' || facet === 'cleared' || facet === 'rate') return Number(value)
   if (facet !== 'aspect') return 0
   const weapon = traits.get(value)?.requiredWeapon
   return weapon ? (weaponRank.get(weapon) ?? 99) : 99
@@ -461,7 +546,15 @@ export function choose(selection: Selection, facet: FacetId, value: string | nul
 }
 
 /** How a library is ordered, when a reader wants it ordered rather than filtered. */
-export type SortId = 'name' | 'arm' | 'gods' | 'recent' | 'assemble' | 'fear'
+export type SortId =
+  | 'name'
+  | 'arm'
+  | 'gods'
+  | 'recent'
+  | 'assemble'
+  | 'fear'
+  | 'clears'
+  | 'rate'
 
 export const SORTS: { id: SortId; name: string }[] = [
   { id: 'name', name: 'Name' },
@@ -470,6 +563,8 @@ export const SORTS: { id: SortId; name: string }[] = [
   { id: 'recent', name: 'Recently changed' },
   { id: 'assemble', name: 'Easiest to assemble' },
   { id: 'fear', name: 'Fear cleared' },
+  { id: 'clears', name: 'Most cleared' },
+  { id: 'rate', name: 'Clears most often' },
 ]
 
 /**
@@ -519,6 +614,24 @@ export function sortBuilds(builds: readonly ShownBuild[], by: SortId): ShownBuil
     case 'fear':
       return copy.sort(
         (a, b) => (b.play?.fear ?? 0) - (a.play?.fear ?? 0) || a.name.localeCompare(b.name),
+      )
+    case 'clears':
+      return copy.sort(
+        (a, b) => (b.play?.clears ?? 0) - (a.play?.clears ?? 0) || a.name.localeCompare(b.name),
+      )
+    /**
+     * By rate, and **a build with no runs sorts last rather than first**.
+     *
+     * `winRate` answers null for one, and null is not zero: it is the absence
+     * of an answer. Coercing it would put every unplayed build at the bottom
+     * as though it never clears, which is a claim about builds nobody has
+     * tried. `-1` files them below the worst real rate without asserting one.
+     */
+    case 'rate':
+      return copy.sort(
+        (a, b) => (winRate(b.play) ?? -1) - (winRate(a.play) ?? -1) ||
+          (b.play?.runs ?? 0) - (a.play?.runs ?? 0) ||
+          a.name.localeCompare(b.name),
       )
     default:
       return copy.sort((a, b) => a.name.localeCompare(b.name))

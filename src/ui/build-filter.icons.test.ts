@@ -24,8 +24,13 @@ const bar = facets(SAMPLE_BUILDS, EMPTY_SELECTION)
  * anything the game drew, so inventing a glyph for "Mine" would be this tool
  * making up art the game never had. Listing it here means adding a second
  * artless facet has to be a decision rather than an omission.
+ *
+ * **`cleared` and `rate` joined it**, and were a decision. `fear` has art
+ * because Fear is a thing in the game, with a shrine and an icon. How many
+ * times a build cleared, and how often it does, are facts about one person's
+ * own runs, which the game never drew because the game does not know them.
  */
-const NO_ART: string[] = ['whose']
+const NO_ART: string[] = ['whose', 'cleared', 'rate']
 
 describe('the icons beside filter options', () => {
   it.each(bar.map((facet) => [facet.id, facet] as const))('%s gives every option art', (_id, facet) => {
