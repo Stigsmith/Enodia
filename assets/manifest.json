@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-06",
+ "generated": "2026-09-07",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1034,
+ "count": 1035,
  "categories": [
   {
    "name": "arcana",
@@ -41,10 +41,10 @@
   },
   {
    "name": "characters",
-   "count": 28,
+   "count": 29,
    "source": "mixed",
    "wiki": 27,
-   "game": 1
+   "game": 2
   },
   {
    "name": "duos",
@@ -4239,6 +4239,14 @@
    "source": "wiki",
    "sourceFile": "FP_Cerberus_II.webp",
    "sourcePage": "Characters-Hades II"
+  },
+  {
+   "id": "charon-coins",
+   "category": "characters",
+   "file": "characters/charon-coins.png",
+   "bytes": 188560,
+   "sha256": "dc069071b7f53c6d74adde0dfbb7452a895ea0e70e1cd27ccfdd11ba5872b239",
+   "source": "game"
   },
   {
    "id": "charon-shop",

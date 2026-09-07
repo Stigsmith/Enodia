@@ -494,19 +494,43 @@ with `deppth2 ex -s`. What is in it:
 | | | |
 |---|---|---|
 | `Portraits_CharonHooded_01.png` | 2169x1734, 1 MB | the full portrait, and the one worth having |
-| `CharonCoins` | 60 frames, 314x454 | **not coins** |
+| `CharonCoins` | 60 frames, 314x454 | the coins, and they are coins |
 | `CharonMist` | 60 frames, 706x396 | 11 MB of PNG |
 | `CharonMoonGlow` | 50 frames, 543x767 | 12 MB of PNG |
 | `CharonGlint` | 60 frames, 549x542 | |
 | `CharonWiggle1` to `4` | 15 frames each | |
 | `CharonGlowMain`, `CharonGlowEyes` | 1 frame each | |
 
-**`CharonCoins` is a glow overlay, not coin art.** A frame on its own is a purple
-blob with gold flecks: it is meant to be composited over the coins in the
-portrait, and the coins themselves are painted into the portrait. Animating it
-alone would put a purple splat on the page. The sheet was built and measured
-first, 410 KB at 62x90 frames, before that was noticed by looking at a frame.
-The still is what ships.
+**`CharonCoins` was read wrong twice, and both readings are worth keeping.**
+
+The first note here said it was a glow overlay and not coin art, because a frame
+on its own is a purple blob with gold flecks. That is what a frame looks like out
+of position. **What was missing was the offset, not the art.**
+`Game/Animations/GUI_Portraits_VFX.sjson` composites the portrait from layers,
+each with an offset from a shared anchor and a scale:
+
+    Portrait_Charon_Default_01  Portraits_CharonHooded_01  off (-50,-200)  scale 1
+    Portrait_Charon_Coins       CharonCoins, 60 frames     off (-34,-130)  scale 0.8
+
+The extraction's sidecars give each sprite's untrimmed size and where its trimmed
+image sits inside it, and the hulls run negative to positive, so sprites are
+centre-anchored. Placed by those numbers the layer lands exactly in his open
+palm, and it is unmistakably a handful of coins.
+
+**Then the animation was wrong, for a reason that has nothing to do with the
+art.** The sheet is 5940x119, sixty 99-wide frames, and the first CSS stepped
+`background-position` from `0` to `-6000%`. A percentage in `background-position`
+is not an offset: the spec resolves it against `(positioning area - image size)`,
+and with an image sixty times the box that puts 59 of the 60 steps thousands of
+box-widths off the sheet, painting nothing. Only the frame at exactly 0% was ever
+drawn, one frame in sixty, which is why the coins were reported as invisible.
+`steps(60, jump-none)` from `0%` to `100%` lands on exactly `k/59` for k in 0..59,
+which is the frame series. Verified by pausing the animation and reading the
+computed position at three times: 0%, 50.8475% and 98.3051%, which are frames 0,
+30 and 58 to the digit.
+
+The sheet ships as **`assets/characters/charon-coins.png`, 184 KB**, quantised to
+128 colours from 1077 KB with no visible difference at the size it is drawn.
 
 The portrait is cropped to its own alpha and saved at 760px tall as
 **`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:

@@ -18,30 +18,35 @@ import type { Stage } from '../data/roadmap.ts'
 export function Page({
   title,
   standfirst,
-  broad,
+  measure,
   children,
 }: {
   title: string
   standfirst: string
   /**
-   * Lift the 44rem measure, for a page that lays itself out in columns.
+   * How wide the page is allowed to be. Absent is the 44rem reading measure.
    *
-   * **Not for making paragraphs wider.** Measured on a 1600px screen, a line of
-   * body copy here was already 113 characters, well past the 45 to 75 a reader
-   * is comfortable with, so the cap was doing its job and widening it would
-   * have made these pages harder to read rather than shorter. What this is for
-   * is pages whose content is a set of columns: Help came out at 104 characters
-   * a line afterwards, and one screen instead of two.
+   * **`broad` is not for making paragraphs wider.** Measured on a 1600px
+   * screen, a line of body copy here was already 113 characters, well past the
+   * 45 to 75 a reader is comfortable with, so the cap was doing its job and
+   * widening it would have made these pages harder to read rather than shorter.
+   * What it is for is pages whose content is a set of columns: Help came out at
+   * 104 characters a line afterwards, and one screen instead of two. It only
+   * lifts the cap above 78rem, where there are columns to fill.
    *
-   * The class only lifts the cap above 78rem, where there are columns to fill.
-   * Below that the base 44rem still applies, because a wider single column is
-   * exactly the thing this is trying not to do.
+   * **`shelf` is a different question and takes its answer from `.builds`.**
+   * The exchange is not prose at all, it is the build manager's grid with a
+   * different list behind it, and the two have to be the same width because
+   * they draw the same cards. Measured at 1600x950 with the reading measure on:
+   * the page was 704px, Charon took 304 of it, and the shelf was left with
+   * **336px, one column, one very large card**, which is what the owner
+   * reported. The cards were never the problem.
    */
-  broad?: boolean
+  measure?: 'broad' | 'shelf'
   children: React.ReactNode
 }) {
   return (
-    <div className={`page${broad ? ' is-broad' : ''}`}>
+    <div className={`page${measure ? ` is-${measure}` : ''}`}>
       <header className="builds-top">
         <h2>{title}</h2>
       </header>
@@ -123,7 +128,7 @@ export function Roadmap() {
 
   return (
     <Page
-      broad
+      measure="broad"
       title="Roadmap"
       standfirst="What is built, what is planned, and what is stalled. No dates: this is a side project and any date would be a guess."
     >

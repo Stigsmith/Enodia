@@ -34,6 +34,7 @@ import { useId, useState } from 'react'
 import { Dropdown } from './Dropdown.tsx'
 import { SORTS, SURFACE_FACETS, countSelected } from './build-filter.ts'
 import type { Facet, FacetId, SortId } from './build-filter.ts'
+import type { BuildDensity } from '../state/prefs.ts'
 
 export function BuildFilters({
   facets,
@@ -41,6 +42,8 @@ export function BuildFilters({
   onClear,
   sort,
   onSort,
+  density,
+  onDensity,
   query,
   onQuery,
   showing,
@@ -51,6 +54,9 @@ export function BuildFilters({
   onClear: () => void
   sort: SortId
   onSort: (sort: SortId) => void
+  /** How closely builds are packed, and how to change it. */
+  density: BuildDensity
+  onDensity: (density: BuildDensity) => void
   query: string
   onQuery: (query: string) => void
   showing: number
@@ -113,6 +119,30 @@ export function BuildFilters({
             ))}
           </select>
         </label>
+
+        {/**
+          * Cards or a list, on the same row as Sort because it is the same kind
+          * of question: not what is on the shelf, but how to look at it.
+          *
+          * Two states, so a switch rather than a menu, and it says which one it
+          * is rather than which one it would become. Measured at 1600x950 with
+          * eighteen builds: five fully on screen as cards, and the owner asked
+          * for at least twelve.
+          */}
+        <div className="bfilter-density" role="radiogroup" aria-label="How closely builds are packed">
+          {(['cards', 'list'] as const).map((one) => (
+            <button
+              key={one}
+              type="button"
+              role="radio"
+              aria-checked={density === one}
+              className={density === one ? 'is-on' : ''}
+              onClick={() => onDensity(one)}
+            >
+              {one === 'cards' ? 'Cards' : 'List'}
+            </button>
+          ))}
+        </div>
 
         <p className="bfilter-count" aria-live="polite">
           {showing === total ? (

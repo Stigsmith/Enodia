@@ -23,7 +23,7 @@ import { Page } from './Pages.tsx'
 export function Help() {
   return (
     <Page
-      broad
+      measure="broad"
       title="Help"
       standfirst="Where the numbers come from, and what each term on the run screen means. These are the rules as the tool implements them."
     >
@@ -163,6 +163,33 @@ export function Help() {
           <p className="ref-say">
             Two of them can never be on together: one wants three cards or fewer, the other wants at
             least five. That conflict is most of the reason there are only a few shapes worth having.
+          </p>
+        </section>
+
+        <section className="ref">
+          <h3 className="ref-rule">The exchange, and the shelf that is not there</h3>
+          <p className="ref-say">
+            Two shelves: builds picked by hand, and builds from people you swapped codes with.
+            Both of them passed a person before anything appeared on them.
+          </p>
+          <p className="ref-say">
+            There is no shelf of everything anybody published, and that is deliberate rather
+            than unfinished. It is the first thing a stranger could stumble across, so it needs
+            a way to report a listing and a way to hide one, and those have to exist before it
+            opens rather than after.
+          </p>
+          <p className="ref-say">
+            You <strong>follow</strong> a build rather than copying it. It stays the person who
+            made it, it sits in your library marked as theirs, and when they improve it their
+            version reaches you. Changing anything about it is what makes it yours: that forks
+            it into an ordinary build of your own and ends the following.
+          </p>
+          <p className="ref-say">
+            The numbers under a listing are counts and never a score. How many people took it,
+            how many runs and clears they logged, the best Fear anybody cleared with it, and
+            what they rated it out of five with the number of raters beside the average. Rating
+            needs a run behind it, so a rating is always somebody saying how a build went rather
+            than how it read.
           </p>
         </section>
       </div>
