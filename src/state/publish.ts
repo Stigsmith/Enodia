@@ -23,7 +23,7 @@
  */
 
 import type { ShownBuild } from '../data/builds.ts'
-import { saveBuild } from './builds.ts'
+import { loadBuilds, saveBuild } from './builds.ts'
 import { fingerprint, shapeOf } from './exchange.ts'
 import { packBuild, unpackBuild } from './transfer.ts'
 
@@ -215,3 +215,80 @@ export async function openPublished(id: string): Promise<Opened | null> {
  * quiet.
  */
 export type Opened = { build: ShownBuild; takenDown: boolean }
+
+/**
+ * Reconnect listings to the builds they were published from.
+ *
+ * **A listing whose local build carries no `publishedAs` is orphaned.** Nothing
+ * offers to update it or take it down, it holds one of the account's slots
+ * forever, and pressing Publish on the build it came from mints a second
+ * listing rather than replacing the first, which is the duplicate problem the
+ * republish route exists to prevent.
+ *
+ * Two ways in. Everything published before that field existed has no stamp, and
+ * that is not hypothetical: the owner had exactly one such listing. And
+ * publishing from a browser you no longer have leaves the same hole for anybody.
+ *
+ * ## Matched on the picks, never on the name
+ *
+ * The danger here is stamping the wrong build: `publishedAs` is a claim that
+ * updating this build replaces that listing, so a wrong match hands somebody a
+ * button that overwrites a listing with a different build. A name is a label a
+ * person can change and reuse; `shapeOf` is what the build actually is, and it
+ * is the same comparison run reporting already trusts.
+ *
+ * So the rules are deliberately strict, and skipping is always the safe answer:
+ *
+ * - only builds that are yours and carry no stamp already
+ * - the shape must match exactly
+ * - **an ambiguous match is skipped, not guessed.** Two local builds with the
+ *   same picks are a duplicate and a fork, and picking either one would be a
+ *   coin toss with somebody's listing as the stake. The name breaks a tie only
+ *   when it is exact
+ *
+ * ## What it costs
+ *
+ * One request for the list, then one per listing that nothing local claims. A
+ * reconnected listing is claimed from then on, so this settles to a single
+ * cheap call. `once` stops it running twice in a page: a genuinely orphaned
+ * listing can never be matched, and without the guard it would be re-fetched
+ * on every render that asked.
+ */
+let reconnected = false
+
+export async function reconnectPublished(): Promise<number> {
+  if (reconnected) return 0
+  reconnected = true
+
+  const listings = await myPublished()
+  if (!listings.length) return 0
+
+  const library = loadBuilds()
+  const claimed = new Set(library.map((one) => one.publishedAs).filter(Boolean))
+  const orphans = listings.filter((one) => !claimed.has(one.id))
+  if (!orphans.length) return 0
+
+  /* Only your own, and only the ones with nothing to lose by being stamped. */
+  const candidates = library.filter((one) => one.by === 'owner' && !one.publishedAs)
+  if (!candidates.length) return 0
+
+  let joined = 0
+  for (const listing of orphans) {
+    const opened = await openPublished(listing.id)
+    if (!opened) continue
+
+    const shape = fingerprint(shapeOf(opened.build))
+    const same = candidates.filter((one) => fingerprint(shapeOf(one)) === shape && !one.publishedAs)
+    /* Ambiguous, so leave it alone. An exact name settles a tie and nothing
+       else does: two builds with the same picks and the same name are the same
+       build by every measure this tool has. */
+    const exact = same.filter((one) => one.name === listing.name)
+    const match = same.length === 1 ? same[0] : exact.length === 1 ? exact[0] : null
+    if (!match) continue
+
+    saveBuild({ ...match, publishedAs: listing.id, publishedHash: shape })
+    match.publishedAs = listing.id
+    joined += 1
+  }
+  return joined
+}
