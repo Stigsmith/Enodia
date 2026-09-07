@@ -579,15 +579,14 @@ the loop is smooth, closes cleanly and does not flicker. That motion is the
 animation and not an artefact. It was reported as wandering when the cluster was
 drawn a quarter too small, which is the scale error above.
 
-**The one number on Charon that is ours rather than the game's: the loop runs
-over four seconds and the game plays it in two.** `PlaySpeed = 30` over
-`NumFrames = 60` is two seconds. The owner asked for half speed once the art was
-corrected, and the measurement says there is room for it: the largest step
-between two frames is 0.61px, so holding a frame for 66ms instead of 33ms cannot
-make it read as stepped. Five pixels of drift becomes a slow breath rather than a
-swirl. `src/ui/charon-coins.test.ts` pins the four seconds, so that a later pass
-aiming at fidelity does not quietly undo a decision thinking it is fixing a
-mistake.
+**Four seconds was tried and reverted, and the loop is the game's two.** On the
+numbers above, halving the speed looked safe: the largest step between frames is
+0.61px, so a 66ms hold could not read as stepped where a 33ms one did not. On
+screen it was simply too slow. The measurement was right and the conclusion drawn
+from it was wrong, which is the useful part: **these numbers say what the
+animation does, not what it should feel like.** `PlaySpeed = 30` over
+`NumFrames = 60` is the two seconds, and `src/ui/charon-coins.test.ts` pins it so
+the idea is not had a second time.
 
 The portrait is cropped to its own alpha and saved at 760px tall as
 **`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:

@@ -466,12 +466,12 @@ along a path 2.2 times its widest span, so a there-and-back drift rather than a 
 step 0.27px, none over 0.61, seam 0.31px, brightness 87% to 100% of peak. Composited offline
 and looked at, rather than reasoned about.
 
-**And then slowed on purpose, which is the one number on Charon that is not the game's.** The
-loop runs over four seconds where `PlaySpeed = 30` over sixty frames is two. The owner's call
-once the art was right, and the measurement says it is safe: the largest step between frames
-is 0.61px, so a 66ms hold cannot look stepped where a 33ms one did not.
-`src/ui/charon-coins.test.ts` pins the four seconds so a later pass aiming at fidelity does not
-undo a decision thinking it is fixing a mistake.
+**Four seconds was tried and reverted on sight**, and the loop is the game's two, `PlaySpeed =
+30` over sixty frames. The numbers said halving was safe, because the largest step between
+frames is 0.61px and a 66ms hold could not look stepped where a 33ms one did not. It was
+simply too slow to watch. The measurement was right and the conclusion drawn from it was not:
+these figures say what the animation does, not what it should feel like, and that is the
+owner's call. `src/ui/charon-coins.test.ts` pins the two seconds so the idea is not had twice.
 
 **What cannot be rebuilt, stated rather than attempted.** The portrait in the game also draws
 `CharonMist`, `CharonMoonGlow`, `CharonGlint`, `CharonGlowMain`, `CharonGlowEyes` and four

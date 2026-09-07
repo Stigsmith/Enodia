@@ -93,15 +93,15 @@ describe('the coin animation', () => {
    * the first, which is the kind of wrong that reads as softness rather than as
    * a bug.
    *
-   * **The four seconds is deliberate and is not the game's.** `PlaySpeed = 30`
-   * over sixty frames is two seconds, and this holds each frame twice as long,
-   * on the owner's call, so the cluster's five pixels of drift read as a slow
-   * breath. Pinned here because it is the one number on this rule that a reader
-   * would otherwise assume came from the source, and a future correction toward
-   * "fidelity" would be undoing a decision rather than fixing a mistake.
+   * **The two seconds is the game's**, `PlaySpeed = 30` over sixty frames, and
+   * it is pinned because it was once changed. Four seconds was tried on the
+   * numbers, which said the drift was small enough to halve safely, and reverted
+   * on sight because it was too slow. The measurement was right and the
+   * conclusion drawn from it was not, which is the sort of thing worth a test
+   * rather than a memory.
    */
-  it('steps with jump-none, across a closed range, at our own four seconds', () => {
-    expect(CSS).toContain(`animation: charon-coins 4s steps(${FRAMES}, jump-none) infinite`)
+  it('steps with jump-none, across a closed range, at the game’s two seconds', () => {
+    expect(CSS).toContain(`animation: charon-coins 2s steps(${FRAMES}, jump-none) infinite`)
     expect(CSS).toContain('background-position-x: 100%')
   })
 
