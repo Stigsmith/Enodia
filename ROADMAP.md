@@ -396,9 +396,12 @@ which had shipped.
 
 **Nothing checks this file against the code**, which is why five claims drifted at once. Each
 one was a sentence that was true when written, in a file nothing imports for behaviour, so no
-test and no type could fail. Worth a validator check that at least matches a `now` item
-against something that exists, though what the check would key on is not obvious: the titles
-are prose. Filed rather than done.
+test and no type could fail.
+
+**Done on 8 September, after it drifted a second time.** The check keys on a `proof`, one path
+per entry under `src/`, rather than on the prose: a built thing's file must exist and a planned
+one's must not. Four entries cannot be proved that way and carry a `why` instead. See the 4a
+note above for the rest.
 
 **5. Phase 2.** `REQUIREMENTS.md` 7. **Started, on the one part of it that needs no
 judgement.** Four of its five items are the owner's: archetypes, keepsake sequencing, hammer
@@ -413,6 +416,36 @@ the sum of every vow rank. The sum is **67**, and **55** before Vow of Rivals is
 below what a player can actually clear, so anyone above 57 could not record their run. It is
 summed from the data now, the filter bands derive from it rather than being typed out, and
 `src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
+
+**And two of them were half built**, found on 8 September by reading the plan back against the
+code rather than by anybody hitting them.
+
+**Following counted nothing.** `takeBuild` lost its last caller when following replaced
+copying, and it was the only thing writing `taken_at`, so the count on every listing had been
+frozen at whatever the copy era left. `followBuild` reports to the existing `take` route now,
+which already refuses your own build, refuses a taken-down one and dedupes. The label follows
+the meaning: "Followed by N". It also let you start following a build the author had taken
+down, through a raw link, which `take` refuses on the server and this path never reached.
+
+**Put it back had no caller at all.** Take it down shipped without its other half, so a
+listing could be taken down and never restored, and the menu offered Take it down for a build
+already down because nothing on this side knew. `publishedDown` is the third stamp, stripped
+from duplicates and share links with the other two, refreshed by the same request that
+reconnects orphans so a takedown made on another device arrives.
+
+**Art reaches people within an hour now, not a day.** The `?v` token only ever worked for art
+named in a stylesheet, and all 1,035 images are named from data, so there was no escape hatch
+for the ones that matter. `assets/_headers` carries the arithmetic and the header was read
+back off a real response, which that file requires of anyone editing it.
+
+**Open, and deliberately not fixed: acting on a build can eject you out of it.** `useSync`
+calls back when a sync applies changes (`src/state/useSync.ts:68`), `src/App.tsx:286` bumps
+`libraryAt`, and remounting `<Builds>` drops `openId`. A local write round-trips and triggers
+it, so this follows Edit and Log run as much as the new buttons: 307 sync requests in one
+local session, and both take-down and put-back ejected reliably. `src/App.tsx:260-265` argues
+the remount is the honest fix for a stale list and is right about that; what it does not do is
+keep the reader's place. Lifting `openId` beside `libraryAt` is the likely shape, and it is a
+change to a deliberate contract rather than a loose end.
 
 **Following got its guarantees**, 7 September 2026. Three things a follower could not rely
 on, and the owner found the first by using it.
