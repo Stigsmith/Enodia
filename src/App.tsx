@@ -203,6 +203,15 @@ export function App() {
    * again after it has already been answered.
    */
   const [arrived, setArrived] = useState<ShownBuild | null>(null)
+  /**
+   * Whether the build that arrived has been taken off the shelves.
+   *
+   * A short link keeps working after its author takes the listing down, so
+   * somebody can open one and has to be told they are looking at the last
+   * version rather than the current one. Only the short-link path can set this:
+   * a build carried inside a fragment has no listing behind it to take down.
+   */
+  const [arrivedDown, setArrivedDown] = useState(false)
 
   /**
    * Bumped when storage changes underneath a screen that has already read it.
@@ -280,8 +289,10 @@ export function App() {
     // Cleared first, for the same reason the fragment is: a reload should not
     // offer the same build again after it has been answered.
     history.replaceState(null, '', '/')
-    void openPublished(id).then((build) => {
-      if (build) setArrived(build)
+    void openPublished(id).then((opened) => {
+      if (!opened) return
+      setArrived(opened.build)
+      setArrivedDown(opened.takenDown)
     })
   }, [])
 
@@ -382,6 +393,7 @@ export function App() {
       {arrived ? (
         <Shared
           build={arrived}
+          takenDown={arrivedDown}
           replaces={loadBuilds().find((one) => one.id === arrived.id) ?? null}
           onKeep={() => {
             saveBuild(received(arrived))
@@ -389,7 +401,10 @@ export function App() {
             setLibraryAt((was) => was + 1)
             setView('builds')
           }}
-          onDismiss={() => setArrived(null)}
+          onDismiss={() => {
+            setArrived(null)
+            setArrivedDown(false)
+          }}
         />
       ) : null}
     </div>

@@ -68,7 +68,15 @@ function shortId(): string {
   return out
 }
 
-export type Published = { id: string; name: string; createdAt: number; updatedAt: number | null; revision: number }
+export type Published = {
+  id: string
+  name: string
+  createdAt: number
+  updatedAt: number | null
+  revision: number
+  /** null while it is live. A timestamp, so it answers when as well as whether. */
+  takenDownAt: number | null
+}
 
 /** What a caller did wrong, in words the UI can show without rewording. */
 export type Refusal = { status: number; say: string }
@@ -182,30 +190,71 @@ export async function listMine(db: DB, userId: string): Promise<Published[]> {
       createdAt: publishedBuild.createdAt,
       updatedAt: publishedBuild.updatedAt,
       revision: publishedBuild.revision,
+      takenDownAt: publishedBuild.takenDownAt,
     })
     .from(publishedBuild)
     .where(eq(publishedBuild.userId, userId))
 
+  // Taken-down rows are listed rather than filtered: this is the author's own
+  // inventory, and a listing they cannot see is one they cannot put back.
   return rows.map((one) => ({
     ...one,
     createdAt: one.createdAt.getTime(),
     updatedAt: one.updatedAt ? one.updatedAt.getTime() : null,
+    takenDownAt: one.takenDownAt ? one.takenDownAt.getTime() : null,
   }))
 }
 
 /**
- * Delete one, and only if it is yours.
+ * Take one off the shelves, and only if it is yours.
+ *
+ * **This was a delete and is not any more.** The row is referenced by
+ * `exchange_stat` and `curated_pick`, both `on delete cascade`, so deleting it
+ * destroyed every run and rating anybody had logged against the build and the
+ * curator's note in the same statement. It also emptied the build out of the
+ * library of everybody following it, because their client reads it back from
+ * here. One person pressing a button should not throw away that much of other
+ * people's work, and the owner's call was that it should not.
+ *
+ * What is left is a tombstone: the build leaves every shelf, and `read` keeps
+ * answering for anybody holding the link. Unlisted rather than destroyed, which
+ * is the honest word for it, since the id is ten unguessable characters that
+ * were already shared and what taking it down really removes is discovery.
  *
  * The ownership check is in the `where` rather than in a read followed by a
- * delete. Two statements would be a race, and on D1 there is no transaction to
+ * write. Two statements would be a race, and on D1 there is no transaction to
  * close it with.
  */
-export async function unpublish(db: DB, userId: string, id: string): Promise<boolean> {
+export async function takeDown(db: DB, userId: string, id: string): Promise<boolean> {
   const result = await db
-    .delete(publishedBuild)
+    .update(publishedBuild)
+    .set({ takenDownAt: new Date() })
     .where(and(eq(publishedBuild.id, id), eq(publishedBuild.userId, userId)))
-  // D1 reports rows changed; zero means it was not theirs or was already gone,
-  // and those two are deliberately not told apart.
+  // D1 reports rows changed; zero means it was not theirs or never existed, and
+  // those two are deliberately not told apart. SQLite counts a matched row as
+  // changed even when the value written is the one already there, so taking the
+  // same build down twice answers truthfully rather than claiming it is gone.
+  return (result as { meta?: { changes?: number } }).meta?.changes !== 0
+}
+
+/**
+ * Put one back on the shelves. The other half of taking it down.
+ *
+ * **A separate verb rather than a side effect of republishing.** An author
+ * fixing a build while it is down should not have to make it public to save the
+ * fix, and a republish that quietly relisted would put a build back on the
+ * curated shelf without anybody asking. Two verbs with one meaning each are
+ * easier to put on a screen than one verb with a hidden second effect.
+ *
+ * It touches `takenDownAt` and nothing else. In particular it does not move
+ * `revision`, because nothing about the build changed and every follower would
+ * otherwise be told there was something to look at.
+ */
+export async function putBack(db: DB, userId: string, id: string): Promise<boolean> {
+  const result = await db
+    .update(publishedBuild)
+    .set({ takenDownAt: null })
+    .where(and(eq(publishedBuild.id, id), eq(publishedBuild.userId, userId)))
   return (result as { meta?: { changes?: number } }).meta?.changes !== 0
 }
 
@@ -214,18 +263,35 @@ export async function unpublish(db: DB, userId: string, id: string): Promise<boo
  *
  * Carries the revision so a follower can tell whether what they are holding is
  * current without diffing a 1.2 KB payload against the one they cached.
+ *
+ * **It does not filter out a build that has been taken down**, and that is the
+ * decision rather than an oversight. Taking a build down removes it from the
+ * shelves so nobody new finds it; the link somebody was already handed keeps
+ * working, and says so. Filtering here would empty the build out of the library
+ * of everybody following it, which is the outcome the tombstone exists to
+ * prevent.
+ *
+ * It is also the only version this route can enforce. There is no session on
+ * it, by design, so the server cannot tell a follower from a stranger and any
+ * rule of the form "only for people already following" would be a rule it has
+ * no way to apply.
  */
 export async function read(
   db: DB,
   id: string,
-): Promise<{ payload: string; name: string; revision: number } | null> {
+): Promise<{ payload: string; name: string; revision: number; takenDown: boolean } | null> {
   const [row] = await db
     .select({
       payload: publishedBuild.payload,
       name: publishedBuild.name,
       revision: publishedBuild.revision,
+      takenDownAt: publishedBuild.takenDownAt,
     })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, id))
-  return row ?? null
+  if (!row) return null
+  const { takenDownAt, ...rest } = row
+  // A boolean, not the timestamp. When the author took it down is their
+  // business and answers no question the reader has.
+  return { ...rest, takenDown: takenDownAt !== null }
 }

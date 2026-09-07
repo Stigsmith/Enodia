@@ -36,7 +36,7 @@
  * good, and a single number would be exactly that claim wearing arithmetic.
  */
 
-import { and, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
 import { curatedPick, exchangeStat, friendship, publishedBuild } from './schema-app.ts'
@@ -207,6 +207,11 @@ export async function picked(db: DB, viewer?: string | null): Promise<Listing[]>
     .from(curatedPick)
     .innerJoin(publishedBuild, eq(curatedPick.buildId, publishedBuild.id))
     .leftJoin(user, eq(publishedBuild.userId, user.id))
+    /* A build the author has taken down leaves every shelf, and this is the
+       one that matters most: the curated shelf is the one a stranger lands on.
+       The pick itself is left alone rather than deleted, so putting the build
+       back brings the note with it. */
+    .where(isNull(publishedBuild.takenDownAt))
     .orderBy(desc(curatedPick.at))
     .limit(PAGE)
 
@@ -240,7 +245,7 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
     })
     .from(publishedBuild)
     .leftJoin(user, eq(publishedBuild.userId, user.id))
-    .where(inArray(publishedBuild.userId, ids))
+    .where(and(inArray(publishedBuild.userId, ids), isNull(publishedBuild.takenDownAt)))
     .orderBy(desc(publishedBuild.createdAt))
     .limit(PAGE)
 
@@ -288,12 +293,23 @@ export async function take(
       payload: publishedBuild.payload,
       name: publishedBuild.name,
       userId: publishedBuild.userId,
+      takenDownAt: publishedBuild.takenDownAt,
     })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, buildId))
     .limit(1)
 
-  if (!found) return { status: 404, say: 'That build is not there any more.' }
+  /**
+   * Gone and taken down answer the same way, and that is right here.
+   *
+   * `take` starts a new relationship with a build, and taking one down is the
+   * author saying no new ones. It reads differently from `read`, which keeps
+   * answering: that route serves people who already have the link, and this one
+   * hands out a copy to somebody who does not.
+   */
+  if (!found || found.takenDownAt !== null) {
+    return { status: 404, say: 'That build is not there any more.' }
+  }
 
   /**
    * Your own build is already yours.
@@ -427,10 +443,13 @@ export async function pick(
   if (!said) return { status: 400, say: 'A pick says why it is a pick.' }
   if (said.length > 280) return { status: 400, say: 'That note is too long.' }
 
+  /* A build the author has taken down is not one to put on the shelf, and the
+     existing sentence covers it without a second one: from the curator's side
+     there is nothing there to pick. */
   const [found] = await db
     .select({ id: publishedBuild.id })
     .from(publishedBuild)
-    .where(eq(publishedBuild.id, buildId))
+    .where(and(eq(publishedBuild.id, buildId), isNull(publishedBuild.takenDownAt)))
     .limit(1)
 
   if (!found) return { status: 404, say: 'There is no such build to pick.' }

@@ -57,6 +57,13 @@
       "when": 1788721470812,
       "tag": "0007_wet_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1788780551142,
+      "tag": "0008_tranquil_shadowcat",
+      "breakpoints": true
     }
   ]
 }

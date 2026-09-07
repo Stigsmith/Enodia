@@ -124,6 +124,9 @@ describe('the short link', () => {
       payload: 'Zthepayload',
       name: 'Shared One',
       revision: 0,
+      // Whether the author has taken it off the shelves. False here, and the
+      // only reason a reader needs it is to say so rather than to be refused.
+      takenDown: false,
     })
   })
 
@@ -161,16 +164,85 @@ describe('whose build it is', () => {
     expect((await SELF.fetch(`${ORIGIN}/api/b/${id}`)).status).toBe(200)
   })
 
-  it('lets the owner delete it, after which the link is dead', async () => {
+  /**
+   * **This used to assert that the link died, and that decision was reversed.**
+   *
+   * A delete cascades: it takes every run and rating anybody logged against the
+   * build, the curator's note, and the build itself out of the library of
+   * everyone following it. Too much of other people's work to destroy because
+   * one person pressed a button. Taking a build down now removes it from the
+   * shelves and leaves the link answering, marked.
+   */
+  it('lets the owner take it down, and the link keeps answering, marked', async () => {
     const { cookie } = await someone()
     const { id } = (await (await publish(cookie, 'Going away')).json()) as { id: string }
 
-    const gone = await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+    const down = await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
       method: 'DELETE',
       headers: { origin: ORIGIN, cookie },
     })
-    expect(gone.status).toBe(200)
-    expect((await SELF.fetch(`${ORIGIN}/api/b/${id}`)).status).toBe(404)
+    expect(down.status).toBe(200)
+
+    const after = await SELF.fetch(`${ORIGIN}/api/b/${id}`)
+    expect(after.status).toBe(200)
+    expect((await after.json() as { takenDown: boolean }).takenDown).toBe(true)
+  })
+
+  it('is not an error to take the same one down twice', async () => {
+    const { cookie } = await someone()
+    const { id } = (await (await publish(cookie, 'Twice')).json()) as { id: string }
+    const down = () =>
+      SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+        method: 'DELETE',
+        headers: { origin: ORIGIN, cookie },
+      })
+
+    expect((await down()).status).toBe(200)
+    // SQLite counts a matched row as changed even when the value it writes is
+    // the one already there, so this stays truthful rather than 404ing.
+    expect((await down()).status).toBe(200)
+  })
+
+  it('puts one back, without moving the revision', async () => {
+    const { cookie } = await someone()
+    const { id } = (await (await publish(cookie, 'Back again')).json()) as { id: string }
+
+    await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie },
+    })
+    const back = await SELF.fetch(`${ORIGIN}/api/builds/${id}/restore`, {
+      method: 'POST',
+      headers: { origin: ORIGIN, cookie },
+    })
+    expect(back.status).toBe(200)
+
+    const after = (await (await SELF.fetch(`${ORIGIN}/api/b/${id}`)).json()) as {
+      takenDown: boolean
+      revision: number
+    }
+    expect(after.takenDown).toBe(false)
+    // Putting it back is not a change to the build, so nobody following it
+    // should be told anything happened.
+    expect(after.revision).toBe(0)
+  })
+
+  it('refuses to let somebody else take yours down or put it back', async () => {
+    const mine = await someone('203.0.113.21')
+    const theirs = await someone('203.0.113.22')
+    const { id } = (await (await publish(mine.cookie, 'Still mine')).json()) as { id: string }
+
+    const down = await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie: theirs.cookie },
+    })
+    expect(down.status).toBe(404)
+
+    const back = await SELF.fetch(`${ORIGIN}/api/builds/${id}/restore`, {
+      method: 'POST',
+      headers: { origin: ORIGIN, cookie: theirs.cookie },
+    })
+    expect(back.status).toBe(404)
   })
 
   /**

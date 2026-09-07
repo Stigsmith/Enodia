@@ -27,12 +27,24 @@ export function Shared({
   replaces,
   onKeep,
   onDismiss,
+  takenDown,
 }: {
   build: ShownBuild
   /** the build already here with this id, when there is one */
   replaces: ShownBuild | null
   onKeep: () => void
   onDismiss: () => void
+  /**
+   * Whether the author has taken this listing off the shelves.
+   *
+   * The link keeps working after a takedown, on purpose: the id was already
+   * shared and destroying the build would empty it out of the library of
+   * everybody following it. So somebody can arrive here at a build nobody can
+   * find any more, and showing it as though it were current would be the wrong
+   * kind of quiet. Only a short link can be taken down; a build carried inside
+   * a fragment has no listing behind it.
+   */
+  takenDown?: boolean
 }) {
   /* The same as “Not now”, which is the button sitting next to it. The build
      is still in the link it arrived on, so nothing is destroyed by leaving. */
@@ -50,6 +62,12 @@ export function Shared({
     <div className="shared" role="dialog" aria-label="A build someone shared with you">
       <div className="shared-card">
         <p className="shared-eyebrow">{sharedLine(build.author, readName())}</p>
+        {takenDown ? (
+          <p className="shared-down">
+            This one has been taken off the exchange. It is the last version its author
+            published, and it will not change again.
+          </p>
+        ) : null}
         <h2 className="shared-name">{build.name || 'Untitled build'}</h2>
         {build.say ? <p className="shared-say">{build.say}</p> : null}
 

@@ -41,6 +41,14 @@ export type Published = {
   revision: number
   /** null when it has never been republished. */
   updatedAt: number | null
+  /**
+   * null while it is on the shelves. A timestamp, so it answers when too.
+   *
+   * Taken-down listings are in this list rather than filtered out of it: it is
+   * the author's own inventory, and one they cannot see is one they cannot put
+   * back.
+   */
+  takenDownAt: number | null
 }
 
 export type PublishOutcome = { ok: true; id: string; link: string } | { ok: false; say: string }
@@ -183,13 +191,27 @@ export async function putBackBuild(id: string): Promise<boolean> {
  * missing id from a corrupt payload: both mean the same thing to whoever
  * followed the link, which is that there is nothing on the other end of it.
  */
-export async function openPublished(id: string): Promise<ShownBuild | null> {
+export async function openPublished(id: string): Promise<Opened | null> {
   try {
     const response = await fetch(`/api/b/${id}`)
     if (!response.ok) return null
-    const { payload } = (await response.json()) as { payload: string }
-    return await unpackBuild(payload)
+    const { payload, takenDown } = (await response.json()) as {
+      payload: string
+      takenDown?: boolean
+    }
+    const build = await unpackBuild(payload)
+    return build ? { build, takenDown: takenDown === true } : null
   } catch {
     return null
   }
 }
+
+/**
+ * A published build and whether its author has taken it off the shelves.
+ *
+ * The link keeps working after a takedown, so somebody can open one and needs
+ * telling: this is the last version the author published and it is not on the
+ * exchange any more. Silently showing it as current would be the wrong kind of
+ * quiet.
+ */
+export type Opened = { build: ShownBuild; takenDown: boolean }

@@ -3662,6 +3662,18 @@ button.mark {
   color: var(--bone-faint);
 }
 
+/* A fact about the listing rather than a warning about the build. It sits above
+   the name because it changes what the whole card means, and it is quiet
+   because nothing here is wrong: the build is fine, it is just not on a shelf
+   any more. */
+.shared-down {
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0.6rem;
+  border-left: 2px solid var(--div-4);
+  color: var(--bone-dim);
+  font-size: 0.78rem;
+}
+
 .shared-name {
   margin: 0;
   font-family: var(--display);
