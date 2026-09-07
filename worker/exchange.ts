@@ -274,13 +274,36 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
  * build and then taking, playing and rating it moved its own public numbers.
  * The owner found the first half of that by taking copies of their own build.
  */
-async function authorOf(db: DB, buildId: string): Promise<string | null> {
+/**
+ * **It returns the row rather than the id**, so "no such build" cannot be
+ * confused with "no author".
+ *
+ * It used to answer `row?.userId ?? null`, which folds those two together. The
+ * column is `not null` today so they cannot both happen, but the two callers
+ * were already reading that fold in opposite directions: `played` treated null
+ * as gone and 404'd, while `rate` compared null to the caller, found them
+ * unequal and carried on. That is two routes disagreeing about whether a build
+ * exists, waiting for the column to become nullable.
+ *
+ * Which it nearly did: see `schema-app.ts` on why the rebuild that would have
+ * made it nullable was reverted. Keeping this shape means the day that change
+ * is made properly, it is one column and not a hunt for callers.
+ *
+ * `rate` gained the missing-build branch here too. Without it a rating against
+ * an id that does not exist fell through to the run gate and answered "log a
+ * run against this build before rating it", about a build there is nothing to
+ * log a run against.
+ */
+async function authorOf(
+  db: DB,
+  buildId: string,
+): Promise<{ userId: string | null } | null> {
   const [row] = await db
     .select({ userId: publishedBuild.userId })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, buildId))
     .limit(1)
-  return row?.userId ?? null
+  return row ?? null
 }
 
 export async function take(
@@ -352,8 +375,8 @@ export async function played(
   cleared: boolean,
   fear: number | null,
 ): Promise<{ ok: true } | Refusal> {
-  const author = await authorOf(db, buildId)
-  if (author === null) return { status: 404, say: 'That build is not there any more.' }
+  const found = await authorOf(db, buildId)
+  if (!found) return { status: 404, say: 'That build is not there any more.' }
 
   /**
    * An author's own runs do not count toward their own build.
@@ -363,7 +386,7 @@ export async function played(
    * A refusal would make `LogRun` show an error for something the player did
    * nothing wrong in doing.
    */
-  if (author === userId) return { ok: true }
+  if (found.userId === userId) return { ok: true }
 
   const raise = cleared && fear !== null ? fear : null
 
@@ -399,8 +422,12 @@ export async function rate(
     return { status: 400, say: 'A rating is one to five.' }
   }
 
-  const author = await authorOf(db, buildId)
-  if (author === userId) {
+  const found = await authorOf(db, buildId)
+  /* Missing answers the same way it does in `played`, rather than falling
+     through to the run gate and telling somebody to log a run against a build
+     that is not there. */
+  if (!found) return { status: 404, say: 'That build is not there any more.' }
+  if (found.userId === userId) {
     return { status: 409, say: 'You cannot rate your own build.' }
   }
 

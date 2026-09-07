@@ -49,7 +49,38 @@ export const publishedBuild = sqliteTable(
      */
     id: text('id').primaryKey(),
 
-    /** Cascade, so deleting an account takes its published builds with it. */
+    /**
+     * Whose it is. Still `cascade`, and **that was tried and reverted rather
+     * than left unexamined.**
+     *
+     * The cascade is wrong in principle: deleting an account would destroy its
+     * published builds, taking every run and rating anybody logged against
+     * them, the curator's notes, and the builds themselves out of the library
+     * of everybody following them. A person leaving should take their name with
+     * them, not other people's work. `set null` plus the "Somebody" byline that
+     * `exchange.ts` already falls back to is the right shape.
+     *
+     * **SQLite cannot alter a foreign key, so that is a table rebuild, and the
+     * rebuild is the danger.** `published_build` is a parent and both
+     * `exchange_stat` and `curated_pick` point at it `on delete cascade`, so the
+     * `DROP TABLE` in the middle of a rebuild performs an implicit delete that
+     * carries out those cascade actions.
+     *
+     * drizzle-kit wraps its rebuild in `PRAGMA foreign_keys=OFF`. **Measured, on
+     * a real database with real rows: it does not help here.** The rebuild ran,
+     * reported nine statements executed successfully, and took `exchange_stat`
+     * from 2 rows to 0 and `curated_pick` from 1 to 0. D1 documents
+     * `defer_foreign_keys` and not `foreign_keys`, and deferral postpones
+     * constraint checking rather than suppressing cascade actions. So the
+     * migration written to stop this loss would have caused it.
+     *
+     * **The rule instead, since there is no account deletion path today:**
+     * whoever builds one must reassign this account's published builds before
+     * deleting the row, to a reserved account that stands for a player who has
+     * left. That needs no schema change and no rebuild. Do not reach for
+     * `set null` without rehearsing the migration against an export and
+     * counting `exchange_stat` and `curated_pick` on both sides of it.
+     */
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
