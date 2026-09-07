@@ -16,7 +16,7 @@
  *   /api/auth/*      handed whole to better-auth: sign up, sign in, sign out, session
  *   /api/capabilities  what this deployment can do. Public, and honest about mail
  *   /api/me            who is signed in
- *   /api/builds        publish one, list yours, replace one, unpublish one
+ *   /api/builds        publish one, list yours, replace one, take one down
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *   /api/sync          everything an account carries between devices
  *   /api/exchange      the picked shelf. PUBLIC, and every item was chosen by hand
@@ -63,7 +63,7 @@ import {
   rotateCode,
   unfriend,
 } from './friends.ts'
-import { listMine, publish, read, republish, unpublish } from './publish.ts'
+import { listMine, publish, putBack, read, republish, takeDown } from './publish.ts'
 import { fromFriends, pick, picked, played, rate, take } from './exchange.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
@@ -334,11 +334,32 @@ export default {
         return json(outcome)
       }
 
+      /**
+       * DELETE is still the verb, and it still takes the build off the shelves.
+       * What it no longer does is destroy the row: see `takeDown`. The method
+       * is kept because that is what a caller means by it, and because the
+       * alternative is a second spelling of the same intention.
+       */
       if (mine && request.method === 'DELETE') {
-        const gone = await unpublish(db, userId, mine[1] as string)
+        const down = await takeDown(db, userId, mine[1] as string)
         // Not found and not yours answer the same way, so this cannot be used
         // to ask whether a given id exists on somebody else's account.
-        if (!gone) return json({ error: 'no such build' }, 404)
+        if (!down) return json({ error: 'no such build' }, 404)
+        return json({ ok: true })
+      }
+
+      /**
+       * Putting one back needs its own route rather than riding on republish.
+       *
+       * `GET /api/builds` returns no payload, so an author's own inventory
+       * cannot put a build back by republishing it: it does not hold the build
+       * to send. And a restore must not move `revision`, or every follower
+       * would be told there was a change to look at when there was none.
+       */
+      const restore = /^\/api\/builds\/([A-Za-z0-9]{1,32})\/restore$/.exec(url.pathname)
+      if (restore && request.method === 'POST') {
+        const back = await putBack(db, userId, restore[1] as string)
+        if (!back) return json({ error: 'no such build' }, 404)
         return json({ ok: true })
       }
 

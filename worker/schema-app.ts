@@ -92,6 +92,28 @@ export const publishedBuild = sqliteTable(
      */
     updatedAt: integer('updated_at', { mode: 'timestamp_ms' }),
     revision: integer('revision').default(0).notNull(),
+    /**
+     * When the author took it off the shelves, or null while it is live.
+     *
+     * **Taking a build down is not a delete, and this column is why.** A delete
+     * cascades: it destroys every run and rating anybody logged against the
+     * build and the curator's note with it, and it empties the build out of the
+     * library of everyone following it. That is a lot of other people's work to
+     * throw away because one person pressed a button, and the owner's call was
+     * that it should not happen.
+     *
+     * So a tombstone. The row stays, it leaves every shelf, and `read` still
+     * answers for anybody holding the link. Unlisted rather than destroyed, and
+     * that is the honest description: the id is ten unguessable characters and
+     * was already shared, so the thing taking it down actually removes is
+     * discovery.
+     *
+     * A timestamp rather than a boolean because it answers when for free and
+     * sits beside `updatedAt`. `syncItem.deleted` is a boolean for a reason its
+     * own docblock gives, which does not apply here: there the fact of the
+     * delete is what syncs, and nothing about this syncs.
+     */
+    takenDownAt: integer('taken_down_at', { mode: 'timestamp_ms' }),
   },
   (table) => [
     index('published_build_userId_idx').on(table.userId),

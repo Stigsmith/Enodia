@@ -1,0 +1,1 @@
+ALTER TABLE `published_build` ADD `taken_down_at` integer;

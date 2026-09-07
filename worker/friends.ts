@@ -15,7 +15,7 @@
  * removing somebody, which is one call.
  */
 
-import { and, eq, inArray, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
 import { friendCode, friendship, publishedBuild } from './schema-app.ts'
@@ -172,7 +172,9 @@ export async function buildsOfFriend(
       createdAt: publishedBuild.createdAt,
     })
     .from(publishedBuild)
-    .where(eq(publishedBuild.userId, friendId))
+    /* These two are shelves under another name, so a build the author has taken
+       down leaves them the same way it leaves the exchange. */
+    .where(and(eq(publishedBuild.userId, friendId), isNull(publishedBuild.takenDownAt)))
 
   return rows.map((one) => ({ ...one, createdAt: one.createdAt.getTime() }))
 }
@@ -203,9 +205,12 @@ export async function friendsFeed(
     .from(publishedBuild)
     .innerJoin(user, eq(user.id, publishedBuild.userId))
     .where(
-      inArray(
-        publishedBuild.userId,
-        friends.map((one) => one.id),
+      and(
+        inArray(
+          publishedBuild.userId,
+          friends.map((one) => one.id),
+        ),
+        isNull(publishedBuild.takenDownAt),
       ),
     )
 

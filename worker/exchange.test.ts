@@ -528,3 +528,95 @@ describe('republishing', () => {
     expect((await put({ payload: 'Z'.repeat(17_000), name: 'x' })).status).toBe(413)
   })
 })
+
+/**
+ * Taking a build down, and what it must not destroy.
+ *
+ * A delete cascaded through `exchange_stat` and `curated_pick`, so one press of
+ * a button threw away every run and rating anybody had logged against the build
+ * and the curator's note as well. It also emptied the build out of the library
+ * of everybody following it, because their client reads it back from the same
+ * route. The owner's call was that none of that should happen.
+ *
+ * What is left is that the build leaves the shelves and the link keeps
+ * answering. These assertions are the record of that decision.
+ */
+describe('taking a build down', () => {
+  const takeDown = (id: string, cookie: string) =>
+    SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie },
+    })
+
+  it('takes it off the picked shelf', async () => {
+    const { cookie } = await someone()
+    const id = await publish(cookie, 'On the shelf')
+    await curate(id, 'worth a look')
+    expect((await shelf('/api/exchange')).map((one) => one.id)).toContain(id)
+
+    await takeDown(id, cookie)
+
+    expect((await shelf('/api/exchange')).map((one) => one.id)).not.toContain(id)
+  })
+
+  it('takes it off the friends shelf', async () => {
+    const mine = await someone('Author')
+    const friend = await someone('Friend')
+    const code = await (await get('/api/friends/code', mine.cookie)).json<{ code: string }>()
+    await post('/api/friends/redeem', { code: code.code }, { cookie: friend.cookie })
+    const id = await publish(mine.cookie, 'Among friends')
+    expect((await shelf('/api/exchange/friends', friend.cookie)).map((o) => o.id)).toContain(id)
+
+    await takeDown(id, mine.cookie)
+
+    expect((await shelf('/api/exchange/friends', friend.cookie)).map((o) => o.id)).not.toContain(id)
+  })
+
+  /**
+   * The whole point. Every one of these rows is somebody else's work, and the
+   * cascades used to take all of it.
+   */
+  it('keeps every run, every rating and the curator\u2019s note', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publish(author.cookie, 'Played and rated')
+    await curate(id, 'the one I hand new players')
+    await post(`/api/exchange/${id}/played`, { cleared: true, fear: 20 }, { cookie: player.cookie })
+    await post(`/api/exchange/${id}/rate`, { rating: 5 }, { cookie: player.cookie })
+
+    await takeDown(id, author.cookie)
+
+    const stats = await env.DB.prepare('select count(*) as n from exchange_stat where build_id = ?')
+      .bind(id)
+      .first<{ n: number }>()
+    const note = await env.DB.prepare('select count(*) as n from curated_pick where build_id = ?')
+      .bind(id)
+      .first<{ n: number }>()
+    expect(stats?.n).toBe(1)
+    expect(note?.n).toBe(1)
+  })
+
+  it('comes back on the shelf when it is put back', async () => {
+    const { cookie } = await someone()
+    const id = await publish(cookie, 'Back on it')
+    await curate(id, 'still worth a look')
+    await takeDown(id, cookie)
+
+    await SELF.fetch(`${ORIGIN}/api/builds/${id}/restore`, {
+      method: 'POST',
+      headers: { origin: ORIGIN, cookie },
+    })
+
+    expect((await shelf('/api/exchange')).map((one) => one.id)).toContain(id)
+  })
+
+  it('cannot be taken by somebody who did not already have it', async () => {
+    const author = await someone('Author')
+    const stranger = await someone('Stranger')
+    const id = await publish(author.cookie, 'Not any more')
+    await takeDown(id, author.cookie)
+
+    const attempt = await post(`/api/exchange/${id}/take`, {}, { cookie: stranger.cookie })
+    expect(attempt.status).toBe(404)
+  })
+})
