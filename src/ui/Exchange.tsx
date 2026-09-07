@@ -361,7 +361,22 @@ function Counted({ stats, before }: { stats: Stats; before?: Before }) {
 
   return (
     <>
-      {anything ? <Tally stats={stats} /> : null}
+      {anything ? (
+        <Tally stats={stats} />
+      ) : (
+        /**
+         * **A build whose counts reset must not read as one nobody has touched.**
+         *
+         * With no current counts `Tally` draws nothing, which is right for a
+         * build nobody has played and wrong for one whose author replaced the
+         * picks: those look identical, and on the shelf in list view, where the
+         * old counts are not drawn at all, that was the only thing on screen.
+         * One line, on the row rather than under it, so it costs no height.
+         */
+        <p className="xchange-counts xchange-fresh">
+          Nothing logged since the author changed this build
+        </p>
+      )}
       {/**
         * What the build earned before its author changed it.
         *

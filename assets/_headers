@@ -23,8 +23,9 @@
   Cache-Control: public, max-age=31536000, immutable
 
 # The art is not fingerprinted: paths are stable because icons.ts derives them
-# from a display name and the validator holds them to it. A day, then
-# revalidate, so the site does not re-fetch 900 files every visit.
+# from a display name and the validator holds them to it. An hour, then
+# revalidate, so the site does not re-fetch a thousand files every visit and a
+# corrected one is never more than an hour away.
 #
 # 3. THIS DOES NOT MEAN A CORRECTED IMAGE REACHES PEOPLE. An earlier version of
 #    this comment claimed it did, which was a sentence nobody had tested.
@@ -40,21 +41,35 @@
 #
 #    If you change an image's bytes without changing its name, bump a `?v` token
 #    on the URL that references it. Stylesheets are fingerprinted, so a token in
-#    a `url()` propagates; see `.xchange-coins` in `src/ui/builds.css`. There is
-#    no such escape hatch for art referenced from data, so re-cutting one of
-#    those needs a rename.
+#    a `url()` propagates; see `.xchange-coins` in `src/ui/builds.css`.
+#
+#    THAT ESCAPE HATCH ONLY EXISTS FOR ART NAMED IN A STYLESHEET, and all 1,035
+#    images are named from data instead: `icons.ts` derives the path from a
+#    display name and the validator holds it to that. So a re-cut icon had no
+#    way to reach anybody for a whole day, which is the general form of the
+#    coins bug rather than a corner of it.
+#
+#    Hence an hour rather than a day, below. A session is usually shorter than
+#    an hour, so within one nothing revalidates at all; coming back tomorrow
+#    costs one conditional request per image, answered 304 against the ETag
+#    Cloudflare already sends. Static asset requests are unlimited on every
+#    Cloudflare plan, so that costs latency and not money, and `run_worker_first`
+#    keeps these off the metered path entirely.
+#
+#    A rename is still the right answer for art that changes shape rather than
+#    pixels, because it also busts anything holding the old path.
 #
 # .jpg is new. netlify.toml only ever named .png and .webp, so the twelve JPGs
 # in themes/ have never had a rule, and one of them is the largest file on the
 # site at 1.6 MB.
 /*.png
-  Cache-Control: public, max-age=86400, must-revalidate
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /*.webp
-  Cache-Control: public, max-age=86400, must-revalidate
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /*.jpg
-  Cache-Control: public, max-age=86400, must-revalidate
+  Cache-Control: public, max-age=3600, must-revalidate
 
 # The page itself names the fingerprinted bundle, so it must never be the stale
 # thing that pins everything else to an old build. This matches what Workers

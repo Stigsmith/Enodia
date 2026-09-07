@@ -9315,6 +9315,13 @@ p.landing-say {
   }
 }
 
+/* Said on the row itself, because a listing with no current counts and a reset
+   behind it would otherwise look like one nobody has ever played. */
+.xchange-fresh {
+  font-style: italic;
+  color: var(--bone-faint);
+}
+
 /**
  * What the build earned before its author replaced the picks.
  *
