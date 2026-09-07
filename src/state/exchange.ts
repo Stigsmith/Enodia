@@ -238,17 +238,6 @@ export const listShelf = (shelf: Shelf): Promise<Listed[]> =>
 export type TakeOutcome = { ok: true; build: ShownBuild } | { ok: false; say: string }
 
 /**
- * Take a copy into your own library.
- *
- * The copy is made by the same `duplicateBuild` a fork uses, so it is an
- * ordinary build of yours from the first moment: your name on it, a new id, and
- * no play record, because inheriting somebody else's twelve runs would have
- * yours lying on its first day.
- *
- * What it does carry is where it came from and what it looked like, which is
- * what lets a run you log later count toward the build you took.
- */
-/**
  * Follow a build, which is the relationship the exchange offers now.
  *
  * **A follow is not a copy, and the difference is who the build belongs to.** A
@@ -300,11 +289,24 @@ export async function followBuild(id: string): Promise<TakeOutcome> {
 
   if (!response.ok) return { ok: false, say: 'That build is not there any more.' }
 
-  const { payload, name, revision } = (await response.json()) as {
+  const { payload, name, revision, takenDown } = (await response.json()) as {
     payload: string
     name: string
     revision?: number
+    takenDown?: boolean
   }
+
+  /**
+   * A build off the shelves takes no new followers.
+   *
+   * `take` says the same on the server, and this is the path that never reaches
+   * it: `/api/b/:id` keeps answering after a takedown on purpose, so anybody
+   * with the link can still read one. Reading it is the point; starting a
+   * relationship with it is not, because it will never change again and its
+   * author has said they are done with it.
+   */
+  if (takenDown) return { ok: false, say: 'That build has been taken off the exchange.' }
+
   const source = await unpackBuild(payload)
   if (!source) return { ok: false, say: 'That build is in a format this version cannot read.' }
 
@@ -331,6 +333,29 @@ export async function followBuild(id: string): Promise<TakeOutcome> {
   }
 
   saveBuild(followed)
+
+  /**
+   * Tell the server, so the count on the listing can move again.
+   *
+   * **Nothing had written `taken_at` since following replaced taking**, so
+   * "Taken N" on every listing was frozen at whatever the copy era left in it.
+   * A number on screen that can never change is worse than no number, because
+   * it reads as current.
+   *
+   * The `take` route rather than a new one: it already refuses your own build,
+   * refuses one that has been taken down, dedupes so a second press is the same
+   * relationship rather than a second person, and files the row under the
+   * build's current shape. All four are things this would otherwise reimplement.
+   * The payload it hands back is thrown away, which costs about 1.2 KB on a
+   * button somebody pressed on purpose.
+   *
+   * **Not awaited, and a failure is not a failure.** The follow is already in
+   * the library; the count is somebody else's tally. Losing it is worth less
+   * than making a person watch a spinner, or telling them the thing they asked
+   * for did not happen when it did.
+   */
+  void fetch(`/api/exchange/${id}/take`, { method: 'POST' }).catch(() => {})
+
   return { ok: true, build: followed }
 }
 

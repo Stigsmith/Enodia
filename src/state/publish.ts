@@ -168,6 +168,7 @@ export async function republishBuild(build: ShownBuild): Promise<PublishOutcome>
 export async function takeDownBuild(id: string): Promise<boolean> {
   try {
     const response = await fetch(`/api/builds/${id}`, { method: 'DELETE' })
+    if (response.ok) mark(id, true)
     return response.ok
   } catch {
     return false
@@ -178,10 +179,23 @@ export async function takeDownBuild(id: string): Promise<boolean> {
 export async function putBackBuild(id: string): Promise<boolean> {
   try {
     const response = await fetch(`/api/builds/${id}/restore`, { method: 'POST' })
+    if (response.ok) mark(id, false)
     return response.ok
   } catch {
     return false
   }
+}
+
+/**
+ * Record on the local build whether its listing is on the shelves.
+ *
+ * Without it the menu cannot tell the two states apart and offers Take it down
+ * for a build already down, which is how `putBackBuild` ended up with no caller
+ * at all: there was no state for a Put it back control to key on.
+ */
+function mark(id: string, down: boolean): void {
+  const held = loadBuilds().find((one) => one.publishedAs === id)
+  if (held) saveBuild({ ...held, publishedDown: down })
 }
 
 /**
@@ -264,6 +278,24 @@ export async function reconnectPublished(): Promise<number> {
   if (!listings.length) return 0
 
   const library = loadBuilds()
+
+  /**
+   * First, bring the down-state of everything already connected up to date.
+   *
+   * The same one request answers both halves, so this costs nothing extra. It
+   * matters because the flag can go stale without this browser doing anything:
+   * take a listing down on a laptop and the phone still offers Take it down
+   * until it is told otherwise.
+   */
+  const by = new Map(listings.map((one) => [one.id, one]))
+  for (const held of library) {
+    if (!held.publishedAs) continue
+    const listing = by.get(held.publishedAs)
+    if (!listing) continue
+    const down = listing.takenDownAt !== null
+    if (down !== (held.publishedDown ?? false)) saveBuild({ ...held, publishedDown: down })
+  }
+
   const claimed = new Set(library.map((one) => one.publishedAs).filter(Boolean))
   const orphans = listings.filter((one) => !claimed.has(one.id))
   if (!orphans.length) return 0
@@ -286,7 +318,12 @@ export async function reconnectPublished(): Promise<number> {
     const match = same.length === 1 ? same[0] : exact.length === 1 ? exact[0] : null
     if (!match) continue
 
-    saveBuild({ ...match, publishedAs: listing.id, publishedHash: shape })
+    saveBuild({
+      ...match,
+      publishedAs: listing.id,
+      publishedHash: shape,
+      publishedDown: listing.takenDownAt !== null,
+    })
     match.publishedAs = listing.id
     joined += 1
   }

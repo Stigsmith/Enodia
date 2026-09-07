@@ -392,7 +392,11 @@ function Tally({ stats, bare }: { stats: Stats; bare?: boolean }) {
         <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
       )}
       <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
-      {stats.takes ? <span>Taken {stats.takes}</span> : null}
+      {/* "Taken" was the copy era's word for it. The row records somebody
+        * adding this build to their library from this listing, which is what
+        * following is; the rows written before following existed are the same
+        * act under the older name. */}
+      {stats.takes ? <span>Followed by {stats.takes}</span> : null}
       {stats.runs ? (
         <span>
           {stats.clears} of {stats.runs} cleared

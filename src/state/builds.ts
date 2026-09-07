@@ -193,6 +193,7 @@ export function duplicateBuild(
     author: _author,
     publishedAs: _publishedAs,
     publishedHash: _publishedHash,
+    publishedDown: _publishedDown,
     ...rest
   } = source
   const mine = readName()

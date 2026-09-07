@@ -680,3 +680,59 @@ describe('what republishing would do', () => {
     expect(republishChangesTheBuild({ ...BUILD, publishedAs: 'KmUkC9VotY' })).toBe(false)
   })
 })
+
+/**
+ * What following tells the server, and what it refuses.
+ *
+ * Following replaced taking a copy, and when it did, nothing was left that
+ * writes `taken_at`: `takeBuild` lost its last caller and the count on every
+ * listing froze at whatever the copy era had left in it. A number on screen
+ * that can never move again is worse than no number, because it reads as
+ * current.
+ *
+ * The `take` route is the right one to reuse rather than a new endpoint: it
+ * already refuses your own build, refuses one that has been taken down, and
+ * counts a second press as the same relationship rather than a second person.
+ */
+describe('what following reports', () => {
+  const answer = (payload: string, over: Record<string, unknown> = {}) => ({
+    body: { payload, name: BUILD.name, revision: 1, takenDown: false, ...over },
+  })
+
+  it('tells the server, so the count on the listing can move again', async () => {
+    const payload = await packBuild(BUILD)
+    const seen = stubFetch((path) => (path.endsWith('/take') ? { body: {} } : answer(payload)))
+
+    const outcome = await followBuild('KmUkC9VotY')
+
+    expect(outcome.ok).toBe(true)
+    expect(seen.map((call) => call.path)).toContain('/api/exchange/KmUkC9VotY/take')
+  })
+
+  it('follows anyway when the report fails, because the follow is local', async () => {
+    const payload = await packBuild(BUILD)
+    stubFetch((path) => (path.endsWith('/take') ? { status: 500 } : answer(payload)))
+
+    const outcome = await followBuild('KmUkC9VotY')
+
+    // The build is in the library either way. A count is not worth failing a
+    // thing the person asked for.
+    expect(outcome.ok).toBe(true)
+    expect(loadBuilds().some((one) => one.derivedFrom === 'KmUkC9VotY')).toBe(true)
+  })
+
+  /**
+   * A build off the shelves keeps working for people who already follow it and
+   * takes no new followers. `take` says the same on the server; this is the
+   * raw-link path, which never reaches it.
+   */
+  it('refuses to start following one the author has taken down', async () => {
+    const payload = await packBuild(BUILD)
+    stubFetch(() => answer(payload, { takenDown: true }))
+
+    const outcome = await followBuild('KmUkC9VotY')
+
+    expect(outcome.ok).toBe(false)
+    expect(loadBuilds()).toHaveLength(0)
+  })
+})
