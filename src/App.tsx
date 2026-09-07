@@ -161,7 +161,20 @@ export function App() {
    * down must not stop them reading what they already have.
    */
   useEffect(() => {
-    void refreshFollowed()
+    /**
+     * The result is kept now rather than discarded, and that fixes a live bug.
+     *
+     * A followed build whose author had rewritten a note was updated in storage
+     * and the Builds screen went on drawing the old one until something else
+     * happened to remount it. `libraryAt` is the remount key that already exists
+     * for exactly this, so the redraw is one line.
+     *
+     * Offers need no bump: they are read when the screen renders, and the screen
+     * renders after this resolves in every case where there is one to show.
+     */
+    void refreshFollowed().then((out) => {
+      if (out.moved > 0) setLibraryAt((was) => was + 1)
+    })
   }, [])
 
   useEffect(() => {

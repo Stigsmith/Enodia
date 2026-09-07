@@ -20,9 +20,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  acceptOffer,
   fingerprint,
   followBuild,
   listShelf,
+  refreshFollowed,
   rateBuild,
   reportRun,
   reportsTo,
@@ -31,7 +33,8 @@ import {
 } from './exchange.ts'
 import { packBuild } from './transfer.ts'
 import { DEFAULT_PREFS, loadPrefs, savePrefs } from './prefs.ts'
-import { duplicateBuild, loadBuilds } from './builds.ts'
+import { duplicateBuild, loadBuilds, saveBuild } from './builds.ts'
+import { declineOffer, loadOffers } from './offers.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const BUILD: ShownBuild = {
@@ -508,5 +511,114 @@ describe('what a reported run tells the server', () => {
 
     expect(seen).toHaveLength(1)
     expect((seen[0]?.body as { shape?: string }).shape).toBe(fingerprint(shapeOf(BUILD)))
+  })
+})
+
+/**
+ * What reaches you when a build you follow changes.
+ *
+ * Following used to mean the author's version simply became yours: the refresh
+ * compared a revision number and overwrote the record. So an author replacing a
+ * good build with a worse one replaced yours too, silently, with nothing to go
+ * back to. That is the failure the owner described.
+ *
+ * The line is `shapeOf`. Words apply, picks wait.
+ */
+describe('an author changing a build you follow', () => {
+  /** Follow BUILD, then answer the next fetch with whatever the author did. */
+  const following = async () => {
+    const payload = await packBuild(BUILD)
+    stubFetch(() => ({ body: { payload, name: BUILD.name, revision: 1 } }))
+    const outcome = await followBuild('KmUkC9VotY')
+    expect(outcome.ok).toBe(true)
+    vi.unstubAllGlobals()
+    return loadBuilds().find((one) => one.by === 'community')!
+  }
+
+  it('applies a change to the words on its own', async () => {
+    const held = await following()
+    const payload = await packBuild({ ...BUILD, say: 'Rewritten advice.' })
+    stubFetch(() => ({ body: { payload, name: 'A better name', revision: 2 } }))
+
+    const out = await refreshFollowed()
+
+    expect(out.moved).toBe(1)
+    expect(out.offered).toBe(0)
+    const after = loadBuilds().find((one) => one.id === held.id)!
+    expect(after.name).toBe('A better name')
+    expect(after.say).toBe('Rewritten advice.')
+    expect(loadOffers()[held.id]).toBeUndefined()
+  })
+
+  it('offers a change to the picks, and does not apply it', async () => {
+    const held = await following()
+    const payload = await packBuild({ ...BUILD, boons: ['ZeusWeaponBoon'] })
+    stubFetch(() => ({ body: { payload, name: BUILD.name, revision: 2 } }))
+
+    const out = await refreshFollowed()
+
+    expect(out.offered).toBe(1)
+    expect(out.moved).toBe(0)
+    // The build in the library is untouched. This is the whole point.
+    const after = loadBuilds().find((one) => one.id === held.id)!
+    expect(after.boons).toEqual(BUILD.boons)
+    expect(after.derivedRevision).toBe(1)
+    expect(loadOffers()[held.id]?.kind).toBe('changed')
+  })
+
+  it('takes the offer when it is accepted, and keeps your play record', async () => {
+    const held = await following()
+    saveBuild({ ...held, play: { runs: 4, clears: 2 } })
+    const payload = await packBuild({ ...BUILD, boons: ['ZeusWeaponBoon'] })
+    stubFetch(() => ({ body: { payload, name: BUILD.name, revision: 2 } }))
+    await refreshFollowed()
+
+    const outcome = await acceptOffer(loadBuilds().find((one) => one.id === held.id)!)
+
+    expect(outcome.ok).toBe(true)
+    const after = loadBuilds().find((one) => one.id === held.id)!
+    expect(after.boons).toEqual(['ZeusWeaponBoon'])
+    expect(after.play?.runs).toBe(4)
+    expect(loadOffers()[held.id]).toBeUndefined()
+  })
+
+  it('asks once when it is declined, and again only if the author moves again', async () => {
+    const held = await following()
+    const changed = await packBuild({ ...BUILD, boons: ['ZeusWeaponBoon'] })
+    stubFetch(() => ({ body: { payload: changed, name: BUILD.name, revision: 2 } }))
+    await refreshFollowed()
+
+    declineOffer(held.id)
+    vi.unstubAllGlobals()
+    stubFetch(() => ({ body: { payload: changed, name: BUILD.name, revision: 2 } }))
+    expect((await refreshFollowed()).offered).toBe(0)
+
+    // The author edits again. Saying no once is not saying no forever.
+    vi.unstubAllGlobals()
+    const again = await packBuild({ ...BUILD, boons: ['HeraWeaponBoon'] })
+    stubFetch(() => ({ body: { payload: again, name: BUILD.name, revision: 3 } }))
+    expect((await refreshFollowed()).offered).toBe(1)
+  })
+
+  it('records a takedown, and leaves the build in the library', async () => {
+    const held = await following()
+    const payload = await packBuild(BUILD)
+    stubFetch(() => ({ body: { payload, name: BUILD.name, revision: 2, takenDown: true } }))
+
+    const out = await refreshFollowed()
+
+    expect(out.down).toBe(1)
+    expect(loadBuilds().find((one) => one.id === held.id)).toBeDefined()
+    expect(loadOffers()[held.id]?.kind).toBe('takenDown')
+  })
+
+  it('changes nothing when the server cannot be reached', async () => {
+    const held = await following()
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('offline') }))
+
+    const out = await refreshFollowed()
+
+    expect(out).toEqual({ moved: 0, offered: 0, down: 0 })
+    expect(loadBuilds().find((one) => one.id === held.id)?.derivedRevision).toBe(1)
   })
 })

@@ -32,6 +32,8 @@
 
 import type { ShownBuild } from '../data/builds.ts'
 import { duplicateBuild, loadBuilds, newBuildId, saveBuild } from './builds.ts'
+import { clearOffer, loadOffers, offerFor, setOffers } from './offers.ts'
+import type { Offers } from './offers.ts'
 import { loadPrefs } from './prefs.ts'
 import { unpackBuild } from './transfer.ts'
 
@@ -321,51 +323,151 @@ export async function followBuild(id: string): Promise<TakeOutcome> {
   return { ok: true, build: followed }
 }
 
+/** What a refresh did, so the screen can say so. */
+export type Refreshed = {
+  /** Applied silently: the author changed words and not picks. */
+  moved: number
+  /** Waiting for an answer, because the picks changed. */
+  offered: number
+  /** Authors who took a build off the shelves. */
+  down: number
+}
+
 /**
- * Re-read every followed build, and replace the ones whose author moved.
+ * Re-read every followed build. **Apply prose, offer the build itself.**
  *
- * Cheap on purpose: the worker hands back a `revision` with the payload, so
- * this compares a number rather than a kilobyte. A build that has not changed
- * costs one request and no write.
+ * This used to compare a revision number and overwrite whatever it found, which
+ * meant an author could turn a build you follow into a different and worse one
+ * and it would simply become your build. That is the failure the owner named.
  *
- * **A build the author has taken down is kept rather than deleted.** What is
- * held is somebody's reading material, and removing it out of their library
- * because a stranger pressed unpublish is the worse failure. It stops updating,
- * which is all that actually changed.
+ * The line is `shapeOf`, the same one run reporting already uses: the picks are
+ * the build, and the name and the write-up are not. So a fixed typo lands
+ * quietly, because being asked about a typo is worse than not being told, and a
+ * swapped boon waits in `state/offers.ts` until you look at it.
+ *
+ * Cheap on purpose. The revision is compared first, so a build that has not
+ * changed costs one request, no unpack and no write.
  */
-export async function refreshFollowed(): Promise<number> {
+export async function refreshFollowed(): Promise<Refreshed> {
   const followed = loadBuilds().filter((one) => one.by === 'community' && one.derivedFrom)
+  const held = loadOffers()
+  const next: Offers = {}
   let moved = 0
 
   for (const one of followed) {
+    const from = one.derivedFrom as string
     try {
-      const response = await fetch(`/api/b/${one.derivedFrom}`)
-      if (!response.ok) continue
-      const { payload, name, revision } = (await response.json()) as {
+      const response = await fetch(`/api/b/${from}`)
+
+      /**
+       * Rate limited: stop, rather than spending the rest of the budget one
+       * refused request at a time.
+       *
+       * `worker/limit.ts` allows 120 reads a minute per address. A library with
+       * more followed builds than that would previously have carried on asking
+       * and been refused for every one of them.
+       */
+      if (response.status === 429) break
+
+      /* Anything else that is not ok, including a 404 for a build genuinely
+         purged, leaves both the build and any existing offer exactly as they
+         are. Offline and gone are not distinguishable here and should not be
+         acted on differently. */
+      if (!response.ok) {
+        const carry = held[one.id]
+        if (carry) next[one.id] = carry
+        continue
+      }
+
+      const { payload, name, revision, takenDown } = (await response.json()) as {
         payload: string
         name: string
         revision?: number
+        takenDown?: boolean
       }
-      if ((revision ?? 0) === (one.derivedRevision ?? 0)) continue
+
+      /**
+       * Taken down: record it and touch nothing.
+       *
+       * The docblock here used to promise this and got it by accident, because
+       * a takedown was a delete and the fetch 404'd. Now the row survives and
+       * answers, so without this branch a build the author took down and
+       * changed on the way out would be applied like any other change.
+       */
+      if (takenDown) {
+        next[one.id] = { kind: 'takenDown', from, at: Date.now() }
+        continue
+      }
+
+      const now = revision ?? 0
+      if (now === (one.derivedRevision ?? 0)) continue
 
       const source = await unpackBuild(payload)
       if (!source) continue
-      saveBuild({
-        ...source,
-        id: one.id,
-        by: 'community',
-        name: name || source.name,
-        derivedFrom: one.derivedFrom,
-        derivedHash: fingerprint(shapeOf(source)),
-        derivedRevision: revision ?? 0,
-        ...(one.play ? { play: one.play } : {}),
-      })
-      moved += 1
+
+      /**
+       * The picks decide. Equal means the author rewrote words, which is theirs
+       * to do and yours to receive; different means they changed the build, and
+       * that waits.
+       */
+      if (fingerprint(shapeOf(source)) === one.derivedHash) {
+        saveBuild({
+          ...source,
+          id: one.id,
+          by: 'community',
+          name: name || source.name,
+          derivedFrom: from,
+          derivedHash: one.derivedHash,
+          derivedRevision: now,
+          ...(one.play ? { play: one.play } : {}),
+        })
+        moved += 1
+        continue
+      }
+
+      /* Already said no to exactly this one. Carried forward rather than asked
+         again; a further change from the author moves the revision and asks. */
+      const before = held[one.id]
+      const declined =
+        before && before.kind === 'changed' && before.declined === now
+          ? { declined: now }
+          : {}
+
+      next[one.id] = { kind: 'changed', from, revision: now, name, payload, at: Date.now(), ...declined }
     } catch {
       // Offline, or the server is having a moment. Nothing here changes.
+      const carry = held[one.id]
+      if (carry) next[one.id] = carry
     }
   }
-  return moved
+
+  /* Wholesale, which is what prunes entries for builds that were forked,
+     deleted, or whose author put them back. */
+  setOffers(next)
+
+  const outstanding = Object.values(next)
+  return {
+    moved,
+    offered: outstanding.filter((o) => o.kind === 'changed' && o.declined !== o.revision).length,
+    down: outstanding.filter((o) => o.kind === 'takenDown').length,
+  }
+}
+
+/**
+ * Take the version an author offered, which is following as it was meant to be.
+ *
+ * It goes through `followBuild`, so there is still exactly one function that
+ * writes a follow: it re-fetches, finds the held entry through the same dedupe,
+ * keeps the `play` record, and sets the new revision and hash.
+ */
+export async function acceptOffer(build: ShownBuild): Promise<TakeOutcome> {
+  const offer = offerFor(build.id)
+  if (!offer || offer.kind !== 'changed') {
+    return { ok: false, say: 'There is nothing waiting for that build.' }
+  }
+  const outcome = await followBuild(offer.from)
+  if (outcome.ok) clearOffer(build.id)
+  return outcome
 }
 
 /**
