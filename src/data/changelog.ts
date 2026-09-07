@@ -20,11 +20,12 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-07',
-    title: 'Escape closes things, and the coins stop jumping',
-    say: 'Two small ones the owner caught by using it.',
+    title: 'Escape closes things, and the coins are the right size',
+    say: 'Two the owner caught by using it.',
     points: [
       'Escape closes what is on top. The listing on the exchange, a boon’s card, a build somebody shared with you and the run log all opened over the page with no way out but the mouse. On the run log it means Back while you are naming vows and Close on the form, because leaving from in there would throw away the answer you were part way through giving. An Escape that a menu has already answered is left alone, so one keystroke never closes two things.',
-      'The coins in Charon’s hand wandered around his palm. The sprite sheet was built by fitting each of the sixty frames to its cell instead of cropping all sixty to one box, so every frame sat somewhere slightly different and 41 of them were clipped at the edge. Rebuilt from one box: the wander is down from 8.9 pixels to 4.1, which is what the animation actually does, and nothing is cut off.',
+      'The coins Charon is holding were drawn a quarter too small and about ten pixels out of place, because their size is stated on the record they inherit from rather than on the record itself and I read only the record. They are the right size now. The swirl is the animation the game plays: the cluster travels about four pixels over two seconds, which is what it is meant to do.',
+      'The sprite sheet behind them was rebuilt too. It had been built by fitting each of the sixty frames to its cell instead of cropping all sixty to one box, so every frame sat somewhere slightly different and 41 of them were clipped at the edge. Rebuilt from one box: the wander is down from 8.9 pixels to 4.1, which is what the animation actually does, and nothing is cut off.',
       'He also failed to appear at all sometimes. The portrait was marked as deferrable, and it is positioned by its own width, so before it loaded it sat exactly off the right edge of the window, where the browser decided it was not worth loading. It is not deferred now.',
     ],
   },

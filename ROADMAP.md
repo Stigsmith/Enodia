@@ -453,7 +453,25 @@ element and declined to fetch it, which kept the box zero wide. Caught by measur
 same path. It is not deferred now and `aspect-ratio: 768 / 760` gives the box its shape
 before the bytes arrive.
 
-`assets/README.md` carries all three wrong readings of this layer, because they are three
+**And a fourth, which is the one that was actually being seen.**
+`Portrait_Charon_Default_01` inherits `Scale = 0.8` from `Portrait_Base_01` and states no
+scale of its own, so reading the record without the base treated the body as scale 1 while
+the coin layer used its own stated 0.8. The coins shipped at four fifths of their size and
+about 10px out of place, 76 by 82 where they should be 95 by 103. Same rule as `InheritFrom`
+in `TraitData`, different file format, now `CLAUDE.md` error 8.
+
+The swirl itself is real and was measured before being blamed: the cluster's centroid travels
+4.2px per axis over the loop, median 0.27px a frame, no step over 0.61, and a 0.31px seam, so
+it closes cleanly. Composited offline and looked at, rather than reasoned about.
+
+**What cannot be rebuilt, stated rather than attempted.** The portrait in the game also draws
+`CharonMist`, `CharonMoonGlow`, `CharonGlint`, `CharonGlowMain`, `CharonGlowEyes` and four
+`CharonWiggle` layers. Their alphas are not in the files: `Combat_Menu_Additive` turns out to
+be a draw-order group with no alpha of its own, and Mist, MoonGlow, Glint and the Wiggles
+state none, so compositing them at face value blows the picture out into magenta and cyan
+blobs. Reproducing the full stack would be guesswork, and it is not being guessed at.
+
+`assets/README.md` carries all four wrong readings of this layer, because they are four
 different mistakes, and `src/ui/charon-coins.test.ts` pins two of them: 41 of 60 frames flush
 to a cell edge against a limit of 15, and the exact old step put back failing that assertion
 alone.
