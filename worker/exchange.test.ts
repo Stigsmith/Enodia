@@ -60,6 +60,16 @@ async function publish(cookie: string, name = 'Killer Current') {
 const shelf = async (path: string, cookie?: string) =>
   (await (await get(path, cookie)).json<{ builds: Listing[] }>()).builds
 
+type Counts = {
+  takes: number
+  players: number
+  runs: number
+  clears: number
+  bestFear: number | null
+  rating: number | null
+  raters: number
+}
+
 type Listing = {
   id: string
   name: string
@@ -67,15 +77,9 @@ type Listing = {
   by: string
   note?: string
   mine?: boolean
-  stats: {
-    takes: number
-    players: number
-    runs: number
-    clears: number
-    bestFear: number | null
-    rating: number | null
-    raters: number
-  }
+  stats: Counts
+  /** What earlier versions of this build earned, when there is anything. */
+  before?: Omit<Counts, 'players'>
 }
 
 beforeEach(async () => {
@@ -618,5 +622,143 @@ describe('taking a build down', () => {
 
     const attempt = await post(`/api/exchange/${id}/take`, {}, { cookie: stranger.cookie })
     expect(attempt.status).toBe(404)
+  })
+})
+
+/**
+ * A build that changes stops inheriting the numbers its old version earned.
+ *
+ * Republish had no limit on how much the payload could change, so an author
+ * could swap a build entirely and keep four stars from forty people. The owner
+ * asked for the counts to start again, with the old ones still visible as being
+ * from before the change.
+ *
+ * **The server never learns what changed.** The browser hashes the picks and
+ * sends the result; the server stores that token and compares two strings. The
+ * last test in here is the one that pins that: nonsense in, same behaviour out.
+ */
+describe('counts, when the build underneath them changes', () => {
+  const republish = (id: string, cookie: string, body: Record<string, unknown>) =>
+    SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'PUT',
+      headers: { origin: ORIGIN, cookie, 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+  const publishShaped = async (cookie: string, name: string, shape: string) => {
+    const response = await post('/api/builds', { payload: 'Zpackedbuild', name, shape }, { cookie })
+    expect(response.status).toBe(201)
+    return (await response.json<{ id: string }>()).id
+  }
+
+  /** A run and a rating from one player, against whatever shape is current. */
+  const playAndRate = async (id: string, cookie: string, shape: string) => {
+    await post(`/api/exchange/${id}/played`, { cleared: true, fear: 30, shape }, { cookie })
+    await post(`/api/exchange/${id}/rate`, { rating: 4 }, { cookie })
+  }
+
+  const statsOf = async (id: string) => {
+    const rows = await shelf('/api/exchange')
+    return rows.find((one) => one.id === id)
+  }
+
+  it('keeps them when a republish changes only the words', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publishShaped(author.cookie, 'Same picks', 'aaa111')
+    await curate(id, 'unchanged')
+    await playAndRate(id, player.cookie, 'aaa111')
+
+    await republish(id, author.cookie, {
+      payload: 'Zpackedbuild',
+      name: 'Same picks, better name',
+      shape: 'aaa111',
+    })
+
+    const listing = await statsOf(id)
+    expect(listing?.stats.runs).toBe(1)
+    expect(listing?.stats.rating).toBe(4)
+    expect(listing?.before).toBeUndefined()
+  })
+
+  it('starts them again when the picks change, and keeps the old ones as before', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publishShaped(author.cookie, 'Changing', 'aaa111')
+    await curate(id, 'changed under you')
+    await playAndRate(id, player.cookie, 'aaa111')
+
+    await republish(id, author.cookie, {
+      payload: 'Zdifferentbuild',
+      name: 'Changing',
+      shape: 'bbb222',
+    })
+
+    const listing = await statsOf(id)
+    expect(listing?.stats.runs).toBe(0)
+    expect(listing?.stats.rating).toBeNull()
+    // Not thrown away. Somebody reading the listing can still see that an
+    // earlier version of it was played and rated.
+    expect(listing?.before?.runs).toBe(1)
+    expect(listing?.before?.rating).toBe(4)
+  })
+
+  it('does not count a run logged against the version before', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publishShaped(author.cookie, 'Moved on', 'aaa111')
+    await curate(id, 'moved on')
+    await republish(id, author.cookie, { payload: 'Znew', name: 'Moved on', shape: 'bbb222' })
+
+    // A follower who has not taken the update yet, playing what they hold.
+    const late = await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 40, shape: 'aaa111' },
+      { cookie: player.cookie },
+    )
+    expect(late.status).toBe(200)
+
+    const listing = await statsOf(id)
+    expect(listing?.stats.runs).toBe(0)
+  })
+
+  it('takes them back when an author republishes the picks they had before', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publishShaped(author.cookie, 'There and back', 'aaa111')
+    await curate(id, 'there and back')
+    await playAndRate(id, player.cookie, 'aaa111')
+    await republish(id, author.cookie, { payload: 'Zother', name: 'There and back', shape: 'bbb222' })
+    expect((await statsOf(id))?.stats.runs).toBe(0)
+
+    await republish(id, author.cookie, {
+      payload: 'Zpackedbuild',
+      name: 'There and back',
+      shape: 'aaa111',
+    })
+
+    // Nothing was moved or copied to make this happen: the row was always
+    // filed under the shape it was played against, and that shape is current
+    // again.
+    expect((await statsOf(id))?.stats.runs).toBe(1)
+  })
+
+  /**
+   * The invariant, stated as a test.
+   *
+   * If this ever fails, somebody has taught the server to care what a build is.
+   */
+  it('treats the token as opaque, whatever it is', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publishShaped(author.cookie, 'Not a build', 'not-a-fingerprint')
+    await curate(id, 'nonsense')
+    await playAndRate(id, player.cookie, 'not-a-fingerprint')
+
+    expect((await statsOf(id))?.stats.runs).toBe(1)
+
+    await republish(id, author.cookie, { payload: 'Zx', name: 'Not a build', shape: 'banana' })
+    expect((await statsOf(id))?.stats.runs).toBe(0)
+    expect((await statsOf(id))?.before?.runs).toBe(1)
   })
 })

@@ -70,6 +70,21 @@ export type Listing = {
    */
   mine?: boolean
   stats: Stats
+  /**
+   * What earlier versions of this build earned, when there is anything.
+   *
+   * Present only when the author has replaced the picks and somebody had
+   * already played or rated what was there before. Absent is the normal case
+   * and means there is nothing to say, which is why it is optional rather than
+   * a row of zeroes: `Counted` already refuses to draw those, and a listing
+   * claiming "0 from before" would be a verdict on a build nobody changed.
+   *
+   * **No `players`.** That count is a distinct-people claim, and folding
+   * several versions together would count somebody who played two of them
+   * twice. Takes and raters fold honestly, because two takes of two versions
+   * really are two takes.
+   */
+  before?: Omit<Stats, 'players'>
 }
 
 /** Counted facts. Every one of these is a tally, and none is a judgement. */
@@ -111,13 +126,25 @@ const PAGE = 60
  * make the counts arithmetic rather than to be reported, and a function that
  * could leak it is a function somebody will eventually call.
  */
-async function statsFor(db: DB, ids: string[]): Promise<Map<string, Stats>> {
-  const found = new Map<string, Stats>()
-  if (ids.length === 0) return found
+type Tally = {
+  buildId: string
+  shape: string
+  takes: number
+  players: number
+  runs: number
+  clears: number
+  bestFear: number | null
+  ratingSum: number | null
+  raters: number
+}
+
+async function statsFor(db: DB, ids: string[]): Promise<Tally[]> {
+  if (ids.length === 0) return []
 
   const rows = await db
     .select({
       buildId: exchangeStat.buildId,
+      shape: exchangeStat.shape,
       takes: sql<number>`sum(case when ${exchangeStat.takenAt} is not null then 1 else 0 end)`,
       players: sql<number>`sum(case when ${exchangeStat.runs} > 0 then 1 else 0 end)`,
       runs: sql<number>`coalesce(sum(${exchangeStat.runs}), 0)`,
@@ -128,26 +155,57 @@ async function statsFor(db: DB, ids: string[]): Promise<Map<string, Stats>> {
     })
     .from(exchangeStat)
     .where(inArray(exchangeStat.buildId, ids))
-    .groupBy(exchangeStat.buildId)
+    /* By version as well as by build, which is still one query for the page.
+       The caller decides which group is current, because only it knows what
+       shape each build is in now. */
+    .groupBy(exchangeStat.buildId, exchangeStat.shape)
 
-  for (const row of rows) {
-    found.set(row.buildId, {
-      takes: Number(row.takes ?? 0),
-      players: Number(row.players ?? 0),
-      runs: Number(row.runs ?? 0),
-      clears: Number(row.clears ?? 0),
-      bestFear: row.bestFear === null ? null : Number(row.bestFear),
-      /* Rounded to one place, and never shown without `raters` beside it. An
-       * average of two is a different thing from an average of two hundred and
-       * the reader has to be able to tell. */
-      rating:
-        row.raters && row.ratingSum
-          ? Math.round((Number(row.ratingSum) / Number(row.raters)) * 10) / 10
-          : null,
-      raters: Number(row.raters ?? 0),
-    })
+  return rows.map((row) => ({
+    buildId: row.buildId,
+    shape: row.shape,
+    takes: Number(row.takes ?? 0),
+    players: Number(row.players ?? 0),
+    runs: Number(row.runs ?? 0),
+    clears: Number(row.clears ?? 0),
+    bestFear: row.bestFear === null ? null : Number(row.bestFear),
+    ratingSum: row.ratingSum === null ? null : Number(row.ratingSum),
+    raters: Number(row.raters ?? 0),
+  }))
+}
+
+/** The mean, to one place, or null. Never shown without `raters` beside it. */
+const mean = (sum: number | null, raters: number): number | null =>
+  raters && sum ? Math.round((sum / raters) * 10) / 10 : null
+
+/** One version's tally, as counts. */
+const countsOf = (t: Tally): Stats => ({
+  takes: t.takes,
+  players: t.players,
+  runs: t.runs,
+  clears: t.clears,
+  bestFear: t.bestFear,
+  rating: mean(t.ratingSum, t.raters),
+  raters: t.raters,
+})
+
+/** Everything that is not the current version, added up. */
+function foldBefore(tallies: Tally[]): Omit<Stats, 'players'> | undefined {
+  if (!tallies.length) return undefined
+  const takes = tallies.reduce((n, t) => n + t.takes, 0)
+  const runs = tallies.reduce((n, t) => n + t.runs, 0)
+  const clears = tallies.reduce((n, t) => n + t.clears, 0)
+  const raters = tallies.reduce((n, t) => n + t.raters, 0)
+  const sum = tallies.reduce((n, t) => n + (t.ratingSum ?? 0), 0)
+  const fears = tallies.map((t) => t.bestFear).filter((f): f is number => f !== null)
+  if (!takes && !runs && !clears && !raters && !fears.length) return undefined
+  return {
+    takes,
+    runs,
+    clears,
+    bestFear: fears.length ? Math.max(...fears) : null,
+    rating: mean(sum || null, raters),
+    raters,
   }
-  return found
 }
 
 /**
@@ -167,22 +225,30 @@ async function withStats(
     createdAt: Date | number
     note?: string
     userId?: string | null
+    shape?: string
   }[],
   viewer?: string | null,
 ): Promise<Listing[]> {
-  const stats = await statsFor(db, rows.map((row) => row.id))
-  return rows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    payload: row.payload,
-    // A published build always has an author row; the left join is what makes
-    // the type nullable rather than anything that happens.
-    by: row.by ?? 'Somebody',
-    createdAt: row.createdAt instanceof Date ? row.createdAt.getTime() : Number(row.createdAt),
-    ...(row.note === undefined ? {} : { note: row.note }),
-    ...(viewer && row.userId ? { mine: row.userId === viewer } : {}),
-    stats: stats.get(row.id) ?? NONE,
-  }))
+  const tallies = await statsFor(db, rows.map((row) => row.id))
+  return rows.map((row) => {
+    const mine = tallies.filter((t) => t.buildId === row.id)
+    const now = row.shape ?? ''
+    const current = mine.find((t) => t.shape === now)
+    const before = foldBefore(mine.filter((t) => t.shape !== now))
+    return {
+      id: row.id,
+      name: row.name,
+      payload: row.payload,
+      // A published build always has an author row; the left join is what makes
+      // the type nullable rather than anything that happens.
+      by: row.by ?? 'Somebody',
+      createdAt: row.createdAt instanceof Date ? row.createdAt.getTime() : Number(row.createdAt),
+      ...(row.note === undefined ? {} : { note: row.note }),
+      ...(viewer && row.userId ? { mine: row.userId === viewer } : {}),
+      stats: current ? countsOf(current) : NONE,
+      ...(before ? { before } : {}),
+    }
+  })
 }
 
 /**
@@ -201,6 +267,9 @@ export async function picked(db: DB, viewer?: string | null): Promise<Listing[]>
       by: user.name,
       userId: publishedBuild.userId,
       createdAt: publishedBuild.createdAt,
+      /* Which version is current, so `withStats` knows which tally to put in
+         `stats` and which to fold into `before`. */
+      shape: publishedBuild.shape,
       note: curatedPick.note,
       at: curatedPick.at,
     })
@@ -242,6 +311,7 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
       by: user.name,
       userId: publishedBuild.userId,
       createdAt: publishedBuild.createdAt,
+      shape: publishedBuild.shape,
     })
     .from(publishedBuild)
     .leftJoin(user, eq(publishedBuild.userId, user.id))
@@ -297,9 +367,9 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
 async function authorOf(
   db: DB,
   buildId: string,
-): Promise<{ userId: string | null } | null> {
+): Promise<{ userId: string | null; shape: string } | null> {
   const [row] = await db
-    .select({ userId: publishedBuild.userId })
+    .select({ userId: publishedBuild.userId, shape: publishedBuild.shape })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, buildId))
     .limit(1)
@@ -317,6 +387,7 @@ export async function take(
       name: publishedBuild.name,
       userId: publishedBuild.userId,
       takenDownAt: publishedBuild.takenDownAt,
+      shape: publishedBuild.shape,
     })
     .from(publishedBuild)
     .where(eq(publishedBuild.id, buildId))
@@ -347,9 +418,9 @@ export async function take(
   }
 
   await db.run(sql`
-    insert into exchange_stat (build_id, user_id, taken_at, updated)
-    values (${buildId}, ${userId}, ${Date.now()}, ${Date.now()})
-    on conflict(build_id, user_id) do update set
+    insert into exchange_stat (build_id, user_id, shape, taken_at, updated)
+    values (${buildId}, ${userId}, ${found.shape}, ${Date.now()}, ${Date.now()})
+    on conflict(build_id, user_id, shape) do update set
       taken_at = coalesce(exchange_stat.taken_at, excluded.taken_at),
       updated = excluded.updated
   `)
@@ -374,6 +445,14 @@ export async function played(
   buildId: string,
   cleared: boolean,
   fear: number | null,
+  /**
+   * The shape the player was holding, or absent from an older client.
+   *
+   * Absent is treated as the current shape rather than as a stale one: a client
+   * that does not send this cannot be wrong about it, and refusing its runs
+   * would punish somebody for not having reloaded the page.
+   */
+  shape?: string,
 ): Promise<{ ok: true } | Refusal> {
   const found = await authorOf(db, buildId)
   if (!found) return { status: 404, say: 'That build is not there any more.' }
@@ -388,12 +467,23 @@ export async function played(
    */
   if (found.userId === userId) return { ok: true }
 
+  /**
+   * A run against a version the author has replaced is answered and not counted.
+   *
+   * The same quiet ok the author's own run gets, and for the same reason: the
+   * run happened, it is real, and it is recorded in that player's own library.
+   * What must not happen is it moving a number a stranger reads as evidence
+   * about a build it was not run against. This is what stops a follower who has
+   * not taken an update yet from feeding the new version's counts.
+   */
+  if (shape !== undefined && shape !== found.shape) return { ok: true }
+
   const raise = cleared && fear !== null ? fear : null
 
   await db.run(sql`
-    insert into exchange_stat (build_id, user_id, runs, clears, best_fear, updated)
-    values (${buildId}, ${userId}, 1, ${cleared ? 1 : 0}, ${raise}, ${Date.now()})
-    on conflict(build_id, user_id) do update set
+    insert into exchange_stat (build_id, user_id, shape, runs, clears, best_fear, updated)
+    values (${buildId}, ${userId}, ${found.shape}, 1, ${cleared ? 1 : 0}, ${raise}, ${Date.now()})
+    on conflict(build_id, user_id, shape) do update set
       runs = exchange_stat.runs + 1,
       clears = exchange_stat.clears + ${cleared ? 1 : 0},
       best_fear = max(coalesce(exchange_stat.best_fear, 0), coalesce(excluded.best_fear, 0)),
@@ -431,10 +521,25 @@ export async function rate(
     return { status: 409, say: 'You cannot rate your own build.' }
   }
 
+  /**
+   * The run has to be against the version being rated.
+   *
+   * Scoped to the current shape rather than to the build, so after an author
+   * replaces the picks you play the new build before you can rate it. That is
+   * what makes the reset mean something: without it, the first person to rate a
+   * changed build would be rating it on the strength of runs against the one it
+   * replaced.
+   */
   const [mine] = await db
     .select({ runs: exchangeStat.runs })
     .from(exchangeStat)
-    .where(and(eq(exchangeStat.buildId, buildId), eq(exchangeStat.userId, userId)))
+    .where(
+      and(
+        eq(exchangeStat.buildId, buildId),
+        eq(exchangeStat.userId, userId),
+        eq(exchangeStat.shape, found.shape),
+      ),
+    )
     .limit(1)
 
   if (!mine || mine.runs < 1) {
@@ -444,7 +549,13 @@ export async function rate(
   await db
     .update(exchangeStat)
     .set({ rating, updated: Date.now() })
-    .where(and(eq(exchangeStat.buildId, buildId), eq(exchangeStat.userId, userId)))
+    .where(
+      and(
+        eq(exchangeStat.buildId, buildId),
+        eq(exchangeStat.userId, userId),
+        eq(exchangeStat.shape, found.shape),
+      ),
+    )
 
   return { ok: true }
 }

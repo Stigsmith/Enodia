@@ -145,6 +145,29 @@ export const publishedBuild = sqliteTable(
      * delete is what syncs, and nothing about this syncs.
      */
     takenDownAt: integer('taken_down_at', { mode: 'timestamp_ms' }),
+
+    /**
+     * What shape the build is in, as a token the browser computes and this
+     * server never interprets.
+     *
+     * **It is compared and never read.** The client hashes `shapeOf`, which is
+     * the picks and not the prose, and sends the result. Two tokens are equal
+     * or they are not. Nothing here derives one, validates one, or would behave
+     * differently if a client sent the word "banana": the invariant at the top
+     * of `publish.ts`, that the server has no opinion about what a build is,
+     * holds exactly as it did.
+     *
+     * It exists so a listing's counts can be split by version. Renaming a build
+     * or rewriting its notes leaves this alone; changing a boon moves it, and
+     * the runs and ratings earned on the old picks stop being claims about the
+     * new ones.
+     *
+     * Defaults to the empty string, which is doing real work: every row that
+     * existed before this column gets `''`, every stat row gets `''`, and `''`
+     * equals `''`, so all the counts that exist today stay current with no
+     * backfill.
+     */
+    shape: text('shape').default('').notNull(),
   },
   (table) => [
     index('published_build_userId_idx').on(table.userId),
@@ -209,9 +232,31 @@ export const exchangeStat = sqliteTable(
     updated: integer('updated')
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
+
+    /**
+     * Which version of the build this row is about.
+     *
+     * **A token rather than a version number, and the difference matters.** A
+     * counter would need this server to decide when to increment it, which
+     * means deciding whether a change was substantial, which means reading the
+     * payload. Keying on the shape the player actually played needs no such
+     * decision: a run lands on the version it belongs to, and if an author
+     * republishes back to earlier picks the token matches again and those
+     * counts come back as current on their own.
+     */
+    shape: text('shape').default('').notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.buildId, table.userId] }),
+    /**
+     * One row per person **per version**, which the third column is.
+     *
+     * It was two columns, and that made one row per person per build: a run
+     * logged against picks the author has since replaced went on counting
+     * toward whatever the build became. Four stars from forty people silently
+     * transferring onto a different build is the thing the owner asked to be
+     * stopped.
+     */
+    primaryKey({ columns: [table.buildId, table.userId, table.shape] }),
     /* Every read is "everything about this build", aggregated. */
     index('exchange_stat_build_idx').on(table.buildId),
   ],

@@ -241,6 +241,9 @@ export default {
             buildId,
             body.cleared === true,
             typeof body.fear === 'number' && Number.isFinite(body.fear) ? body.fear : null,
+            // Which version the player was holding. Absent from an older
+            // client, which `played` reads as "cannot be stale".
+            typeof body.shape === 'string' ? body.shape : undefined,
           )
           if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
           return json(outcome)
