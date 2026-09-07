@@ -396,6 +396,54 @@ below what a player can actually clear, so anyone above 57 could not record thei
 summed from the data now, the filter bands derive from it rather than being typed out, and
 `src/data/vows.test.ts` fails if any of it moves. `CLAUDE.md` error 7.
 
+**Following got its guarantees**, 7 September 2026. Three things a follower could not rely
+on, and the owner found the first by using it.
+
+**You could follow your own build**, which put a second copy of it in your library marked as
+somebody else's. `Listed` had declared `mine?: boolean` for weeks, the worker had computed it
+at `exchange.ts:183`, and `Relation` had a branch saying "This one is yours" that had never
+executed, because `Wire` did not declare the field and `shelfAt` had nothing to copy. Two
+lines. `publishedAs` on the build closes the other door, a raw `/b/<id>` link to your own
+listing, which the server cannot refuse because that route takes no session.
+
+**Taking a build down was a delete**, and `published_build` is a parent with two
+`on delete cascade` children, so it destroyed every run and rating logged against the build,
+the curator's note, and the build itself out of the library of everybody following it. It is
+`taken_down_at` now: off every shelf, `read` still answering for anybody holding the link,
+marked. Unlisted rather than destroyed, which is also the only version `/api/b/:id` can
+enforce.
+
+**An author could replace a build entirely and keep its numbers.** `exchange_stat` is keyed
+per version now, `(build_id, user_id, shape)`, where `shape` is a token the browser computes
+from `shapeOf` and the server only ever compares. `statsFor` groups by it, still one query a
+page, and `withStats` puts the current version in `stats` and folds the rest into `before`.
+A run against a version the author replaced is answered and not counted, the same quiet ok an
+author's own run gets. `before` omits `players`, because that is a distinct-people claim and
+folding versions would double count somebody who played two.
+
+**And what reaches a follower now depends on what changed.** `refreshFollowed` compared a
+revision and overwrote the record; it compares the picks as well now. Prose applies quietly,
+a changed build waits in `state/offers.ts` with three answers. Offers live in their own store
+rather than on the build because `saveBuild` stamps `modified` and sync merges newest wins:
+**a noticing must not be able to outrank a change** made on another device an hour earlier.
+
+The author's side exists at last. Nothing in `src/` had ever called PUT or DELETE on
+`/api/builds`, so republish and unpublish were unreachable and the server's own "unpublish one
+first" at the fifty-build cap was impossible to act on. Update and Take it down sit on the
+build, and `republishChangesTheBuild` raises the warning before a republish that replaces the
+build rather than its write-up, offering a second listing first.
+
+**Two migrations, and both were rehearsed against real rows rather than trusted.** The first
+would have destroyed what it was written to protect: see the `user_id` note in
+`worker/schema-app.ts`. The second reported success and silently wrote the string `'shape'`
+into every existing stat row, because drizzle-kit selected a column that did not exist on the
+table it was copying from and SQLite falls back to treating a double-quoted identifier as a
+string literal. Corrected by hand, with the reason in the migration file.
+
+**Admitted gap:** a listing whose local build is gone, published from a browser you no longer
+have or deleted locally, has no surface and still counts toward the cap. The inventory that
+would fix it belongs under Account and is out of scope by the owner's choice.
+
 **The exchange follows rather than copies**, 6 September 2026. A build you take
 stays its author's: stored as an ordinary build with `by: 'community'`, refreshed against
 `/api/b/<id>` on load when the author's `revision` has moved, and forked into an owner build
