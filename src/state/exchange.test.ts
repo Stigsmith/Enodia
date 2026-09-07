@@ -19,7 +19,15 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fingerprint, rateBuild, reportRun, reportsTo, shapeOf, takeBuild } from './exchange.ts'
+import {
+  fingerprint,
+  listShelf,
+  rateBuild,
+  reportRun,
+  reportsTo,
+  shapeOf,
+  takeBuild,
+} from './exchange.ts'
 import { packBuild } from './transfer.ts'
 import { DEFAULT_PREFS, loadPrefs, savePrefs } from './prefs.ts'
 import { duplicateBuild } from './builds.ts'
@@ -364,5 +372,66 @@ describe('a fork of a build you took', () => {
     expect(fork.derivedFrom).toBe(taken.id)
     expect(fork.derivedHash).toBeUndefined()
     expect(reportsTo(fork)).toBeNull()
+  })
+})
+
+/**
+ * Whether a listing is one of yours, and the fact that the answer never arrived.
+ *
+ * `Listed` has declared `mine?: boolean` since the author checks went in, the
+ * worker has computed it since then too, and `Relation` in `Exchange.tsx` has
+ * had a branch for it that says "This one is yours". None of that ever ran:
+ * `Wire` did not declare the field and `shelfAt` built its object field by
+ * field without copying it, so the value was dropped between the response and
+ * the screen. Every listing offered Follow, including your own, and following
+ * your own wrote a second copy of it into your library marked as somebody
+ * else's. The owner found that by using it.
+ *
+ * **Absent is a third state and must survive as one.** The worker omits `mine`
+ * entirely when nobody is signed in, because "not yours" and "we do not know
+ * whose this is" are different answers and a screen that collapses them would
+ * offer Follow to a signed-out reader as though it had checked.
+ */
+describe('whether a listing is one of yours', () => {
+  const shelfOf = async (extra: Record<string, unknown>) => {
+    const payload = await packBuild(BUILD)
+    stubFetch(() => ({
+      body: {
+        builds: [
+          {
+            id: 'KmUkC9VotY',
+            name: 'Killer Current',
+            payload,
+            by: 'Tester',
+            createdAt: 1788521975798,
+            stats: {
+              takes: 0,
+              players: 0,
+              runs: 0,
+              clears: 0,
+              bestFear: null,
+              rating: null,
+              raters: 0,
+            },
+            ...extra,
+          },
+        ],
+      },
+    }))
+    return (await listShelf('picked'))[0]
+  }
+
+  it('carries a true through from the worker', async () => {
+    expect((await shelfOf({ mine: true }))?.mine).toBe(true)
+  })
+
+  it('carries a false through, which is not the same as saying nothing', async () => {
+    expect((await shelfOf({ mine: false }))?.mine).toBe(false)
+  })
+
+  it('leaves it absent when the worker said nothing, rather than inventing a false', async () => {
+    const row = await shelfOf({})
+    expect(row).toBeDefined()
+    expect(row && 'mine' in row).toBe(false)
   })
 })
