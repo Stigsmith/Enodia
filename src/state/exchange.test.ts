@@ -155,7 +155,14 @@ describe('taking a copy and reporting a run against it', () => {
 
     const report = seen.find((call) => call.path.endsWith('/played'))
     expect(report?.path).toBe('/api/exchange/pub1/played')
-    expect(report?.body).toEqual({ cleared: true, fear: 20 })
+    // The shape goes with it, so the server can file the run under the version
+    // it was played against rather than whatever the build is now. Asserted
+    // exactly rather than loosened: this is the whole request.
+    expect(report?.body).toEqual({
+      cleared: true,
+      fear: 20,
+      shape: fingerprint(shapeOf(BUILD)),
+    })
   })
 
   it('keeps reporting after the copy is renamed, because a name is not a build', async () => {
@@ -481,5 +488,25 @@ describe('following a build of your own', () => {
 
     expect(outcome.ok).toBe(true)
     expect(loadBuilds()).toHaveLength(2)
+  })
+})
+
+/**
+ * A run says which version of the build it was against.
+ *
+ * `reportsTo` only proves the picks matched the author's as of the last
+ * refresh. The author can have replaced them since, and without the token the
+ * server would file the run under whatever the build is now: a run against a
+ * build nobody played, counted as evidence about it.
+ */
+describe('what a reported run tells the server', () => {
+  it('sends the shape it was played against', async () => {
+    const taken = duplicateBuild(BUILD, undefined, { id: 'KmUkC9VotY', hash: fingerprint(shapeOf(BUILD)) }).copy
+    const seen = stubFetch(() => ({ body: { ok: true } }))
+
+    await reportRun(taken, true, 30)
+
+    expect(seen).toHaveLength(1)
+    expect((seen[0]?.body as { shape?: string }).shape).toBe(fingerprint(shapeOf(BUILD)))
   })
 })

@@ -9209,6 +9209,31 @@ p.landing-say {
   }
 }
 
+/**
+ * What the build earned before its author replaced the picks.
+ *
+ * Quieter than the current counts and labelled, because the two must not read as
+ * one number. It is real evidence and it is evidence about a build that is not
+ * on this listing any more, and the only honest way to show both of those at
+ * once is to say so.
+ */
+.xchange-was {
+  margin: 0.15rem 0 0;
+  color: var(--bone-faint);
+  font-size: 0.66rem;
+}
+
+.xchange-was .xchange-counts {
+  display: inline-flex;
+  font-size: inherit;
+}
+
+/* In a row, the old counts are a second line and would double the row height.
+   The listing says which build it is; opening it says what happened to it. */
+.is-list .xchange-was {
+  display: none;
+}
+
 /* The stack of coins from `GUI/Icons/Currency`, on the counts that are the only
    evidence this screen offers. */
 .xchange-coin {

@@ -349,10 +349,41 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
 function Counted({ stats }: { stats: Stats }) {
   const anything =
     stats.takes > 0 || stats.runs > 0 || stats.raters > 0 || stats.bestFear !== null
-  if (!anything) return null
+  const before = stats.before
+  if (!anything && !before) return null
 
   return (
+    <>
+      {anything ? <Tally stats={stats} /> : null}
+      {/**
+        * What the build earned before its author changed it.
+        *
+        * Kept rather than thrown away, and kept apart rather than added in. Four
+        * stars from forty people is a claim about the picks those forty played,
+        * and once the author replaces the picks it stops being a claim about
+        * this build. Deleting it would lose real evidence; folding it in would
+        * quietly transfer it. So it is shown, quieter, and said to be old.
+        *
+        * No player count in here: see `Stats.before`. Two versions folded
+        * together would count somebody who played both of them twice.
+        */}
+      {before ? (
+        <p className="xchange-was">
+          Before the author changed this build:{' '}
+          <Tally stats={{ ...before, players: 0 }} bare />
+        </p>
+      ) : null}
+    </>
+  )
+}
+
+/** One set of counts, current or old. */
+function Tally({ stats, bare }: { stats: Stats; bare?: boolean }) {
+  return (
     <p className="xchange-counts">
+      {bare ? null : (
+        <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
+      )}
       <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
       {stats.takes ? <span>Taken {stats.takes}</span> : null}
       {stats.runs ? (

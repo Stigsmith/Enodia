@@ -37,6 +37,18 @@ const MAX_PAYLOAD = 16 * 1024
 const MAX_NAME = 120
 
 /**
+ * The shape token, which this server stores and compares and never reads.
+ *
+ * The browser hashes the build's picks and sends the result. 32 is generous for
+ * a base36 FNV fingerprint and short enough that the column cannot be used as
+ * somewhere to put a payload. Anything longer is dropped rather than refused:
+ * it is a hint about versions, not a thing worth failing a publish over.
+ */
+const MAX_SHAPE = 32
+const shapeIn = (body: { shape?: unknown }): string =>
+  typeof body.shape === 'string' && body.shape.length <= MAX_SHAPE ? body.shape : ''
+
+/**
  * Per account, and the only thing bounding total storage.
  *
  * better-auth's rate limiter covers `/api/auth/*` and nothing else, so it caps
@@ -84,10 +96,11 @@ export type Refusal = { status: number; say: string }
 export async function publish(
   db: DB,
   userId: string,
-  body: { payload?: unknown; name?: unknown },
+  body: { payload?: unknown; name?: unknown; shape?: unknown },
 ): Promise<{ id: string } | Refusal> {
   const payload = typeof body.payload === 'string' ? body.payload : ''
   const name = typeof body.name === 'string' ? body.name.trim() : ''
+  const shape = shapeIn(body)
 
   if (!payload) return { status: 400, say: 'No build in that request.' }
   if (payload.length > MAX_PAYLOAD) return { status: 413, say: 'That build is too large to publish.' }
@@ -114,7 +127,7 @@ export async function publish(
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const id = shortId()
     try {
-      await db.insert(publishedBuild).values({ id, userId, payload, name })
+      await db.insert(publishedBuild).values({ id, userId, payload, name, shape })
       return { id }
     } catch (error) {
       if (attempt === 2) throw error
@@ -149,10 +162,11 @@ export async function republish(
   db: DB,
   userId: string,
   id: string,
-  body: { payload?: unknown; name?: unknown },
+  body: { payload?: unknown; name?: unknown; shape?: unknown },
 ): Promise<{ id: string; revision: number } | Refusal> {
   const payload = typeof body.payload === 'string' ? body.payload : ''
   const name = typeof body.name === 'string' ? body.name.trim() : ''
+  const shape = shapeIn(body)
 
   if (!payload) return { status: 400, say: 'No build in that request.' }
   if (payload.length > MAX_PAYLOAD) return { status: 413, say: 'That build is too large to publish.' }
@@ -164,6 +178,7 @@ export async function republish(
     .set({
       payload,
       name,
+      shape,
       updatedAt: new Date(),
       revision: sql`${publishedBuild.revision} + 1`,
     })

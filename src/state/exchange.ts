@@ -44,6 +44,16 @@ export type Stats = {
   bestFear: number | null
   rating: number | null
   raters: number
+  /**
+   * What earlier versions of this build earned, when the author has replaced
+   * the picks and somebody had already played or rated what was there before.
+   *
+   * Absent is the normal case, and means there is nothing to say rather than
+   * nothing to count. **No `players`**: that is a distinct-people claim, and
+   * folding several versions would count somebody who played two of them twice.
+   * The worker omits it for that reason and this mirrors it.
+   */
+  before?: Omit<Stats, 'players' | 'before'>
 }
 
 /** One build on a shelf, unpacked and ready for the ordinary filters. */
@@ -457,7 +467,17 @@ export async function reportRun(
     const response = await fetch(`/api/exchange/${to}/played`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ cleared, fear }),
+      /**
+       * The shape travels with the run, so the server files it under the
+       * version that was actually played.
+       *
+       * `reportsTo` has already established these picks match what the author
+       * published as of the last refresh, but the author can have republished
+       * since. Sending it means a run against picks they have replaced is
+       * answered and quietly not counted, rather than moving numbers about a
+       * build it was never run against.
+       */
+      body: JSON.stringify({ cleared, fear, shape: fingerprint(shapeOf(build)) }),
     })
     return response.ok
   } catch {
