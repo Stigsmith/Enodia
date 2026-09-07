@@ -44,7 +44,7 @@ import { ratingCeiling, readRepeat } from '../engine/repeat.ts'
 import { rateBuild, reportRun, reportsTo } from '../state/exchange.ts'
 import { Stars, Stepper } from './Fear.tsx'
 import { VowScreen } from './VowSheet.tsx'
-import { useEscape } from './escape.ts'
+import { useBackdrop, useEscape } from './escape.ts'
 import { tidyVows, vowsTakenCount } from '../engine/vows.ts'
 import type { VowsTaken } from '../engine/vows.ts'
 import type { Assembles, PlayRecord, ShownBuild } from '../data/builds.ts'
@@ -107,6 +107,17 @@ export function LogRun({
    * own Escape does what Cancel does.
    */
   useEscape(true, () => (view === 'vows' ? setView('form') : onClose()))
+  /**
+   * And the dim around it, answering the same way.
+   *
+   * Back from the vow screen, close from the form, so the gesture means the
+   * same thing whichever way it is made. The form holds unsaved answers, which
+   * argues for asking first, and against that: the dialog is a dim sheet with a
+   * panel on it, every other one closes when you click the dim, and the run is
+   * three controls that take a moment to set again. A confirm on every stray
+   * click would cost more than it saves.
+   */
+  const backdrop = useBackdrop(() => (view === 'vows' ? setView('form') : onClose()))
 
   const play = build.play
 
@@ -190,7 +201,7 @@ export function LogRun({
   }
 
   return (
-    <div className="logrun" role="dialog" aria-label="Log a run">
+    <div className="logrun" role="dialog" aria-label="Log a run" {...backdrop}>
       {/* Two elements, and the inner one is not decoration. The panel holds the
         * art and its aspect ratio; the inner holds the padding. Percentage
         * padding resolves against the *containing block's* width, so on the
