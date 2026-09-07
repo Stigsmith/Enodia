@@ -38,6 +38,7 @@ import { ACCOUNTS_LIVE } from '../state/account.ts'
 import { publishBuild } from '../state/publish.ts'
 import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import type { BuildDensity } from '../state/prefs.ts'
 import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
@@ -83,6 +84,17 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
    */
   const [mine, setMine] = useState<ShownBuild[]>(loadBuilds)
   const [editing, setEditing] = useState<ShownBuild | 'new' | null>(null)
+
+  /**
+   * Cards or a list. Absent in prefs means nobody has chosen, and the library's
+   * answer to that is cards: it holds your own handful, and the plate is worth
+   * the room when there are eight of something rather than eight hundred.
+   */
+  const [density, setDensity] = useState<BuildDensity>(() => loadPrefs().buildDensity ?? 'cards')
+  const chooseDensity = (one: BuildDensity) => {
+    setDensity(one)
+    savePrefs({ ...loadPrefs(), buildDensity: one })
+  }
 
   /**
    * Whether to say out loud that these can be lost. Read once on mount, because
@@ -411,6 +423,8 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
         }}
         sort={sort}
         onSort={setSort}
+        density={density}
+        onDensity={chooseDensity}
         query={query}
         onQuery={setQuery}
         showing={shown.length}
@@ -459,7 +473,7 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
       ) : null}
 
       {shown.length ? (
-        <ul className="builds-grid" data-tour="builds-grid">
+        <ul className={`builds-grid${density === 'list' ? ' is-list' : ''}`} data-tour="builds-grid">
           {shown.map((build, at) => (
             /* The tour points at the first card rather than the whole grid.
               * The grid is most of the viewport, which leaves Dora nowhere to

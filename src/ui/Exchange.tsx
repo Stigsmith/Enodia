@@ -51,6 +51,8 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { followBuild, listShelf } from '../state/exchange.ts'
 import { loadBuilds } from '../state/builds.ts'
+import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import type { BuildDensity } from '../state/prefs.ts'
 import type { Listed, Shelf, Stats } from '../state/exchange.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
 import type { ShownBuild } from '../data/builds.ts'
@@ -90,6 +92,24 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
    */
   const [reading, setReading] = useState<string | null>(null)
 
+  /**
+   * Cards or a list, and **absent means the shelf decides**.
+   *
+   * The library opens as cards because it holds your own handful. This one is
+   * expected to hold hundreds, and measured at 1600x950 a card shelf puts five
+   * of eighteen on screen with 2.38 screens of scroll. So once there is more
+   * than a screenful here it opens as a list, which is how a list of hundreds
+   * is read. The moment anybody presses the control their answer is stored and
+   * both screens obey it.
+   */
+  const [chosenDensity, setChosenDensity] = useState<BuildDensity | undefined>(
+    () => loadPrefs().buildDensity,
+  )
+  const chooseDensity = (one: BuildDensity) => {
+    setChosenDensity(one)
+    savePrefs({ ...loadPrefs(), buildDensity: one })
+  }
+
   useEffect(() => {
     let live = true
     setListed(null)
@@ -128,6 +148,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       : found
     return sortBuilds(narrowed, sort)
   }, [builds, selection, sort, query, listingOf])
+
+  /** What the shelf is showing, once the count is known. */
+  const density: BuildDensity = chosenDensity ?? (rows.length > 12 ? 'list' : 'cards')
 
   /** The listing open for reading, or null. */
   const readingRow = reading ? (listingOf.get(reading) ?? null) : null
@@ -175,6 +198,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
 
   return (
     <Page
+      measure="shelf"
       title="Build exchange"
       standfirst="Builds other people published, and what happened when people played them."
     >
@@ -186,13 +210,22 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       <div className="xchange-shelf">
       <Tabs tabs={SHELVES} open={shelf} onOpen={setShelf} label="Which shelf" />
 
-      {/* Said out loud rather than left as an absence. Two shelves presented as
-        * the whole exchange would be a quieter kind of untrue. */}
-      <p className="ref-say xchange-scope">
-        Two shelves, and both of them passed a person: builds picked by hand, and builds from
-        people you swapped codes with. There is no shelf of everything anybody published yet,
-        because that is the first thing a stranger could stumble across and it needs a way to
-        report and hide a listing before it opens rather than after.
+      {/**
+        * One line, where there were six.
+        *
+        * The claim still has to be here: two shelves presented as the whole
+        * exchange would be a quieter kind of untrue, and that argument has not
+        * changed. What changed is the price. Measured on a 420 by 880 phone,
+        * the paragraph was 139px, **16% of the screen**, and it pushed the
+        * first build to y=544, so most of a phone screen was spent explaining
+        * an absence before anybody saw a build.
+        *
+        * The reasoning went to Help, which is where reasoning lives, is two
+        * columns wide and fits on one screen. This keeps the fact and drops the
+        * essay.
+        */}
+      <p className="xchange-scope">
+        Both shelves passed a person. Help says why there is no third.
       </p>
 
       {listed === null ? (
@@ -212,6 +245,8 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             }}
             sort={sort}
             onSort={setSort}
+            density={density}
+            onDensity={chooseDensity}
             query={query}
             onQuery={setQuery}
             showing={shown.length}
@@ -225,7 +260,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
           ) : null}
 
           {shown.length ? (
-            <ul className="builds-grid">
+            <ul className={`builds-grid${density === 'list' ? ' is-list' : ''}`}>
               {shown.map((build) => {
                 const listing = listingOf.get(build.id)
                 return (
@@ -428,7 +463,11 @@ function Relation({
 function CharonShop() {
   return (
     <div className="xchange-charon" aria-hidden="true">
-      <img src="/characters/charon-shop.png" alt="" loading="lazy" />
+      <img className="xchange-charon-art" src="/characters/charon-shop.png" alt="" loading="lazy" />
+      {/* The coins, over his open palm, where the game puts them. Its own
+        * element rather than part of the picture, because it is sixty frames
+        * and an additive blend. `builds.css` has the arithmetic. */}
+      <span className="xchange-coins" />
     </div>
   )
 }

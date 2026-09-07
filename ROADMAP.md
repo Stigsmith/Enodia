@@ -406,9 +406,35 @@ the moment you want to change it. `published_build` gained `revision` and `updat
 **Charon runs it now.** The exchange was the build manager with a different list behind it,
 so it says where you are: the game's own portrait, anchored to the bottom the way the art is
 drawn, with the shelf inset past him and the counts on `GUI/Icons/Currency`. Gated at 96rem
-because below that reserving his column costs a card column. `CharonCoins` turned out to be a
-glow overlay rather than coin art, which `assets/README.md` records along with the rest of
-the package.
+because below that his column costs more than it is worth. The coins in his hand are
+`CharonCoins`, sixty frames, placed from the offsets in `GUI_Portraits_VFX.sjson`.
+
+**A shelf that scales, 7 September 2026.** The exchange showed one very large card, and the
+cause was not the card: `Exchange.tsx` draws the build manager's grid inside `Page`, whose
+measure is capped at 44rem for reading. Measured at 1600x950, the page was 704px, Charon took
+304 of it, and `repeat(auto-fill, minmax(14rem, 1fr))` resolved 336px to a single column.
+`Page` takes a `measure` now, and `is-shelf` carries the same three caps as `.builds`.
+
+On top of that a **density control**, cards or a list, on both shelves and stored in
+`prefs.buildDensity`. **Absence is the state that matters**: with nobody having chosen, the
+library opens as cards and the exchange opens as a list once it holds more than a screenful,
+because the two shelves are different sizes of problem. It is the same `variants/Card.tsx`
+restyled, not a second component.
+
+Numbers, at 1600x950 with 22 listings: **five of eighteen visible as cards at 2.38 screens of
+scroll, twelve now**, fourteen at 1920x1080, nine at 1280x800 where the window is simply not
+tall enough for more. Every row is 51px whatever the build carries, and the reading, the
+byline and the counts hold their columns down the shelf. Zero intersections between Charon's
+drawn box and any row or any piece of shelf chrome, at 1280, 1600 and 1920, pinned and not.
+
+**And the coins were invisible for a reason that was not the art.** The sheet stepped
+`background-position` to `-6000%`, and a percentage there resolves against
+`(positioning area - image size)` rather than being an offset, so with an image sixty times
+the box, 59 of the 60 steps painted thousands of box-widths off the sheet and nothing at all
+appeared. One frame in sixty was ever drawn. `steps(60, jump-none)` from `0%` to `100%` lands
+on `k/59` exactly, checked by pausing the animation and reading 0%, 50.8475% and 98.3051% for
+frames 0, 30 and 58. `assets/README.md` carries both wrong readings of this layer, because
+they are different mistakes.
 
 **Three routes had no author check at all.** `take`, `played` and `rate` each read the row to
 prove it existed and none compared its owner to the caller, so an author taking, playing and

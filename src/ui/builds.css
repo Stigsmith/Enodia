@@ -490,6 +490,35 @@
   padding: 0.2rem 0.4rem;
 }
 
+/* Two states, so a switch. Same idiom as `.builds-layout` on the detail screen:
+   one control, and the lit half is the answer. */
+.bfilter-density {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.bfilter-density button {
+  padding: 0.2rem 0.55rem 0.26rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.bfilter-density button:hover {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+.bfilter-density button.is-on {
+  border-color: var(--lit-dim);
+  background: color-mix(in oklab, var(--lit) 16%, transparent);
+  color: var(--bone);
+}
+
 .bfilter-count {
   margin: 0 0 0 auto !important;
   font-size: 0.75rem;
@@ -555,6 +584,231 @@
     gap: 1.1rem;
   }
 }
+
+/* ==========================================================================
+ * A LIST INSTEAD OF CARDS
+ *
+ * **Measured, because the card shelf does not scale.** At 1600x950 with
+ * eighteen builds: five columns, cards 285 by 422, and **five of the eighteen
+ * fully on screen**, at 2.38 screens of scroll. A shelf expected to hold
+ * hundreds cannot open like that, and the owner asked for at least twelve
+ * visible at once.
+ *
+ * **The markup does not change.** This is the same `Card`, restyled. The plate
+ * becomes a row, the three bands of boons and the Arcana row and the sentence
+ * go away, and what is left is the aspect, the name, the arm and the reading.
+ * That is what a row of a long list is for, and opening one is what shows the
+ * rest. A second component would have been a second thing to keep in step with
+ * the first, which is why `variants/Card.tsx` is shared between the library and
+ * the exchange in the first place.
+ *
+ * **The plate art goes with the shape.** `SaveProfileSlot` is a 425 by 630
+ * frame and stretching it into a 44px strip pulls its corners out of true. A
+ * row gets a hairline and a fill instead, and it moves onto `.bcard` rather
+ * than `.bcard-hit`, so that on the exchange the byline and the counts sit
+ * inside the same row as the name rather than in a block under it. That is the
+ * difference between twelve listings on a screen and six.
+ * ======================================================================== */
+
+.builds-grid.is-list {
+  grid-template-columns: 1fr;
+  /* No gap, because the rows are separated by a rule rather than by air. Four
+     pixels a row is a thirteenth row at this height. */
+  gap: 0;
+  border-top: 1px solid var(--div-1);
+}
+
+/**
+ * The row itself, and the plate the card used to draw for itself.
+ *
+ * A rule under each rather than a box around each: a boxed row at this height
+ * reads as a stack of small cards, which is the shape being moved away from.
+ * The even ones take a very faint fill, which is what keeps a name and the
+ * reading at the far end of a 1500px row on the same line for the eye.
+ */
+.is-list .bcard {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  padding-right: 0.7rem;
+  border-bottom: 1px solid var(--div-1);
+  /* Every row carries a fill, not only the striped ones. The card plates used
+     to be what stood between a build and the wallpaper, and without them a
+     0.6rem arm line is read against whatever the region art is doing behind it. */
+  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
+  transition: background var(--t-response) var(--e-response);
+}
+
+.is-list .bcard:nth-child(even) {
+  background: color-mix(in oklab, var(--ink-850) 72%, transparent);
+}
+
+.is-list .bcard:hover,
+.is-list .bcard:has(.bcard-hit:focus-visible) {
+  background: color-mix(in oklab, var(--lit) 9%, transparent);
+}
+
+.is-list .bcard-hit {
+  /* Everything the plate imposed: the ratio, the percentage padding measured
+     off the frame's inner edge, and the two layers of art. */
+  flex: 1 1 auto;
+  min-width: 0;
+  aspect-ratio: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.3rem 0 0.3rem 0.7rem;
+}
+
+.is-list .bcard-hit::before,
+.is-list .bcard-hit::after {
+  display: none;
+}
+
+/* The three bands, the Arcana row and the sentence. A row says which build it
+   is. Opening it says what is in it. */
+.is-list .bcard-band,
+.is-list .bcard-arcana,
+.is-list .bcard-say {
+  display: none;
+}
+
+/**
+ * The head becomes the row.
+ *
+ * Mark, then the name over the arm, then the reading against the right edge of
+ * the button. `min-width: 0` on the name column so a long one ellipsises rather
+ * than shoving the stamp out, and the child selectors carry a class more than
+ * the `.bcard-head > .bcard-name` rule below, which would otherwise put all
+ * three back in column 2.
+ */
+.is-list .bcard-head {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  /* The two rows are declared rather than implied, because `grid-row: 1 / -1`
+     on the mark and the stamp counts lines in the **explicit** grid. With no
+     `grid-template-rows` the explicit grid is one line, `-1` resolves to 1, and
+     both land in row one instead of spanning. Measured: the mark's full height
+     went into the first track, the second track added its own 10px on top, and
+     the row was 11px taller than the tallest thing in it. */
+  grid-template-rows: auto auto;
+  align-items: center;
+  /* Fills the button, so the reading lands on the right margin and the readings
+     down a long shelf line up as a column. Without it the head is only as wide
+     as its content and the stamp sits wherever the name ends. */
+  width: 100%;
+  gap: 0 0.7rem;
+  /* Overriding the card's clamp on the element that declares it, not on
+     `.bcard-hit` above: a custom property redeclared on a descendant wins for
+     that descendant's subtree whatever the ancestor says. Measured, because it
+     was set on `.bcard-hit` first and the mark stayed at its 2.8rem ceiling.
+     **The mark is what a row's height is**, so this is the whole measurement:
+     45px of mark made a 67px row and 8 on screen, and 1.8rem makes a 44px row
+     and 13. */
+  --mark-arm: 1.8rem;
+}
+
+.is-list .bcard-head > .bcard-name {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-list .bcard-head > .bcard-arm {
+  grid-column: 2;
+  grid-row: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-list .bcard-head > .stamp {
+  grid-column: 3;
+  grid-row: 1 / -1;
+  margin-top: 0;
+}
+
+/**
+ * The exchange's foot, beside the row rather than under it.
+ *
+ * The byline, the counts and Follow are what somebody scanning a shelf of
+ * hundreds is choosing on, so they stay. The note does not: it is a sentence,
+ * it is the one thing on a listing with no length limit, and it is the first
+ * thing the read dialog shows.
+ */
+.is-list .xchange-foot {
+  display: flex;
+  /* Every one of these is an override of the card's foot and every one was
+     needed: the base stacks in a column, pads itself off the plate below it and
+     draws a rule across the card's width. On a row it is neither below nor
+     across anything. */
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+  /**
+   * A fixed width, so the columns down a long shelf line up.
+   *
+   * Left to size itself the foot is as wide as its own counts, and the counts
+   * are different on every listing: measured with the seeded shelf, the reading
+   * landed at x=448 on every row only because every row happened to carry
+   * similar numbers. One build with two hundred raters would have moved that
+   * column for its row alone, which is the thing a list is for avoiding.
+   */
+  flex: 0 0 33rem;
+}
+
+.is-list .xchange-take {
+  align-self: center;
+  margin-top: 0;
+}
+
+.is-list .xchange-note {
+  display: none;
+}
+
+/* Wrapping rather than clipping. The widest honest line here is a build with
+   four figures on it, and at 0.68rem two wrapped lines are 22px inside a 51px
+   row, so the column costs nothing and no number gets cut in half. */
+.is-list .xchange-counts {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.is-list .xchange-by {
+  flex: 0 0 6.5rem;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Under about 60rem the row cannot hold the counts and the name at once, so the
+   name keeps the row and the foot wraps under it. */
+@media (max-width: 60rem) {
+  .is-list .bcard {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 0 0.4rem;
+  }
+
+  .is-list .bcard-hit {
+    padding: 0.35rem 0.7rem;
+  }
+
+  .is-list .xchange-foot {
+    flex-wrap: wrap;
+    white-space: normal;
+    margin: 0 0.7rem;
+  }
+}
+
 
 .bcard {
   display: flex;
@@ -3580,6 +3834,38 @@ button.mark {
 
 @media (min-width: 60rem) {
   .page { padding: 1.25rem 2rem 5rem; }
+}
+
+/**
+ * A shelf, not a page of prose, and the same width as the other shelf.
+ *
+ * These are the three caps `.builds` uses, repeated on purpose rather than
+ * shared through a class on both: the two screens are separate components with
+ * separate headers, and the thing that has to stay true is the number, not the
+ * selector. If one moves the other has to move with it, which is why they are
+ * written next to each other here.
+ *
+ * **Why it exists.** The exchange draws the build manager's grid inside a
+ * reading page. Measured at 1600x950: `.page` capped at 44rem gave 704px,
+ * `.xchange-shelf` gave 304 of that to Charon, and the grid ran at 336px, which
+ * `repeat(auto-fill, minmax(14rem, 1fr))` resolves to exactly one column. One
+ * very large card, which is what was reported, and the card was innocent.
+ */
+.page.is-shelf {
+  max-width: 100%;
+}
+
+@media (min-width: 60rem) {
+  .page.is-shelf {
+    max-width: 82rem;
+  }
+}
+
+@media (min-width: 100rem) {
+  .page.is-shelf {
+    max-width: 140rem;
+    padding: 1.5rem 3rem 4rem;
+  }
 }
 
 .page-standfirst {
@@ -8659,9 +8945,13 @@ p.landing-say {
  * ========================================================================== */
 
 /* The missing third shelf, said rather than left as an absence. */
+/* One line, and it earns its line. The six-line version it replaced was 139px
+   and 16% of a 420x880 phone before anybody saw a build. */
 .xchange-scope {
-  margin-bottom: 1rem;
-  color: var(--bone-dim);
+  margin: 0 0 0.9rem;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
 }
 
 .xchange-said {
@@ -8711,7 +9001,9 @@ p.landing-say {
   .xchange-charon {
     display: block;
     position: fixed;
-    left: 0;
+    /* The owner's call, and the art agrees: he faces slightly left, so on the
+       right he looks into the shelf rather than out of the window. */
+    right: 0;
     bottom: 0;
     z-index: 1;
     /* Scenery. Nothing here is clickable and nothing here should catch a drag
@@ -8719,12 +9011,22 @@ p.landing-say {
     pointer-events: none;
   }
 
-  .xchange-charon img {
+  .xchange-charon-art {
     display: block;
-    /* Height, because a figure standing on an edge is sized by how tall it is.
-       Capped against the viewport so a short window crops him further rather
-       than pushing him up off the floor. */
-    height: min(47rem, 82dvh);
+    /**
+     * Height, because a figure standing on an edge is sized by how tall it is.
+     * Capped against the viewport so a short window crops him further rather
+     * than pushing him up off the floor.
+     *
+     * **34rem and not the 47 he started at, and the difference is the shelf.**
+     * `charon-shop.png` is 768 by 760 and fully opaque to all four edges: the
+     * drawn box is the element box, so every pixel of his height is 1.01
+     * pixels of shelf given up. At 47rem he was 760 wide, over a fifth of a
+     * 1600px window taken back out of a list the owner wants twelve rows of.
+     * At 34rem he is 550, still 57% of a 950px window tall, which is what
+     * standing on the floor of a screen looks like.
+     */
+    height: min(34rem, 62dvh);
     width: auto;
     /* He is behind a dark page and lit from behind in the art. Left at full
        strength he reads as a second subject; this puts him where a painted
@@ -8738,27 +9040,100 @@ p.landing-say {
    * On the whole shelf rather than on the grid, and that was measured rather
    * than assumed: with the inset on `.builds-grid` alone, no card touched him
    * and the scope paragraph and the filter bar both did, because they are full
-   * width and sit above the cards. Two intersections at 1600x950, none at 1920.
+   * width and sit above the cards.
    */
   .xchange-shelf {
     /**
-     * **The inset depends on whether the menu is pinned, and finding that out
-     * took the live site.** Every measurement here was taken with the pane
-     * pinned, because that is how this browser had it; signed out, the default
-     * is a pop-out and there is no menu occupying the left, so the page is
-     * centred in the whole window and starts further left. Measured at
-     * 1600x950: the shelf's box starts at 611 pinned and 475 not, a 136px
-     * difference, and his paint ends at 747 either way. Three intersections on
-     * the live site against none on localhost, from one attribute.
+     * **The number is his width minus how far the page stops short of the
+     * window**, and it is one value now for two reasons rather than one.
      *
-     * 19rem clears it unpinned with 20px to spare. Pinned, the pane has already
-     * taken 272px of him and 12rem is enough.
+     * He is fixed to the window's right edge; the shelf is inside a page that
+     * stops `--page-pad` short of it. So the inset that clears him is his
+     * rendered width less that padding, plus room to breathe. At his tallest,
+     * 34rem, he is 550px wide, and the page's padding is 48px above 100rem and
+     * 32px below it. 550 - 32 + 10 rounds to **33rem**, which covers the
+     * narrower padding and therefore both.
+     *
+     * The nav mode used to need its own number, when he stood on the left: a
+     * pinned pane sits on that side and the page starts 136px further right
+     * unpinned. On this side the pane is nowhere near him and the page's right
+     * edge lands in the same place either way. Checked at 1600x950 in both
+     * modes rather than reasoned about, because that is the mistake this
+     * comment exists to record.
      */
-    padding-left: 19rem;
+    padding-right: 33rem;
   }
+}
 
-  :root[data-nav='pane'] .xchange-shelf {
-    padding-left: 12rem;
+/**
+ * The coins in his hand, sixty frames of them, placed by the game's numbers.
+ *
+ * **`GUI_Portraits_VFX.sjson` composites this portrait from layers**, each with
+ * an offset from a shared anchor and a scale:
+ *
+ *     Portrait_Charon_Default_01  Portraits_CharonHooded_01  off (-50,-200) scale 1
+ *     Portrait_Charon_Coins       CharonCoins, 60 frames     off (-34,-130) scale 0.8
+ *
+ * The extraction's sidecars give each sprite's untrimmed size and where its
+ * trimmed image sits inside it, and the hulls run negative to positive, so
+ * sprites are centre-anchored. That is everything needed to put the coins where
+ * the game puts them, and it lands them in his open palm.
+ *
+ * **The first reading of this layer was wrong and is worth recording.** On its
+ * own a frame is a purple blob with gold flecks, so it was written off as a glow
+ * mask with no coin art behind it, and the still shipped without it. It is a
+ * glow mask, and the coins are painted into it. What was missing was the offset,
+ * not the art: detached it is unusable and placed it is exactly right. The
+ * owner said they could not see the coins, which is what sent me back to it.
+ *
+ * `Material = "Unlit"` is additive, which is `screen` here.
+ *
+ * Every number is a percentage of the portrait, so the coins scale with him
+ * rather than needing their own breakpoints. Sixty frames in one row and
+ * `steps(60)`, at the game's own `PlaySpeed = 30`, which is two seconds.
+ *
+ * 184 KB, down from 1077. The sheet quantises to 128 colours with no visible
+ * difference at 3x zoom, because it is purple and gold and little else.
+ */
+.xchange-coins {
+  position: absolute;
+  left: 41.377%;
+  top: 44.970%;
+  width: 12.891%;
+  height: 15.658%;
+  background: url('/characters/charon-coins.png') 0 0 / 6000% 100% no-repeat;
+  mix-blend-mode: screen;
+  /**
+   * **Sixty frames, and the step has to be `jump-none`.**
+   *
+   * A percentage in `background-position` is not an offset. The spec resolves
+   * it against `(positioning area - image size)`, and the image here is sixty
+   * times the box, so `X%` paints at `-59 x boxWidth x X/100`. The first
+   * version of this animated to `-6000%`, which resolves to **+3481 box widths
+   * to the right**: with `no-repeat` that paints nothing at all, and the same
+   * is true of 58 of the other 59 steps. Only the frame at exactly 0% was ever
+   * on screen, for a thirtieth of a second in every two, which is why the coins
+   * were reported as not visible.
+   *
+   * `0%` puts the sheet's left edge on the box's left edge and `100%` puts its
+   * right edge on the box's right edge, so frame `k` of sixty sits at exactly
+   * `k/59 x 100%`. `jump-none` is the timing function that emits sixty values
+   * across a closed range including both ends, which is that series and no
+   * rounding. Plain `steps(60)` would emit `k/60`, a fifty-ninth of a frame out
+   * on every frame but the first.
+   */
+  animation: charon-coins 2s steps(60, jump-none) infinite;
+}
+
+@keyframes charon-coins {
+  to {
+    background-position-x: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xchange-coins {
+    animation: none;
   }
 }
 

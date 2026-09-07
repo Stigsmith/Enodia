@@ -26,6 +26,20 @@ const VERSION = 1
  */
 export type BuildDetail = 'poster' | 'constellation'
 
+/**
+ * How closely builds are packed on a shelf.
+ *
+ * `cards` is the plate: the game's own `SaveProfileSlot` art, 2:3, with the
+ * boons on it. `list` is a row each.
+ *
+ * **This exists because of scale.** Measured at 1600x950 with eighteen builds:
+ * five columns, cards 285 by 422, and **five fully on screen** with 2.38 screens
+ * of scroll. A shelf that is expected to hold hundreds cannot open like that.
+ * The owner asked for at least twelve visible and a list is how a list of
+ * hundreds is read.
+ */
+export type BuildDensity = 'cards' | 'list'
+
 export type Prefs = {
   version: number
   /**
@@ -38,6 +52,16 @@ export type Prefs = {
   staleAfterHours: number
   /** Poster or Constellation, for a single build. */
   buildDetail: BuildDetail
+  /**
+   * Cards or a list, **or absent, which is the point.**
+   *
+   * Absent means nobody has chosen, and the two screens then answer differently:
+   * the library opens as cards because it holds your own handful, and the
+   * exchange opens as a list once it has more than a screenful, because it is
+   * expected to hold hundreds. The moment anybody presses the control this holds
+   * their answer and both screens obey it.
+   */
+  buildDensity?: BuildDensity
   /**
    * Whether the "these live in this browser" warning has been read and dismissed.
    *
@@ -123,6 +147,11 @@ function migrate(stored: unknown): Prefs | null {
       typeof record.graspLimit === 'number' && record.graspLimit > 0
         ? record.graspLimit
         : DEFAULT_PREFS.graspLimit,
+    /* Absent stays absent: it is the "nobody has chosen" state and each screen
+       has its own answer for it. */
+    ...(record.buildDensity === 'cards' || record.buildDensity === 'list'
+      ? { buildDensity: record.buildDensity }
+      : {}),
     // Same reasoning as buildDetail above: absent in anything stored before the
     // warning existed, and absent means "not seen yet", which is the default.
     // No version bump for an additive field.

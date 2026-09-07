@@ -19,6 +19,19 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-07',
+    title: 'A shelf that can hold hundreds, and Charon out of the way of it',
+    say: 'The exchange showed one very large card at a time. It shows a list now, and the list is the point.',
+    points: [
+      'The exchange is as wide as the build manager. It was not: it was drawing the build manager’s grid inside a reading page capped at a paragraph’s width, Charon was standing on a third of what was left, and the grid resolved to a single column. One very large card. The cards were never the problem.',
+      'Cards or a list, and the control is next to Sort on both shelves. A list is a row each: the aspect, the name, the arm and the reading, with the byline, the counts and Follow beside it. Everything else is one click away in the listing.',
+      'Nobody has to choose. Your own builds open as cards, because a library is a handful of things and the plate is worth the room. The exchange opens as a list once there is more than a screenful, because it is expected to hold hundreds. Press the control once and it remembers your answer everywhere.',
+      'Measured rather than eyeballed. At 1600 by 950 the exchange showed five of eighteen builds as cards, at 2.38 screens of scroll. It shows twelve now, fourteen at 1920 by 1080, and every row is the same height whether the build has a one-word name or four figures of play behind it.',
+      'Charon is smaller and further right, and the shelf has a clear column beside him. Zero overlaps between his drawn box and any row, at 1280, 1600 and 1920, with the menu pinned and not.',
+      'The coins in his hand are actually there. They were animating through sixty frames of which fifty-nine were painted off the edge of the sprite sheet, so they appeared for one frame in sixty and were invisible in any screenshot. Sixty frames, all of them on screen.',
+    ],
+  },
+  {
     date: '2026-09-06',
     title: 'You follow a build now, rather than copying it',
     say: 'A build you take off the exchange stays its author\u2019s, and their edits reach you.',
