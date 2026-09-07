@@ -69,6 +69,17 @@ type Wire = {
   by: string
   createdAt: number
   note?: string
+  /**
+   * Optional here for the same reason it is optional on `Listed`: the worker
+   * omits it entirely when nobody is signed in, and that absence is an answer.
+   *
+   * **This field was declared on `Listed` and computed by the worker for weeks
+   * without ever being declared here, so `shelfAt` had nothing to copy.** The
+   * cost was that `Relation` never reached its "This one is yours" branch and
+   * offered Follow on your own listing, which then wrote a second copy of your
+   * own build into your library marked as somebody else's.
+   */
+  mine?: boolean
   stats: Stats
 }
 
@@ -184,6 +195,11 @@ async function shelfAt(path: string): Promise<Listed[]> {
       by: row.by,
       createdAt: row.createdAt,
       ...(row.note === undefined ? {} : { note: row.note }),
+      // Same conditional spread as the note above, and for a sharper reason:
+      // absent means nobody is signed in, so the shelf does not know whose this
+      // is. Defaulting that to false would have the screen say "not yours" when
+      // what it means is that it never asked.
+      ...(row.mine === undefined ? {} : { mine: row.mine }),
       // The server's name is authoritative for the listing: it is what the
       // author published under, and the packed build could say anything.
       build: { ...build, name: row.name },
