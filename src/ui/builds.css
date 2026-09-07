@@ -9121,7 +9121,24 @@ p.landing-say {
   top: 42.237%;
   width: 17.350%;
   height: 18.890%;
-  background: url('/characters/charon-coins.png') 0 0 / 6000% 100% no-repeat;
+  /**
+   * **The `?v` is load-bearing and is not decoration.**
+   *
+   * Art is not fingerprinted: `assets/_headers` serves it `max-age=86400`
+   * because paths are stable and there are a thousand files. This sheet broke
+   * that assumption by keeping its name while its bytes changed twice in one
+   * day, and a browser inside its 24 hours never asks again, so it goes on
+   * drawing the old one. Two machines, the same deploy, one right and one
+   * wrong, and only clearing site data fixed the second: the owner found that,
+   * not a test.
+   *
+   * The token goes in the URL, which lives in the stylesheet, which Vite does
+   * fingerprint. So a new sheet ships a new stylesheet, a new stylesheet names a
+   * new URL, and the old bytes cannot be reused. **Bump it whenever this file's
+   * bytes change.** `scripts/prune.ts` stops matching at the extension so the
+   * query is invisible to it.
+   */
+  background: url('/characters/charon-coins.png?v=2') 0 0 / 6000% 100% no-repeat;
   mix-blend-mode: screen;
   /**
    * **Sixty frames, and the step has to be `jump-none`.**

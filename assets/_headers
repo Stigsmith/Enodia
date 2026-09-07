@@ -24,8 +24,25 @@
 
 # The art is not fingerprinted: paths are stable because icons.ts derives them
 # from a display name and the validator holds them to it. A day, then
-# revalidate, so a corrected image reaches people without re-fetching 900 files
-# every visit.
+# revalidate, so the site does not re-fetch 900 files every visit.
+#
+# 3. THIS DOES NOT MEAN A CORRECTED IMAGE REACHES PEOPLE. An earlier version of
+#    this comment claimed it did, which was a sentence nobody had tested.
+#    `must-revalidate` governs what happens once a response is STALE; while it
+#    is fresh the browser serves it from cache and sends no request at all. So a
+#    re-cut image is invisible to anyone who already has it, for up to 24 hours.
+#
+#    Found the hard way on 7 September 2026: `charon-coins.png` was rebuilt
+#    twice in a day under the same name. A machine that had loaded the site that
+#    morning kept drawing the broken sheet against the new stylesheet, while a
+#    machine seeing the site for the first time was correct, on the same deploy.
+#    Only clearing site data fixed the first, and the owner found that.
+#
+#    If you change an image's bytes without changing its name, bump a `?v` token
+#    on the URL that references it. Stylesheets are fingerprinted, so a token in
+#    a `url()` propagates; see `.xchange-coins` in `src/ui/builds.css`. There is
+#    no such escape hatch for art referenced from data, so re-cutting one of
+#    those needs a rename.
 #
 # .jpg is new. netlify.toml only ever named .png and .webp, so the twelve JPGs
 # in themes/ have never had a rule, and one of them is the largest file on the
