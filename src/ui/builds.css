@@ -9103,16 +9103,24 @@ p.landing-say {
 .xchange-coins {
   position: absolute;
   /**
-   * Derived, not nudged. `assets/README.md` carries the arithmetic: the two
-   * layers' offsets and scales out of `GUI_Portraits_VFX.sjson`, both sprites
-   * centre-anchored on their `originalSize`, mapped through the crop and the
-   * 760/1694 scale that made `charon-shop.png`. The four numbers are the coin
-   * sheet's own crop box expressed as a fraction of that portrait.
+   * Derived, not nudged, and derived **through `InheritFrom` this time**.
+   *
+   * `Portrait_Charon_Default_01` states `OffsetX`, `OffsetY` and nothing else
+   * about size, and inherits `Scale = 0.8` from `Portrait_Base_01`. The first
+   * two versions of these numbers read the record and not the base, so the body
+   * was treated as scale 1 while the coin layer used its own stated 0.8: the
+   * coins came out at four fifths of their size and about 10px out of place, on
+   * a cluster only 95px wide. Both layers are 0.8, so the coin canvas maps one
+   * to one into the portrait's own pixels.
+   *
+   * `assets/README.md` carries the rest of the arithmetic: both sprites centre
+   * anchored on their `originalSize`, the sheet's crop box, the portrait's trim
+   * at (297, 40) and the 760/1694 that made `charon-shop.png`.
    */
-  left: 40.442%;
-  top: 43.554%;
-  width: 13.880%;
-  height: 15.112%;
+  left: 39.052%;
+  top: 42.237%;
+  width: 17.350%;
+  height: 18.890%;
   background: url('/characters/charon-coins.png') 0 0 / 6000% 100% no-repeat;
   mix-blend-mode: screen;
   /**

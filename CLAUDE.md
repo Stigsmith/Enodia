@@ -138,6 +138,14 @@ the play experience cannot see.
 5. Counted 33 duos and 13 legendaries by counting prerequisite sets. The game marks both
    itself and the real split is 37 and 10. Same shape as error 3: a proxy for the property,
    never checked against the property
+8. Composited Charon's coin layer from `Portrait_Charon_Default_01` without following its
+   `InheritFrom = "Portrait_Base_01"`, which is where `Scale = 0.8` is stated. The record
+   overrides `OffsetX` and `OffsetY` and says nothing about scale, so the body was treated as
+   scale 1 while the coin layer used its own stated 0.8. The coins shipped at four fifths of
+   their size and about 10px out of place, twice, and the owner reported it twice.
+   **`InheritFrom` in the animation files is the same rule as `InheritFrom` in the trait
+   files**, which is error 3 and the `GodLoot` note and this, three times in three different
+   file formats. Read the base before believing a record is complete
 
 ---
 

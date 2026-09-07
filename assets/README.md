@@ -554,11 +554,27 @@ because the cells are half again as tall: 172 is a real 2x for the 82px the
 element draws at, where 119 was not. `src/ui/charon-coins.test.ts` pins both
 mistakes.
 
-The placement in `builds.css` is derived from the numbers above rather than
-nudged: the crop box mapped through the coin layer's scale and offset, the
-portrait's offset, the trim at `(297, 40)` and the 760/1694 that made
-`charon-shop.png`, giving left 40.442%, top 43.554%, width 13.880% and height
-15.112% of that portrait.
+**And a fourth time, on the scale.** `Portrait_Charon_Default_01` states
+`OffsetX = -50` and `OffsetY = -200` and nothing about size, and inherits
+`Scale = 0.8` from `Portrait_Base_01`. Both versions of the placement read the
+record and not the base, so the body was treated as scale 1 while the coin layer
+used its own stated 0.8. The coins shipped at four fifths of their size and about
+10px out of place: 76 by 82 where they should be 95 by 103. It is the same rule
+as `InheritFrom` in `TraitData`, in a different file format, and it is now
+`CLAUDE.md` error 8.
+
+Both layers being 0.8 means the coin canvas maps one to one into the portrait's
+own pixels. The placement in `builds.css` follows from that: the crop box
+`(18, 28)` to `(315, 348)`, the two offsets, the portrait's trim at `(297, 40)`
+and the 760/1694 that made `charon-shop.png`, giving **left 39.052%, top
+42.237%, width 17.350% and height 18.890%** of that portrait.
+
+**What the animation actually does, measured rather than guessed.** The cluster
+of coins swirls: its centroid travels 4.2px in each axis over the loop, at a
+median 0.27px per frame with no step larger than 0.61, and the seam from frame 60
+back to frame 1 is 0.31px, so the loop is smooth and closes cleanly. That motion
+is the animation and not an artefact. It was reported as wandering when the
+cluster was drawn a quarter too small, which is the scale error above.
 
 The portrait is cropped to its own alpha and saved at 760px tall as
 **`assets/characters/charon-shop.png`, 348 KB**. PNG rather than WebP on purpose:
