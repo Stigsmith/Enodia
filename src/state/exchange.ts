@@ -52,11 +52,13 @@ export type Stats = {
  * What earlier versions of a build earned, when its author replaced the picks
  * and somebody had already played or rated what was there before.
  *
- * **No `players`.** That is a distinct-people claim, and folding versions
- * together would count somebody who played two of them twice. The worker omits
- * it for that reason and this mirrors it.
+ * **No `players` and no `takes`.** `players` is a distinct-people claim, and
+ * folding versions together would count somebody who played two of them twice.
+ * `takes` is absent because a follow belongs to the listing rather than to a
+ * version of it and stays current across a republish. The worker omits both and
+ * this mirrors it; its `Listing.before` carries the full reasoning.
  */
-export type Before = Omit<Stats, 'players'>
+export type Before = Omit<Stats, 'players' | 'takes'>
 
 /** One build on a shelf, unpacked and ready for the ordinary filters. */
 export type Listed = {

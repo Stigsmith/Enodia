@@ -957,3 +957,96 @@ describe('all, and your own', () => {
     expect(body).toContain('Author')
   })
 })
+
+/**
+ * Following is a fact about the listing, not about one version of it.
+ *
+ * Found on the live site. A listing had exactly one thing recorded against it,
+ * a follow, filed under the empty shape every listing carried before publishing
+ * sent one. Its author republished, the shape became a real hash, and the follow
+ * fell into `before`, so the card said **"Nothing logged since the author
+ * changed this build"** about a build nobody had knowingly changed.
+ *
+ * The narrower bug is that a take was ever in `before` at all. `foldBefore`
+ * already said takes fold honestly across versions, and the reason is that
+ * somebody following a listing goes on following it when the author replaces
+ * the picks. That is the whole difference between following and copying. So a
+ * take belongs to the listing, is counted once, and is never evidence that
+ * anything was superseded.
+ */
+describe('a follow outlives the version it was made against', () => {
+  const republish = (id: string, cookie: string, body: Record<string, unknown>) =>
+    SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'PUT',
+      headers: { origin: ORIGIN, cookie, 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+  const statsOf = async (id: string) => {
+    const rows = await shelf('/api/exchange')
+    return rows.find((one) => one.id === id)
+  }
+
+  it('keeps counting after the author replaces the picks', async () => {
+    const author = await someone('Author')
+    const reader = await someone('Reader')
+    const id = await publish(author.cookie, 'Replaced')
+    await curate(id, 'a pick')
+    await post(`/api/exchange/${id}/take`, {}, { cookie: reader.cookie })
+
+    expect((await statsOf(id))?.stats.takes).toBe(1)
+
+    await republish(id, author.cookie, { payload: 'Znew', name: 'Replaced', shape: 'brandnew' })
+
+    const after = await statsOf(id)
+    expect(after?.stats.takes).toBe(1)
+    /* And it is not also reported as something the build used to have, which
+       would be the same follower counted twice on one card. */
+    expect(after?.before?.takes).toBeUndefined()
+  })
+
+  /**
+   * The live case exactly: one follow under the empty shape, a real shape now.
+   *
+   * Nothing was ever played, so there is nothing to say was earned before a
+   * change, and the card must not claim there was one.
+   */
+  it('does not read a follow as evidence the build changed', async () => {
+    const author = await someone('Author')
+    const reader = await someone('Reader')
+    const id = await publish(author.cookie, 'Never really changed')
+    await curate(id, 'a pick')
+    await post(`/api/exchange/${id}/take`, {}, { cookie: reader.cookie })
+    await republish(id, author.cookie, { payload: 'Zp', name: 'Never really changed', shape: '750c7d' })
+
+    const after = await statsOf(id)
+    expect(after?.stats.takes).toBe(1)
+    expect(after?.before).toBeUndefined()
+  })
+
+  /* Runs are the other way round and must stay that way: they are evidence
+     about the picks they were run against, so replacing the picks resets them
+     and the old ones are still shown, marked as from before. */
+  it('still resets the runs, and still shows what they were', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publish(author.cookie, 'Played then changed')
+    await curate(id, 'a pick')
+    await post(`/api/exchange/${id}/take`, {}, { cookie: player.cookie })
+    await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 30, shape: 'a-real-fingerprint' },
+      { cookie: player.cookie },
+    )
+    expect((await statsOf(id))?.stats.clears).toBe(1)
+
+    await republish(id, author.cookie, { payload: 'Znew', name: 'Played then changed', shape: 'later' })
+
+    const after = await statsOf(id)
+    expect(after?.stats.clears).toBe(0)
+    expect(after?.before?.clears).toBe(1)
+    expect(after?.before?.bestFear).toBe(30)
+    /* The follower is still following, so the take stays current. */
+    expect(after?.stats.takes).toBe(1)
+  })
+})
