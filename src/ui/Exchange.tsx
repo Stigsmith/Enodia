@@ -37,22 +37,20 @@
  * named the same thing. A listing now says whether it is yours, and following
  * twice is following once.
  *
- * ## Four shelves, and the two that were missing
+ * ## Four shelves
  *
- * It was Picked and From friends, on the argument that both passed a human
- * before they were listed and so stayed on the right side of the line
- * `REQUIREMENTS.md` 5 draws around discoverability. The screen carried a
- * paragraph saying why there was no third.
+ * **All**, everything published. **From friends**, the people whose codes you
+ * swapped. **Mine**, your own listings including any you took down. And
+ * **Followed**, the builds you took up, including ones their authors withdrew.
  *
- * **What that missed is that it left your own builds on no shelf.** Picked
- * shows only what the curator chose and From friends cannot contain your own,
- * so the owner published nine builds, had picked one, and saw one. Live,
- * reachable by link, invisible in the app that made them.
+ * It used to be two, Picked and From friends, on the argument that both had
+ * passed a human before they were listed. What that missed is that it left your
+ * own builds on no shelf: the owner published nine and saw one.
  *
- * All and Mine are both here now. The owner decided to open the everything
- * shelf without a report button and a hide button; `worker/exchange.ts` carries
- * that argument, and the paragraph explaining the absence is gone because there
- * is no longer an absence to explain.
+ * **The curated shelf is gone entirely**, table and route and owner gate. It
+ * was the default and the only thing a stranger could see, which made sense
+ * while there was no way to browse and stopped making sense the moment All
+ * opened. The owner's call: people find what they want themselves.
  */
 
 import { useEffect, useMemo, useState } from 'react'
@@ -75,22 +73,22 @@ import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filt
 import type { FacetId, SortId } from './build-filter.ts'
 
 const SHELVES = [
-  { id: 'picked' as const, label: 'Picked' },
   { id: 'all' as const, label: 'All' },
   { id: 'friends' as const, label: 'From friends' },
   { id: 'mine' as const, label: 'Mine' },
+  { id: 'followed' as const, label: 'Followed' },
 ]
 
 /** One line per shelf, saying what you are looking at rather than why. */
 const SCOPE: Record<Shelf, string> = {
-  picked: 'Chosen by hand, one at a time, each with a note saying why.',
   all: 'Everything anybody has published and not taken back down.',
   friends: 'Published by the people whose codes you swapped.',
   mine: 'Your own listings. Ones you have taken down are still here.',
+  followed: 'Builds you took up. Ones the author withdrew are still here.',
 }
 
 export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'friends') => void }) {
-  const [shelf, setShelf] = useState<Shelf>('picked')
+  const [shelf, setShelf] = useState<Shelf>('all')
   const [listed, setListed] = useState<Listed[] | null>(null)
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
@@ -293,12 +291,6 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                       listing ? (
                         <div className="xchange-foot">
                           <p className="xchange-by">by {listing.by}</p>
-                          {listing.note ? (
-                            /* The owner's own words, and the only opinion the
-                             * tool states as its own. It is signed, which is
-                             * what makes it allowed. */
-                            <p className="xchange-note">&ldquo;{listing.note}&rdquo;</p>
-                          ) : null}
                           <Counted stats={listing.stats} {...(listing.before ? { before: listing.before } : {})} />
                           <Relation
                             listing={listing}
@@ -334,7 +326,6 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             <Poster built={assemble(readingRow.build)} />
             <div className="xchange-read-foot">
               <p className="xchange-by">by {readingRow.by}</p>
-              {readingRow.note ? <p className="xchange-note">&ldquo;{readingRow.note}&rdquo;</p> : null}
               <Counted stats={readingRow.stats} {...(readingRow.before ? { before: readingRow.before } : {})} />
               <div className="xchange-read-actions">
                 <Relation
@@ -418,10 +409,12 @@ function Counted({ stats, before }: { stats: Stats; before?: Before }) {
 function Tally({ stats, bare }: { stats: Stats; bare?: boolean }) {
   return (
     <p className="xchange-counts">
+      {/* One coin, and none on the quieter line for the old counts. `bare` was
+          added around the existing image rather than replacing it, so it drew
+          two here and one there: the inverse of what the flag means. */}
       {bare ? null : (
         <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
       )}
-      <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
       {/* "Taken" was the copy era's word for it. The row records somebody
         * adding this build to their library from this listing, which is what
         * following is; the rows written before following existed are the same
@@ -455,12 +448,19 @@ function Empty({
   shelf: Shelf
   onGo?: (view: 'account' | 'builds' | 'friends') => void
 }) {
-  if (shelf === 'picked') {
+  if (shelf === 'followed') {
     return (
-      <p className="ref-say">
-        Nothing picked yet. This shelf holds builds chosen by hand, one at a time, each with a
-        note saying why it is here.
-      </p>
+      <div>
+        <p className="ref-say">
+          You are not following anything yet. Following a build from one of the other shelves
+          puts it in your library and keeps it up to date with what its author does next.
+        </p>
+        {ACCOUNTS_LIVE && onGo ? (
+          <button type="button" className="quiet" onClick={() => onGo('builds')}>
+            Go to your builds
+          </button>
+        ) : null}
+      </div>
     )
   }
 

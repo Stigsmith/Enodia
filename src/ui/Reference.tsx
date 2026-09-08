@@ -169,18 +169,25 @@ export function Help() {
         <section className="ref">
           <h3 className="ref-rule">The exchange, and its four shelves</h3>
           <p className="ref-say">
-            <strong>Picked</strong> is builds chosen by hand, each with a note saying why.
-            <strong> All</strong> is everything anybody has published and not taken back down.
-            <strong> From friends</strong> is the people whose codes you swapped, and{' '}
-            <strong>Mine</strong> is your own listings, including any you have taken down.
+            <strong>All</strong> is everything anybody has published and not taken back down.
+            <strong> From friends</strong> is the people whose codes you swapped.{' '}
+            <strong>Mine</strong> is your own listings, and <strong>Followed</strong> is the
+            builds you took up. Those last two keep the ones that have been taken down, because
+            they are about your own relationship with a build rather than about browsing.
           </p>
           <p className="ref-say">
-            All of them was closed for a long time, on the argument that a shelf of everybody
-            needs a way to report a listing and a way to hide one first. It is open now, and
-            those still do not exist. What tipped it was that the old arrangement put your own
-            published builds on no shelf at all, and what makes it defensible is that a listing
-            carries a build&rsquo;s name and its author&rsquo;s name and no other writing. If
-            that stops being enough, it changes.
+            There used to be a fifth, a shelf of builds picked by hand with a note saying why,
+            and it was the only one a stranger could see. It made sense while there was no way
+            to browse. Once there was, it was a second answer to a question that already had
+            one, so it is gone: you find what you want yourself.
+          </p>
+          <p className="ref-say">
+            A shelf of everybody was closed for a long time, on the argument that it needs a way
+            to report a listing and a way to hide one first. It is open now and those still do
+            not exist. What tipped it was that the old arrangement put your own published builds
+            on no shelf at all, and what makes it defensible is that a listing carries a
+            build&rsquo;s name and its author&rsquo;s name and no other writing. If that stops
+            being enough, it changes.
           </p>
           <p className="ref-say">
             You <strong>follow</strong> a build rather than copying it. It stays the person who

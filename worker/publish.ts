@@ -304,7 +304,7 @@ export async function listMine(db: DB, userId: string): Promise<Published[]> {
  * Take one off the shelves, and only if it is yours.
  *
  * **This was a delete and is not any more.** The row is referenced by
- * `exchange_stat` and `curated_pick`, both `on delete cascade`, so deleting it
+ * `exchange_stat` and `build_facet`, both `on delete cascade`, so deleting it
  * destroyed every run and rating anybody had logged against the build and the
  * curator's note in the same statement. It also emptied the build out of the
  * library of everybody following it, because their client reads it back from
@@ -338,7 +338,7 @@ export async function takeDown(db: DB, userId: string, id: string): Promise<bool
  * **A separate verb rather than a side effect of republishing.** An author
  * fixing a build while it is down should not have to make it public to save the
  * fix, and a republish that quietly relisted would put a build back on the
- * curated shelf without anybody asking. Two verbs with one meaning each are
+ * shelves without anybody asking. Two verbs with one meaning each are
  * easier to put on a screen than one verb with a hidden second effect.
  *
  * It touches `takenDownAt` and nothing else. In particular it does not move

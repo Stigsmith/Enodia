@@ -157,11 +157,15 @@ The original rule was that nothing discoverable exists until there is a way to r
 listing and a way to hide one. It held for a year and then was reversed, on 8 September
 2026, by the owner. Recorded here rather than quietly dropped.
 
-**What forced the question** was not the leaderboards. The exchange's two shelves were
-Picked and From friends, and neither can contain your own builds: `picked` starts from
-`curated_pick`, and `fromFriends` excludes you by construction. So an account's own listings
-appeared on no shelf, and the owner published nine builds and could see one. Opening the
-everything shelf and adding a Mine shelf are the same fix from two sides.
+**What forced the question** was not the leaderboards. The exchange had a hand-picked shelf
+and From friends, and neither can contain your own builds: the first showed only what the
+owner had picked, and `fromFriends` excludes you by construction. So an account's own
+listings appeared on no shelf, and the owner published nine builds and could see one.
+Opening the everything shelf and adding a Mine shelf are the same fix from two sides.
+
+**The curated shelf was retired the same day**, on the owner's call: once there is a way to
+browse, a shelf somebody has read every item of is a second answer to a question that
+already has one, and one person reading everything does not scale past one person.
 
 **What makes it defensible at this size**, stated so it can be checked later rather than
 assumed:
@@ -169,8 +173,8 @@ assumed:
 - A listing carries a build's name and its author's display name. There is no free text a
   stranger wrote on either the shelf or the boards: no comments, no descriptions from
   anybody but the author, no avatars, no handles to claim.
-- The remedies that exist are the author taking their own listing down, which removes it
-  from every shelf and every board, and the curator un-picking.
+- The one removal lever is the author taking their own listing down, which takes it off
+  every shelf and every board at once.
 - Adding a hide is a nullable column on `published_build` and one clause in each of
   `worker/boards.ts` and `worker/exchange.ts`. It is a smaller change than the year of
   deferral made it sound.

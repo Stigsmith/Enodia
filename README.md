@@ -119,10 +119,14 @@ for it is removing somebody.
 ship with no report button and no hide button, which is the owner's call and worth stating
 rather than glossing. The argument for it is narrow: a listing carries a build name and an
 author's display name and no other text a stranger wrote, so there is nothing on either
-surface that is not already on the hand-picked shelf. The remedies that exist are the author
-taking their own listing down and the curator un-picking. Adding a hide would be a nullable
-column on `published_build` and one clause in `worker/boards.ts`, because every board and
-every shelf reads through one file each.
+surface to moderate. The one removal lever is the author taking their own listing down.
+Adding a hide would be a nullable column on `published_build` and one clause in
+`worker/boards.ts`, because every board and every shelf reads through one file each.
+
+There **was** a curated shelf, hand-picked with a note on each build, and it was the default
+and the only thing a stranger could see. It was retired the same day All opened: a shelf
+somebody had read every item of answers "what is safe to land on", and All answers it by
+being browsable instead. One person reading everything does not scale past one person.
 
 Publishing is a copy, not a move. The build in the browser stays the record and stays what
 the export writes. `ACCOUNTS_LIVE` in `src/state/account.ts` hides all of it until password

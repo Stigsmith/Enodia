@@ -82,7 +82,6 @@ async function befriend(a: { cookie: string }, b: { cookie: string }) {
 beforeEach(async () => {
   for (const table of [
     'exchange_stat',
-    'curated_pick',
     'published_build',
     'friendship',
     'friend_code',

@@ -430,7 +430,7 @@ describe('whether a listing is one of yours', () => {
         ],
       },
     }))
-    return (await listShelf('picked'))[0]
+    return (await listShelf('all'))[0]
   }
 
   it('carries a true through from the worker', async () => {
