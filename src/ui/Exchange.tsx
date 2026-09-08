@@ -399,13 +399,15 @@ function Counted({ stats, before }: { stats: Stats; before?: Before }) {
         * this build. Deleting it would lose real evidence; folding it in would
         * quietly transfer it. So it is shown, quieter, and said to be old.
         *
-        * No player count in here: see `Stats.before`. Two versions folded
-        * together would count somebody who played both of them twice.
+        * No player count and no follows in here: see `Before`. Players folded
+        * across versions would count somebody who played both of them twice,
+        * and a follow is about the listing rather than a version, so it stays
+        * on the current line and is never repeated down here.
         */}
       {before ? (
         <p className="xchange-was">
           Before the author changed this build:{' '}
-          <Tally stats={{ ...before, players: 0 }} bare />
+          <Tally stats={{ ...before, players: 0, takes: 0 }} bare />
         </p>
       ) : null}
     </>

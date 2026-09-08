@@ -91,12 +91,20 @@ export type Listing = {
    * a row of zeroes: `Counted` already refuses to draw those, and a listing
    * claiming "0 from before" would be a verdict on a build nobody changed.
    *
-   * **No `players`.** That count is a distinct-people claim, and folding
-   * several versions together would count somebody who played two of them
-   * twice. Takes and raters fold honestly, because two takes of two versions
-   * really are two takes.
+   * **No `players` and no `takes`**, for two different reasons.
+   *
+   * `players` is a distinct-people claim, and folding several versions together
+   * would count somebody who played two of them twice.
+   *
+   * `takes` is not here because a follow is a fact about the **listing** rather
+   * than about a version of it. Somebody following a build goes on following it
+   * when the author replaces the picks, which is the whole difference between
+   * following and copying, so their follow is counted once and stays current.
+   * It used to fold into here, and on the live site a listing whose entire
+   * history was one follow therefore said "Nothing logged since the author
+   * changed this build" about a build nobody had knowingly changed.
    */
-  before?: Omit<Stats, 'players'>
+  before?: Omit<Stats, 'players' | 'takes'>
 }
 
 /** Counted facts. Every one of these is a tally, and none is a judgement. */
@@ -200,18 +208,24 @@ const countsOf = (t: Tally): Stats => ({
   raters: t.raters,
 })
 
-/** Everything that is not the current version, added up. */
-function foldBefore(tallies: Tally[]): Omit<Stats, 'players'> | undefined {
+/**
+ * What earlier versions earned, added up. Play only.
+ *
+ * **Takes are not in here**, and leaving them out is what stops a listing whose
+ * only history is a follow from claiming its author changed it. See
+ * `Listing.before`; the short version is that a follow is about the listing and
+ * survives a republish, so it is counted once, currently, and is never evidence
+ * that something was superseded.
+ */
+function foldBefore(tallies: Tally[]): Omit<Stats, 'players' | 'takes'> | undefined {
   if (!tallies.length) return undefined
-  const takes = tallies.reduce((n, t) => n + t.takes, 0)
   const runs = tallies.reduce((n, t) => n + t.runs, 0)
   const clears = tallies.reduce((n, t) => n + t.clears, 0)
   const raters = tallies.reduce((n, t) => n + t.raters, 0)
   const sum = tallies.reduce((n, t) => n + (t.ratingSum ?? 0), 0)
   const fears = tallies.map((t) => t.bestFear).filter((f): f is number => f !== null)
-  if (!takes && !runs && !clears && !raters && !fears.length) return undefined
+  if (!runs && !clears && !raters && !fears.length) return undefined
   return {
-    takes,
     runs,
     clears,
     bestFear: fears.length ? Math.max(...fears) : null,
@@ -248,6 +262,10 @@ async function withStats(
     const now = row.shape ?? ''
     const current = mine.find((t) => t.shape === now)
     const before = foldBefore(mine.filter((t) => t.shape !== now))
+    /* Every version's, not the current one's. A follower of this listing is a
+       follower of this listing, whichever version they arrived at, and the row
+       that records them is never rewritten when the author republishes. */
+    const takes = mine.reduce((n, t) => n + t.takes, 0)
     return {
       id: row.id,
       name: row.name,
@@ -261,7 +279,7 @@ async function withStats(
       /* Absent rather than false on the shelves that filter these out, so the
          field means "this shelf tracks it" rather than "this one is live". */
       ...(row.takenDownAt === undefined ? {} : { takenDown: row.takenDownAt !== null }),
-      stats: current ? countsOf(current) : NONE,
+      stats: { ...(current ? countsOf(current) : NONE), takes },
       ...(before ? { before } : {}),
     }
   })
