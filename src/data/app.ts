@@ -8,6 +8,7 @@
 
 import bundle from '../../data/app/app-data.json'
 import type { GodId, Requirement, Slot, Trait, TraitId, TraitIndex, TraitKind, WeaponId } from './types.ts'
+import type { ShownBuild } from './builds.ts'
 
 type RawTrait = {
   id: string
@@ -198,6 +199,35 @@ export const familiars: readonly Familiar[] = bundle.familiars as Familiar[]
 export const familiarById: ReadonlyMap<string, Familiar> = new Map(familiars.map((one) => [one.id, one]))
 
 export const weaponById: ReadonlyMap<WeaponId, Weapon> = new Map(weapons.map((one) => [one.id, one]))
+
+/**
+ * Which Olympians a build's boons come from.
+ *
+ * **Intersected with `olympians` rather than filtered by name.** The naive
+ * version walks each boon's `gods` and hard-codes Hermes, Selene and Chaos to
+ * drop them, which is three god names written as string literals and which
+ * `validate.ts` refuses by name. `olympians` is the nine that carry `GodLoot`
+ * and spend one of the four slots, read out of the generated bundle, so
+ * intersecting says the same thing from the data.
+ *
+ * The distinction matters wherever this is used: listing Selene beside Zeus
+ * would imply they cost the same thing, and they do not.
+ *
+ * Lives here rather than in `ui/build-filter.ts`, where it was written, because
+ * `state/facets.ts` needs it too and nothing in `src/state` imports from
+ * `src/ui`. Both of its sources are in this file already.
+ */
+export function godsOf(build: ShownBuild): string[] {
+  const found = new Set<string>()
+  for (const id of build.boons) {
+    for (const god of traits.get(id)?.gods ?? []) {
+      if (OLYMPIAN.has(god)) found.add(god)
+    }
+  }
+  return [...found].sort()
+}
+
+const OLYMPIAN = new Set<string>(olympians)
 
 /** Each god's offer pools, for the Exit picker and the simulator. */
 export const godPools: ReadonlyMap<GodId, { priority: TraitId[]; pool: TraitId[] }> = new Map(

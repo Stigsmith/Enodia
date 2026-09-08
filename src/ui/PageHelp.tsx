@@ -34,7 +34,6 @@ const ALIAS: Partial<Record<View, string>> = {
   exchange: 'unbuilt',
   account: 'unbuilt',
   friends: 'unbuilt',
-  leaderboards: 'unbuilt',
 }
 
 // ---------------------------------------------------------------------------

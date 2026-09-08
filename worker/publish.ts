@@ -21,7 +21,7 @@
 import { and, eq, isNull, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
-import { publishedBuild } from './schema-app.ts'
+import { buildFacet, publishedBuild } from './schema-app.ts'
 import * as schema from './schema.ts'
 
 type DB = DrizzleD1Database<typeof schema>
@@ -47,6 +47,61 @@ const MAX_NAME = 120
 const MAX_SHAPE = 32
 const shapeIn = (body: { shape?: unknown }): string =>
   typeof body.shape === 'string' && body.shape.length <= MAX_SHAPE ? body.shape : ''
+
+/**
+ * The facet tokens, which this server stores and groups by and never reads.
+ *
+ * The same bargain as the shape above and the same reasoning, applied to a
+ * different question: the leaderboards want to say which arm gets published
+ * most, and nothing here knows what an arm is. `src/state/facets.ts` owns the
+ * vocabulary in both directions; this only bounds it.
+ *
+ * **Bounded twice, and both bounds matter.** Forty tokens is roughly double
+ * what a build produces today, and 40 characters fits `aspect:<id>` with room
+ * to spare. Without both, a column that accepts arbitrary strings is somewhere
+ * to put a payload, which is exactly what `MAX_SHAPE` exists to prevent one
+ * column being.
+ *
+ * Anything over is dropped rather than refused, as with the shape: these are a
+ * hint for a board, not a thing worth failing somebody's publish over.
+ */
+const MAX_FACETS = 40
+const MAX_FACET = 40
+const facetsIn = (body: { facets?: unknown }): string[] => {
+  if (!Array.isArray(body.facets)) return []
+  const out = new Set<string>()
+  for (const one of body.facets) {
+    if (typeof one === 'string' && one.length > 0 && one.length <= MAX_FACET) out.add(one)
+    if (out.size >= MAX_FACETS) break
+  }
+  return [...out]
+}
+
+/**
+ * Write a listing's facets, replacing whatever was there.
+ *
+ * Delete then insert rather than a diff: a build's facets are few and derived,
+ * so working out which three changed costs more than writing all of them. One
+ * `batch`, because D1 has no interactive transaction and a delete that lands
+ * without its insert would leave a listing off the content boards entirely.
+ *
+ * **Never fatal.** A publish that succeeded and a board that is missing a row
+ * are not the same size of problem, so a failure here is swallowed: the listing
+ * exists, the link works, and the next republish writes them again.
+ */
+async function setFacets(db: DB, id: string, facets: string[]): Promise<void> {
+  try {
+    const writes: Parameters<DB['batch']>[0] = [
+      db.delete(buildFacet).where(eq(buildFacet.buildId, id)),
+    ]
+    if (facets.length) {
+      writes.push(db.insert(buildFacet).values(facets.map((facet) => ({ buildId: id, facet }))))
+    }
+    await db.batch(writes as Parameters<DB['batch']>[0])
+  } catch {
+    /* Deliberately quiet. See above. */
+  }
+}
 
 /**
  * Per account, and the only thing bounding total storage.
@@ -101,11 +156,12 @@ export type Refusal = { status: number; say: string }
 export async function publish(
   db: DB,
   userId: string,
-  body: { payload?: unknown; name?: unknown; shape?: unknown },
+  body: { payload?: unknown; name?: unknown; shape?: unknown; facets?: unknown },
 ): Promise<{ id: string } | Refusal> {
   const payload = typeof body.payload === 'string' ? body.payload : ''
   const name = typeof body.name === 'string' ? body.name.trim() : ''
   const shape = shapeIn(body)
+  const facets = facetsIn(body)
 
   if (!payload) return { status: 400, say: 'No build in that request.' }
   if (payload.length > MAX_PAYLOAD) return { status: 413, say: 'That build is too large to publish.' }
@@ -145,6 +201,7 @@ export async function publish(
     const id = shortId()
     try {
       await db.insert(publishedBuild).values({ id, userId, payload, name, shape })
+      await setFacets(db, id, facets)
       return { id }
     } catch (error) {
       if (attempt === 2) throw error
@@ -179,11 +236,12 @@ export async function republish(
   db: DB,
   userId: string,
   id: string,
-  body: { payload?: unknown; name?: unknown; shape?: unknown },
+  body: { payload?: unknown; name?: unknown; shape?: unknown; facets?: unknown },
 ): Promise<{ id: string; revision: number } | Refusal> {
   const payload = typeof body.payload === 'string' ? body.payload : ''
   const name = typeof body.name === 'string' ? body.name.trim() : ''
   const shape = shapeIn(body)
+  const facets = facetsIn(body)
 
   if (!payload) return { status: 400, say: 'No build in that request.' }
   if (payload.length > MAX_PAYLOAD) return { status: 413, say: 'That build is too large to publish.' }
@@ -204,6 +262,11 @@ export async function republish(
   if ((result as { meta?: { changes?: number } }).meta?.changes === 0) {
     return { status: 404, say: 'That build is not one of yours.' }
   }
+
+  /* After the ownership check, never before: the `where` above is what proves
+     this listing is the caller's, so writing facets first would let anybody
+     rewrite anybody's. */
+  await setFacets(db, id, facets)
 
   const [row] = await db
     .select({ revision: publishedBuild.revision })

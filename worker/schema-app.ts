@@ -291,6 +291,56 @@ export const curatedPick = sqliteTable('curated_pick', {
 })
 
 /**
+ * What a build is made of, as tokens this server never reads.
+ *
+ * **The same bargain as `publishedBuild.shape`, one step further.** The server
+ * has no opinion about what a build is: the payload arrives packed, is stored
+ * as text, and is handed back packed, and nothing here parses a boon id or
+ * needs a second copy of the game data to check one against. That is what lets
+ * the build format change without a migration.
+ *
+ * It also means the leaderboards cannot ask "which arm do people publish most",
+ * because nothing here knows what an arm is. So the browser answers it: it
+ * derives a small set of strings from the build it is publishing and sends
+ * them, `src/state/facets.ts` owns the vocabulary in both directions, and this
+ * table stores them and groups by them. **Nothing in `worker/` interprets one.**
+ * A token this deployment has never seen is not an error, the same way a boon
+ * it has never heard of is not.
+ *
+ * The honest cost, stated so nobody has to rediscover it:
+ *
+ * - **A facet is a client's claim about its own build.** A modified client
+ *   could send `god:zeus` on a build with no Zeus boon. That is the same trust
+ *   model as `shape`, and as `cleared` and `fear` on a reported run, both of
+ *   which this backend already accepts. Worth naming; not worth solving for a
+ *   board that says which arm is popular.
+ * - **A listing published before this existed has no facets** until its author
+ *   replaces it, so the content boards start thin and fill in. No backfill is
+ *   possible here for the same reason the boards need this table at all.
+ *
+ * Rows are replaced wholesale on republish rather than diffed. A build's facets
+ * are small and derived, so working out which three changed costs more than
+ * writing all of them.
+ */
+export const buildFacet = sqliteTable(
+  'build_facet',
+  {
+    buildId: text('build_id')
+      .notNull()
+      .references(() => publishedBuild.id, { onDelete: 'cascade' }),
+
+    /** Opaque. Stored, grouped by, and never parsed. */
+    facet: text('facet').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.buildId, table.facet] }),
+    /* The boards group by this column across every listing, which is the one
+       read that is not by build. */
+    index('build_facet_facet_idx').on(table.facet),
+  ],
+)
+
+/**
  * How two people become friends, and why it is a code rather than a search.
  *
  * **You cannot look somebody up here, on purpose.** `name` is not unique, so it

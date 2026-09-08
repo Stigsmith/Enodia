@@ -31,6 +31,7 @@ import { Account, ResetPassword } from './ui/Account.tsx'
 import { Exchange } from './ui/Exchange.tsx'
 import { You } from './ui/You.tsx'
 import { Friends } from './ui/Friends.tsx'
+import { Leaderboards } from './ui/Leaderboards.tsx'
 import { refreshFollowed } from './state/exchange.ts'
 import { ACCOUNTS_LIVE, ACCOUNT_CHANGED, currentAccount, resetInUrl } from './state/account.ts'
 import type { ResetArrival } from './state/account.ts'
@@ -535,10 +536,20 @@ export function App() {
     )
   }
 
+  /* Above the `unbuilt` map for the same reason the exchange is: that map lists
+     the rooms that are genuinely empty, and a room with a branch above it is
+     not one of them. */
+  if (screen === 'leaderboards') {
+    return frame(
+      <div className="shell is-wide">
+        <Leaderboards onGo={setView} />
+      </div>,
+    )
+  }
+
   const unbuilt: Partial<Record<View, { title: string; phase: string }>> = {
     account: { title: 'Account', phase: 'Phase 4' },
     friends: { title: 'Friends', phase: 'Phase 4' },
-    leaderboards: { title: 'Leaderboards', phase: 'Phase 4' },
   }
   const room = unbuilt[screen]
   if (room) {

@@ -50,6 +50,7 @@
 
 import {
   familiarById,
+  godsOf,
   iconOf,
   olympians,
   sources,
@@ -203,24 +204,14 @@ export const isEmpty = (selection: Partial<Selection>): boolean => countSelected
  *
  * **Kept to the roster rather than excluding a list.** This named Hermes,
  * Selene and Chaos to drop them, which is three god names written as string
- * literals in source, and `validate.ts` refused it by name. `olympians` is the
- * nine that carry `GodLoot` and spend one of the four slots, read out of the
- * generated bundle, so intersecting with it says the same thing from the data.
+ * literals in source, and `validate.ts` refused it by name.
  *
- * The distinction matters to a filter: an entry for Selene beside one for Zeus
- * would imply they cost the same thing, and they do not.
+ * It now lives in `data/app.ts` beside the two things it reads, because
+ * `state/facets.ts` needs the same answer and nothing in `src/state` imports
+ * from `src/ui`. Re-exported here because this is where callers and the test
+ * already look for it.
  */
-const OLYMPIAN = new Set<string>(olympians)
-
-export function godsOf(build: ShownBuild): string[] {
-  const found = new Set<string>()
-  for (const id of build.boons) {
-    for (const god of traits.get(id)?.gods ?? []) {
-      if (OLYMPIAN.has(god)) found.add(god)
-    }
-  }
-  return [...found].sort()
-}
+export { godsOf }
 
 /** What a build offers a facet. It matches if the picked value is among them. */
 function valuesFor(build: ShownBuild, facet: FacetId): string[] {
