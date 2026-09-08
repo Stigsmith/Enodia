@@ -20,6 +20,20 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-08',
+    title: 'Two shelves that were missing, leaderboards, and a count that was never counting',
+    say: 'Your own published builds were on no shelf at all, and most listings had been quietly dropping every run logged against them.',
+    points: [
+      'Every run logged against a build published and never replaced was being thrown away. The browser sends which version it is holding so a run cannot be counted toward a build somebody has since rewritten, and publishing was not sending that version in the first place, so the two never matched. Runs, clears and best Fear sat at zero on those listings, which is exactly what a build nobody has played looks like, and rating one was refused as unplayed even after you had played it. Fixed both ends: new listings say which version they are, and a listing that never said gets the benefit of the doubt rather than losing your run.',
+      'The exchange had two shelves and neither could contain your own builds, so publishing nine and seeing one was working as designed. There are four now: Picked, All, From friends, and Mine.',
+      'All is every build anybody has published and not taken back down. It was held back on the grounds that a shelf of everybody needs a way to report a listing and a way to hide one first, and it is open now without them. A listing carries a build’s name and its author’s name and nothing else anybody wrote.',
+      'Mine is your own listings, and it keeps the ones you have taken down, marked. That is the only place they appear, and it is the only way to reach a listing whose build is no longer in this browser.',
+      'Leaderboards. What has been followed, played and cleared most, at what Fear, and by whom, for everybody or just the people whose codes you swapped. Also which arm, aspect and god get published most, and a few sillier ones.',
+      'Every board counts one thing and none of them is a rate. A clear rate would rank five clears from five runs above ninety from a hundred, which says more about how much evidence there is than about the builds.',
+      'The shelf buttons were sitting on top of the line above them. They are not now.',
+    ],
+  },
+  {
+    date: '2026-09-08',
     title: 'Two half-finished things, and a roadmap that had gone out of date',
     say: 'Found by reading yesterday’s plan back against the code rather than by anybody hitting them.',
     points: [

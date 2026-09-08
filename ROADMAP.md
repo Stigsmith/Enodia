@@ -12,9 +12,9 @@ Last updated 8 September 2026, game build `138174`.
 
 | | |
 |---|---|
-| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, and the **exchange loop closes** since the 4th |
+| **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 620 in node across 32 files, and **115 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 633 in node across 33 files, and **148 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 3 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -64,7 +64,8 @@ is the missing end, and it renders whatever `ACCOUNTS_LIVE` says: a token exists
 a letter was sent, so refusing to honour one would be the exact trap the flag guards against.
 
 **`ACCOUNTS_LIVE` opens three things and no more**: the Account screen, Friends, and the
-Publish item on a build. Exchange and Leaderboards stay as Dora's empty rooms. All three were
+Publish item on a build. The exchange and the leaderboards have both shipped since, and
+Account is now the last of Dora's empty rooms. All three of those were
 driven through the interface before the flip rather than only through the API, which was worth
 the time it cost: the API had a full suite behind it and the publish button had never once
 been clicked.
@@ -290,6 +291,51 @@ the builds. `arcana-layouts.test.ts` checks a filled one and prints its Grasp, w
 conditionals came on and why each of the rest did not; it fails only on the impossible.
 
 ---
+
+## Leaderboards, and the two shelves that were missing
+
+**8 September 2026.** The owner asked for leaderboards and, while the plan was being written,
+noticed that publishing nine builds showed one.
+
+**That was not a display bug and it is the more interesting half.** The exchange had two
+shelves. `picked` starts `.from(curated_pick)` with an inner join, so it shows only what the
+curator chose. `fromFriends` carries a comment saying nothing on it can ever be yours. So an
+account's own listings were on **no shelf at all**: live, reachable by link, invisible in the
+app that published them. There are four shelves now, All and Mine among them, and Mine keeps
+taken-down listings because that is the only way to reach one whose local build is gone.
+
+**Every run against most listings had been thrown away.** `publishBuild` did not send the
+`shape` token while `republishBuild` did, so a listing published and never replaced was
+stored under `''`, the follower's browser sent its real fingerprint with each run, and
+`played` read the mismatch as "you are holding a version the author has moved on from" and
+answered ok without counting. Rating one was then refused as unplayed. Nothing could see it:
+zero is what an unplayed build looks like, `stamp` wrote the correct hash locally so the
+build looked right, and takes carried on counting because `take` files under whatever the
+listing says. Fixed at both ends, and an empty stored token now means "never stated a
+version" rather than "stale". Neither publish test asserted the request body, which is how it
+survived; both do now.
+
+**The boards themselves are counts and never a score.** `worker/exchange.ts` had said there
+is no ranking anywhere, which a leaderboard plainly is, so the rule was narrowed rather than
+dropped: order by one counted column, never combine two. The owner's "no rate boards at all"
+is the same principle one step on, and the reason is worth keeping: a clear rate ranks five
+clears from five runs above ninety from a hundred, which is a claim about how much evidence
+there is rather than about the builds.
+
+**Content boards needed a new table**, because `worker/publish.ts` refuses to parse a payload
+and therefore has no idea what an arm is. `build_facet` extends the `shape` precedent: the
+browser derives tokens, the server stores and groups them and never reads one, and
+`src/state/facets.ts` owns the vocabulary in both directions. Two honest costs, both recorded
+in the schema: a facet is a client's claim about its own build, and listings published before
+the table existed carry none until their authors replace them.
+
+**And the discoverability rule was reversed.** Six places in code and two documents said
+nothing discoverable ships before a report button and a hide button. All of it is rewritten
+rather than quietly contradicted; `REQUIREMENTS.md` 5 now carries the argument, what makes it
+defensible at this size, and what would change the answer.
+
+**The one thing found and not fixed** is still the sync remount ejecting you out of an open
+build, below.
 
 ## Corrections since Phase 1
 
