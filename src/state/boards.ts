@@ -40,9 +40,22 @@ export type Board = {
   rows: BoardRow[]
 }
 
-export async function loadBoards(scope: Scope): Promise<Board[]> {
+/**
+ * The boards, or `null` when the answer needs an account you do not have.
+ *
+ * **Only a 401 gives back null**, and it is the one refusal worth telling apart
+ * from an empty result. The friends scope answered [] for a signed-out reader
+ * to begin with, so the screen said "nothing counted yet among the people you
+ * have swapped codes with" to somebody who has neither codes nor an account.
+ * Every other failure still folds into an empty list: a board is a nice thing
+ * to look at and nothing depends on it, so a request that does not come back
+ * leaves the page saying there is nothing yet rather than putting a red
+ * sentence in front of somebody who came to read a list.
+ */
+export async function loadBoards(scope: Scope): Promise<Board[] | null> {
   try {
     const response = await fetch(`/api/exchange/boards?scope=${scope}`)
+    if (response.status === 401) return null
     if (!response.ok) return []
     const body = (await response.json()) as { boards?: Board[] }
     return body.boards ?? []

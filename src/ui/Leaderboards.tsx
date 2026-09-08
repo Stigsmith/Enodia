@@ -47,24 +47,28 @@ const SAYS: Record<Scope, string> = {
   friends: 'You, and the people whose codes you swapped.',
 }
 
-export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends') => void }) {
+/** Loading, needs an account, or the answer. Three states, so none is guessed. */
+type Showing = 'waiting' | 'signed-out' | Board[]
+
+export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends' | 'account') => void }) {
   const [scope, setScope] = useState<Scope>('global')
-  const [boards, setBoards] = useState<Board[] | null>(null)
+  const [showing, setShowing] = useState<Showing>('waiting')
 
   useEffect(() => {
     let live = true
-    setBoards(null)
+    setShowing('waiting')
     void loadBoards(scope).then((found) => {
-      if (live) setBoards(found)
+      if (live) setShowing(found === null ? 'signed-out' : found)
     })
     return () => {
       live = false
     }
   }, [scope])
 
-  const builds = boards?.filter((one) => one.kind === 'build') ?? []
-  const folk = boards?.filter((one) => one.kind === 'person') ?? []
-  const stuff = boards?.filter((one) => one.kind === 'facet') ?? []
+  const boards = Array.isArray(showing) ? showing : []
+  const builds = boards.filter((one) => one.kind === 'build')
+  const folk = boards.filter((one) => one.kind === 'person')
+  const stuff = boards.filter((one) => one.kind === 'facet')
 
   return (
     <Page
@@ -77,8 +81,23 @@ export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends') => 
       ) : null}
       <p className="board-scope">{SAYS[scope]}</p>
 
-      {boards === null ? (
+      {showing === 'waiting' ? (
         <p className="acct-quiet">One moment.</p>
+      ) : showing === 'signed-out' ? (
+        /* Only the friends scope can land here, and saying "nothing counted
+           yet among the people you swapped codes with" to somebody with no
+           account was telling them about a circle they do not have. */
+        <div>
+          <p className="ref-say">
+            This one needs an account, because it is a question about yours. Everybody&rsquo;s
+            boards are up above and open to anybody.
+          </p>
+          {ACCOUNTS_LIVE && onGo ? (
+            <button type="button" className="quiet" onClick={() => onGo('account')}>
+              Sign in
+            </button>
+          ) : null}
+        </div>
       ) : boards.length === 0 ? (
         <Empty scope={scope} onGo={onGo} />
       ) : (
@@ -170,7 +189,13 @@ function One({ board }: { board: Board }) {
   )
 }
 
-function Empty({ scope, onGo }: { scope: Scope; onGo?: (view: 'builds' | 'friends') => void }) {
+function Empty({
+  scope,
+  onGo,
+}: {
+  scope: Scope
+  onGo?: (view: 'builds' | 'friends' | 'account') => void
+}) {
   if (scope === 'friends') {
     return (
       <div>
