@@ -130,9 +130,12 @@ user's own data.
 - **No stated probabilities in v1.** See section 6.2.
 - **No accounts, server or social features before Phase 4.** ~~Held through Phases 1 to 3.~~
   Phase 4 has now started: accounts exist in `worker/`, on a Worker and D1 at the same
-  origin. **The social half of this non-goal still stands**, and deliberately. Friends and
-  leaderboards need the moderation section 5 asks for, and should not be designed in the
-  same breath as the auth they would sit on
+  origin. ~~The social half of this non-goal still stands, and deliberately. Friends and
+  leaderboards need the moderation section 5 asks for.~~ **Retired on 8 September 2026.**
+  Friends shipped first and is not discovery: a code you hand over by hand, no search, and
+  the moderation tool is removing somebody. Then the exchange's All shelf and the
+  leaderboards shipped, and both are discoverable and public, with **no report and no hide**.
+  That is a deliberate reversal rather than a drift, and the reasoning is below
 - **Not a competitor to Mobalytics on published build guides.** We will lose that fight.
 
 ---
@@ -143,10 +146,38 @@ user's own data.
 |---|---|---|
 | Platform | Web app, mobile-first, static host, `localStorage` | Playable second screen. Works for Steam Deck and console players, whom no PC-only tool reaches |
 | Certainty model | Feasibility states plus coarse bands | Section 6.2 |
-| Community | Local-first, URL sharing. Accounts deferred to Phase 4 | Most of the engineering budget, needs moderation from day one |
+| Community | Local-first, URL sharing. Accounts deferred to Phase 4 | Most of the engineering budget. ~~Needs moderation from day one~~, see the note below |
 | Auto-tracking | Deferred to Phase 4, manual entry always supported | PC-only, and the manual path must exist anyway |
 | Build library size | 30 to 40 generated archetypes, not 150 to 500 hand-authored | Section 7, Phase 2 |
 | Audience | Public | Sets the confidence register everywhere. Opinions must carry a visible byline or a source |
+
+### Discoverability, and shipping it without moderation
+
+The original rule was that nothing discoverable exists until there is a way to report a
+listing and a way to hide one. It held for a year and then was reversed, on 8 September
+2026, by the owner. Recorded here rather than quietly dropped.
+
+**What forced the question** was not the leaderboards. The exchange's two shelves were
+Picked and From friends, and neither can contain your own builds: `picked` starts from
+`curated_pick`, and `fromFriends` excludes you by construction. So an account's own listings
+appeared on no shelf, and the owner published nine builds and could see one. Opening the
+everything shelf and adding a Mine shelf are the same fix from two sides.
+
+**What makes it defensible at this size**, stated so it can be checked later rather than
+assumed:
+
+- A listing carries a build's name and its author's display name. There is no free text a
+  stranger wrote on either the shelf or the boards: no comments, no descriptions from
+  anybody but the author, no avatars, no handles to claim.
+- The remedies that exist are the author taking their own listing down, which removes it
+  from every shelf and every board, and the curator un-picking.
+- Adding a hide is a nullable column on `published_build` and one clause in each of
+  `worker/boards.ts` and `worker/exchange.ts`. It is a smaller change than the year of
+  deferral made it sound.
+
+**What would change the answer**: any free text a third party can write onto something
+somebody else sees, a display name shown to people who did not choose to see it beyond the
+boards, or enough accounts that the owner cannot read everything published in an evening.
 
 ### Dead positions, recorded so they are not revived
 

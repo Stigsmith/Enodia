@@ -100,10 +100,10 @@ fragment, which is why sharing needs no server and always will not. It is also *
 characters**, which Discord renders as a wall. Publishing stores the same payload under a
 random ten-character id, so the link becomes `enodia.me/b/aB3xK9pQmR`, about thirty.
 
-Published builds are **unlisted, not public**: no gallery, no index, no search, and a random
-id rather than a sequential one, so one is reachable only by whoever was handed the link.
-`REQUIREMENTS.md` 5 wants moderation designed before anything discoverable exists, and this
-is deliberately not that.
+A published build has a random ten-character id, so nothing about the link is guessable. It
+is **listed** now, though: the exchange has an All shelf and the leaderboards name authors,
+both of which a signed-out stranger can read. `REQUIREMENTS.md` 5 wanted moderation designed
+before anything discoverable existed, and section 4 there records why that was reopened.
 
 **Friends is a code, not a search.** You cannot look anybody up: a display name is not
 unique so it cannot address anybody, and searching by email would let a stranger test whether
@@ -111,9 +111,18 @@ any given address has an account here. You hand somebody an eight character code
 it, and both directions are written at once. There are no handles to claim and therefore no
 handles to moderate.
 
-A friend sees what you published and nothing else. There is no feed of strangers, no gallery
-and no search, so nothing here is discoverable. **Leaderboards would be the first thing that
-crosses that line**, which is why they are still not built.
+**Friends is still not discovery.** A friend sees what you published; there is no way to
+search for a person, so nobody can be found who did not want to be, and the moderation tool
+for it is removing somebody.
+
+**What is discoverable is the exchange's All shelf and the leaderboards**, both public. They
+ship with no report button and no hide button, which is the owner's call and worth stating
+rather than glossing. The argument for it is narrow: a listing carries a build name and an
+author's display name and no other text a stranger wrote, so there is nothing on either
+surface that is not already on the hand-picked shelf. The remedies that exist are the author
+taking their own listing down and the curator un-picking. Adding a hide would be a nullable
+column on `published_build` and one clause in `worker/boards.ts`, because every board and
+every shelf reads through one file each.
 
 Publishing is a copy, not a move. The build in the browser stays the record and stays what
 the export writes. `ACCOUNTS_LIVE` in `src/state/account.ts` hides all of it until password
