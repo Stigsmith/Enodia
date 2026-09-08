@@ -62,14 +62,14 @@ export const publishedBuild = sqliteTable(
      *
      * **SQLite cannot alter a foreign key, so that is a table rebuild, and the
      * rebuild is the danger.** `published_build` is a parent and both
-     * `exchange_stat` and `curated_pick` point at it `on delete cascade`, so the
+     * `exchange_stat` and `build_facet` point at it `on delete cascade`, so the
      * `DROP TABLE` in the middle of a rebuild performs an implicit delete that
      * carries out those cascade actions.
      *
      * drizzle-kit wraps its rebuild in `PRAGMA foreign_keys=OFF`. **Measured, on
      * a real database with real rows: it does not help here.** The rebuild ran,
      * reported nine statements executed successfully, and took `exchange_stat`
-     * from 2 rows to 0 and `curated_pick` from 1 to 0. D1 documents
+     * from 2 rows to 0 and the curated shelf's table from 1 to 0. D1 documents
      * `defer_foreign_keys` and not `foreign_keys`, and deferral postpones
      * constraint checking rather than suppressing cascade actions. So the
      * migration written to stop this loss would have caused it.
@@ -79,7 +79,7 @@ export const publishedBuild = sqliteTable(
      * deleting the row, to a reserved account that stands for a player who has
      * left. That needs no schema change and no rebuild. Do not reach for
      * `set null` without rehearsing the migration against an export and
-     * counting `exchange_stat` and `curated_pick` on both sides of it.
+     * counting every table that points at this one, on both sides of it.
      */
     userId: text('user_id')
       .notNull()
@@ -261,34 +261,6 @@ export const exchangeStat = sqliteTable(
     index('exchange_stat_build_idx').on(table.buildId),
   ],
 )
-
-/**
- * The owner's own shelf, and the only opinion the tool states as its own.
- *
- * `CLAUDE.md` draws the line where this sits: evaluations are not in the game
- * files and must come from the owner, and an opinion is allowed when it carries
- * a visible byline. So a pick is signed and says why in the owner's own words,
- * and it never looks like a measurement.
- *
- * It is also the only shelf that works on the first day, when every count in
- * `exchangeStat` is zero. A ranked list of nothing is not a feature.
- *
- * Not a column on `publishedBuild`, because curation is a fact about the shelf
- * rather than about the build: unpicking one must not touch what its author
- * published.
- */
-export const curatedPick = sqliteTable('curated_pick', {
-  buildId: text('build_id')
-    .primaryKey()
-    .references(() => publishedBuild.id, { onDelete: 'cascade' }),
-
-  /** Why it is here, in the owner's words. The byline is the point. */
-  note: text('note').notNull(),
-
-  at: integer('at')
-    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-    .notNull(),
-})
 
 /**
  * What a build is made of, as tokens this server never reads.

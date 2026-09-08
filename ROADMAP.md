@@ -298,8 +298,9 @@ conditionals came on and why each of the rest did not; it fails only on the impo
 noticed that publishing nine builds showed one.
 
 **That was not a display bug and it is the more interesting half.** The exchange had two
-shelves. `picked` starts `.from(curated_pick)` with an inner join, so it shows only what the
-curator chose. `fromFriends` carries a comment saying nothing on it can ever be yours. So an
+shelves. The first was curated: `.from(curated_pick)` with an inner join, so it showed only
+what the owner had picked. `fromFriends` carries a comment saying nothing on it can ever be
+yours. So an
 account's own listings were on **no shelf at all**: live, reachable by link, invisible in the
 app that published them. There are four shelves now, All and Mine among them, and Mine keeps
 taken-down listings because that is the only way to reach one whose local build is gone.
@@ -333,6 +334,20 @@ the table existed carry none until their authors replace them.
 nothing discoverable ships before a report button and a hide button. All of it is rewritten
 rather than quietly contradicted; `REQUIREMENTS.md` 5 now carries the argument, what makes it
 defensible at this size, and what would change the answer.
+
+**Then the curated shelf came out, the same day.** The owner read the tab name "Picked" as
+"the builds I follow", which is a fair thing for a shelf to mean and was not what that one
+was: it was the owner's own hand-picked list, each build carrying a note, gated on the single
+`CURATOR_USER_ID` check that was the only owner-only route in the API. Their call on being
+told what it actually was: there are no curated builds, people find what they want
+themselves. So the tab, the route, the gate, the env var and the `curated_pick` table are all
+gone, and a **Followed** shelf took its place. That one needed no new column, because
+`exchange_stat.taken_at` already records when somebody started following a listing.
+
+Two shelves now keep taken-down listings rather than filtering them: **Mine**, because a
+listing its author cannot see is one they cannot put back, and **Followed**, because a build
+you follow goes on working after its author withdraws it and the useful thing to say is
+where it went.
 
 **The one thing found and not fixed** is still the sync remount ejecting you out of an open
 build, below.
@@ -503,9 +518,9 @@ executed, because `Wire` did not declare the field and `shelfAt` had nothing to 
 lines. `publishedAs` on the build closes the other door, a raw `/b/<id>` link to your own
 listing, which the server cannot refuse because that route takes no session.
 
-**Taking a build down was a delete**, and `published_build` is a parent with two
+**Taking a build down was a delete**, and `published_build` is a parent with
 `on delete cascade` children, so it destroyed every run and rating logged against the build,
-the curator's note, and the build itself out of the library of everybody following it. It is
+and the build itself out of the library of everybody following it. It is
 `taken_down_at` now: off every shelf, `read` still answering for anybody holding the link,
 marked. Unlisted rather than destroyed, which is also the only version `/api/b/:id` can
 enforce.

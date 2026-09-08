@@ -19,34 +19,35 @@
  *   /api/builds        publish one, list yours, replace one, take one down
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *   /api/sync          everything an account carries between devices
- *   /api/exchange      the picked shelf. PUBLIC, and every item was chosen by hand
- *   /api/exchange/all  everything published and still up. PUBLIC
+ *   /api/exchange      everything published and still up. PUBLIC
  *   /api/exchange/friends  what the people you added have published
  *   /api/exchange/mine  your own listings, taken-down ones included
+ *   /api/exchange/followed  the builds you took up, taken-down ones included
  *   /api/exchange/boards  leaderboards, global or among your friends. PUBLIC
- *   /api/exchange/<id>/...  take a copy, report a run, rate one, pick one
+ *   /api/exchange/<id>/...  take a copy, report a run, rate one
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
  *
  * **Some of this is discoverable now, and that is a decision rather than a
  * drift.** `REQUIREMENTS.md` 5 wanted moderation designed before anything
  * discoverable existed, and for a long time nothing here was: a published build
- * was unlisted, the exchange's two shelves were the owner's own picks and the
- * builds of people you added by code, and every item on both had passed a human.
+ * was unlisted, and the exchange showed a hand-picked shelf and the builds of
+ * people you added by code, so every item on it had passed a human.
  *
- * `/api/exchange/all` crosses that line deliberately, and the owner made the
- * call knowing it. What tipped it was that the old arrangement failed in the
- * other direction: an account's own listings appeared on no shelf, so the app
- * that published them could not show them back. Opening the everything shelf and
- * adding `/api/exchange/mine` are the same fix from two sides.
+ * `/api/exchange` crosses that line deliberately, and the owner made the call
+ * knowing it. What tipped it was that the old arrangement failed in the other
+ * direction: an account's own listings appeared on no shelf, so the app that
+ * published them could not show them back. Opening the everything shelf and
+ * adding `/api/exchange/mine` are the same fix from two sides, and the curated
+ * shelf came out with them because one person reading everything is not a thing
+ * that scales past one person.
  *
  * **There is still no report and no hide, and that is worth stating plainly.**
  * The argument for shipping without them is narrow: a listing carries a build
- * name and an author's display name and no other text a stranger wrote, so there
- * is nothing here to moderate that is not already on the picked shelf. The
- * remedies that exist are the author taking their own listing down and the
- * curator un-picking. `worker/exchange.ts` holds the fuller version, and says
- * what adding a hide would cost if it becomes necessary.
+ * name and an author's display name and no other text a stranger wrote, so
+ * there is nothing on it to moderate. The one removal lever is the author taking
+ * their own listing down. `worker/exchange.ts` holds the fuller version, and
+ * says what adding a hide would cost if it becomes necessary.
  *
  * Friends is still not discovery: a list you build one person at a time from
  * codes you were given by hand, and the moderation tool for it is removing
@@ -76,10 +77,9 @@ import {
 import { listMine, publish, putBack, read, republish, takeDown } from './publish.ts'
 import {
   everything,
+  followedByYou,
   fromFriends,
   myShelf,
-  pick,
-  picked,
   played,
   rate,
   take,
@@ -207,38 +207,18 @@ export default {
      * exhaust the other.
      */
     /**
-     * The picked shelf, and the only exchange route a stranger can reach.
+     * Everything published, and the shelf a stranger lands on.
      *
-     * Public because every build on it was chosen by hand and signed, so there
-     * is nothing here that arrived unread. Rate limited on the address like the
-     * other public route, because there is no account to count against.
+     * Public, and rate limited on the caller's address because there is no
+     * account to count against. A curated shelf used to stand here and be the
+     * only thing a signed-out reader could see; `worker/exchange.ts` says why it
+     * is gone.
+     *
+     * Signed in or not, the shelf is the same. The session is read only so a row
+     * can be marked as the reader's own, and what goes back is a boolean rather
+     * than the id it was compared against.
      */
     if (url.pathname === '/api/exchange' && request.method === 'GET') {
-      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
-      if (over) return tooMany(over.retryAfter)
-      /**
-       * Signed in or not, and the shelf is the same either way.
-       *
-       * The session is read only so a row can be marked as the reader's own.
-       * It is optional: this route is public, a stranger gets the shelf without
-       * one, and the mark is simply absent for them. What goes back is a
-       * boolean, never the id it was compared against.
-       */
-      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
-      return json({ builds: await picked(db, who?.user.id ?? null) })
-    }
-
-    /**
-     * Everything published, and the second route a stranger can reach.
-     *
-     * Public for the same reason the picked shelf is, which is now a thinner
-     * argument than it was: `worker/exchange.ts` carries it, and the short
-     * version is that this shelf shows a build name and a display name, both of
-     * which already travel on the picked shelf. Rate limited on the address
-     * because there is no account to count against, and it must be taken before
-     * the session lookup below or a signed-out reader would fall into it.
-     */
-    if (url.pathname === '/api/exchange/all' && request.method === 'GET') {
       const over = await take_limit(db, keyFor.address('read', request), RULES.read)
       if (over) return tooMany(over.retryAfter)
       const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
@@ -248,15 +228,11 @@ export default {
     /**
      * The leaderboards, both scopes on one route.
      *
-     * Public at `scope=global` for the same reason the shelves above it are,
-     * and it has to sit before the prefix branch to stay that way. `friends`
-     * needs an account because it is a question about your account, and it is
-     * the one case here where 401 is the honest answer rather than an empty
-     * board: a stranger has no friends to scope to, not zero of them.
-     *
-     * One rate limit on the address covers both. The screen fetches one scope
-     * at a time and switching is a fetch, so the counter is per look rather
-     * than per board.
+     * Public at `scope=global` for the same reason the shelf above it is, and it
+     * has to sit before the prefix branch to stay that way. `friends` needs an
+     * account because it is a question about your account, and it is the one
+     * case here where 401 is the honest answer rather than an empty board: a
+     * stranger has no friends to scope to, not zero of them.
      */
     if (url.pathname === '/api/exchange/boards' && request.method === 'GET') {
       const over = await take_limit(db, keyFor.address('read', request), RULES.read)
@@ -285,7 +261,13 @@ export default {
         return json({ builds: await myShelf(db, userId) })
       }
 
-      const one = /^\/api\/exchange\/([A-Za-z0-9]{1,32})\/(take|played|rate|pick)$/.exec(
+      /* What you took up. Taken-down listings stay on this one too: a build you
+         follow goes on working when its author withdraws it. */
+      if (url.pathname === '/api/exchange/followed' && request.method === 'GET') {
+        return json({ builds: await followedByYou(db, userId) })
+      }
+
+      const one = /^\/api\/exchange\/([A-Za-z0-9]{1,32})\/(take|played|rate)$/.exec(
         url.pathname,
       )
       if (one && request.method === 'POST') {
@@ -314,27 +296,7 @@ export default {
           return json(outcome)
         }
 
-        if (what === 'rate') {
-          const outcome = await rate(db, userId, buildId, Number(body.rating))
-          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
-          return json(outcome)
-        }
-
-        /**
-         * Curating, and the one route with an owner check on it.
-         *
-         * `CURATOR_USER_ID` is a var rather than a role column because there is
-         * exactly one curator. Unset means nobody can curate, which is the right
-         * default for a deployment that is not this one.
-         */
-        if (!env.CURATOR_USER_ID || userId !== env.CURATOR_USER_ID) {
-          return json({ error: 'no such route' }, 404)
-        }
-        const outcome = await pick(
-          db,
-          buildId,
-          typeof body.note === 'string' ? body.note : null,
-        )
+        const outcome = await rate(db, userId, buildId, Number(body.rating))
         if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
         return json(outcome)
       }

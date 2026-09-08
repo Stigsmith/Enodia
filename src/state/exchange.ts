@@ -66,8 +66,6 @@ export type Listed = {
   id: string
   by: string
   createdAt: number
-  /** The owner's own words, on the picked shelf only. */
-  note?: string
   /** Whether you published it. A boolean from the worker, never an id. */
   mine?: boolean
   /**
@@ -95,12 +93,11 @@ export type Listed = {
 /**
  * Which shelf is open.
  *
- * `all` and `mine` were added after the owner published nine builds and could
- * see one: the picked shelf shows only what the curator chose and the friends
- * shelf cannot contain your own, so an account's own listings were on no shelf
- * at all.
+ * There used to be a curated one, and it used to be the default. It went when
+ * All opened: a shelf somebody had read every item of made sense while there
+ * was no way to browse, and stopped making sense the moment there was.
  */
-export type Shelf = 'picked' | 'all' | 'friends' | 'mine'
+export type Shelf = 'all' | 'friends' | 'mine' | 'followed'
 
 type Wire = {
   id: string
@@ -108,7 +105,6 @@ type Wire = {
   payload: string
   by: string
   createdAt: number
-  note?: string
   /**
    * Optional here for the same reason it is optional on `Listed`: the worker
    * omits it entirely when nobody is signed in, and that absence is an answer.
@@ -239,8 +235,7 @@ async function shelfAt(path: string): Promise<Listed[]> {
       id: row.id,
       by: row.by,
       createdAt: row.createdAt,
-      ...(row.note === undefined ? {} : { note: row.note }),
-      // Same conditional spread as the note above, and for a sharper reason:
+      // A conditional spread, and for a sharp reason:
       // absent means nobody is signed in, so the shelf does not know whose this
       // is. Defaulting that to false would have the screen say "not yours" when
       // what it means is that it never asked.
@@ -257,10 +252,10 @@ async function shelfAt(path: string): Promise<Listed[]> {
 }
 
 const PATHS: Record<Shelf, string> = {
-  picked: '/api/exchange',
-  all: '/api/exchange/all',
+  all: '/api/exchange',
   friends: '/api/exchange/friends',
   mine: '/api/exchange/mine',
+  followed: '/api/exchange/followed',
 }
 
 export const listShelf = (shelf: Shelf): Promise<Listed[]> => shelfAt(PATHS[shelf])

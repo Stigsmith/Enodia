@@ -18,7 +18,6 @@ import { SELF, env } from 'cloudflare:test'
 import { drizzle } from 'drizzle-orm/d1'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { pick } from './exchange.ts'
 import * as schema from './schema.ts'
 
 const ORIGIN = 'https://enodia.me'
@@ -82,94 +81,52 @@ type Listing = {
   before?: Omit<Counts, 'players'>
 }
 
+/**
+ * `/api/exchange` is every live listing now, not a hand-picked handful, so a
+ * test that reads `[0]` off it is reading whatever the test before it left
+ * behind. The shelf tables go too.
+ */
 beforeEach(async () => {
-  await env.DB.prepare('delete from rate_limit').run()
-  await env.DB.prepare('delete from api_rate_limit').run()
-  await env.DB.prepare('delete from curated_pick').run()
+  for (const table of ['rate_limit', 'api_rate_limit', 'build_facet', 'exchange_stat', 'published_build']) {
+    await env.DB.prepare(`delete from ${table}`).run()
+  }
 })
 
 describe('the shelves', () => {
   /**
-   * The picked shelf is the one a stranger can see, because every build on it
-   * was chosen by hand. Nothing else about the exchange is reachable signed out.
+   * The everything shelf is the one a stranger can see. It used to be a curated
+   * one, on the argument that anything a stranger lands on should have been read
+   * by somebody first; the owner retired that. Nothing else about the exchange
+   * is reachable signed out.
    */
-  it('shows the picked shelf to a stranger and nothing else', async () => {
+  it('shows everything to a stranger and nothing else', async () => {
     expect((await get('/api/exchange')).status).toBe(200)
     expect((await get('/api/exchange/friends')).status).toBe(401)
+    expect((await get('/api/exchange/mine')).status).toBe(401)
+    expect((await get('/api/exchange/followed')).status).toBe(401)
     expect((await post('/api/exchange/anything/take', {})).status).toBe(401)
   })
 
-  it('is empty until somebody picks something', async () => {
+  it('is empty until somebody publishes something', async () => {
     expect(await shelf('/api/exchange')).toEqual([])
   })
 
-  /**
-   * **Only the curator curates.** A signed-in stranger gets 404 rather than 403,
-   * so the route does not confirm it exists to somebody who cannot use it.
-   */
-  it('refuses to curate for anybody but the curator', async () => {
-    const stranger = await someone()
-    const id = await publish(stranger.cookie)
+  /* The curated shelf is gone, and so is the one route in this API that had an
+     owner check on it. A route that no longer exists must answer like one. */
+  it('no longer has anything to curate with', async () => {
+    const someone_ = await someone('Stig')
+    const id = await publish(someone_.cookie)
 
-    const refused = await post(`/api/exchange/${id}/pick`, { note: 'mine now' }, { cookie: stranger.cookie })
-    expect(refused.status).toBe(404)
-    expect(await shelf('/api/exchange')).toEqual([])
+    const gone = await post(`/api/exchange/${id}/pick`, { note: 'mine now' }, { cookie: someone_.cookie })
+    expect(gone.status).toBe(404)
   })
 
-  /**
-   * **Nobody curates when no curator is configured**, which is the state every
-   * deployment that is not this one is in. The refusal above passes for the same
-   * reason, so this pins the reason rather than the symptom.
-   *
-   * `vitest.worker.config.ts` sets this binding explicitly. It used to be read
-   * from `.dev.vars`, which is gitignored and which gets a real account id in it
-   * the moment somebody wants to try curating in a browser: this test then
-   * failed on a machine and passed on every other, which is the worst way for a
-   * test to be wrong.
-   */
-  it('lets nobody curate when no curator is set', async () => {
-    expect(env.CURATOR_USER_ID ?? '').toBe('')
-  })
-
-  /**
-   * And the writing half works, tested through `pick` rather than the route,
-   * because the route's guard is about who is calling and this is about what
-   * happens once they are through it.
-   */
-  it('puts a build on the shelf and takes it off again', async () => {
-    const curator = await someone('Stig')
-    const id = await publish(curator.cookie, 'Picked one')
-    const db = drizzle(env.DB, { schema })
-
-    expect(await pick(db, id, 'worth your evening')).toEqual({ ok: true })
-    expect((await shelf('/api/exchange'))[0]?.note).toBe('worth your evening')
-
-    // Re-picking replaces the note rather than failing or duplicating.
-    await pick(db, id, 'still worth it')
-    expect((await shelf('/api/exchange'))[0]?.note).toBe('still worth it')
-
-    expect(await pick(db, id, null)).toEqual({ ok: true })
-    expect(await shelf('/api/exchange')).toEqual([])
-  })
-
-  it('refuses a pick with no reason, and one for a build that is not there', async () => {
-    const curator = await someone('Stig')
-    const id = await publish(curator.cookie)
-    const db = drizzle(env.DB, { schema })
-
-    // A pick is an opinion with a byline. An unsigned one is not a pick.
-    expect(await pick(db, id, '   ')).toMatchObject({ status: 400 })
-    expect(await pick(db, 'nosuchbuild', 'lovely')).toMatchObject({ status: 404 })
-  })
-
-  it('shows a picked build with the note and the byline', async () => {
-    const curator = await someone('Stig')
-    const id = await publish(curator.cookie, 'Killer Current')
-    await curate(id, 'the one I hand new players')
+  it('shows a published build with its author and its payload', async () => {
+    const author = await someone('Stig')
+    await publish(author.cookie, 'Killer Current')
 
     const [only] = await shelf('/api/exchange')
     expect(only?.name).toBe('Killer Current')
-    expect(only?.note).toBe('the one I hand new players')
     expect(only?.by).toBe('Stig')
     // The payload travels packed and unread, so the browser can filter on it.
     expect(only?.payload).toBe('Zpackedbuild')
@@ -199,7 +156,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('counts a take once, however many times it is taken', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const taker = await someone()
     expect((await post(`/api/exchange/${id}/take`, {}, { cookie: taker.cookie })).status).toBe(200)
@@ -212,7 +168,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('counts two people as two takes', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     for (const _ of [1, 2]) {
       const taker = await someone()
@@ -230,7 +185,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('sums runs and clears across people, and counts the people', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const one = await someone()
     const two = await someone()
@@ -251,7 +205,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('raises Fear only on a clear, and keeps the best', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const player = await someone()
     await post(`/api/exchange/${id}/played`, { cleared: true, fear: 20 }, { cookie: player.cookie })
@@ -270,7 +223,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('says nothing at all about a build nobody has touched', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const stats = (await shelf('/api/exchange'))[0]?.stats
     expect(stats).toEqual({
@@ -294,7 +246,6 @@ describe('the counts, which are the only evidence there is', () => {
   it('never says whose runs they are', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const player = await someone()
     await post(`/api/exchange/${id}/played`, { cleared: true, fear: 12 }, { cookie: player.cookie })
@@ -324,7 +275,6 @@ describe('the counts, which are the only evidence there is', () => {
       { cookie: author.cookie },
     )
     const id = (await made.json<{ id: string }>()).id
-    await curate(id, 'a pick')
     await post(`/api/exchange/${id}/played`, { cleared: true, fear: 12, shape: 'aaa' }, { cookie: player.cookie })
     await SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
       method: 'PUT',
@@ -346,7 +296,6 @@ describe('rating', () => {
   it('refuses a rating from somebody who has not played it', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const nosy = await someone()
     const refused = await post(`/api/exchange/${id}/rate`, { rating: 5 }, { cookie: nosy.cookie })
@@ -357,7 +306,6 @@ describe('rating', () => {
   it('takes a rating once a run is logged, and averages with the count beside it', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const one = await someone()
     const two = await someone()
@@ -376,7 +324,6 @@ describe('rating', () => {
   it('replaces a rating rather than adding another', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const player = await someone()
     await post(`/api/exchange/${id}/played`, { cleared: true, fear: 10 }, { cookie: player.cookie })
@@ -391,7 +338,6 @@ describe('rating', () => {
   it('refuses a rating outside one to five', async () => {
     const curator = await someone('Stig')
     const id = await publish(curator.cookie)
-    await curate(id, 'a pick')
 
     const player = await someone()
     await post(`/api/exchange/${id}/played`, { cleared: true }, { cookie: player.cookie })
@@ -402,19 +348,6 @@ describe('rating', () => {
   })
 })
 
-/**
- * Curate as the curator.
- *
- * `CURATOR_USER_ID` is read from the environment, and the test environment sets
- * a fixed one in `vitest.worker.config.ts`. So the curator here is whichever
- * account is written into that row, and this writes the pick directly for the
- * cases that are not about the gate itself.
- */
-async function curate(buildId: string, note: string) {
-  await env.DB.prepare('insert or replace into curated_pick (build_id, note, at) values (?, ?, ?)')
-    .bind(buildId, note, Date.now())
-    .run()
-}
 
 /**
  * The author acting on their own build, which nothing checked.
@@ -440,7 +373,6 @@ describe('your own build', () => {
     const me = await someone('Author')
     const other = await someone('Reader')
     const id = await publish(me.cookie, 'Mine')
-    await pick(drizzle(env.DB, { schema }), id, 'a note')
 
     await post(`/api/exchange/${id}/take`, {}, { cookie: me.cookie })
     const afterMine = (await shelf('/api/exchange'))[0]
@@ -454,7 +386,6 @@ describe('your own build', () => {
   it('does not count the author\'s own runs', async () => {
     const me = await someone('Author')
     const id = await publish(me.cookie, 'Mine')
-    await pick(drizzle(env.DB, { schema }), id, 'a note')
 
     // Answers ok rather than refusing: the run happened, and the player did
     // nothing wrong. It simply does not move a number a stranger reads.
@@ -484,7 +415,6 @@ describe('your own build', () => {
     const me = await someone('Author')
     const other = await someone('Reader')
     const id = await publish(me.cookie, 'Mine')
-    await pick(drizzle(env.DB, { schema }), id, 'a note')
 
     const asAuthor = (await shelf('/api/exchange', me.cookie))[0]
     expect(asAuthor?.mine).toBe(true)
@@ -572,9 +502,9 @@ describe('republishing', () => {
 /**
  * Taking a build down, and what it must not destroy.
  *
- * A delete cascaded through `exchange_stat` and `curated_pick`, so one press of
- * a button threw away every run and rating anybody had logged against the build
- * and the curator's note as well. It also emptied the build out of the library
+ * A delete cascaded through every table pointing at the listing, so one press
+ * of a button threw away every run and rating anybody had logged against the
+ * build. It also emptied the build out of the library
  * of everybody following it, because their client reads it back from the same
  * route. The owner's call was that none of that should happen.
  *
@@ -588,10 +518,9 @@ describe('taking a build down', () => {
       headers: { origin: ORIGIN, cookie },
     })
 
-  it('takes it off the picked shelf', async () => {
+  it('takes it off the everything shelf', async () => {
     const { cookie } = await someone()
     const id = await publish(cookie, 'On the shelf')
-    await curate(id, 'worth a look')
     expect((await shelf('/api/exchange')).map((one) => one.id)).toContain(id)
 
     await takeDown(id, cookie)
@@ -620,7 +549,6 @@ describe('taking a build down', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publish(author.cookie, 'Played and rated')
-    await curate(id, 'the one I hand new players')
     await post(`/api/exchange/${id}/played`, { cleared: true, fear: 20 }, { cookie: player.cookie })
     await post(`/api/exchange/${id}/rate`, { rating: 5 }, { cookie: player.cookie })
 
@@ -629,17 +557,12 @@ describe('taking a build down', () => {
     const stats = await env.DB.prepare('select count(*) as n from exchange_stat where build_id = ?')
       .bind(id)
       .first<{ n: number }>()
-    const note = await env.DB.prepare('select count(*) as n from curated_pick where build_id = ?')
-      .bind(id)
-      .first<{ n: number }>()
     expect(stats?.n).toBe(1)
-    expect(note?.n).toBe(1)
   })
 
   it('comes back on the shelf when it is put back', async () => {
     const { cookie } = await someone()
     const id = await publish(cookie, 'Back on it')
-    await curate(id, 'still worth a look')
     await takeDown(id, cookie)
 
     await SELF.fetch(`${ORIGIN}/api/builds/${id}/restore`, {
@@ -702,7 +625,6 @@ describe('counts, when the build underneath them changes', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publishShaped(author.cookie, 'Same picks', 'aaa111')
-    await curate(id, 'unchanged')
     await playAndRate(id, player.cookie, 'aaa111')
 
     await republish(id, author.cookie, {
@@ -721,7 +643,6 @@ describe('counts, when the build underneath them changes', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publishShaped(author.cookie, 'Changing', 'aaa111')
-    await curate(id, 'changed under you')
     await playAndRate(id, player.cookie, 'aaa111')
 
     await republish(id, author.cookie, {
@@ -743,7 +664,6 @@ describe('counts, when the build underneath them changes', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publishShaped(author.cookie, 'Moved on', 'aaa111')
-    await curate(id, 'moved on')
     await republish(id, author.cookie, { payload: 'Znew', name: 'Moved on', shape: 'bbb222' })
 
     // A follower who has not taken the update yet, playing what they hold.
@@ -762,7 +682,6 @@ describe('counts, when the build underneath them changes', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publishShaped(author.cookie, 'There and back', 'aaa111')
-    await curate(id, 'there and back')
     await playAndRate(id, player.cookie, 'aaa111')
     await republish(id, author.cookie, { payload: 'Zother', name: 'There and back', shape: 'bbb222' })
     expect((await statsOf(id))?.stats.runs).toBe(0)
@@ -788,7 +707,6 @@ describe('counts, when the build underneath them changes', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publishShaped(author.cookie, 'Not a build', 'not-a-fingerprint')
-    await curate(id, 'nonsense')
     await playAndRate(id, player.cookie, 'not-a-fingerprint')
 
     expect((await statsOf(id))?.stats.runs).toBe(1)
@@ -823,7 +741,6 @@ describe('a listing published before it could state its shape', () => {
     const player = await someone('Player')
     /* No shape, which is exactly what every publish did until now. */
     const id = await publish(author.cookie, 'Published empty')
-    await curate(id, 'from before')
 
     await post(
       `/api/exchange/${id}/played`,
@@ -843,7 +760,6 @@ describe('a listing published before it could state its shape', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publish(author.cookie, 'Rate me')
-    await curate(id, 'from before')
 
     await post(
       `/api/exchange/${id}/played`,
@@ -860,11 +776,11 @@ describe('a listing published before it could state its shape', () => {
 /**
  * The two shelves your own builds were missing from.
  *
- * The exchange had Picked and From friends. `picked` starts from `curated_pick`
- * so it shows only what the curator chose, and `fromFriends` cannot return your
- * own by construction. So an account's own listings were on no shelf at all: the
- * owner published nine builds, had picked one, and saw one. Live, reachable by
- * link, invisible in the app that made them.
+ * The exchange had a curated shelf and From friends. The first showed only what
+ * the owner had picked by hand, and `fromFriends` cannot return your own by
+ * construction. So an account's own listings were on no shelf at all: the owner
+ * published nine builds, had picked one, and saw one. Live, reachable by link,
+ * invisible in the app that made them.
  */
 describe('all, and your own', () => {
   const takeDown = (id: string, cookie: string) =>
@@ -873,19 +789,19 @@ describe('all, and your own', () => {
       headers: { origin: ORIGIN, cookie },
     })
 
-  it('shows everything published to a stranger, picked or not', async () => {
-    const author = await someone('Author')
-    const unpicked = await publish(author.cookie, 'Nobody picked me')
+  it('shows everything anybody published, to anybody', async () => {
+    const one = await someone('One')
+    const two = await someone('Two')
+    const a = await publish(one.cookie, 'Hers')
+    const b = await publish(two.cookie, 'Theirs')
 
-    const rows = await shelf('/api/exchange/all')
-
-    expect(rows.map((one) => one.id)).toContain(unpicked)
-    /* And it really is the shelf that was empty before, not a renamed one. */
-    expect(await shelf('/api/exchange')).toEqual([])
+    /* Signed out, and both are there. Nothing had to be picked first, which is
+       the whole of what changed. */
+    expect((await shelf('/api/exchange')).map((row) => row.id).sort()).toEqual([a, b].sort())
   })
 
   it('is public, while your own listings are not', async () => {
-    expect((await get('/api/exchange/all')).status).toBe(200)
+    expect((await get('/api/exchange')).status).toBe(200)
     expect((await get('/api/exchange/mine')).status).toBe(401)
   })
 
@@ -922,14 +838,13 @@ describe('all, and your own', () => {
   it('keeps a taken-down listing on your own shelf, and off all the others', async () => {
     const author = await someone('Author')
     const id = await publish(author.cookie, 'Withdrawn')
-    await curate(id, 'was picked')
     expect(await takeDown(id, author.cookie)).toMatchObject({ status: 200 })
 
     const own = await shelf('/api/exchange/mine', author.cookie)
     expect(own.map((one) => one.id)).toEqual([id])
     expect(own[0]?.takenDown).toBe(true)
 
-    expect((await shelf('/api/exchange/all')).map((one) => one.id)).not.toContain(id)
+    expect((await shelf('/api/exchange')).map((one) => one.id)).not.toContain(id)
     expect((await shelf('/api/exchange')).map((one) => one.id)).not.toContain(id)
   })
 
@@ -939,10 +854,9 @@ describe('all, and your own', () => {
   it('says nothing about takedowns on the shelves that filter them', async () => {
     const author = await someone('Author')
     const id = await publish(author.cookie, 'Up and about')
-    await curate(id, 'picked')
 
     expect((await shelf('/api/exchange'))[0]?.takenDown).toBeUndefined()
-    const all = await shelf('/api/exchange/all')
+    const all = await shelf('/api/exchange')
     expect(all.find((one) => one.id === id)?.takenDown).toBeUndefined()
   })
 
@@ -952,7 +866,7 @@ describe('all, and your own', () => {
     const author = await someone('Author')
     await publish(author.cookie, 'Anybody')
 
-    const body = await (await get('/api/exchange/all')).text()
+    const body = await (await get('/api/exchange')).text()
     expect(body).not.toContain(author.id)
     expect(body).toContain('Author')
   })
@@ -991,7 +905,6 @@ describe('a follow outlives the version it was made against', () => {
     const author = await someone('Author')
     const reader = await someone('Reader')
     const id = await publish(author.cookie, 'Replaced')
-    await curate(id, 'a pick')
     await post(`/api/exchange/${id}/take`, {}, { cookie: reader.cookie })
 
     expect((await statsOf(id))?.stats.takes).toBe(1)
@@ -1015,7 +928,6 @@ describe('a follow outlives the version it was made against', () => {
     const author = await someone('Author')
     const reader = await someone('Reader')
     const id = await publish(author.cookie, 'Never really changed')
-    await curate(id, 'a pick')
     await post(`/api/exchange/${id}/take`, {}, { cookie: reader.cookie })
     await republish(id, author.cookie, { payload: 'Zp', name: 'Never really changed', shape: '750c7d' })
 
@@ -1031,7 +943,6 @@ describe('a follow outlives the version it was made against', () => {
     const author = await someone('Author')
     const player = await someone('Player')
     const id = await publish(author.cookie, 'Played then changed')
-    await curate(id, 'a pick')
     await post(`/api/exchange/${id}/take`, {}, { cookie: player.cookie })
     await post(
       `/api/exchange/${id}/played`,
@@ -1048,5 +959,91 @@ describe('a follow outlives the version it was made against', () => {
     expect(after?.before?.bestFear).toBe(30)
     /* The follower is still following, so the take stays current. */
     expect(after?.stats.takes).toBe(1)
+  })
+})
+
+/**
+ * The builds you took up.
+ *
+ * The owner asked for this tab after reading "Picked" as "the ones I follow",
+ * which is a fair thing to expect a shelf to mean and was not what that one was.
+ * It needs no new column: `exchange_stat.taken_at` already records the moment
+ * somebody started following a listing.
+ */
+describe('the shelf of what you follow', () => {
+  const takeDown = (id: string, cookie: string) =>
+    SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie },
+    })
+
+  it('is empty until you follow something', async () => {
+    const me = await someone('Me')
+    const author = await someone('Author')
+    await publish(author.cookie, 'Not followed')
+
+    expect(await shelf('/api/exchange/followed', me.cookie)).toEqual([])
+  })
+
+  it('holds what you followed and nothing else', async () => {
+    const me = await someone('Me')
+    const author = await someone('Author')
+    const wanted = await publish(author.cookie, 'Followed')
+    await publish(author.cookie, 'Ignored')
+
+    await post(`/api/exchange/${wanted}/take`, {}, { cookie: me.cookie })
+
+    const rows = await shelf('/api/exchange/followed', me.cookie)
+    expect(rows.map((one) => one.name)).toEqual(['Followed'])
+    expect(rows[0]?.by).toBe('Author')
+  })
+
+  it('is yours alone, not everybody who followed it', async () => {
+    const me = await someone('Me')
+    const other = await someone('Other')
+    const author = await someone('Author')
+    const id = await publish(author.cookie, 'Popular')
+    await post(`/api/exchange/${id}/take`, {}, { cookie: other.cookie })
+
+    expect(await shelf('/api/exchange/followed', me.cookie)).toEqual([])
+    expect((await shelf('/api/exchange/followed', other.cookie)).map((o) => o.id)).toEqual([id])
+  })
+
+  /**
+   * The one that makes this different from every other browsing shelf.
+   *
+   * A build you follow goes on working when its author withdraws it: it is
+   * still in your library and the link still opens. Hiding it here would make
+   * it vanish from the exchange with no explanation, when the useful thing to
+   * say is that it is off the shelves and still yours.
+   */
+  it('keeps a build whose author withdrew it, and says so', async () => {
+    const me = await someone('Me')
+    const author = await someone('Author')
+    const id = await publish(author.cookie, 'Withdrawn')
+    await post(`/api/exchange/${id}/take`, {}, { cookie: me.cookie })
+
+    await takeDown(id, author.cookie)
+
+    const rows = await shelf('/api/exchange/followed', me.cookie)
+    expect(rows.map((one) => one.id)).toEqual([id])
+    expect(rows[0]?.takenDown).toBe(true)
+    /* And it is off the shelf a stranger reads, which is what taking it down is. */
+    expect((await shelf('/api/exchange')).map((one) => one.id)).not.toContain(id)
+  })
+
+  /* A run is not a follow. Somebody who reported a run without ever taking the
+     build up has no `taken_at`, and this shelf is about the relationship. */
+  it('does not count a build you only logged a run against', async () => {
+    const me = await someone('Me')
+    const author = await someone('Author')
+    const id = await publish(author.cookie, 'Only played')
+    await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 10, shape: 'whatever' },
+      { cookie: me.cookie },
+    )
+
+    expect(await shelf('/api/exchange/followed', me.cookie)).toEqual([])
   })
 })

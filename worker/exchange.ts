@@ -1,23 +1,20 @@
 /**
  * The build exchange: builds other people published, and what happened to them.
  *
- * ## Four shelves, and the two that were missing
+ * ## Four shelves
  *
- * - **Picked**, the owner's own choices, each signed and saying why.
+ * - **All**, everything published and still up. Public.
  * - **From friends**, people whose code you swapped one at a time.
- * - **All**, everything published and still up.
  * - **Mine**, your own listings, taken-down ones included.
+ * - **Followed**, the builds you took up, taken-down ones included.
  *
- * The first two were the whole exchange for a while, on the argument that
- * `REQUIREMENTS.md` 5 wants moderation before anything discoverable and both of
- * those passed a human before they were listed. What that reasoning missed is
- * that it left **your own builds on no shelf at all**: `picked` starts from
- * `curated_pick`, `fromFriends` cannot return your own by construction, and the
- * owner published nine builds and could see one.
- *
- * All and Mine are both open now. `everything` carries the argument for opening
- * the first without a report button and a hide button, which is the owner's
- * decision and a narrower claim than the old comment here made it sound.
+ * **There was a fifth and it is gone.** A curated shelf held builds the owner
+ * had picked by hand, each with a note saying why, and it was the default and
+ * the only thing a stranger could see. It made sense while there was no way to
+ * browse: somebody had to have read anything a stranger landed on. Once All
+ * opened, curation was a second answer to a question that already had one, and
+ * the owner's call is that people find what they want themselves. The table,
+ * the route and the one owner-gated endpoint in this API went with it.
  *
  * ## The server still has no opinion about what a build is
  *
@@ -39,10 +36,10 @@
  * good, and a single number would be exactly that claim wearing arithmetic.
  */
 
-import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
-import { curatedPick, exchangeStat, friendship, publishedBuild } from './schema-app.ts'
+import { exchangeStat, friendship, publishedBuild } from './schema-app.ts'
 import * as schema from './schema.ts'
 import { user } from './schema.ts'
 
@@ -57,8 +54,6 @@ export type Listing = {
   payload: string
   by: string
   createdAt: number
-  /** The owner's note, when this came off the picked shelf. */
-  note?: string
   /**
    * Whether the person asking published it.
    *
@@ -68,8 +63,8 @@ export type Listing = {
    * the wire. Answering the question without shipping the identity is the whole
    * shape of this field.
    *
-   * Absent on the picked shelf when nobody is signed in, because there is then
-   * nobody for it to be true of.
+   * Absent when nobody is signed in, because there is then nobody for it to be
+   * true of.
    */
   mine?: boolean
   /**
@@ -249,7 +244,6 @@ async function withStats(
     payload: string
     by: string | null
     createdAt: Date | number
-    note?: string
     userId?: string | null
     shape?: string
     takenDownAt?: Date | number | null
@@ -274,7 +268,6 @@ async function withStats(
       // the type nullable rather than anything that happens.
       by: row.by ?? 'Somebody',
       createdAt: row.createdAt instanceof Date ? row.createdAt.getTime() : Number(row.createdAt),
-      ...(row.note === undefined ? {} : { note: row.note }),
       ...(viewer && row.userId ? { mine: row.userId === viewer } : {}),
       /* Absent rather than false on the shelves that filter these out, so the
          field means "this shelf tracks it" rather than "this one is live". */
@@ -283,42 +276,6 @@ async function withStats(
       ...(before ? { before } : {}),
     }
   })
-}
-
-/**
- * The owner's shelf. Public, and the only one a signed-out reader can see.
- *
- * Picked builds are chosen one at a time by a person, so showing them to
- * everybody does not cross the line `REQUIREMENTS.md` 5 draws: there is nothing
- * here that arrived without being read.
- */
-export async function picked(db: DB, viewer?: string | null): Promise<Listing[]> {
-  const rows = await db
-    .select({
-      id: publishedBuild.id,
-      name: publishedBuild.name,
-      payload: publishedBuild.payload,
-      by: user.name,
-      userId: publishedBuild.userId,
-      createdAt: publishedBuild.createdAt,
-      /* Which version is current, so `withStats` knows which tally to put in
-         `stats` and which to fold into `before`. */
-      shape: publishedBuild.shape,
-      note: curatedPick.note,
-      at: curatedPick.at,
-    })
-    .from(curatedPick)
-    .innerJoin(publishedBuild, eq(curatedPick.buildId, publishedBuild.id))
-    .leftJoin(user, eq(publishedBuild.userId, user.id))
-    /* A build the author has taken down leaves every shelf, and this is the
-       one that matters most: the curated shelf is the one a stranger lands on.
-       The pick itself is left alone rather than deleted, so putting the build
-       back brings the note with it. */
-    .where(isNull(publishedBuild.takenDownAt))
-    .orderBy(desc(curatedPick.at))
-    .limit(PAGE)
-
-  return withStats(db, rows, viewer)
 }
 
 /**
@@ -360,22 +317,23 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
 }
 
 /**
- * Everything anybody published, which this file spent a year calling impossible.
+ * Everything anybody published, which this file spent a year calling impossible,
+ * and which is now the shelf a stranger lands on.
  *
  * The reasoning it used to carry was real: an everything shelf is the first
  * thing a stranger can stumble across, and `REQUIREMENTS.md` 5 wanted a way to
  * report a listing and a way to hide one before that happened. The owner has
  * decided to open it without them, and the honest version of the argument is
  * narrower than the old comment made it sound. A listing carries a build's name
- * and its author's display name, both of which already travel on the picked
- * shelf; there is no free text here that a stranger wrote. The remedies that do
- * exist are the author taking their own listing down and the curator
- * un-picking. If a hide is ever needed it is a nullable column and one more
- * clause in this `where`, because every shelf reads through this file.
+ * and its author's display name and no free text a stranger wrote. The only
+ * removal lever is the author taking their own listing down. If a hide is ever
+ * needed it is a nullable column and one more clause in this `where`, because
+ * every shelf reads through this file.
  *
- * The other half of the decision is that the shelf was already leaking in the
- * worst direction: your own nine listings appeared on no shelf at all, so the
- * app that published them could not show them to you.
+ * Two things pushed it open. Your own listings appeared on no shelf at all, so
+ * the app that published them could not show them back to you. And the curated
+ * shelf that used to stand here was one person reading everything, which is not
+ * a thing that scales past one person.
  */
 export async function everything(db: DB, viewer?: string | null): Promise<Listing[]> {
   const rows = await db
@@ -395,6 +353,44 @@ export async function everything(db: DB, viewer?: string | null): Promise<Listin
     .limit(PAGE)
 
   return withStats(db, rows, viewer)
+}
+
+/**
+ * The builds you took up.
+ *
+ * **The server already knows.** `exchange_stat.taken_at` records the moment
+ * somebody started following a listing, so this needs no new column and no list
+ * kept on the client: it is the rows that are yours and have a `taken_at`.
+ *
+ * Like `myShelf` and unlike everything else, **taken-down listings stay on it**.
+ * A build you follow goes on working when its author withdraws it: it is still
+ * in your library and the link still opens. Hiding it here would make it
+ * disappear from the exchange with no explanation, when the useful thing to say
+ * is that it is off the shelves and still yours.
+ *
+ * Nothing on this shelf can be your own, because `take` refuses your own build.
+ * `mine` is passed anyway so every shelf answers the same question the same way.
+ */
+export async function followedByYou(db: DB, userId: string): Promise<Listing[]> {
+  const rows = await db
+    .select({
+      id: publishedBuild.id,
+      name: publishedBuild.name,
+      payload: publishedBuild.payload,
+      by: user.name,
+      userId: publishedBuild.userId,
+      createdAt: publishedBuild.createdAt,
+      shape: publishedBuild.shape,
+      takenDownAt: publishedBuild.takenDownAt,
+    })
+    .from(exchangeStat)
+    .innerJoin(publishedBuild, eq(publishedBuild.id, exchangeStat.buildId))
+    .leftJoin(user, eq(publishedBuild.userId, user.id))
+    .where(and(eq(exchangeStat.userId, userId), isNotNull(exchangeStat.takenAt)))
+    .orderBy(desc(exchangeStat.takenAt))
+    .limit(PAGE)
+
+  return withStats(db, rows, userId)
 }
 
 /**
@@ -680,43 +676,3 @@ export async function rate(
   return { ok: true }
 }
 
-/**
- * Put a build on the picked shelf, or take it off. The owner only.
- *
- * Gated on a single account id from the environment rather than a role column,
- * because there is exactly one curator and a table of one row is a table to keep
- * in step. If that stops being true, this is the function to change.
- */
-export async function pick(
-  db: DB,
-  buildId: string,
-  note: string | null,
-): Promise<{ ok: true } | Refusal> {
-  if (note === null) {
-    await db.delete(curatedPick).where(eq(curatedPick.buildId, buildId))
-    return { ok: true }
-  }
-
-  const said = note.trim()
-  if (!said) return { status: 400, say: 'A pick says why it is a pick.' }
-  if (said.length > 280) return { status: 400, say: 'That note is too long.' }
-
-  /* A build the author has taken down is not one to put on the shelf, and the
-     existing sentence covers it without a second one: from the curator's side
-     there is nothing there to pick. */
-  const [found] = await db
-    .select({ id: publishedBuild.id })
-    .from(publishedBuild)
-    .where(and(eq(publishedBuild.id, buildId), isNull(publishedBuild.takenDownAt)))
-    .limit(1)
-
-  if (!found) return { status: 404, say: 'There is no such build to pick.' }
-
-  await db.run(sql`
-    insert into curated_pick (build_id, note, at)
-    values (${buildId}, ${said}, ${Date.now()})
-    on conflict(build_id) do update set note = excluded.note
-  `)
-
-  return { ok: true }
-}

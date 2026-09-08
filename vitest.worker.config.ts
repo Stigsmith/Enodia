@@ -70,19 +70,6 @@ export default defineConfig(async () => {
              * opacity. It never leaves the test runner and is not a secret.
              */
             BETTER_AUTH_SECRET: 'test-secret-not-used-anywhere-else-000000',
-            /**
-             * **Stated, not inherited.** Without this the tests read whatever
-             * `.dev.vars` happens to hold, which is gitignored and which a
-             * developer sets to their own account id to try the curator path in
-             * a browser. A suite that passes or fails on the contents of an
-             * untracked file is not a suite.
-             *
-             * Empty, because that is the state every deployment except this one
-             * is in and the one worth pinning: nobody can curate. The admitting
-             * half is covered by calling `pick` directly, since this binding is
-             * fixed before any account exists and account ids are not.
-             */
-            CURATOR_USER_ID: '',
           },
         },
       }),

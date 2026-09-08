@@ -85,7 +85,7 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Build exchange',
     proof: 'src/ui/Exchange.tsx',
-    say: 'Four shelves: builds picked by hand, everything anybody has published, builds from people you swapped codes with, and your own listings. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs.',
+    say: 'Four shelves: everything anybody has published, builds from people you swapped codes with, your own listings, and the ones you follow. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs.',
   },
   {
     stage: 'now',
