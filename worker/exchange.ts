@@ -475,8 +475,20 @@ export async function played(
    * What must not happen is it moving a number a stranger reads as evidence
    * about a build it was not run against. This is what stops a follower who has
    * not taken an update yet from feeding the new version's counts.
+   *
+   * **An empty stored token is not a version, so it cannot be a stale one.**
+   * `publishBuild` sent no `shape` while `republishBuild` sent one, so every
+   * listing published and never replaced holds `''`, the player's browser sent
+   * its real fingerprint, and every run against one was dropped right here.
+   * Takes still counted, which is what made the exchange look like it worked.
+   *
+   * That is the same argument the parameter's own docblock makes about a client
+   * too old to send a token: something that never stated a version cannot be
+   * wrong about which one it is holding. The client half is fixed, and this is
+   * what stops the listings already published from sitting at zero until their
+   * authors happen to replace them.
    */
-  if (shape !== undefined && shape !== found.shape) return { ok: true }
+  if (found.shape !== '' && shape !== undefined && shape !== found.shape) return { ok: true }
 
   const raise = cleared && fear !== null ? fear : null
 

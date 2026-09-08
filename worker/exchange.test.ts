@@ -798,3 +798,61 @@ describe('counts, when the build underneath them changes', () => {
     expect((await statsOf(id))?.before?.runs).toBe(1)
   })
 })
+
+/**
+ * A listing that never declared a version, which is most of them.
+ *
+ * `publishBuild` in `src/state/publish.ts` did not send `shape` while
+ * `republishBuild` did, so every listing published and never replaced is stored
+ * with an empty token. The player's browser then sends its real fingerprint,
+ * the two do not match, and `played` files the run under "you are holding
+ * something else" and drops it. Takes still counted, which is what made it look
+ * like the exchange worked.
+ *
+ * The client half is fixed. This is the other half: a stored token that was
+ * never set cannot be a stale one, so a run against it counts.
+ */
+describe('a listing published before it could state its shape', () => {
+  const statsOf = async (id: string) => {
+    const rows = await shelf('/api/exchange')
+    return rows.find((one) => one.id === id)
+  }
+
+  it('counts a run sent by a client that does state one', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    /* No shape, which is exactly what every publish did until now. */
+    const id = await publish(author.cookie, 'Published empty')
+    await curate(id, 'from before')
+
+    await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 30, shape: 'a-real-fingerprint' },
+      { cookie: player.cookie },
+    )
+
+    expect((await statsOf(id))?.stats.runs).toBe(1)
+    expect((await statsOf(id))?.stats.clears).toBe(1)
+    expect((await statsOf(id))?.stats.bestFear).toBe(30)
+  })
+
+  /* Rating needs a run against the version being rated, and the run above was
+     filed under the empty token, so this is the same bug one step further on:
+     it refused people who had played. */
+  it('lets somebody who has played it rate it', async () => {
+    const author = await someone('Author')
+    const player = await someone('Player')
+    const id = await publish(author.cookie, 'Rate me')
+    await curate(id, 'from before')
+
+    await post(
+      `/api/exchange/${id}/played`,
+      { cleared: true, fear: 10, shape: 'a-real-fingerprint' },
+      { cookie: player.cookie },
+    )
+    const rated = await post(`/api/exchange/${id}/rate`, { rating: 4 }, { cookie: player.cookie })
+
+    expect(rated.status).toBe(200)
+    expect((await statsOf(id))?.stats.raters).toBe(1)
+  })
+})

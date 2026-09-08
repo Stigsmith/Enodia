@@ -221,3 +221,55 @@ describe('knowing whether your listing is on the shelves', () => {
     expect(loadBuilds()[0]?.publishedDown).toBe(true)
   })
 })
+
+/**
+ * The token that says which version a listing is.
+ *
+ * `republishBuild` sent one from the day the column existed and `publishBuild`
+ * never did, so every listing published and never replaced was stored under an
+ * empty token. The follower's browser sends its real fingerprint with each run,
+ * the worker compared the two, and dropped every run as though the follower
+ * were holding a version the author had moved on from.
+ *
+ * Nothing could see it. The counts stayed at zero and zero is what a build
+ * nobody has played looks like, `stamp` wrote the correct hash locally so the
+ * build itself looked right, and takes kept counting because `take` files
+ * under whatever the listing says rather than comparing.
+ */
+describe('the shape a listing goes up as', () => {
+  it('is sent when a build is published, not only when it is replaced', async () => {
+    const build = mine()
+    shelve([build])
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ id: 'KmUkC9VotY' }), { status: 201 })),
+    )
+
+    const { publishBuild } = await import('./publish.ts')
+    await publishBuild(build)
+
+    const sent = JSON.parse(vi.mocked(fetch).mock.calls[0]?.[1]?.body as string) as {
+      shape?: string
+    }
+    expect(sent.shape).toBe(fingerprint(shapeOf(build)))
+  })
+
+  /* The pair has to agree. A listing stored under one token and a local build
+     stamped with another is the same bug wearing a different hat. */
+  it('matches what it stamps on the build', async () => {
+    const build = mine()
+    shelve([build])
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ id: 'KmUkC9VotY' }), { status: 201 })),
+    )
+
+    const { publishBuild } = await import('./publish.ts')
+    await publishBuild(build)
+
+    const sent = JSON.parse(vi.mocked(fetch).mock.calls[0]?.[1]?.body as string) as {
+      shape?: string
+    }
+    expect(loadBuilds()[0]?.publishedHash).toBe(sent.shape)
+  })
+})
