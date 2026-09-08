@@ -90,13 +90,25 @@ async function readError(response: Response): Promise<string> {
  * This module is the only writer of both fields, the way `reportRun` is the
  * only sender of a run. A second writer forgets one of them, and the pair
  * coming apart is a failure this codebase has already had once.
+ *
+ * **The shape goes up here too, and for a long time it did not.** Only
+ * `republishBuild` sent one, so a listing published and never replaced was
+ * stored under an empty token while `stamp` wrote the real hash locally. The
+ * worker compares the two on every reported run, so every run against such a
+ * listing was answered and dropped, and rating one was refused as unplayed.
+ * Nothing showed it: zero is what an unplayed build looks like, and takes carry
+ * on counting because `take` files under whatever the listing says.
  */
 export async function publishBuild(build: ShownBuild): Promise<PublishOutcome> {
   try {
     const response = await fetch('/api/builds', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ payload: await packBuild(build), name: build.name }),
+      body: JSON.stringify({
+        payload: await packBuild(build),
+        name: build.name,
+        shape: fingerprint(shapeOf(build)),
+      }),
     })
     if (!response.ok) return { ok: false, say: await readError(response) }
     const { id } = (await response.json()) as { id: string }
