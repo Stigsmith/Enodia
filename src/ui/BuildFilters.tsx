@@ -146,8 +146,10 @@ export function BuildFilters({
 
         <p className="bfilter-count" aria-live="polite">
           {showing === total ? (
+            /* One build is one build. The shelves made this visible: the
+               library rarely holds exactly one and a shelf often does. */
             <>
-              <strong>{total}</strong> builds
+              <strong>{total}</strong> {total === 1 ? 'build' : 'builds'}
             </>
           ) : (
             <>

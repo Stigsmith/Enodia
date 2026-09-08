@@ -37,14 +37,22 @@
  * named the same thing. A listing now says whether it is yours, and following
  * twice is following once.
  *
- * ## Two shelves, and the missing third is said out loud
+ * ## Four shelves, and the two that were missing
  *
- * Picked and From friends. Both passed a human before they were listed, which
- * is what keeps this on the right side of the line `REQUIREMENTS.md` 5 draws
- * around discoverability. The shelf that would cross it is everything anybody
- * published, and it needs a way to report a listing and a way to hide one
- * first. The screen says so, rather than presenting two shelves as though they
- * were the whole thing.
+ * It was Picked and From friends, on the argument that both passed a human
+ * before they were listed and so stayed on the right side of the line
+ * `REQUIREMENTS.md` 5 draws around discoverability. The screen carried a
+ * paragraph saying why there was no third.
+ *
+ * **What that missed is that it left your own builds on no shelf.** Picked
+ * shows only what the curator chose and From friends cannot contain your own,
+ * so the owner published nine builds, had picked one, and saw one. Live,
+ * reachable by link, invisible in the app that made them.
+ *
+ * All and Mine are both here now. The owner decided to open the everything
+ * shelf without a report button and a hide button; `worker/exchange.ts` carries
+ * that argument, and the paragraph explaining the absence is gone because there
+ * is no longer an absence to explain.
  */
 
 import { useEffect, useMemo, useState } from 'react'
@@ -68,8 +76,18 @@ import type { FacetId, SortId } from './build-filter.ts'
 
 const SHELVES = [
   { id: 'picked' as const, label: 'Picked' },
+  { id: 'all' as const, label: 'All' },
   { id: 'friends' as const, label: 'From friends' },
+  { id: 'mine' as const, label: 'Mine' },
 ]
+
+/** One line per shelf, saying what you are looking at rather than why. */
+const SCOPE: Record<Shelf, string> = {
+  picked: 'Chosen by hand, one at a time, each with a note saying why.',
+  all: 'Everything anybody has published and not taken back down.',
+  friends: 'Published by the people whose codes you swapped.',
+  mine: 'Your own listings. Ones you have taken down are still here.',
+}
 
 export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'friends') => void }) {
   const [shelf, setShelf] = useState<Shelf>('picked')
@@ -219,22 +237,17 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       <Tabs tabs={SHELVES} open={shelf} onOpen={setShelf} label="Which shelf" />
 
       {/**
-        * One line, where there were six.
+        * One line, and it used to be the sentence explaining an absence.
         *
-        * The claim still has to be here: two shelves presented as the whole
-        * exchange would be a quieter kind of untrue, and that argument has not
-        * changed. What changed is the price. Measured on a 420 by 880 phone,
-        * the paragraph was 139px, **16% of the screen**, and it pushed the
-        * first build to y=544, so most of a phone screen was spent explaining
-        * an absence before anybody saw a build.
+        * There were two shelves and a paragraph saying why there was no third.
+        * That paragraph was measured at 139px on a 420 by 880 phone, **16% of
+        * the screen**, spent on an absence before anybody saw a build, so the
+        * reasoning went to Help and one line stayed.
         *
-        * The reasoning went to Help, which is where reasoning lives, is two
-        * columns wide and fits on one screen. This keeps the fact and drops the
-        * essay.
+        * The absence is gone now. What is left worth saying is which shelf you
+        * are on, because Picked and All look alike and mean different things.
         */}
-      <p className="xchange-scope">
-        Both shelves passed a person. Help says why there is no third.
-      </p>
+      <p className="xchange-scope">{SCOPE[shelf]}</p>
 
       {listed === null ? (
         <p className="acct-quiet">One moment.</p>
@@ -449,6 +462,31 @@ function Empty({
     )
   }
 
+  if (shelf === 'all') {
+    return (
+      <p className="ref-say">
+        Nothing published yet. This shelf holds every build anybody has published and not taken
+        back down.
+      </p>
+    )
+  }
+
+  if (shelf === 'mine') {
+    return (
+      <div>
+        <p className="ref-say">
+          You have not published anything yet. Publishing a build gives it a short link and puts
+          it here, and it stays yours to replace or take back down.
+        </p>
+        {ACCOUNTS_LIVE && onGo ? (
+          <button type="button" className="quiet" onClick={() => onGo('builds')}>
+            Go to your builds
+          </button>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
     <div>
       <p className="ref-say">
@@ -482,6 +520,22 @@ function Relation({
   following: boolean
   onFollow: () => void
 }) {
+  /**
+   * Off the shelves, which only the Mine shelf can say.
+   *
+   * Every other query filters these rows out, so `takenDown` is absent there
+   * rather than false and this branch cannot fire by accident. It comes first
+   * because it is the more useful fact: "yours" is true of every row on that
+   * shelf and tells you nothing, while this one tells you why a listing you
+   * remember publishing is not on the other shelves.
+   */
+  if (listing.takenDown) {
+    return (
+      <p className="xchange-down">
+        Off the shelves. The link still works and anybody following it keeps it.
+      </p>
+    )
+  }
   if (listing.mine) {
     return <p className="xchange-yours">This one is yours. It is already in your builds.</p>
   }

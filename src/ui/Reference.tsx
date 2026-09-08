@@ -167,16 +167,20 @@ export function Help() {
         </section>
 
         <section className="ref">
-          <h3 className="ref-rule">The exchange, and the shelf that is not there</h3>
+          <h3 className="ref-rule">The exchange, and its four shelves</h3>
           <p className="ref-say">
-            Two shelves: builds picked by hand, and builds from people you swapped codes with.
-            Both of them passed a person before anything appeared on them.
+            <strong>Picked</strong> is builds chosen by hand, each with a note saying why.
+            <strong> All</strong> is everything anybody has published and not taken back down.
+            <strong> From friends</strong> is the people whose codes you swapped, and{' '}
+            <strong>Mine</strong> is your own listings, including any you have taken down.
           </p>
           <p className="ref-say">
-            There is no shelf of everything anybody published, and that is deliberate rather
-            than unfinished. It is the first thing a stranger could stumble across, so it needs
-            a way to report a listing and a way to hide one, and those have to exist before it
-            opens rather than after.
+            All of them was closed for a long time, on the argument that a shelf of everybody
+            needs a way to report a listing and a way to hide one first. It is open now, and
+            those still do not exist. What tipped it was that the old arrangement put your own
+            published builds on no shelf at all, and what makes it defensible is that a listing
+            carries a build&rsquo;s name and its author&rsquo;s name and no other writing. If
+            that stops being enough, it changes.
           </p>
           <p className="ref-say">
             You <strong>follow</strong> a build rather than copying it. It stays the person who
@@ -212,6 +216,7 @@ export function Help() {
             than how it read.
           </p>
         </section>
+
       </div>
     </Page>
   )

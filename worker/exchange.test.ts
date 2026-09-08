@@ -856,3 +856,104 @@ describe('a listing published before it could state its shape', () => {
     expect((await statsOf(id))?.stats.raters).toBe(1)
   })
 })
+
+/**
+ * The two shelves your own builds were missing from.
+ *
+ * The exchange had Picked and From friends. `picked` starts from `curated_pick`
+ * so it shows only what the curator chose, and `fromFriends` cannot return your
+ * own by construction. So an account's own listings were on no shelf at all: the
+ * owner published nine builds, had picked one, and saw one. Live, reachable by
+ * link, invisible in the app that made them.
+ */
+describe('all, and your own', () => {
+  const takeDown = (id: string, cookie: string) =>
+    SELF.fetch(`${ORIGIN}/api/builds/${id}`, {
+      method: 'DELETE',
+      headers: { origin: ORIGIN, cookie },
+    })
+
+  it('shows everything published to a stranger, picked or not', async () => {
+    const author = await someone('Author')
+    const unpicked = await publish(author.cookie, 'Nobody picked me')
+
+    const rows = await shelf('/api/exchange/all')
+
+    expect(rows.map((one) => one.id)).toContain(unpicked)
+    /* And it really is the shelf that was empty before, not a renamed one. */
+    expect(await shelf('/api/exchange')).toEqual([])
+  })
+
+  it('is public, while your own listings are not', async () => {
+    expect((await get('/api/exchange/all')).status).toBe(200)
+    expect((await get('/api/exchange/mine')).status).toBe(401)
+  })
+
+  it('gives you back every build you published', async () => {
+    const author = await someone('Author')
+    const ids = [
+      await publish(author.cookie, 'One'),
+      await publish(author.cookie, 'Two'),
+      await publish(author.cookie, 'Three'),
+    ]
+
+    const rows = await shelf('/api/exchange/mine', author.cookie)
+
+    expect(rows.map((one) => one.id).sort()).toEqual([...ids].sort())
+    expect(rows.every((one) => one.mine === true)).toBe(true)
+  })
+
+  it('shows nobody else’s on your own shelf', async () => {
+    const author = await someone('Author')
+    const stranger = await someone('Stranger')
+    await publish(stranger.cookie, 'Not yours')
+    const yours = await publish(author.cookie, 'Yours')
+
+    expect((await shelf('/api/exchange/mine', author.cookie)).map((one) => one.id)).toEqual([yours])
+  })
+
+  /**
+   * The one that makes this an inventory rather than a shelf.
+   *
+   * Every other query filters taken-down rows out. This one must not, because a
+   * listing its author cannot see is one they cannot put back, and a listing
+   * whose local build is gone can be reached from nowhere else in the app.
+   */
+  it('keeps a taken-down listing on your own shelf, and off all the others', async () => {
+    const author = await someone('Author')
+    const id = await publish(author.cookie, 'Withdrawn')
+    await curate(id, 'was picked')
+    expect(await takeDown(id, author.cookie)).toMatchObject({ status: 200 })
+
+    const own = await shelf('/api/exchange/mine', author.cookie)
+    expect(own.map((one) => one.id)).toEqual([id])
+    expect(own[0]?.takenDown).toBe(true)
+
+    expect((await shelf('/api/exchange/all')).map((one) => one.id)).not.toContain(id)
+    expect((await shelf('/api/exchange')).map((one) => one.id)).not.toContain(id)
+  })
+
+  /* `takenDown` is absent rather than false elsewhere, so the field means "this
+     shelf tracks it" and a screen cannot read a live listing as a withdrawn one
+     by looking at a shelf that never answers the question. */
+  it('says nothing about takedowns on the shelves that filter them', async () => {
+    const author = await someone('Author')
+    const id = await publish(author.cookie, 'Up and about')
+    await curate(id, 'picked')
+
+    expect((await shelf('/api/exchange'))[0]?.takenDown).toBeUndefined()
+    const all = await shelf('/api/exchange/all')
+    expect(all.find((one) => one.id === id)?.takenDown).toBeUndefined()
+  })
+
+  /* The same boundary the picked shelf has. A shelf of everybody is exactly
+     where an id would be most tempting to include. */
+  it('never says whose builds they are', async () => {
+    const author = await someone('Author')
+    await publish(author.cookie, 'Anybody')
+
+    const body = await (await get('/api/exchange/all')).text()
+    expect(body).not.toContain(author.id)
+    expect(body).toContain('Author')
+  })
+})
