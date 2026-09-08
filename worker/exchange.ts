@@ -1,20 +1,23 @@
 /**
  * The build exchange: builds other people published, and what happened to them.
  *
- * ## Two shelves, and why not a third yet
- *
- * `REQUIREMENTS.md` 5 requires moderation before anything discoverable, and this
- * would be the first discoverable thing the tool has. So both shelves are ones
- * a human already stood in front of:
+ * ## Four shelves, and the two that were missing
  *
  * - **Picked**, the owner's own choices, each signed and saying why.
  * - **From friends**, people whose code you swapped one at a time.
+ * - **All**, everything published and still up.
+ * - **Mine**, your own listings, taken-down ones included.
  *
- * Neither is discovery. `worker/friends.ts` makes the same argument about the
- * friends list, and this inherits it. An **everything** shelf is the obvious
- * third and is deliberately absent: it needs a way to report a listing and a way
- * for the owner to hide one, and those do not exist. The UI says so rather than
- * quietly offering two shelves as though they were the whole thing.
+ * The first two were the whole exchange for a while, on the argument that
+ * `REQUIREMENTS.md` 5 wants moderation before anything discoverable and both of
+ * those passed a human before they were listed. What that reasoning missed is
+ * that it left **your own builds on no shelf at all**: `picked` starts from
+ * `curated_pick`, `fromFriends` cannot return your own by construction, and the
+ * owner published nine builds and could see one.
+ *
+ * All and Mine are both open now. `everything` carries the argument for opening
+ * the first without a report button and a hide button, which is the owner's
+ * decision and a narrower claim than the old comment here made it sound.
  *
  * ## The server still has no opinion about what a build is
  *
@@ -69,6 +72,15 @@ export type Listing = {
    * nobody for it to be true of.
    */
   mine?: boolean
+  /**
+   * Whether the author has taken it off the shelves.
+   *
+   * Only ever present on the Mine shelf, and always false everywhere else,
+   * because every other shelf filters these rows out entirely. It exists for
+   * the same reason `listMine` does not filter them: a listing its author
+   * cannot see is one they cannot put back.
+   */
+  takenDown?: boolean
   stats: Stats
   /**
    * What earlier versions of this build earned, when there is anything.
@@ -226,6 +238,7 @@ async function withStats(
     note?: string
     userId?: string | null
     shape?: string
+    takenDownAt?: Date | number | null
   }[],
   viewer?: string | null,
 ): Promise<Listing[]> {
@@ -245,6 +258,9 @@ async function withStats(
       createdAt: row.createdAt instanceof Date ? row.createdAt.getTime() : Number(row.createdAt),
       ...(row.note === undefined ? {} : { note: row.note }),
       ...(viewer && row.userId ? { mine: row.userId === viewer } : {}),
+      /* Absent rather than false on the shelves that filter these out, so the
+         field means "this shelf tracks it" rather than "this one is live". */
+      ...(row.takenDownAt === undefined ? {} : { takenDown: row.takenDownAt !== null }),
       stats: current ? countsOf(current) : NONE,
       ...(before ? { before } : {}),
     }
@@ -322,6 +338,80 @@ export async function fromFriends(db: DB, userId: string): Promise<Listing[]> {
   /* Never true on this shelf: self-friendship is refused in `friends.ts`, so
      nothing here can be yours. Passed anyway so the two shelves answer the
      same question the same way. */
+  return withStats(db, rows, userId)
+}
+
+/**
+ * Everything anybody published, which this file spent a year calling impossible.
+ *
+ * The reasoning it used to carry was real: an everything shelf is the first
+ * thing a stranger can stumble across, and `REQUIREMENTS.md` 5 wanted a way to
+ * report a listing and a way to hide one before that happened. The owner has
+ * decided to open it without them, and the honest version of the argument is
+ * narrower than the old comment made it sound. A listing carries a build's name
+ * and its author's display name, both of which already travel on the picked
+ * shelf; there is no free text here that a stranger wrote. The remedies that do
+ * exist are the author taking their own listing down and the curator
+ * un-picking. If a hide is ever needed it is a nullable column and one more
+ * clause in this `where`, because every shelf reads through this file.
+ *
+ * The other half of the decision is that the shelf was already leaking in the
+ * worst direction: your own nine listings appeared on no shelf at all, so the
+ * app that published them could not show them to you.
+ */
+export async function everything(db: DB, viewer?: string | null): Promise<Listing[]> {
+  const rows = await db
+    .select({
+      id: publishedBuild.id,
+      name: publishedBuild.name,
+      payload: publishedBuild.payload,
+      by: user.name,
+      userId: publishedBuild.userId,
+      createdAt: publishedBuild.createdAt,
+      shape: publishedBuild.shape,
+    })
+    .from(publishedBuild)
+    .leftJoin(user, eq(publishedBuild.userId, user.id))
+    .where(isNull(publishedBuild.takenDownAt))
+    .orderBy(desc(publishedBuild.createdAt))
+    .limit(PAGE)
+
+  return withStats(db, rows, viewer)
+}
+
+/**
+ * Your own listings, which is an inventory rather than a shelf to browse.
+ *
+ * **Taken-down rows are listed rather than filtered**, which is the one place
+ * that rule is inverted and it is the same argument `listMine` makes in
+ * `publish.ts`: a listing its author cannot see is one it cannot put back. It
+ * also reaches the case nothing else could, a listing whose local build is gone
+ * because it was deleted or published from a browser that no longer exists.
+ * Until this shelf existed such a listing could be neither updated nor removed
+ * from anywhere in the app, while still holding one of the hundred slots.
+ *
+ * `mine` is true on every row here by construction. It is computed anyway, so
+ * the screen can read one field on every shelf rather than knowing which shelf
+ * it is looking at.
+ */
+export async function myShelf(db: DB, userId: string): Promise<Listing[]> {
+  const rows = await db
+    .select({
+      id: publishedBuild.id,
+      name: publishedBuild.name,
+      payload: publishedBuild.payload,
+      by: user.name,
+      userId: publishedBuild.userId,
+      createdAt: publishedBuild.createdAt,
+      shape: publishedBuild.shape,
+      takenDownAt: publishedBuild.takenDownAt,
+    })
+    .from(publishedBuild)
+    .leftJoin(user, eq(publishedBuild.userId, user.id))
+    .where(eq(publishedBuild.userId, userId))
+    .orderBy(desc(publishedBuild.createdAt))
+    .limit(PAGE)
+
   return withStats(db, rows, userId)
 }
 

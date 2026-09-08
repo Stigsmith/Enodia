@@ -20,27 +20,36 @@
  *   /api/b/<id>        read a published build. PUBLIC, because that is the point
  *   /api/sync          everything an account carries between devices
  *   /api/exchange      the picked shelf. PUBLIC, and every item was chosen by hand
+ *   /api/exchange/all  everything published and still up. PUBLIC
  *   /api/exchange/friends  what the people you added have published
+ *   /api/exchange/mine  your own listings, taken-down ones included
  *   /api/exchange/<id>/...  take a copy, report a run, rate one, pick one
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
  *
- * **Nothing here is discoverable, which is the line that matters.** A published
- * build is unlisted: no gallery, no index, no search, and a random id rather
- * than a sequential one, so it is reachable only by whoever was handed the link.
- * Friends is a list you build one person at a time from codes you were given by
- * hand, so it is not discovery either, and the moderation tool for it is
- * removing somebody.
+ * **Some of this is discoverable now, and that is a decision rather than a
+ * drift.** `REQUIREMENTS.md` 5 wanted moderation designed before anything
+ * discoverable existed, and for a long time nothing here was: a published build
+ * was unlisted, the exchange's two shelves were the owner's own picks and the
+ * builds of people you added by code, and every item on both had passed a human.
  *
- * **The exchange does not cross that line either, and it was built not to.** Its
- * two shelves are the owner's own picks and the builds of people you added by
- * code, so every item on it passed a human before it was listed. The shelf that
- * would cross the line is "everything anybody published", and it is deliberately
- * not here: it needs a way to report a listing and a way to hide one first.
+ * `/api/exchange/all` crosses that line deliberately, and the owner made the
+ * call knowing it. What tipped it was that the old arrangement failed in the
+ * other direction: an account's own listings appeared on no shelf, so the app
+ * that published them could not show them back. Opening the everything shelf and
+ * adding `/api/exchange/mine` are the same fix from two sides.
  *
- * `REQUIREMENTS.md` 5 wants moderation designed before anything discoverable
- * exists. **Leaderboards would still be the first thing that crosses that
- * line**, and they are still not here.
+ * **There is still no report and no hide, and that is worth stating plainly.**
+ * The argument for shipping without them is narrow: a listing carries a build
+ * name and an author's display name and no other text a stranger wrote, so there
+ * is nothing here to moderate that is not already on the picked shelf. The
+ * remedies that exist are the author taking their own listing down and the
+ * curator un-picking. `worker/exchange.ts` holds the fuller version, and says
+ * what adding a hide would cost if it becomes necessary.
+ *
+ * Friends is still not discovery: a list you build one person at a time from
+ * codes you were given by hand, and the moderation tool for it is removing
+ * somebody.
  *
  * ## Limits
  *
@@ -64,7 +73,16 @@ import {
   unfriend,
 } from './friends.ts'
 import { listMine, publish, putBack, read, republish, takeDown } from './publish.ts'
-import { fromFriends, pick, picked, played, rate, take } from './exchange.ts'
+import {
+  everything,
+  fromFriends,
+  myShelf,
+  pick,
+  picked,
+  played,
+  rate,
+  take,
+} from './exchange.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
 
@@ -208,6 +226,23 @@ export default {
       return json({ builds: await picked(db, who?.user.id ?? null) })
     }
 
+    /**
+     * Everything published, and the second route a stranger can reach.
+     *
+     * Public for the same reason the picked shelf is, which is now a thinner
+     * argument than it was: `worker/exchange.ts` carries it, and the short
+     * version is that this shelf shows a build name and a display name, both of
+     * which already travel on the picked shelf. Rate limited on the address
+     * because there is no account to count against, and it must be taken before
+     * the session lookup below or a signed-out reader would fall into it.
+     */
+    if (url.pathname === '/api/exchange/all' && request.method === 'GET') {
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
+      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
+      return json({ builds: await everything(db, who?.user.id ?? null) })
+    }
+
     if (url.pathname.startsWith('/api/exchange')) {
       const session = await auth.api.getSession({ headers: request.headers })
       if (!session) return json({ error: 'not signed in' }, 401)
@@ -218,6 +253,12 @@ export default {
 
       if (url.pathname === '/api/exchange/friends' && request.method === 'GET') {
         return json({ builds: await fromFriends(db, userId) })
+      }
+
+      /* Your own inventory, so it needs the account and nothing else. Taken-down
+         rows come back on this one alone; see `myShelf`. */
+      if (url.pathname === '/api/exchange/mine' && request.method === 'GET') {
+        return json({ builds: await myShelf(db, userId) })
       }
 
       const one = /^\/api\/exchange\/([A-Za-z0-9]{1,32})\/(take|played|rate|pick)$/.exec(

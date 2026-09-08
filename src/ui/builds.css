@@ -9062,9 +9062,9 @@ p.landing-say {
  * same object as a card on yours with more written under it.
  * ========================================================================== */
 
-/* The missing third shelf, said rather than left as an absence. */
-/* One line, and it earns its line. The six-line version it replaced was 139px
-   and 16% of a 420x880 phone before anybody saw a build. */
+/* Which shelf you are on. One line, and it earns its line: the six-line
+   version it replaced was 139px and 16% of a 420x880 phone before anybody saw
+   a build. */
 .xchange-scope {
   margin: 0 0 0.9rem;
   font-size: 0.76rem;
@@ -9076,6 +9076,32 @@ p.landing-say {
   margin: 0.6rem 0 0;
   color: var(--lit-hot);
   font-size: 0.85rem;
+}
+
+/**
+ * A tab row under a page's standfirst, given back the space it was taking away.
+ *
+ * `.tabs` carries `margin-top: -0.15rem`, which is right inside the build
+ * editor's panel and wrong under a paragraph: `.page-standfirst` has no bottom
+ * margin, so the buttons were pulled 2px **into** the sentence above them and
+ * read as touching it. The owner reported it as cramping and asked for five to
+ * ten pixels; this is a net nine.
+ *
+ * Scoped rather than changed at the source, because the editor's tabs sit under
+ * a panel edge instead of a paragraph and do not want this.
+ */
+.xchange-shelf > .tabs {
+  margin-top: 0.4rem;
+}
+
+/* A listing its author has taken down, which the Mine shelf alone shows. Muted
+   rather than red: it is a state the author chose, not a fault. */
+.xchange-down {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+  font-style: italic;
 }
 
 /**

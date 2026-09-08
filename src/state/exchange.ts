@@ -68,6 +68,15 @@ export type Listed = {
   note?: string
   /** Whether you published it. A boolean from the worker, never an id. */
   mine?: boolean
+  /**
+   * Whether you have taken it off the shelves. Only the Mine shelf answers.
+   *
+   * Absent everywhere else, because every other shelf filters those rows out
+   * and has therefore not been asked. Reading absent as false would have a
+   * screen say a listing is up on a shelf that would not have shown it either
+   * way.
+   */
+  takenDown?: boolean
   build: ShownBuild
   stats: Stats
   /**
@@ -81,7 +90,15 @@ export type Listed = {
   before?: Before
 }
 
-export type Shelf = 'picked' | 'friends'
+/**
+ * Which shelf is open.
+ *
+ * `all` and `mine` were added after the owner published nine builds and could
+ * see one: the picked shelf shows only what the curator chose and the friends
+ * shelf cannot contain your own, so an account's own listings were on no shelf
+ * at all.
+ */
+export type Shelf = 'picked' | 'all' | 'friends' | 'mine'
 
 type Wire = {
   id: string
@@ -101,6 +118,10 @@ type Wire = {
    * own build into your library marked as somebody else's.
    */
   mine?: boolean
+  /* Declared here as well as on `Listed`, which is the whole lesson of the
+     paragraph above: a field the worker sends and this type does not name is a
+     field `shelfAt` cannot copy, and nothing fails. */
+  takenDown?: boolean
   stats: Stats
   before?: Before
 }
@@ -222,6 +243,7 @@ async function shelfAt(path: string): Promise<Listed[]> {
       // is. Defaulting that to false would have the screen say "not yours" when
       // what it means is that it never asked.
       ...(row.mine === undefined ? {} : { mine: row.mine }),
+      ...(row.takenDown === undefined ? {} : { takenDown: row.takenDown }),
       ...(row.before === undefined ? {} : { before: row.before }),
       // The server's name is authoritative for the listing: it is what the
       // author published under, and the packed build could say anything.
@@ -232,8 +254,14 @@ async function shelfAt(path: string): Promise<Listed[]> {
   return out
 }
 
-export const listShelf = (shelf: Shelf): Promise<Listed[]> =>
-  shelfAt(shelf === 'picked' ? '/api/exchange' : '/api/exchange/friends')
+const PATHS: Record<Shelf, string> = {
+  picked: '/api/exchange',
+  all: '/api/exchange/all',
+  friends: '/api/exchange/friends',
+  mine: '/api/exchange/mine',
+}
+
+export const listShelf = (shelf: Shelf): Promise<Listed[]> => shelfAt(PATHS[shelf])
 
 export type TakeOutcome = { ok: true; build: ShownBuild } | { ok: false; say: string }
 
