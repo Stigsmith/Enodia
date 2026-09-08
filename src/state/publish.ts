@@ -25,6 +25,7 @@
 import type { ShownBuild } from '../data/builds.ts'
 import { loadBuilds, saveBuild } from './builds.ts'
 import { fingerprint, shapeOf } from './exchange.ts'
+import { facetsOf } from './facets.ts'
 import { packBuild, unpackBuild } from './transfer.ts'
 
 /**
@@ -108,6 +109,7 @@ export async function publishBuild(build: ShownBuild): Promise<PublishOutcome> {
         payload: await packBuild(build),
         name: build.name,
         shape: fingerprint(shapeOf(build)),
+        facets: facetsOf(build),
       }),
     })
     if (!response.ok) return { ok: false, say: await readError(response) }
@@ -158,6 +160,7 @@ export async function republishBuild(build: ShownBuild): Promise<PublishOutcome>
         payload: await packBuild(build),
         name: build.name,
         shape: fingerprint(shapeOf(build)),
+        facets: facetsOf(build),
       }),
     })
     if (!response.ok) return { ok: false, say: await readError(response) }

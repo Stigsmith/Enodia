@@ -9087,9 +9087,13 @@ p.landing-say {
  * read as touching it. The owner reported it as cramping and asked for five to
  * ten pixels; this is a net nine.
  *
- * Scoped rather than changed at the source, because the editor's tabs sit under
- * a panel edge instead of a paragraph and do not want this.
+ * Two selectors because the two pages nest differently and the cause is one
+ * thing. The leaderboards put their tabs straight after the standfirst, so the
+ * adjacent sibling reaches them; the exchange has Charon in between, so its
+ * shelf wrapper has to be named. Scoped rather than changed at the source,
+ * because the editor's tabs sit under a panel edge and do not want this.
  */
+.page-standfirst + .tabs,
 .xchange-shelf > .tabs {
   margin-top: 0.4rem;
 }
@@ -9483,4 +9487,130 @@ p.landing-say {
   align-self: flex-start;
   margin-top: 0.15rem;
   font-size: 0.74rem;
+}
+
+/* ==========================================================================
+ * Leaderboards
+ *
+ * A wall of small tables. Everything here is a count somebody can check, so
+ * the design job is legibility rather than drama: no medals, no podium, no
+ * bar lengths. A bar would be a second encoding of the same number and the
+ * only thing it could add is a claim about the gap between two of them.
+ * ========================================================================== */
+
+.board-scope {
+  margin: 0 0 1.4rem;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+.board-wall {
+  margin: 0 0 2.4rem;
+}
+
+.board-wall-name {
+  margin: 0 0 0.9rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+  font-weight: 600;
+}
+
+/**
+ * As many columns as fit, and they are boards rather than paragraphs.
+ *
+ * `auto-fill` rather than `auto-fit`: with two or three boards `auto-fit`
+ * collapses the empty tracks and stretches what is left across the whole page,
+ * so a single board would run the full width of a 1600px screen and read as a
+ * table nobody sized. `auto-fill` keeps the column width and leaves the gap.
+ */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 1rem;
+}
+
+.board {
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--div-1);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ink-850) 70%, transparent);
+}
+
+.board-name {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  color: var(--bone);
+}
+
+.board-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board-row {
+  display: grid;
+  /* Place, then the thing, then the number. The number column is sized to the
+     longest it gets rather than to its content, so the figures line up down
+     the board instead of drifting with the name beside them. */
+  grid-template-columns: 1.1rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.28rem 0;
+  font-size: 0.8rem;
+}
+
+.board-row + .board-row {
+  border-top: 1px solid color-mix(in srgb, var(--div-1) 60%, transparent);
+}
+
+.board-place {
+  color: var(--bone-faint);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.board-what {
+  min-width: 0;
+  color: var(--bone);
+}
+
+.board-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.board-link:hover,
+.board-link:focus-visible {
+  border-bottom-color: var(--lit-hot);
+}
+
+/* On its own line, because a build's name and its author are two facts and
+   running them together makes a long row that wraps in the middle of a name. */
+.board-by {
+  display: block;
+  color: var(--bone-faint);
+  font-size: 0.7rem;
+}
+
+.board-count {
+  color: var(--bone-dim);
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.board-caveat {
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-1);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: var(--bone-faint);
+  max-width: 44rem;
 }

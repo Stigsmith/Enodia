@@ -217,6 +217,27 @@ export function Help() {
           </p>
         </section>
 
+        <section className="ref">
+          <h3 className="ref-rule">Leaderboards, and what they do not say</h3>
+          <p className="ref-say">
+            The same counts, put beside each other. What has been followed most, played most and
+            cleared most, at the highest Fear, and who published it. Everybody, or just the
+            people whose codes you swapped. You are on your own friends board, because a board
+            of your circle that leaves you off it does not answer the question.
+          </p>
+          <p className="ref-say">
+            <strong>Every board counts one thing.</strong> None of them is a rate and none of
+            them adds two numbers together into a score. A clear rate would read as a ranking of
+            how good a build is, and it is not one: five clears from five runs would beat ninety
+            from a hundred, which is a claim about how much evidence there is rather than about
+            the builds. So the boards say what happened and stop there.
+          </p>
+          <p className="ref-say">
+            A board with nothing in it is not drawn, so the page is short while there are few
+            people here. There are no zeroes on it: a build nobody has followed has not come
+            tenth in a following contest.
+          </p>
+        </section>
       </div>
     </Page>
   )

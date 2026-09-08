@@ -162,11 +162,11 @@ export function Menu({
             leave()
           },
         },
-        /* After the exchange, because it is waiting on it: `data/roadmap.ts`
-         * says leaderboards need the exchange to have anything to count. */
+        /* After the exchange, because it is built on it: a board is the counts
+         * the exchange keeps, and it has nothing to show until something has
+         * been published and followed. */
         {
           label: 'Leaderboards',
-          unbuilt: true,
           here: view === 'leaderboards',
           action: () => {
             onGo('leaderboards')

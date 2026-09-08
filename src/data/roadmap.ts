@@ -85,7 +85,13 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Build exchange',
     proof: 'src/ui/Exchange.tsx',
-    say: 'Two shelves of other people’s builds: ones picked by hand, and ones from people you swapped codes with. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs.',
+    say: 'Four shelves: builds picked by hand, everything anybody has published, builds from people you swapped codes with, and your own listings. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs.',
+  },
+  {
+    stage: 'now',
+    title: 'Leaderboards',
+    proof: 'src/ui/Leaderboards.tsx',
+    say: 'What people have followed, played and got through, counted. Everybody, or just the people you swapped codes with. Every board counts one thing and none of them is a rate or a score: a build followed more has been followed more, and nothing here knows whether it is good.',
   },
   {
     stage: 'now',
@@ -163,12 +169,5 @@ export const ROADMAP: Plan[] = [
     why: 'A standing refusal rather than unbuilt work. No file will ever prove it, because shipping one would be the thing this says the tool will not do.',
     say: 'Everything mechanical comes from the game files. Whether a build is strong is not in any file, so the tool does not claim it.',
     on: 'Needs someone with enough play time to judge.',
-  },
-  {
-    stage: 'waiting',
-    title: 'Leaderboards',
-    proof: 'src/ui/Leaderboards.tsx',
-    say: 'Not who plays best. Who has shared the most, whose builds get taken up, that sort of thing, because the tool has no way to judge the first and no business claiming it.',
-    on: 'Waiting on a shelf of everything published. The exchange holds a hand-picked set and your friends, and neither is a field to rank.',
   },
 ]

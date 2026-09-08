@@ -23,6 +23,7 @@
  *   /api/exchange/all  everything published and still up. PUBLIC
  *   /api/exchange/friends  what the people you added have published
  *   /api/exchange/mine  your own listings, taken-down ones included
+ *   /api/exchange/boards  leaderboards, global or among your friends. PUBLIC
  *   /api/exchange/<id>/...  take a copy, report a run, rate one, pick one
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
@@ -83,6 +84,7 @@ import {
   rate,
   take,
 } from './exchange.ts'
+import { boards } from './boards.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
 
@@ -241,6 +243,28 @@ export default {
       if (over) return tooMany(over.retryAfter)
       const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
       return json({ builds: await everything(db, who?.user.id ?? null) })
+    }
+
+    /**
+     * The leaderboards, both scopes on one route.
+     *
+     * Public at `scope=global` for the same reason the shelves above it are,
+     * and it has to sit before the prefix branch to stay that way. `friends`
+     * needs an account because it is a question about your account, and it is
+     * the one case here where 401 is the honest answer rather than an empty
+     * board: a stranger has no friends to scope to, not zero of them.
+     *
+     * One rate limit on the address covers both. The screen fetches one scope
+     * at a time and switching is a fetch, so the counter is per look rather
+     * than per board.
+     */
+    if (url.pathname === '/api/exchange/boards' && request.method === 'GET') {
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
+      const scope = url.searchParams.get('scope') === 'friends' ? 'friends' : 'global'
+      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
+      if (scope === 'friends' && !who) return json({ error: 'not signed in' }, 401)
+      return json({ boards: await boards(db, scope, who?.user.id ?? null) })
     }
 
     if (url.pathname.startsWith('/api/exchange')) {
