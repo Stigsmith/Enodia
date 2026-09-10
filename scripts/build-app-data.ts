@@ -576,6 +576,7 @@ type Source = {
   traits: string[]
 }
 
+const keepsakeGods = dictOf(read('keepsake-gods').data) as Record<string, string>
 const olympianList = olympiansFrom(loot)
 const sources: Source[] = []
 
@@ -1012,6 +1013,20 @@ const bundle = {
     note: 'The app bundle. A projection of data/generated, built through src/data/load.ts.',
   },
   olympians: olympiansFrom(loot),
+  /**
+   * Which keepsake makes a given god's boon likely, for the nine that spend an
+   * Olympian slot.
+   *
+   * Read out of `KeepsakeData.GiftData` by the extractor rather than off the
+   * spelling of `ForceZeusBoonKeepsake`, and filtered to the Olympians here:
+   * the file also names Hermes and the Trial, and neither is a god a build can
+   * list as one it needs, because `godsOf` only ever returns Olympians.
+   */
+  keepsakeGods: Object.fromEntries(
+    olympiansFrom(loot)
+      .map((god) => [god, keepsakeGods[god]])
+      .filter(([, keepsake]) => typeof keepsake === 'string'),
+  ),
   offerRules,
   weapons: WEAPONS.map((weapon) => ({
     id: weapon.id,

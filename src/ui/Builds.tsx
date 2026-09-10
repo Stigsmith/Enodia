@@ -27,10 +27,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { olympians, traits } from '../data/app.ts'
+import { godsOf, keepsakeForGod, olympians, traits } from '../data/app.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
-import { SAMPLE_BUILDS } from '../data/builds.ts'
+import { PLAYSTYLES, SAMPLE_BUILDS } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
@@ -313,14 +313,27 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
             <Poster built={built} onOpen={setPiece} />
           )}
 
+          {/* What the build is built around, and what that means.
+            * The playstyle was stored, filtered on and never once explained:
+            * "Ω Special" was a label with nothing behind it anywhere in the
+            * tool. The sentence is the game's own mechanic in our words, so it
+            * says what the move is and never whether leaning on it is wise. */}
+          <Playstyle build={open} />
+
           {/* How it works, which is the thing a reader opened a build for.
             * Under the layout rather than over it: the picture says what is in
             * the build faster than a paragraph can, and the paragraph says the
-            * one thing the picture cannot. */}
-          <section className="builds-how" aria-label="How it works">
-            <h3>How it works</h3>
-            <p>{open.how}</p>
-          </section>
+            * one thing the picture cannot.
+            *
+            * Drawn only when there is one. A build with no write-up used to get
+            * the heading and an empty paragraph, which reads as a bug rather
+            * than as nothing having been written. */}
+          {open.how ? (
+            <section className="builds-how" aria-label="How it works">
+              <h3>How it works</h3>
+              <p>{open.how}</p>
+            </section>
+          ) : null}
 
           {open.luck ? (
             <section className="builds-how builds-luck" aria-label="If the run goes your way">
@@ -332,6 +345,8 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
           {/* The tool's read, next to the player's own. They answer the same
             * question in the same three words and they are allowed to disagree:
             * the player has actually played it and the reading has not. */}
+          <KeepsakeHint build={open} />
+
           <section className="builds-repeat" aria-label="Putting it together">
             <h3>Putting it together</h3>
             {/* One reading. This called `readRepeat` twice, once for the stamp
@@ -1084,5 +1099,74 @@ function FollowNews({
         </button>
       </div>
     </div>
+  )
+}
+
+/**
+ * What the build is built around, and what that phrase means.
+ *
+ * The playstyle has been on `ShownBuild` since the library existed and has been
+ * shown exactly nowhere outside the editor's picker, so a reader could filter a
+ * shelf by "Ω Special" without the tool ever saying what an Ω Special is. The
+ * sentence comes from `PLAYSTYLES`, which takes it from the game's own glossary.
+ *
+ * Absent rather than "not set" when a build has no playstyle. Four of the
+ * owner's ten did not, and a row reading "Playstyle: none" is a complaint about
+ * the build rather than a fact about it.
+ */
+function Playstyle({ build }: { build: ShownBuild }) {
+  const found = PLAYSTYLES.find((one) => one.id === build.playstyle)
+  if (!found) return null
+
+  return (
+    <section className="builds-play" aria-label="Built around">
+      <h3>Built around</h3>
+      <p className="builds-play-name">{found.name}</p>
+      <p className="builds-play-say">{found.say}</p>
+    </section>
+  )
+}
+
+/**
+ * Which keepsake would make this build's gods likely.
+ *
+ * **Derived, never judged.** The build says which Olympians its boons come
+ * from; `keepsakeForGod` says which keepsake makes a god's boon likely, read
+ * out of the game's `GiftData` rather than off the spelling of a trait id.
+ * Putting the two together is arithmetic. Which of them is worth carrying is
+ * not, and this deliberately does not say: it lists them in the build's own god
+ * order and stops.
+ *
+ * **Only when the build has not chosen one.** An author who set a keepsake has
+ * answered the question, and repeating the options underneath their answer
+ * would read as second-guessing it.
+ */
+function KeepsakeHint({ build }: { build: ShownBuild }) {
+  if (build.keepsake) return null
+
+  const wanted = godsOf(build)
+    .map((god) => ({ god, id: keepsakeForGod.get(god as never) }))
+    .flatMap((one) => {
+      const trait = one.id ? traits.get(one.id) : undefined
+      return trait ? [{ god: one.god, name: trait.name ?? one.id }] : []
+    })
+  if (!wanted.length) return null
+
+  return (
+    <section className="builds-hint" aria-label="Keepsakes that would help">
+      <h3>No keepsake chosen</h3>
+      <p className="builds-hint-say">
+        This build wants boons from {wanted.length === 1 ? 'one god' : `${wanted.length} gods`}. A
+        keepsake makes the next offer from that god likely, so any of these would help it come
+        together:
+      </p>
+      <ul className="builds-hint-list">
+        {wanted.map((one) => (
+          <li key={one.god}>
+            <strong>{one.name}</strong> for {one.god}
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

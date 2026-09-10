@@ -9614,3 +9614,83 @@ p.landing-say {
   color: var(--bone-faint);
   max-width: 44rem;
 }
+
+/* --------------------------------------------------- built around, and hints -- */
+
+/* What the build leans on, and what that means. The name reads as a label and
+   the sentence under it as prose, because one is a term and one explains it. */
+.builds-play {
+  margin-top: 1.6rem;
+}
+
+.builds-play-name {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--bone);
+}
+
+.builds-play-say {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--bone-dim);
+  max-width: 44rem;
+}
+
+/**
+ * A derived suggestion, drawn so it cannot be mistaken for the build's own.
+ *
+ * Everything else in this column is what the author put there. This is the tool
+ * talking, so it is set apart with a rule down the side rather than sitting in
+ * the same voice as the paragraph above it.
+ */
+.builds-hint {
+  margin-top: 1.6rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--div-2);
+}
+
+.builds-hint-say {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--bone-dim);
+  max-width: 44rem;
+}
+
+.builds-hint-list {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.2rem;
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+}
+
+.builds-hint-list strong {
+  color: var(--bone);
+  font-weight: 600;
+}
+
+/* The author's write-up inside the reading dialog, which used to show only the
+   picture. Narrower than the page's prose because the dialog is narrower. */
+.xchange-read-how {
+  margin-top: 0.9rem;
+}
+
+.xchange-read-how h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.xchange-read-how p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--bone-dim);
+}

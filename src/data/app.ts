@@ -201,6 +201,24 @@ export const familiarById: ReadonlyMap<string, Familiar> = new Map(familiars.map
 export const weaponById: ReadonlyMap<WeaponId, Weapon> = new Map(weapons.map((one) => [one.id, one]))
 
 /**
+ * The keepsake that makes a given god's boon likely, for each of the nine.
+ *
+ * `ForceZeusBoonKeepsake` carries no god of its own: its `gods` array is empty
+ * and nothing on the trait record says Zeus. The link is in the game's
+ * `KeepsakeData.GiftData`, where each god's block names the keepsake they give
+ * you, and `scripts/extract.mjs` reads it from there rather than from the
+ * spelling of the id. That distinction is the whole lesson of the vow icons:
+ * the name looked like the key and was not.
+ *
+ * **A build can be told which keepsake would help without anybody judging it.**
+ * The build already says which gods it needs, this says which keepsake makes
+ * one likely, and neither step is an opinion about whether the build is good.
+ */
+export const keepsakeForGod: ReadonlyMap<GodId, TraitId> = new Map(
+  Object.entries((bundle.keepsakeGods ?? {}) as Record<string, string>) as [GodId, TraitId][],
+)
+
+/**
  * Which Olympians a build's boons come from.
  *
  * **Intersected with `olympians` rather than filtered by name.** The naive
