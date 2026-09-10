@@ -84,16 +84,65 @@ export type Playstyle =
   | 'hex'
 
 /** The nine, in the order the game lists the moves they name. */
-export const PLAYSTYLES: { id: Playstyle; name: string }[] = [
-  { id: 'attack', name: 'Attack' },
-  { id: 'omega-attack', name: 'Ω Attack' },
-  { id: 'special', name: 'Special' },
-  { id: 'omega-special', name: 'Ω Special' },
-  { id: 'cast', name: 'Cast' },
-  { id: 'omega-cast', name: 'Ω Cast' },
-  { id: 'sprint', name: 'Sprint' },
-  { id: 'magick', name: 'Magick' },
-  { id: 'hex', name: 'Hex' },
+/**
+ * The nine, with what each one means.
+ *
+ * **`say` describes the move, not the build.** Every line below is a mechanic
+ * the game states in its own glossary (`HelpText.en.sjson`, the `Keywords`
+ * entries), rewritten in this tool's words: what "Ω Special" is, not whether a
+ * build that leans on it is any good. That keeps it on the right side of the
+ * line `CLAUDE.md` draws, where mechanics are mine to read out of the files and
+ * evaluations are the owner's.
+ *
+ * The order is the order the game lists the moves in, which is why
+ * `build-filter.ts` can rank by index rather than keeping a second list.
+ */
+export const PLAYSTYLES: { id: Playstyle; name: string; say: string }[] = [
+  {
+    id: 'attack',
+    name: 'Attack',
+    say: 'The weapon’s ordinary Attack, with no Magick spent on it.',
+  },
+  {
+    id: 'omega-attack',
+    name: 'Ω Attack',
+    say: 'The Attack held down rather than tapped, spending Magick for a stronger version of it.',
+  },
+  {
+    id: 'special',
+    name: 'Special',
+    say: 'The weapon’s ordinary Special, with no Magick spent on it.',
+  },
+  {
+    id: 'omega-special',
+    name: 'Ω Special',
+    say: 'The Special held down rather than tapped, spending Magick for a stronger version of it.',
+  },
+  {
+    id: 'cast',
+    name: 'Cast',
+    say: 'The Cast that binds what it catches, and can pick up other properties from boons.',
+  },
+  {
+    id: 'omega-cast',
+    name: 'Ω Cast',
+    say: 'The Cast held down, spending Magick so that it damages what it caught when it runs out.',
+  },
+  {
+    id: 'sprint',
+    name: 'Sprint',
+    say: 'Holding the dash to keep running at speed, and whatever the build hangs off doing so.',
+  },
+  {
+    id: 'magick',
+    name: 'Magick',
+    say: 'Magick itself: the pool every Ω Move spends, and having enough of it to keep spending.',
+  },
+  {
+    id: 'hex',
+    name: 'Hex',
+    say: 'Selene’s Hex, which becomes available once enough Magick has been spent near enemies.',
+  },
 ]
 
 /**

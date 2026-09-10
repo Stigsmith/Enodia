@@ -19,6 +19,17 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-10',
+    title: 'A build says what it is built around, and which keepsake would help',
+    say: 'Two things a build has always carried and never explained, plus the author’s write-up where a reader can actually reach it.',
+    points: [
+      'A build records what it is built around, and the tool had never once said what that meant. “Ω Special” was a label you could filter a shelf by with nothing behind it anywhere. Every one of the nine now carries a sentence saying what the move is, taken from the game’s own glossary.',
+      'A build with no keepsake chosen is now told which ones would help. It knows which gods its boons come from, and each of the nine has a keepsake that makes their next offer likely, so it lists them. It never picks one for you, and it says nothing at all once you have chosen.',
+      'Reading somebody else’s listing on the exchange showed the picture of the build and not a word of what the author wrote about it, which is the thing you open a stranger’s build for. Their write-up is in there now.',
+      'A build with no write-up used to show the heading “How it works” above an empty space. Now it shows nothing.',
+    ],
+  },
+  {
     date: '2026-09-08',
     title: 'Two shelves that were missing, leaderboards, and a count that was never counting',
     say: 'Your own published builds were on no shelf at all, and most listings had been quietly dropping every run logged against them.',

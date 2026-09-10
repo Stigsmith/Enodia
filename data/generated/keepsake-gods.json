@@ -1,0 +1,23 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-09-10",
+  "gameVersion": "138174",
+  "source": "Scripts/KeepsakeData.lua",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "sha256": "537b570476e210f2b54b0e80604fb75e74338b7b9a980a67b2959713ffc59bb6"
+ },
+ "data": {
+  "Zeus": "ForceZeusBoonKeepsake",
+  "Hera": "ForceHeraBoonKeepsake",
+  "Poseidon": "ForcePoseidonBoonKeepsake",
+  "Apollo": "ForceApolloBoonKeepsake",
+  "Demeter": "ForceDemeterBoonKeepsake",
+  "Aphrodite": "ForceAphroditeBoonKeepsake",
+  "Hephaestus": "ForceHephaestusBoonKeepsake",
+  "Hestia": "ForceHestiaBoonKeepsake",
+  "Ares": "ForceAresBoonKeepsake",
+  "Hermes": "TimedBuffKeepsake",
+  "Trial": "RandomBlessingKeepsake"
+ }
+}

@@ -534,6 +534,57 @@ if (shrineIcons) {
 console.log(`  shrine icons: ${shrineIcons ? Object.keys(shrineIcons).length : 0} animations resolve to a sprite`)
 
 // ---------------------------------------------------------------------------
+// Which keepsake comes from which god.
+//
+// Nine of them guarantee the next boon is from one god, and a build that needs
+// Zeus can therefore be told which keepsake makes Zeus likely. Nothing in the
+// trait record says so: `ForceZeusBoonKeepsake` carries no god field, and its
+// `gods` array is empty.
+//
+// **The link is in `GiftData`, not in the name.** Each god has a `<God>Upgrade`
+// block holding what they give you as their relationship deepens, and the first
+// gift is the keepsake:
+//
+//     ZeusUpgrade =
+//     {
+//       [1] = { GameStateRequirements = { ... }, Gift = "ForceZeusBoonKeepsake" }
+//     }
+//
+// Reading the id and stripping `Force` and `BoonKeepsake` would produce the same
+// nine pairs today and would be a naming assumption, which is the mistake this
+// project has made three times in three file formats. `ItemOrder` further down
+// the same file agrees, in a source comment naming the giver of every keepsake.
+// ---------------------------------------------------------------------------
+
+function readKeepsakeGods() {
+  let src
+  try {
+    src = readFileSync(join(GAME, 'Scripts/KeepsakeData.lua'), 'utf8').replace(/^﻿/, '')
+  } catch {
+    return null
+  }
+  const out = {}
+  // One block to the next, the same walk the shrine icons use, so a Gift is
+  // always read out of the block that declared it.
+  const blocks = [...src.matchAll(/^	(\w+)Upgrade\s*=/gm)]
+
+  for (let i = 0; i < blocks.length; i++) {
+    const body = src.slice(blocks[i].index, blocks[i + 1]?.index ?? src.length)
+    const gifts = [...body.matchAll(/\bGift\s*=\s*"([A-Za-z0-9_]+)"/g)].map((m) => m[1])
+    // Exactly one, or the block is not the simple "their keepsake" shape this
+    // join assumes and is left out rather than guessed at.
+    if (gifts.length === 1) out[blocks[i][1]] = gifts[0]
+  }
+  return out
+}
+
+const keepsakeGods = readKeepsakeGods()
+if (keepsakeGods) {
+  writeGenerated('keepsake-gods', { source: 'Scripts/KeepsakeData.lua' }, keepsakeGods)
+}
+console.log(`  keepsake gods: ${keepsakeGods ? Object.keys(keepsakeGods).length : 0} gods give a keepsake`)
+
+// ---------------------------------------------------------------------------
 // Stacking curves. Poms raise a trait's StackNum, and TraitLogic.GetProcessedValue
 // applies, per extra stack i:
 //

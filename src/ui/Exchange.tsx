@@ -326,6 +326,23 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             <Poster built={assemble(readingRow.build)} />
             <div className="xchange-read-foot">
               <p className="xchange-by">by {readingRow.by}</p>
+              {/* The author's own explanation, which this dialog did not show.
+                * The Poster draws what is in a build; `how` is the one thing it
+                * cannot draw, and it is the reason somebody opens a stranger's
+                * listing rather than glancing at the card. Reading a build you
+                * are deciding whether to follow without it was reading half. */}
+              {readingRow.build.how ? (
+                <section className="xchange-read-how" aria-label="How it works">
+                  <h4>How it works</h4>
+                  <p>{readingRow.build.how}</p>
+                </section>
+              ) : null}
+              {readingRow.build.luck ? (
+                <section className="xchange-read-how" aria-label="If the run goes your way">
+                  <h4>If the run goes your way</h4>
+                  <p>{readingRow.build.luck}</p>
+                </section>
+              ) : null}
               <Counted stats={readingRow.stats} {...(readingRow.before ? { before: readingRow.before } : {})} />
               <div className="xchange-read-actions">
                 <Relation
