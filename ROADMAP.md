@@ -14,7 +14,7 @@ Last updated 8 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 642 in node across 34 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 646 in node across 35 files, and **153 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -349,8 +349,8 @@ listing its author cannot see is one they cannot put back, and **Followed**, bec
 you follow goes on working after its author withdraws it and the useful thing to say is
 where it went.
 
-**The one thing found and not fixed** is still the sync remount ejecting you out of an open
-build, below.
+**The one thing found and not fixed was the sync remount ejecting you out of an open build.**
+It is fixed as of 11 September; see below.
 
 ## Corrections since Phase 1
 
@@ -499,14 +499,26 @@ named in a stylesheet, and all 1,035 images are named from data, so there was no
 for the ones that matter. `assets/_headers` carries the arithmetic and the header was read
 back off a real response, which that file requires of anyone editing it.
 
-**Open, and deliberately not fixed: acting on a build can eject you out of it.** `useSync`
-calls back when a sync applies changes (`src/state/useSync.ts:68`), `src/App.tsx:286` bumps
-`libraryAt`, and remounting `<Builds>` drops `openId`. A local write round-trips and triggers
-it, so this follows Edit and Log run as much as the new buttons: 307 sync requests in one
-local session, and both take-down and put-back ejected reliably. `src/App.tsx:260-265` argues
-the remount is the honest fix for a stale list and is right about that; what it does not do is
-keep the reader's place. Lifting `openId` beside `libraryAt` is the likely shape, and it is a
-change to a deliberate contract rather than a loose end.
+**Fixed on 11 September: a sync threw you out of whatever you had open.** Recorded here on
+the 8th as losing your place, it was worse: `<Builds key={libraryAt}>` rebuilt the whole
+screen on every bump, and a rebuilt screen had forgotten the open build, the Log run form,
+the filters and the editor's unsaved draft. `useSync` runs on every focus and visibility
+change, so alt-tabbing back from the game was enough, and the owner lost a build halfway
+through writing it.
+
+Lifting `openId` into `App`, the shape proposed here, would not have saved the draft, which
+lives in `BuildEditor`'s own state. So `libraryAt` became a signal instead of a key: `Builds`
+re-reads storage when it moves and leaves everything the reader chose alone, and it is still
+the only owner of its list, which was what the remount was protecting. `FollowNews` had been
+reading the offer for the open build only when the build's id changed, which only ever worked
+because of the remount, so it now reads again when it is handed a new copy of the build.
+
+`src/App.test.tsx` is the first test in the repo that renders the whole app, and it had to
+be: a test of `Builds` alone passes on the broken code, because the fault was in how `App`
+rendered it. Its four tests were watched failing on the old code, three passed once the
+remount was gone, and the offer test kept failing until `FollowNews` was fixed. Then the real
+thing in a real browser: another device's change pushed through `/api/sync`, a focus event,
+the app's own `useSync` pulling and applying it, and an unsaved edit still there afterwards.
 
 **Following got its guarantees**, 7 September 2026. Three things a follower could not rely
 on, and the owner found the first by using it.

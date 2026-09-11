@@ -66,7 +66,16 @@ const DETAILS: { id: BuildDetail; name: string; note: string }[] = [
   },
 ]
 
-export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: View) => void }) {
+export function Builds({
+  onClose,
+  onGo,
+  libraryAt = 0,
+}: {
+  onClose?: () => void
+  onGo?: (view: View) => void
+  /** Moves when storage changed underneath this screen. See the effect below. */
+  libraryAt?: number
+}) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
   /** What was typed into the search box. Not part of `Selection`: see below. */
@@ -86,6 +95,33 @@ export function Builds({ onClose, onGo }: { onClose?: () => void; onGo?: (view: 
    */
   const [mine, setMine] = useState<ShownBuild[]>(loadBuilds)
   const [editing, setEditing] = useState<ShownBuild | 'new' | null>(null)
+
+  /**
+   * Storage changed underneath the screen, so read it again and touch nothing else.
+   *
+   * `App` used to remount this component instead, with `key={libraryAt}`, and a
+   * new key is a new component: the build being read, the open dialog, the Log
+   * run form, the filters and the editor's unsaved draft all went with it. Sync
+   * fires on every focus and visibility change, and this is a tool people
+   * alt-tab out of to play, so coming back to the tab was enough to lose a build
+   * halfway through writing it. That is what happened to the owner.
+   *
+   * So the list is re-read and nothing the reader chose is. It is still this
+   * component's list, which was the point of the remount: `App` only says that
+   * storage moved. A build that vanished closes by itself, because `open` is
+   * looked up in the list. A build being edited keeps its draft, because the
+   * editor's state is its own, and saving is the reader's answer to whatever
+   * arrived while they typed.
+   *
+   * Skipped on mount, where the lazy `useState` reads above have just done it.
+   */
+  const seen = useRef(libraryAt)
+  useEffect(() => {
+    if (seen.current === libraryAt) return
+    seen.current = libraryAt
+    setMine(loadBuilds())
+    setBin(loadBin())
+  }, [libraryAt])
 
   /**
    * Cards or a list. Absent in prefs means nobody has chosen, and the library's
@@ -1044,7 +1080,12 @@ function FollowNews({
 }) {
   const [offer, setOffer] = useState(() => offerFor(build.id))
   const [busy, setBusy] = useState(false)
-  useEffect(() => setOffer(offerFor(build.id)), [build.id])
+  /* On the build object rather than its id. The id never changes while a build
+     is open, so reading on the id alone only ever caught an offer that arrived
+     mid-read because the whole screen used to be remounted underneath it. A
+     refresh hands this a new object for the same build, and that is the moment
+     to look again. `App.test.tsx` fails without it. */
+  useEffect(() => setOffer(offerFor(build.id)), [build])
 
   if (!offer) return null
 

@@ -19,6 +19,17 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-11',
+    title: 'Coming back to the tab no longer loses what you had open',
+    say: 'A background sync was throwing away the build you were reading and the edit you had not saved.',
+    points: [
+      'Whenever your builds changed underneath the screen, because another device had synced something, a build you follow had moved, or you had kept a shared link, the whole build screen was rebuilt from scratch. That threw away whatever you had open: the build you were reading, the run you were logging, your filters, and an edit you had not saved yet.',
+      'A sync runs every time you come back to the tab, and this is a tool you switch away from to play. So switching back from the game was enough to lose a build halfway through writing it.',
+      'The screen now reads your builds again when they change and leaves everything you have open alone. A build that was deleted on another device still closes, because there is nothing left to show.',
+      'News about a build you follow, that its author changed the picks or took it off the exchange, now shows up even when that build was already open as the news arrived.',
+    ],
+  },
+  {
     date: '2026-09-10',
     title: 'A build says what it is built around, and which keepsake would help',
     say: 'Two things a build has always carried and never explained, plus the author’s write-up where a reader can actually reach it.',
