@@ -90,11 +90,11 @@ function walk(dir: string, out: string[] = []): string[] {
 function loadSources(): SourceFile[] {
   const files: SourceFile[] = []
 
-  const add = (path: string, legacy = false) => {
+  const add = (path: string) => {
     const ext = path.slice(path.lastIndexOf('.'))
     const kind = SOURCE_KINDS[ext]
     if (!kind) return
-    files.push({ path: rel(path), kind, text: readFileSync(path, 'utf8'), ...(legacy ? { legacy } : {}) })
+    files.push({ path: rel(path), kind, text: readFileSync(path, 'utf8') })
   }
 
   add(join(ROOT, 'index.html'))
@@ -114,8 +114,6 @@ function loadSources(): SourceFile[] {
   for (const path of walk(join(ROOT, 'artifact'))) {
     if (!path.includes('.test.')) add(path)
   }
-  // The hand-authored page the app replaces. Checked, reported, never fatal.
-  add(join(ROOT, 'placeholder/index.html'), true)
 
   return files
 }

@@ -167,7 +167,9 @@ the play experience cannot see.
   directory is not on PATH, so call `deppth2.exe` by full path
 - **The preview pane cannot load `dist/index.html` from a `file://` path** because it inlines
   local files as data URLs and the page is over 1 MB. Use `preview_start` with the
-  `placeholder` config in `.claude/launch.json`, which serves `dist/` on port 8777
+  `workers` config in `.claude/launch.json`, which serves `dist/` on port 8787 with the
+  API and `assets/_headers` behind it. This line used to name a `placeholder` config on
+  8777, which served the pre-app page in `placeholder/` rather than `dist/`
 - **Screenshots need the Browser pane open.** If they time out with "not compositing frames",
   ask the owner to open the pane. Computed styles are not a substitute: a `<meta charset>`
   bug that mangled every `·` on the live site was invisible to DOM queries and obvious in a

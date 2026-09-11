@@ -14,8 +14,8 @@ Last updated 8 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 633 in node across 33 files, and **148 inside workerd** against a real D1. `npm test` runs both |
-| **Validator** | 0 failures, 3 warnings, across 10 checks |
+| **Tests** | 637 in node across 34 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
@@ -702,7 +702,6 @@ that would let a listing say what its Fear was earned under rather than only how
 | ~~A mail provider~~ | **Done, 4 September 2026.** Resend, sending as `dora@enodia.me`. `RESEND_API_KEY` is a secret; `MAIL_FROM` moved into `wrangler.jsonc` vars because it is printed on every letter and was therefore never a secret. Resend's records sit on `send.enodia.me` so Proton's SPF at the apex never had to be edited |
 | ~~Flipping `ACCOUNTS_LIVE`~~ | **Done, 4 September 2026.** Kept as a flag rather than deleted, so turning accounts off again is one line and a deploy |
 | ~~The Ko-fi handle~~ | **Done.** `stigsmith`, live in the footer |
-| Two "rooms" on the live page | The owner | The validator reports them. `placeholder/index.html` lines 1106 and 1362 say "ten rooms in" and "encounter rooms". Copy is the owner's to change |
 | `feeds` tag | The owner | `DESIGN.md` 12 item 8. Largest hand-authoring job in the project, and the briefing's advice line needs it |
 | Archetype `core` / `compatible` / `avoid` lists | The owner | `DESIGN.md` 4.1.4. Not derivable from any file |
 | Real build definitions | The owner | `data/curated/builds.json` says its records are the owner's alone. The library ships empty now: `SAMPLE_BUILDS` is `[]` and the stress-test build lives in `builds.fixture.ts`, which nothing in the app imports. `how`, `luck`, `playstyle` and `by` are ready for them |
@@ -756,8 +755,6 @@ These are real and none of them block step 2.
   The owner will hunt for one personally. The game's aspect icon carries it until then
 - 17 wiki images lost their manifest row when someone moved them between categories.
   `npm run assets` names them
-- `placeholder/index.html` inlines its own token copy. `src/ui/tokens.css` is the source,
-  and the app now imports it directly
 
 **The open product question, 28 August 2026**
 

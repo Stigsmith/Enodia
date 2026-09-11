@@ -10,8 +10,9 @@ export default defineConfig({
   // before this is deployed for real.
   publicDir: 'assets',
   build: {
-    // dist/ used to hold the hand-authored placeholder page. That page now
-    // lives in placeholder/ and dist/ is build output, ignored by git.
+    // dist/ is build output, and git ignores it. It once held the hand-authored
+    // page that stood in for the app; that page moved to placeholder/ and was
+    // deleted on 11 September 2026, once nothing served it.
     outDir: 'dist',
     emptyOutDir: true,
   },

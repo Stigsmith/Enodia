@@ -40,12 +40,6 @@ export type SourceFile = {
   path: string
   kind: SourceKind
   text: string
-  /**
-   * The hand-authored page in placeholder/ is being replaced by the app, so
-   * its findings are reported rather than fatal. Everything under src/ and the
-   * app's own index.html is not legacy and fails the build.
-   */
-  legacy?: boolean
 }
 
 export type Baseline = {

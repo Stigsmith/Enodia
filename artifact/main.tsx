@@ -11,9 +11,9 @@
  * way it could happen is by someone adding a variant here rather than in
  * `src/ui/variants`.
  *
- * This is not the Netlify page. That still serves `placeholder/`, and putting a
- * design switcher and three "these are samples" notices on a public site would
- * be the wrong thing entirely.
+ * This is not the public site. enodia.me serves the app itself, and putting a
+ * design switcher and three "these are samples" notices there would be the
+ * wrong thing entirely.
  */
 
 import { StrictMode } from 'react'
