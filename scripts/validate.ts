@@ -18,7 +18,7 @@ import { join, relative, resolve } from 'node:path'
 
 import { countsOf, coverageOf, runAllChecks } from './validate/checks.ts'
 import type { Manifest } from '../src/data/icons.ts'
-import type { Baseline, Bundle, CuratedFile, Finding, GeneratedFile, SourceFile, SourceKind } from './validate/types.ts'
+import type { Baseline, Bundle, CodeFile, CuratedFile, Finding, GeneratedFile, SourceFile, SourceKind } from './validate/types.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const GENERATED = join(ROOT, 'data/generated')
@@ -85,6 +85,28 @@ function walk(dir: string, out: string[] = []): string[] {
     else out.push(path)
   }
   return out
+}
+
+/**
+ * Every hand-written source file, for the checks that read bytes rather than
+ * words.
+ *
+ * `loadSources` is what a reader can see, and it leaves out tests, build
+ * scripts and the worker because none of them is UI: the vocabulary check has
+ * no business reading an extractor's strings as copy. The control-character
+ * check has every business, because an encoding fault lands in whatever file a
+ * generator happened to write, and on 10 September that was
+ * `scripts/extract.mjs`. So it gets its own, wider list.
+ */
+const CODE_EXTENSIONS = ['.ts', '.tsx', '.mjs', '.css', '.html']
+
+function loadCode(): CodeFile[] {
+  const paths = [join(ROOT, 'index.html')]
+  for (const dir of ['src', 'scripts', 'worker', 'artifact']) paths.push(...walk(join(ROOT, dir)))
+  return paths
+    .filter((path) => existsSync(path) && !path.includes('node_modules'))
+    .filter((path) => CODE_EXTENSIONS.includes(path.slice(path.lastIndexOf('.'))))
+    .map((path) => ({ path: rel(path), text: readFileSync(path, 'utf8') }))
 }
 
 function loadSources(): SourceFile[] {
@@ -163,7 +185,7 @@ function loadBaseline(): Baseline | null {
 // ---------------------------------------------------------------------------
 
 const colour = process.stdout.isTTY && !process.env.NO_COLOR
-const ESC = '['
+const ESC = '\x1b['
 const paint = (code: string, text: string) => (colour ? `${ESC}${code}m${text}${ESC}0m` : text)
 
 const MARK: Record<Finding['severity'], string> = {
@@ -192,6 +214,7 @@ const bundle: Bundle = {
   generated: loadGenerated(),
   curated: loadCurated(),
   sources: loadSources(),
+  code: loadCode(),
   baseline: loadBaseline(),
   manifest: loadManifest(),
   assetFiles: loadAssetFiles(),

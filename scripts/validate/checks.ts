@@ -1189,13 +1189,25 @@ export function checkCurated(bundle: Bundle): Finding[] {
  * That is the same shape as the charset bug below, which is why this sits
  * beside it: a fault that renders wrong, passes everything automated, and needs
  * a human eye or a rule like this one.
+ *
+ * **It reads every hand-written file, not only what renders.** It used to walk
+ * `bundle.sources`, the UI list, so build scripts, the worker and every test
+ * were out of its reach. On 10 September a change written through Python put a
+ * backspace byte into `scripts/extract.mjs` and nothing noticed. Given the
+ * whole list, it found two more already in `scripts/` on its first run.
  */
 export function checkControlChars(bundle: Bundle): Finding[] {
   const out: Finding[] = []
   // Tab, newline and carriage return are the legitimate ones.
   const CONTROL = new RegExp('[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]', 'g')
 
-  for (const file of bundle.sources) {
+  /* Both lists, once each. `code` holds every file `sources` does and more, so
+     a file that renders arrives twice, and reporting it twice would double the
+     finding without adding anything. */
+  const files = new Map<string, { path: string; text: string }>()
+  for (const file of [...bundle.sources, ...bundle.code]) files.set(file.path, file)
+
+  for (const file of files.values()) {
     const matches = [...file.text.matchAll(CONTROL)]
     if (!matches.length) continue
     const at = matches[0]?.index ?? 0
@@ -1212,6 +1224,14 @@ export function checkControlChars(bundle: Bundle): Finding[] {
     })
   }
 
+  if (!out.length) {
+    out.push(
+      info(
+        'control characters',
+        `no control character in ${files.size} file${files.size === 1 ? '' : 's'}, scripts and tests included`,
+      ),
+    )
+  }
   return out
 }
 

@@ -14,7 +14,7 @@ Last updated 8 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 637 in node across 34 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 642 in node across 34 files, and **153 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |

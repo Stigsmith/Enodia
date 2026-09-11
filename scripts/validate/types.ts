@@ -48,10 +48,26 @@ export type Baseline = {
   coverage: Record<string, number>
 }
 
+/**
+ * A hand-written source file, read for its bytes rather than its words.
+ *
+ * `SourceFile` is what a reader can end up seeing, and every UI check reads it:
+ * the vocabulary, the retired claims, the roster. Build scripts and the worker
+ * are not UI, and putting them in that list would have those checks reading
+ * extractor code as copy. This is the wider list, for checks about encoding
+ * faults, which land in whatever file a generator happened to write.
+ */
+export type CodeFile = {
+  path: string
+  text: string
+}
+
 export type Bundle = {
   generated: GeneratedFile[]
   curated: CuratedFile[]
   sources: SourceFile[]
+  /** Every hand-written source file, tests and scripts included. See `CodeFile`. */
+  code: CodeFile[]
   baseline: Baseline | null
   /** assets/manifest.json, written by scripts/assets.ts */
   manifest: Manifest | null
