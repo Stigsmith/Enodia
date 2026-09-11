@@ -5,6 +5,7 @@ import {
   checkAssets,
   checkCharset,
   checkClassification,
+  checkControlChars,
   checkCounts,
   checkCurated,
   checkProvenance,
@@ -47,6 +48,7 @@ function bundle(parts: Partial<Bundle> = {}): Bundle {
     generated: [],
     curated: [],
     sources: [],
+    code: [],
     baseline: null,
     manifest: null,
     assetFiles: [],
@@ -340,7 +342,7 @@ describe('retired claims', () => {
   /**
    * **The bug this check shipped with, kept so it cannot come back.**
    *
-   * The patterns were first written through a script that turned `` into a
+   * The patterns were first written through a script that turned `\b` into a
    * literal backspace character. `String(pattern)` printed `/no account/i`,
    * identical to a correct one, and it matched nothing at all: the guard
    * reported a clean pass over copy that said the banned thing twice. An
@@ -793,5 +795,56 @@ describe('charset', () => {
     expect(
       messages(checkCharset(bundle({ sources: [source('index.html', 'html', '<head></head>')] })), 'fail'),
     ).toEqual(['index.html has no meta tags at all'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Control characters, and the files that used to be out of their reach.
+ *
+ * The check read `bundle.sources`, the list every UI check reads, so it only
+ * ever saw what renders: `src/`, `index.html` and `artifact/`, tests excluded.
+ * Build scripts and the worker were never looked at. That is where the next one
+ * landed: on 10 September a change to `scripts/extract.mjs` written through
+ * Python put a backspace byte where `\b` belonged, and the regex it broke
+ * matched nothing until it was found by hand.
+ *
+ * Widening it found two more already sitting in `scripts/`: an ESC in
+ * `validate.ts` that happened to work, and a backspace in the docblock of this
+ * very file, in the paragraph about the first time this happened.
+ */
+describe('control characters', () => {
+  const code = (path: string, text: string) => ({ path, text })
+
+  it('fails on one in a build script, which the check never used to read', () => {
+    const findings = checkControlChars(bundle({ code: [code('scripts/extract.mjs', 'const gift = /\bGift/g')] }))
+    expect(messages(findings, 'fail')).toEqual(['scripts/extract.mjs:1 holds U+0008'])
+  })
+
+  it('reads tests too, and says which line', () => {
+    const findings = checkControlChars(bundle({ code: [code('src/state/facets.test.ts', 'one\ntwo \u0000')] }))
+    expect(messages(findings, 'fail')).toEqual(['src/state/facets.test.ts:2 holds U+0000'])
+  })
+
+  it('still reads the files that render', () => {
+    const findings = checkControlChars(bundle({ sources: [source('src/ui/Card.tsx', 'tsx', 'const esc = "\u001b"')] }))
+    expect(messages(findings, 'fail')).toEqual(['src/ui/Card.tsx:1 holds U+001B'])
+  })
+
+  /* In a real run `code` holds every file `sources` does, so each file that
+     renders arrives twice. Reporting it twice would double every finding. */
+  it('reports a file once when both lists carry it', () => {
+    const findings = checkControlChars(
+      bundle({ sources: [source('src/a.ts', 'ts', 'x\by')], code: [code('src/a.ts', 'x\by')] }),
+    )
+    expect(findings).toHaveLength(1)
+  })
+
+  /* Every other check says so when it passes. This one said nothing, so no run
+     ever showed how far it had looked. */
+  it('says how many files it read when they are all clean', () => {
+    const findings = checkControlChars(bundle({ code: [code('scripts/a.ts', 'fine')] }))
+    expect(findings.map((f) => f.message)).toEqual(['no control character in 1 file, scripts and tests included'])
   })
 })
