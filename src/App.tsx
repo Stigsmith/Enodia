@@ -167,8 +167,8 @@ export function App() {
      *
      * A followed build whose author had rewritten a note was updated in storage
      * and the Builds screen went on drawing the old one until something else
-     * happened to remount it. `libraryAt` is the remount key that already exists
-     * for exactly this, so the redraw is one line.
+     * happened to redraw it. `libraryAt` is the signal that already exists for
+     * exactly this, so the redraw is one line.
      *
      * Offers need no bump: they are read when the screen renders, and the screen
      * renders after this resolves in every case where there is one to show.
@@ -257,22 +257,29 @@ export function App() {
   /**
    * Bumped when storage changes underneath a screen that has already read it.
    *
-   * `Builds` reads the library once, when it mounts, which is right: it owns
-   * that list while it is open. A build arriving in a link writes to storage
-   * from outside it, and if the build manager happens to be the screen behind
-   * the card it keeps showing the list it read before. Remounting it is the
-   * honest fix; reaching into its state from here would give the same list two
-   * owners.
+   * `Builds` reads the library when it mounts and owns that list while it is
+   * open. A build arriving in a link, a sync from another device, a followed
+   * build that moved: each writes to storage from outside it, and the screen
+   * would go on drawing the list it read before.
+   *
+   * **This is a signal, not a remount key, and it used to be a remount key.**
+   * `<Builds key={libraryAt}>` rebuilt the whole screen on every bump, and a
+   * rebuilt screen has forgotten what the reader had open: the build, the
+   * dialog, the filters and the editor's unsaved draft. Sync runs on every focus
+   * change, so alt-tabbing back from the game was enough, and the owner lost a
+   * build halfway through writing it. `Builds` now re-reads storage when this
+   * moves and leaves the rest alone, and it is still the only owner of its list.
+   * `App.test.tsx` holds it to that through the real screens.
    */
   const [libraryAt, setLibraryAt] = useState(0)
 
   /**
    * Keep this browser in step with the account.
    *
-   * The redraw is deliberately coarse and reuses `libraryAt`, the remount key
-   * right above, which exists for exactly this class of problem: storage
-   * changing underneath a list that has already read it. Sync is that, arriving
-   * from another device rather than from a share link.
+   * The redraw reuses `libraryAt`, the signal right above, which exists for
+   * exactly this class of problem: storage changing underneath a list that has
+   * already read it. Sync is that, arriving from another device rather than
+   * from a share link.
    *
    * The theme, the wallpapers and the frame are re-read as well, because they
    * are the things held in state up here rather than read fresh by whoever
@@ -608,7 +615,7 @@ export function App() {
   if (screen === 'builds') {
     return frame(
       <div className="shell is-wide">
-        <Builds key={libraryAt} onGo={setView} />
+        <Builds libraryAt={libraryAt} onGo={setView} />
       </div>,
     )
   }
