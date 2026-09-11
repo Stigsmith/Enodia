@@ -57,11 +57,10 @@ function bundle(parts: Partial<Bundle> = {}): Bundle {
 const messages = (findings: Finding[], severity: Finding['severity']) =>
   findings.filter((f) => f.severity === severity).map((f) => f.message)
 
-const source = (path: string, kind: SourceFile['kind'], text: string, legacy = false): SourceFile => ({
+const source = (path: string, kind: SourceFile['kind'], text: string): SourceFile => ({
   path,
   kind,
   text,
-  ...(legacy ? { legacy: true } : {}),
 })
 
 // ---------------------------------------------------------------------------
@@ -263,8 +262,8 @@ describe('counts against the baseline', () => {
 // ---------------------------------------------------------------------------
 
 describe('vocabulary', () => {
-  const scan = (text: string, kind: SourceFile['kind'] = 'tsx', legacy = false) =>
-    checkVocabulary(bundle({ sources: [source('src/Test.tsx', kind, text, legacy)] }))
+  const scan = (text: string, kind: SourceFile['kind'] = 'tsx') =>
+    checkVocabulary(bundle({ sources: [source('src/Test.tsx', kind, text)] }))
 
   it('fails on an internal word in JSX text', () => {
     const findings = scan('export const A = () => <p>Pick a door</p>')
@@ -315,12 +314,6 @@ describe('vocabulary', () => {
     const html = ['<!-- a note about the door', 'and the room -->', '<p>Ten rooms in</p>'].join('\n')
     const findings = checkVocabulary(bundle({ sources: [source('page.html', 'html', html)] }))
     expect(messages(findings, 'fail')).toEqual(['1 UI strings use an internal word'])
-  })
-
-  it('reports the legacy page rather than failing the build on it', () => {
-    const findings = scan('export const A = () => <p>Ten rooms in</p>', 'tsx', true)
-    expect(messages(findings, 'fail')).toEqual([])
-    expect(messages(findings, 'warn')).toHaveLength(1)
   })
 })
 

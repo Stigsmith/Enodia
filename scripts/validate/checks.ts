@@ -815,20 +815,8 @@ export function checkVocabulary(bundle: Bundle): Finding[] {
   const describe = (h: (typeof hits)[number]) =>
     `${h.file.path}:${h.line}  say "${h.use}", not "${h.internal}"  ${h.text.slice(0, 70)}`
 
-  const live = hits.filter((h) => !h.file.legacy)
-  const legacy = hits.filter((h) => h.file.legacy)
-
-  if (live.length) {
-    out.push(fail('vocabulary', `${live.length} UI strings use an internal word`, cap(live.map(describe))))
-  }
-  if (legacy.length) {
-    out.push(
-      warn(
-        'vocabulary',
-        `${legacy.length} UI strings in the hand-authored page use an internal word`,
-        [...cap(legacy.map(describe)), 'That page predates the app and is copy the owner owns, so this reports rather than fails.'],
-      ),
-    )
+  if (hits.length) {
+    out.push(fail('vocabulary', `${hits.length} UI strings use an internal word`, cap(hits.map(describe))))
   }
   if (!hits.length && bundle.sources.length) {
     out.push(info('vocabulary', `${bundle.sources.length} source files carry no internal word in a UI string`))
@@ -972,22 +960,11 @@ export function checkRetiredClaims(bundle: Bundle): Finding[] {
   const describe = (h: (typeof hits)[number]) =>
     `${h.file.path}:${h.line}  "${h.claim}" was retired. ${h.instead}  ${h.text.slice(0, 60)}`
 
-  const live = hits.filter((h) => !h.file.legacy)
-  const legacy = hits.filter((h) => h.file.legacy)
-
-  if (live.length) {
+  if (hits.length) {
     out.push(
-      fail('retired claims', `${live.length} UI strings make a claim the tool no longer may`, [
-        ...cap(live.map(describe)),
+      fail('retired claims', `${hits.length} UI strings make a claim the tool no longer may`, [
+        ...cap(hits.map(describe)),
         `Add ${CLAIM_ESCAPE} to the line if the phrase is genuinely right in context, and say why.`,
-      ]),
-    )
-  }
-  if (legacy.length) {
-    out.push(
-      warn('retired claims', `${legacy.length} in the hand-authored page`, [
-        ...cap(legacy.map(describe)),
-        'That page predates the app and is copy the owner owns, so this reports rather than fails.',
       ]),
     )
   }
@@ -1066,7 +1043,7 @@ export function checkRoster(bundle: Bundle): Finding[] {
   // An app file naming three or more of them has grown a roster of its own.
   const names = new Set(gods.map((g) => g.toLowerCase()))
   for (const file of bundle.sources) {
-    if (file.legacy || (file.kind !== 'ts' && file.kind !== 'tsx')) continue
+    if (file.kind !== 'ts' && file.kind !== 'tsx') continue
     if (file.text.includes(VOCAB_ESCAPE)) continue
     const mentioned = new Set<string>()
     for (const found of extractUiStrings(file)) {
@@ -1226,7 +1203,7 @@ export function checkControlChars(bundle: Bundle): Finding[] {
     const code = file.text.charCodeAt(at).toString(16).toUpperCase().padStart(4, '0')
     out.push({
       check: 'control characters',
-      severity: file.legacy ? 'warn' : 'fail',
+      severity: 'fail',
       message: `${file.path}:${line} holds U+${code}`,
       detail: [
         `${matches.length} control character${matches.length === 1 ? '' : 's'} in this file.`,
@@ -1253,7 +1230,7 @@ export function checkCharset(bundle: Bundle): Finding[] {
       const finding = first
         ? `${file.path} first meta is not the charset: ${first.slice(0, 60)}`
         : `${file.path} has no meta tags at all`
-      out.push(file.legacy ? warn('charset', finding) : fail('charset', finding))
+      out.push(fail('charset', finding))
     }
   }
   if (!out.length) out.push(info('charset', 'every page opens with <meta charset="utf-8">'))

@@ -3,8 +3,7 @@
 An in-run build companion for **Hades II**. Not a build planner and not a wiki: it answers
 the question you have while standing at an Exit with fifteen seconds to decide.
 
-Nothing is implemented yet beyond the data layer and its validator. `placeholder/index.html`
-is the hand-authored page that stands in for the app.
+It is live at [enodia.me](https://enodia.me).
 
 **Start with [`ROADMAP.md`](ROADMAP.md)** for where the build is, then
 [`CLAUDE.md`](CLAUDE.md) for the rules that matter most.
@@ -40,7 +39,6 @@ data/curated/         hand-authored judgement, joined on id. see its README
 data/baseline.json    the structural counts the validator holds the extractor to
 src/                  the app. tokens.css is the source for every colour
 assets/               643 images and their manifest, see assets/README.md
-placeholder/          the hand-authored page, live on Netlify until the deploy moves
 dist/                 build output. Vite owns it, git ignores it
 
 wrangler.jsonc        how the site is served. Cloudflare Workers, and the API route
