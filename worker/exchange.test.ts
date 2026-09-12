@@ -15,10 +15,7 @@
  */
 
 import { SELF, env } from 'cloudflare:test'
-import { drizzle } from 'drizzle-orm/d1'
 import { beforeEach, describe, expect, it } from 'vitest'
-
-import * as schema from './schema.ts'
 
 const ORIGIN = 'https://enodia.me'
 const PASSWORD = 'a-long-enough-password-here'
@@ -76,6 +73,8 @@ type Listing = {
   by: string
   note?: string
   mine?: boolean
+  /** On the Mine and Followed shelves only. Absent, not false, on the others. */
+  takenDown?: boolean
   stats: Counts
   /** What earlier versions of this build earned, when there is anything. */
   before?: Omit<Counts, 'players'>
@@ -222,7 +221,7 @@ describe('the counts, which are the only evidence there is', () => {
 
   it('says nothing at all about a build nobody has touched', async () => {
     const curator = await someone('Stig')
-    const id = await publish(curator.cookie)
+    await publish(curator.cookie)
 
     const stats = (await shelf('/api/exchange'))[0]?.stats
     expect(stats).toEqual({
@@ -414,7 +413,7 @@ describe('your own build', () => {
   it('is marked as yours on the shelf, without saying whose', async () => {
     const me = await someone('Author')
     const other = await someone('Reader')
-    const id = await publish(me.cookie, 'Mine')
+    await publish(me.cookie, 'Mine')
 
     const asAuthor = (await shelf('/api/exchange', me.cookie))[0]
     expect(asAuthor?.mine).toBe(true)

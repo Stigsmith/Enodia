@@ -72,6 +72,15 @@ export type BoardRow = {
   count: number
 }
 
+/**
+ * A row before its count is attached.
+ *
+ * `rank` attaches every count, so the functions that build a row return this
+ * rather than a `BoardRow`. `count` stays required on `BoardRow` because
+ * `src/ui/Leaderboards.tsx` prints it on every row without checking for it.
+ */
+type Uncounted = Omit<BoardRow, 'count'>
+
 export type Board = {
   id: string
   title: string
@@ -225,7 +234,7 @@ function ofKind(counts: Map<string, number>, prefix: string): BoardRow[] {
  * a zero for the same reason, and a board left with no rows at all is dropped
  * by `boards` rather than drawn empty.
  */
-function rank<T>(rows: T[], count: (row: T) => number | null, into: (row: T) => BoardRow): BoardRow[] {
+function rank<T>(rows: T[], count: (row: T) => number | null, into: (row: T) => Uncounted): BoardRow[] {
   return rows
     .map((row) => ({ row, n: count(row) }))
     .filter((one): one is { row: T; n: number } => one.n !== null && one.n > 0)
@@ -235,7 +244,7 @@ function rank<T>(rows: T[], count: (row: T) => number | null, into: (row: T) => 
 }
 
 /** A build board's row, before its count is attached. */
-const asBuild = (one: Scanned): BoardRow => ({ id: one.id, name: one.name, by: one.by })
+const asBuild = (one: Scanned): Uncounted => ({ id: one.id, name: one.name, by: one.by })
 
 /** What one author's listings add up to. */
 type Person = {
@@ -299,7 +308,7 @@ export async function boards(db: DB, scope: Scope, viewer: string | null): Promi
   const folk = people(rows)
   const now = Date.now()
 
-  const asPerson = (one: Person): BoardRow => ({ name: one.name })
+  const asPerson = (one: Person): Uncounted => ({ name: one.name })
 
   const all: Board[] = [
     {

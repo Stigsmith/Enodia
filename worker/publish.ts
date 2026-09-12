@@ -19,6 +19,7 @@
  */
 
 import { and, eq, isNull, sql } from 'drizzle-orm'
+import type { BatchItem } from 'drizzle-orm/batch'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 
 import { buildFacet, publishedBuild } from './schema-app.ts'
@@ -91,13 +92,16 @@ const facetsIn = (body: { facets?: unknown }): string[] => {
  */
 async function setFacets(db: DB, id: string, facets: string[]): Promise<void> {
   try {
-    const writes: Parameters<DB['batch']>[0] = [
+    /* Non-empty, which `batch` requires, and not readonly, so the insert can be
+       pushed on. `Parameters<DB['batch']>[0]` is the readonly form and has no
+       `push`. */
+    const writes: [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]] = [
       db.delete(buildFacet).where(eq(buildFacet.buildId, id)),
     ]
     if (facets.length) {
       writes.push(db.insert(buildFacet).values(facets.map((facet) => ({ buildId: id, facet }))))
     }
-    await db.batch(writes as Parameters<DB['batch']>[0])
+    await db.batch(writes)
   } catch {
     /* Deliberately quiet. See above. */
   }
