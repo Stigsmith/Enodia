@@ -26,6 +26,7 @@ import { canBeOffered } from '../engine/slots.ts'
 import { satisfiesRequirement } from '../engine/reachability.ts'
 import { eligibleGods } from '../engine/runsim.ts'
 import { Offer } from './Offer.tsx'
+import type { Advice } from './Offer.tsx'
 import { Radial } from './Radial.tsx'
 import type { ArtShape, RadialItem } from './Radial.tsx'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
@@ -117,10 +118,13 @@ export function Picker({
   run,
   onTake,
   onSkip,
+  advice = null,
 }: {
   run: RunContext
   onTake: (trait: TraitId, rarity: HeldTrait['rarity'], god: string | null, kind: RunEntry['kind']) => void
   onSkip: (god: string | null, kind: RunEntry['kind'], note?: string) => void
+  /** the notes of the build this run is going for, for the offer cards */
+  advice?: Advice | null
 }) {
   const [kind, setKind] = useState<Kind | null>(null)
   // An Encounter happens inside a Location the player already reached, so it
@@ -405,6 +409,7 @@ export function Picker({
         candidates={options}
         god={source.kind === 'olympian' ? source.id : null}
         rarity={rarity}
+        advice={advice}
         onTake={(id) => {
           onTake(id, rarity, source.kind === 'olympian' ? source.id : null, where(kind))
           reset()

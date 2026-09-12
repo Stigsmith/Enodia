@@ -30,10 +30,11 @@
  */
 
 import { arcanaById, familiarById, iconOf, renderOf, traits, weaponById } from '../data/app.ts'
+import { KEEPSAKE_POSITIONS, noteLabel, notesOf, swapsOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { isHammer } from '../engine/picks.ts'
-import type { Rarity, Slot, TraitId } from '../data/types.ts'
+import type { Rarity, Slot, StatLine, TraitId } from '../data/types.ts'
 
 /** The game's own frames, by the rarity they mark. */
 export const FRAME: Record<Rarity, string> = {
@@ -73,8 +74,13 @@ export const SLOT_GLYPH: Partial<Record<Slot, string>> = {
   Mana: 'slots/magick.webp',
 }
 
+/**
+ * `other` is only ever a mention: a trait named in a write-up that is none of
+ * the rest, a Selene talent or a gift from Circe. No layout draws one, and it
+ * hovers with no kind word rather than being called a boon.
+ */
 export type PieceKind =
-  'aspect' | 'core' | 'boon' | 'duo' | 'hex' | 'hammer' | 'keepsake' | 'familiar' | 'arcana'
+  'aspect' | 'core' | 'boon' | 'duo' | 'hex' | 'hammer' | 'keepsake' | 'familiar' | 'arcana' | 'other'
 
 export type Piece = {
   key: string
@@ -92,6 +98,22 @@ export type Piece = {
   frame: string
   /** the gods behind it. Two, for a duo */
   gods: string[]
+  /** the element it carries, for a boon that carries one */
+  elements?: string[]
+  /** the lines the game draws under its sentence. See `StatLine` */
+  stats?: StatLine[]
+  /**
+   * When in the run a keepsake is taken, "After the first Guardian", for a
+   * build that swaps. Not `slotName`, which is a core slot and is read as one.
+   */
+  when?: string
+  /**
+   * The build author's note on this pick, and whose it is: "Your note", or
+   * "Ana's note" on somebody else's build. Carried on the piece so the hover,
+   * the dialog and the list under a build all show it without being handed
+   * the build. See `ShownBuild.notes`.
+   */
+  note?: { by: string; text: string }
   /** this is the thing the build is for */
   centrepiece: boolean
   /** an upgrade rather than part of the build */
@@ -176,8 +198,73 @@ function fromTrait(id: TraitId, kind: PieceKind, centrepiece: boolean): Piece | 
     glyph: slot ? (SLOT_GLYPH[slot] ?? null) : null,
     frame,
     gods: trait.gods ?? [],
+    elements: trait.elements ?? [],
+    stats: trait.stats ?? [],
     centrepiece,
   }
+}
+
+function pieceOfFamiliar(id: string): Piece | null {
+  const familiar = familiarById.get(id)
+  if (!familiar) return null
+  return {
+    key: `familiar:${familiar.id}`,
+    kind: 'familiar',
+    id: familiar.id,
+    name: familiar.name,
+    icon: familiar.icon,
+    text: familiar.text,
+    slot: null,
+    slotName: null,
+    glyph: null,
+    frame: FRAME.Common,
+    gods: [],
+    centrepiece: false,
+  }
+}
+
+function pieceOfArcana(id: string): Piece | null {
+  const card = arcanaById.get(id)
+  if (!card) return null
+  return {
+    key: `arcana:${id}`,
+    kind: 'arcana',
+    id,
+    name: card.name,
+    icon: card.icon,
+    text: card.text,
+    slot: null,
+    slotName: null,
+    glyph: null,
+    frame: FRAME.Common,
+    gods: [],
+    centrepiece: false,
+  }
+}
+
+/**
+ * Any one thing the wiki has a record for, as a piece, so a mention in a
+ * write-up can draw it and hover it the way a build draws its own picks.
+ *
+ * The kind follows the trait's own, so a keepsake named in a paragraph hovers
+ * as a keepsake and wears the tooltip backing rather than the boon plate. Null
+ * for anything the data does not know, or a trait with no display name, which
+ * the wiki has no record for either.
+ */
+export function pieceOf(at: { kind: 'trait' | 'arcana' | 'familiar'; id: string }): Piece | null {
+  if (at.kind === 'arcana') return pieceOfArcana(at.id)
+  if (at.kind === 'familiar') return pieceOfFamiliar(at.id)
+  const trait = traits.get(at.id)
+  if (!trait?.name) return null
+  const kind: PieceKind =
+    trait.kind === 'hex' || trait.kind === 'aspect' || trait.kind === 'keepsake'
+      ? trait.kind
+      : isHammer(at.id)
+        ? 'hammer'
+        : trait.kind === 'other'
+          ? 'other'
+          : 'boon'
+  return fromTrait(at.id, kind, false)
 }
 
 /**
@@ -191,10 +278,22 @@ export function assemble(build: ShownBuild): Assembled {
   const weapon = weaponById.get(build.weapon)
   const is = (id: string) => id === build.centrepiece
 
-  const aspect = fromTrait(build.aspect, 'aspect', false)
+  /**
+   * The author's note on each pick, put on the piece as it is made, so the
+   * slot map, the groups and `all` hold the same noted piece rather than a copy
+   * that has one and a copy that does not.
+   */
+  const notes = notesOf(build)
+  const by = noteLabel(build)
+  const noted = (piece: Piece | null): Piece | null => {
+    const text = piece ? notes.get(piece.id) : undefined
+    return piece && text ? { ...piece, note: { by, text } } : piece
+  }
+
+  const aspect = noted(fromTrait(build.aspect, 'aspect', false))
 
   const boons = build.boons.flatMap((id) => {
-    const piece = fromTrait(id, 'boon', is(id))
+    const piece = noted(fromTrait(id, 'boon', is(id)))
     return piece ? [piece] : []
   })
 
@@ -209,54 +308,43 @@ export function assemble(build: ShownBuild): Assembled {
     /* Routed by kind, because this list is not only boons any more. A hammer
      * built as a boon comes out with the wrong word on its hover and the wrong
      * frame around its art, and nothing anywhere would say so. */
-    const piece = fromTrait(id, isHammer(id) ? 'hammer' : 'boon', false)
+    const piece = noted(fromTrait(id, isHammer(id) ? 'hammer' : 'boon', false))
     return piece ? [{ ...piece, key: `optional:${id}`, optional: true }] : []
   })
 
-  const hex = build.hex ? fromTrait(build.hex, 'hex', is(build.hex)) : null
+  const hex = build.hex ? noted(fromTrait(build.hex, 'hex', is(build.hex))) : null
   const hammers = build.hammers.flatMap((id) => {
-    const piece = fromTrait(id, 'hammer', is(id))
+    const piece = noted(fromTrait(id, 'hammer', is(id)))
     return piece ? [piece] : []
   })
-  const keepsake = build.keepsake ? fromTrait(build.keepsake, 'keepsake', false) : null
+  /**
+   * The keepsakes, in the order a run takes them.
+   *
+   * A run holds four: the one chosen at the Crossroads and a swap at the rack
+   * after each of the first three Guardians. A build that swaps nothing draws
+   * exactly as it always did, one keepsake with no label. One that swaps labels
+   * every keepsake with when it is taken, so the row reads as a sequence rather
+   * than as four keepsakes at once.
+   *
+   * **A swap to what you are already carrying is not a swap**, and is left out
+   * rather than drawn as the same keepsake twice in a row.
+   */
+  const swaps: Piece[] = []
+  let held = build.keepsake
+  swapsOf(build).forEach((id, at) => {
+    if (!id || id === held) return
+    held = id
+    const piece = noted(fromTrait(id, 'keepsake', false))
+    if (piece) swaps.push({ ...piece, key: `swap:${at}:${id}`, when: KEEPSAKE_POSITIONS[at + 1] })
+  })
+  const first = build.keepsake ? noted(fromTrait(build.keepsake, 'keepsake', false)) : null
+  const keepsake = first && swaps.length ? { ...first, when: KEEPSAKE_POSITIONS[0] } : first
 
-  const familiar = build.familiar ? familiarById.get(build.familiar) : null
-  const familiarPiece: Piece | null = familiar
-    ? {
-        key: `familiar:${familiar.id}`,
-        kind: 'familiar',
-        id: familiar.id,
-        name: familiar.name,
-        icon: familiar.icon,
-        text: familiar.text,
-        slot: null,
-        slotName: null,
-        glyph: null,
-        frame: FRAME.Common,
-        gods: [],
-        centrepiece: false,
-      }
-    : null
+  const familiarPiece = build.familiar ? noted(pieceOfFamiliar(build.familiar)) : null
 
   const arcana = build.arcana.flatMap((id): Piece[] => {
-    const card = arcanaById.get(id)
-    if (!card) return []
-    return [
-      {
-        key: `arcana:${id}`,
-        kind: 'arcana',
-        id,
-        name: card.name,
-        icon: card.icon,
-        text: card.text,
-        slot: null,
-        slotName: null,
-        glyph: null,
-        frame: FRAME.Common,
-        gods: [],
-        centrepiece: false,
-      },
-    ]
+    const piece = noted(pieceOfArcana(id))
+    return piece ? [piece] : []
   })
 
   // The five core slots in fixed order, whether or not the build fills them.
@@ -285,12 +373,13 @@ export function assemble(build: ShownBuild): Assembled {
   const crossroads: Group = {
     id: 'crossroads',
     name: 'Before you go',
-    say: 'Chosen at the Crossroads, and fixed for the run.',
+    say: 'Chosen at the Crossroads. A keepsake can change at the rack after a Guardian.',
     pieces: [
       ...(aspect ? [aspect] : []),
       ...arcana,
       ...(familiarPiece ? [familiarPiece] : []),
       ...(keepsake ? [keepsake] : []),
+      ...swaps,
     ],
   }
 

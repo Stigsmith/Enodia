@@ -22,7 +22,12 @@
  * pointer, clipped by nothing.
  */
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+
+import { ElementWord } from './Elements.tsx'
+import { ProseText } from './ProseText.tsx'
+import { StatLines } from './StatLines.tsx'
+import type { StatLine } from '../data/types.ts'
 
 /** What is being pointed at. `kind` decides which backing it wears. */
 export type Peeked = {
@@ -47,6 +52,32 @@ export type Peeked = {
    */
   icon?: string | null
   gods?: string[]
+  /** The element a boon carries, on its kind line. */
+  elements?: string[]
+  /**
+   * The lines the game draws under the sentence, "Blitz Damage: 80" and so
+   * on. The game's own tooltip is the sentence plus these, so a hover without
+   * them was showing less than the game does.
+   */
+  stats?: StatLine[]
+  /**
+   * The build author's note on the pick being pointed at. A person's words,
+   * so it goes under the game's lines with its own label rather than into them.
+   */
+  note?: { by: string; text: string }
+}
+
+/** The author's note, under the game's own lines and marked as theirs. */
+function PeekNote({ note }: { note: Peeked['note'] }) {
+  if (!note) return null
+  return (
+    <span className="peek-note">
+      <span className="peek-note-by">{note.by}</span>
+      <span className="peek-note-text">
+        <ProseText text={note.text} />
+      </span>
+    </span>
+  )
 }
 
 /**
@@ -54,6 +85,21 @@ export type Peeked = {
  * show rather than one per mark.
  */
 export function Peek({ peeked, at }: { peeked: Peeked | null; at: { x: number; y: number } | null }) {
+  /**
+   * How tall the panel came out, measured once it is drawn.
+   *
+   * It used to be placed as though it were never taller than 160 pixels. That
+   * stopped being true when the game's stat lines and then the author's note
+   * went into it, and a mark near the bottom of the screen put the end of the
+   * panel below the edge. Measured after layout and before paint, so the panel
+   * never shows in the wrong place first.
+   */
+  const box = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState(160)
+  useLayoutEffect(() => {
+    if (box.current) setHeight(box.current.offsetHeight)
+  }, [peeked])
+
   if (!peeked || !at) return null
 
   /**
@@ -62,10 +108,11 @@ export function Peek({ peeked, at }: { peeked: Peeked | null; at: { x: number; y
    * The panel is up to 20rem wide and pointing at something on the right of the
    * screen would push it off. Flipping to the left of the pointer past the
    * halfway mark is cheaper than measuring, and is right for every width.
+   * Height is measured, above, because it varies far more than width does.
    */
   const flip = at.x > window.innerWidth / 2
   const style: React.CSSProperties = {
-    top: Math.min(at.y + 16, window.innerHeight - 160),
+    top: Math.max(8, Math.min(at.y + 16, window.innerHeight - height - 8)),
     ...(flip ? { right: window.innerWidth - at.x + 16 } : { left: at.x + 16 }),
   }
 
@@ -79,7 +126,7 @@ export function Peek({ peeked, at }: { peeked: Peeked | null; at: { x: number; y
    */
   if (peeked.boon) {
     return (
-      <div className="peek is-boon is-slate" style={style} role="tooltip">
+      <div ref={box} className="peek is-boon is-slate" style={style} role="tooltip">
         <div className="peek-head">
           {peeked.icon ? <img className="peek-art" src={`/${peeked.icon}`} alt="" /> : null}
           <div className="peek-titles">
@@ -87,19 +134,24 @@ export function Peek({ peeked, at }: { peeked: Peeked | null; at: { x: number; y
             <span className="peek-line">
               {peeked.kind ? <span>{peeked.kind}</span> : null}
               {peeked.gods?.length ? <span>{peeked.gods.join(' + ')}</span> : null}
+              {peeked.elements?.map((element) => <ElementWord key={element} element={element} />)}
             </span>
           </div>
         </div>
         {peeked.text ? <span className="peek-text">{peeked.text}</span> : null}
+        <StatLines lines={peeked.stats} />
+        <PeekNote note={peeked.note} />
       </div>
     )
   }
 
   return (
-    <div className="peek is-other" style={style} role="tooltip">
+    <div ref={box} className="peek is-other" style={style} role="tooltip">
       {peeked.kind ? <span className="peek-kind">{peeked.kind}</span> : null}
       <span className="peek-name">{peeked.name}</span>
       {peeked.text ? <span className="peek-text">{peeked.text}</span> : null}
+      <StatLines lines={peeked.stats} />
+      <PeekNote note={peeked.note} />
     </div>
   )
 }

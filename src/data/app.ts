@@ -7,7 +7,7 @@
  */
 
 import bundle from '../../data/app/app-data.json'
-import type { GodId, Requirement, Slot, Trait, TraitId, TraitIndex, TraitKind, WeaponId } from './types.ts'
+import type { GodId, Requirement, Slot, StatLine, Trait, TraitId, TraitIndex, TraitKind, WeaponId } from './types.ts'
 import type { ShownBuild } from './builds.ts'
 
 type RawTrait = {
@@ -24,6 +24,12 @@ type RawTrait = {
   needsElements?: { appear?: Record<string, number>; activate?: Record<string, number> }
   icon?: string
   text?: string
+  stats?: StatLine[]
+  group?: string
+  stack?: { shape: string; upTo: number | null }[]
+  noPoms?: boolean
+  olympian?: string[]
+  readsOlympian?: boolean
   render?: string
 }
 
@@ -73,11 +79,27 @@ export const traits: TraitIndex = new Map(
       elements: trait.elements ?? null,
       needsElements: trait.needsElements ?? null,
       text: trait.text ?? null,
+      stats: trait.stats ?? null,
+      group: trait.group ?? null,
+      stack: trait.stack ?? null,
+      noPoms: trait.noPoms ?? false,
+      olympian: trait.olympian ?? null,
+      readsOlympian: trait.readsOlympian ?? false,
     } satisfies Trait,
   ]),
 )
 
 export const olympians: readonly GodId[] = bundle.olympians
+
+/**
+ * How long the game's two Olympian damage lists are.
+ *
+ * `WeaponSets.OlympianProjectileNames` and `OlympianEffectNames`, counted at
+ * build time. What reads them multiplies damage that came out of one of those
+ * names, so the size of the lists is the honest way to describe the rule
+ * without printing 66 engine names at somebody.
+ */
+export const olympianList = bundle.olympianList as { projectiles: number; effects: number }
 
 export const weapons: readonly Weapon[] = bundle.weapons as Weapon[]
 

@@ -114,6 +114,19 @@ magenta #c96aa8     cyan #5ad4d4
 
 Reserved for the at-risk flicker and the dead crack. Never used for anything ambient.
 
+### Rarity, stated by the game
+
+Not sampled at all. `BoonPatchCommon` to `BoonPatchHeroic` in `ColorData.lua:213-217`, the
+colours the Codex tints a boon's name with (`BoonInfoLogic.lua:151`):
+
+```
+common #ffffff     rare #008aff     epic #9d12ff     heroic #f86059
+```
+
+Added on 11 September 2026 for the rarity ladder under a boon's stat line, as `--rarity-*`.
+**A bar under a number, never the colour of small text**: Epic on `--ink-850` measures about
+3.3 to 1.
+
 ### One token swaps, the rest do not
 
 Per-god themes are wanted later, an Ares skin and so on. Nothing needs building for that
@@ -127,6 +140,7 @@ content is Olympus**, so the furniture is fixed and the light is not.
 | Ground, dividers, silver | **Fixed.** The Crossroads does not change colour because you took Ares |
 | Jade, the living light | **Swaps.** This is the per-god hue, and the only one |
 | Rim light, magenta and cyan | **Fixed.** It signals events, and an event means the same thing in every theme |
+| Rarity | **Fixed.** Rare is blue in every theme because it is blue in the game |
 
 So a theme is one ramp of three values replacing `--jade` dim, mid and hot. That is what
 "a theme is a token set, not a rewrite" means in practice, and it is why the ramps have to

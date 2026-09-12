@@ -11,7 +11,9 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { arcanaById, familiarById, traits } from '../data/app.ts'
 import { FIRST_BUILD } from '../data/builds.fixture.ts'
+import { NOTE_MAX, NOTES_BUDGET, notesLength, picksOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import {
   buildInUrl,
@@ -157,11 +159,54 @@ describe('one build, as a link', () => {
   it('makes a link short enough to paste in a chat', async () => {
     const link = await linkFor(build(), 'https://enodia.example/')
     expect(link.startsWith('https://enodia.example/#build=')).toBe(true)
-    // The shipped build is the worst case on purpose: 21 boons, 10 Arcana and
-    // a long paragraph, which comes out around 1250 characters. Browsers and
-    // chat clients handle a URL of that length; the number worth guarding is
-    // the one where they stop, which is nearer 2000.
+    // The fixture is the worst case on purpose: 21 boons and two paragraphs
+    // near their limits, which came to 1598 characters when last measured.
+    // 2000 is the number worth guarding, because it is where a Discord
+    // message stops.
     expect(link.length).toBeLessThan(2000)
+  })
+
+  it('stays under 2000 with the notes on the picks filled to their budget', async () => {
+    /* The case `NOTES_BUDGET` was measured against: the fixture's 29 picks,
+       every other field of prose at its limit, and notes up to the budget. The
+       notes are the game's own sentences with a mention in front, which is as
+       near to what an author writes as a test can get without inventing it. */
+    const fill = (text: string, length: number, filler: string) => {
+      let out = text
+      while (out.length < length) out += ` ${filler}`
+      return out.slice(0, length)
+    }
+    const picks = picksOf(FIRST_BUILD)
+    const named = picks.filter((id) => traits.get(id)?.name)
+    const said = (id: string) => traits.get(id)?.text ?? arcanaById.get(id)?.text ?? familiarById.get(id)?.text ?? ''
+    const words = picks.map(said).join(' ')
+    const notes: Record<string, string> = {}
+    let left = NOTES_BUDGET
+    let from = 0
+    picks.forEach((id, at) => {
+      if (left <= 0) return
+      const other = named[(at + 3) % named.length] ?? id
+      const length = Math.min(NOTE_MAX, left)
+      const note = `@[${traits.get(other)?.name}](t:${other}) ${words.slice(from, from + length)}`.slice(0, length)
+      from = (from + length) % (words.length - NOTE_MAX)
+      notes[id] = note
+      left -= note.length
+    })
+    const full = build({
+      name: fill(FIRST_BUILD.name, 60, 'x'),
+      say: fill(FIRST_BUILD.say, 140, 'y'),
+      how: fill(FIRST_BUILD.how, 900, FIRST_BUILD.luck ?? ''),
+      luck: fill(FIRST_BUILD.luck ?? '', 700, FIRST_BUILD.how),
+      notes,
+    })
+
+    expect(notesLength(full)).toBe(NOTES_BUDGET)
+    expect((await linkFor(full, 'https://enodia.example/')).length).toBeLessThan(2000)
+  })
+
+  it('carries the notes on the picks', async () => {
+    const back = await unpackBuild(await packBuild(build({ notes: { HestiaWeaponBoon: 'Why this one.' } })))
+    expect(back?.notes).toEqual({ HestiaWeaponBoon: 'Why this one.' })
   })
 
   it('finds the payload in a URL and ignores anything else in the fragment', () => {

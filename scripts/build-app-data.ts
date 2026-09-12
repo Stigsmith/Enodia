@@ -19,9 +19,11 @@ import { join, resolve } from 'node:path'
 
 import { buildTraitIndex, godPoolsFrom, olympiansFrom } from '../src/data/load.ts'
 import { aspectIconKeys, buildIconIndex, resolveIcon } from '../src/data/icons.ts'
-import { extractedValues } from './values.ts'
+import { atRarity, extractedValues, formatCode, statDisplays } from './values.ts'
+import { traceOlympian } from './olympian.ts'
+import type { Corner } from './values.ts'
 import type { Manifest } from '../src/data/icons.ts'
-import type { Trait } from '../src/data/types.ts'
+import type { StatLine, Trait } from '../src/data/types.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 
@@ -50,6 +52,9 @@ const externalTables = {
   weapons: dictOf(read('weapons').data),
   hero: dictOf(read('hero').data),
   traits: dictOf(read('traits-resolved').data),
+  // What `GetBaseDataValue({ Type = "Projectile" })` reads, out of
+  // `Game/Projectiles/`. Heaven Strike's Blitz damage is in here.
+  projectiles: dictOf(read('projectiles').data),
 }
 const loot = read('loot').data
 const text = read('text-traits').data
@@ -347,10 +352,99 @@ function tidy(raw: string): string {
     .trim()
 }
 
-function describe(traitId: string): string | null {
-  const raw = dictOf(text[traitId]).description
-  if (typeof raw !== 'string') return null
-  const values = extractedValues(dictOf(dictOf(generated.data)[traitId]), externalTables)
+/**
+ * One reading of a trait's numbers: the record as processed, its
+ * `ExtractData` values, and the stat displays built from them.
+ */
+type Reading = { own: Raw; values: Record<string, string>; displays: (string | null)[] }
+
+/**
+ * The rarity the game's own Codex shows a boon at.
+ *
+ * `GetBoonRarityFromData`, BoonInfoLogic.lua:71, which BoonInfoLogic.lua:121
+ * hands to `GetProcessedTraitData` with `ForceMin`. Common for a plain boon,
+ * Duo for a duo, Legendary for a legendary, and Rare or Epic for one of a Hex's
+ * upgrades by its `TalentCategory`.
+ */
+function codexRarity(record: Raw): string {
+  if (typeof record.TalentCategory === 'string') {
+    if (record.TalentCategory === 'Unique') return 'Rare'
+    if (record.TalentCategory === 'Legendary') return 'Epic'
+    return 'Common'
+  }
+  if (record.IsDuoBoon === true) return 'Duo'
+  if (isDict(record.RarityLevels) && record.RarityLevels.Legendary !== undefined && !record.IsHammerTrait) {
+    return 'Legendary'
+  }
+  return 'Common'
+}
+
+/**
+ * The rarity a trait's numbers are read at, or null for a multiplier of 1.
+ *
+ * **What the Codex lists, at the Codex's rarity**: what a god, Selene or Chaos
+ * hands you, and a Hex's upgrades. Everything else, an aspect or a keepsake,
+ * climbs by rank rather than by rarity and is read as written, which is what
+ * this did for every trait until the rarity step existed.
+ */
+function readingRarity(id: string): string | null {
+  const trait = traits.get(id)
+  if (!trait) return null
+  const record = dictOf(dictOf(generated.data)[id])
+  const listed = godsFor(trait).length > 0 || trait.kind === 'hex' || typeof record.TalentCategory === 'string'
+  return listed ? codexRarity(record) : null
+}
+
+/**
+ * The four corners of a rolled number. A base and a rarity multiplier roll
+ * independently, so the ends of a range can sit at any corner. See the
+ * docblock in scripts/values.ts.
+ */
+const CORNERS: Corner[] = [
+  { base: 'min', roll: 'min' },
+  { base: 'min', roll: 'max' },
+  { base: 'max', roll: 'min' },
+  { base: 'max', roll: 'max' },
+]
+
+/** A trait read at one rarity, at every corner of anything that rolls. */
+function readAt(id: string, rarity: string | null): Reading[] {
+  const record = dictOf(dictOf(generated.data)[id])
+  return CORNERS.map((corner) => {
+    const values = extractedValues(record, externalTables, { rarity, corner })
+    return { own: atRarity(record, rarity, corner), values, displays: statDisplays(record, values) }
+  })
+}
+
+/** The number inside a printed value, "+3%" is 3, or NaN when it is not one. */
+const numberIn = (printed: string): number => Number(printed.replace(/^\+/, '').replace(/%$/, ''))
+
+/**
+ * Game text with every value it names filled in and every code taken out.
+ *
+ * `readings` is the trait read at every corner of its range. A value that
+ * comes out the same every way prints once. One that does not prints "low to
+ * high", smallest first whichever corner it came from, because a rolled boon's
+ * number is a range and printing one end of it would be a claim no file makes.
+ */
+function render(raw: string, readings: Reading[]): string {
+  /**
+   * `sign` and `tail` are what the sentence writes tight against the value,
+   * "-{...}%" for instance. One value keeps them where they are. A range
+   * carries them onto both ends, so "you use -{...}% Magick" reads "-20% to
+   * -35%" rather than "-20 to 35%", which says something else.
+   */
+  const across = (read: (reading: Reading) => string | null | undefined, sign = '', tail = ''): string => {
+    const seen = readings.map(read)
+    if (seen.some((one) => one === null || one === undefined)) return `${sign}#${tail}`
+    const unique = [...new Set(seen as string[])]
+    if (unique.length === 1) return `${sign}${unique[0]}${tail}`
+    const ordered = unique.every((one) => Number.isFinite(numberIn(one)))
+      ? [...unique].sort((a, b) => numberIn(a) - numberIn(b))
+      : unique
+    return `${sign}${ordered[0]}${tail} to ${sign}${ordered[ordered.length - 1]}${tail}`
+  }
+
   return (
     raw
       // The published glossary, so the tool says the game's own words.
@@ -382,7 +476,47 @@ function describe(traitId: string): string | null {
        * table this project does not extract, or the state of a run in
        * progress, stays a `#` rather than becoming a guess.
        */
-      .replace(/\{\$TooltipData\.ExtractData\.([A-Za-z0-9_]+)\}/g, (_match, name: string) => values[name] ?? '#')
+      //
+      // `:P` and `:F` after a name are the engine's percent codes. Until they
+      // were read here, every value carrying one printed as `#`, whether or
+      // not the number was known.
+      .replace(
+        /([+-]?)\{\$TooltipData\.ExtractData\.([A-Za-z0-9_]+)(?::([A-Z]))?\}(%?)/g,
+        (_match, sign: string, name: string, code: string | undefined, tail: string) =>
+          across(
+            (reading) => {
+              const value = reading.values[name]
+              return value === undefined ? null : code ? formatCode(value, code) : value
+            },
+            sign,
+            tail,
+          ),
+      )
+      /**
+       * A stat line's number. `StatDisplayN` and `NewTotalN` point at the same
+       * dressed value whenever nothing is being replaced, which outside a run
+       * is always. `statDisplays` in scripts/values.ts says how it is dressed.
+       */
+      .replace(/\{\$TooltipData\.(?:StatDisplay|NewTotal)(\d+)\}/g, (_match, n: string) =>
+        across((reading) => reading.displays[Number(n) - 1]),
+      )
+      /**
+       * Any other `TooltipData` name is a field of the trait itself. The Codex
+       * hands the processed record to the text as its `LuaValue`
+       * (BoonInfoLogic.lua:186), so "Duration: {$TooltipData.RemainingUses}"
+       * is the record's own `RemainingUses`. Read when it is a number, and a
+       * `#` otherwise.
+       */
+      .replace(/([+-]?)\{\$TooltipData\.([A-Za-z0-9_]+)\}(%?)/g, (_match, sign: string, key: string, tail: string) =>
+        across(
+          (reading) => {
+            const value = reading.own[key]
+            return typeof value === 'number' && Number.isFinite(value) ? String(value) : null
+          },
+          sign,
+          tail,
+        ),
+      )
       .replace(/\{\$TooltipData\.[^}]*\}/g, '#')
       // A value only the run in progress has. There is no static answer, and
       // deleting it left "Your foes deal +% damage".
@@ -392,6 +526,82 @@ function describe(traitId: string): string | null {
       .replace(/\s+([.,;:%])/g, '$1')
       .trim()
   )
+}
+
+/** A trait's own description, read the way the Codex reads it. */
+function describe(traitId: string): string | null {
+  const raw = dictOf(text[traitId]).description
+  if (typeof raw !== 'string') return null
+  return render(raw, readAt(traitId, readingRarity(traitId)))
+}
+
+/**
+ * `TraitRarityData.RarityUpgradeOrder`, the rungs a boon climbs: Common, Rare,
+ * Epic, Heroic. Read out of `offer-rules.json` rather than typed out here.
+ */
+const RUNGS = strings(dictOf(offerRules).rarityUpgradeOrder)
+
+/**
+ * The lines the game draws under a boon's description.
+ *
+ * `StatLines` names text entries, and the Codex prints each as a label and a
+ * number (BoonInfoLogic.lua:169-199). The label is the entry's `DisplayName`
+ * and the number its `Description`, which is nearly always
+ * `{$TooltipData.StatDisplay1}`. **193 of the 203 boons, duos, legendaries and
+ * Hexes carry at least one, and this tool drew none of them**, which is why
+ * Heaven Strike read "Your Attacks inflict Blitz." and never said how much.
+ *
+ * A boon that climbs all four rungs also gets its number at each of them, when
+ * they differ. A build stores no rarity, so the ladder is what a build can say
+ * honestly.
+ */
+function statLinesOf(id: string): StatLine[] | null {
+  const record = dictOf(dictOf(generated.data)[id])
+  const lines = strings(record.StatLines).filter(Boolean)
+  if (!lines.length) return null
+
+  const rarity = readingRarity(id)
+  const readings = readAt(id, rarity)
+  const levels = dictOf(record.RarityLevels)
+  const climbs = rarity === 'Common' && RUNGS.length > 1 && RUNGS.every((rung) => rung in levels)
+  const ladder = climbs ? RUNGS.map((rung) => readAt(id, rung)) : null
+
+  const out: StatLine[] = []
+  for (const lineId of lines) {
+    const entry = dictOf(text[lineId])
+    const label = typeof entry.name === 'string' ? render(entry.name, readings) : ''
+    const raw = typeof entry.description === 'string' ? entry.description : null
+    const value = raw ? render(raw, readings) : ''
+    if (!label && !value) continue
+    const line: StatLine = { label, value }
+    if (ladder && raw) {
+      const rungs = ladder.map((reading) => render(raw, reading))
+      if (new Set(rungs).size > 1) {
+        const tail = sharedTail(rungs)
+        line.ladder = rungs.map((rung) => rung.slice(0, rung.length - tail.length))
+        if (tail) line.tail = tail
+      }
+    }
+    out.push(line)
+  }
+  return out.length ? out : null
+}
+
+/**
+ * The words every rung ends with, " Sec." or " (every 0.35 Sec.)", so a
+ * ladder can say them once. Cut at a space, so "+3%" keeps its percent sign
+ * and "13 Sec." gives up only the " Sec.".
+ */
+function sharedTail(rungs: string[]): string {
+  const first = rungs[0] ?? ''
+  let length = 0
+  const same = (at: number) => rungs.every((rung) => rung.length > at && rung[rung.length - 1 - at] === first[first.length - 1 - at])
+  while (length < first.length && same(length)) length += 1
+  const common = first.slice(first.length - length)
+  const space = common.indexOf(' ')
+  if (space < 0) return ''
+  const tail = common.slice(space)
+  return rungs.every((rung) => rung.length > tail.length) ? tail : ''
 }
 
 function iconFor(trait: Trait): string | null {
@@ -502,26 +712,113 @@ function needsElements(id: string): { appear?: Record<string, number>; activate?
   return { ...(appear ? { appear } : {}), ...(activate ? { activate } : {}) }
 }
 
+/**
+ * The families a trait's own template puts it in, for the wiki's index.
+ *
+ * **Only the ones whose owner is a matter of record.** Each template's traits
+ * are listed in that character's own file, checked on 11 September 2026 rather
+ * than read off the template's spelling: `BaseCirce` in `NPCData_Circe.lua`,
+ * `BaseEcho` in `NPCData_Echo.lua`, `BaseIcarus` in `NPCData_Icarus.lua`,
+ * `NarcissusA` in `NPCData_Narcissus.lua`, and `BaseCurse` in
+ * `NPCData_Medea.lua`, which is how the curses turned out to be Medea's.
+ * `ShopTrait` is stocked by `StoreData.RoomShop`, and `{$Keywords.Costume}`
+ * renders as Outfit. The Path of Stars is every `SpellTalentTrait`.
+ */
+const FAMILY: Record<string, string> = {
+  SpellTalentTrait: 'talent',
+  CostumeTrait: 'outfit',
+  ShopTrait: 'shop',
+  BaseCirce: 'circe',
+  BaseEcho: 'echo',
+  BaseIcarus: 'icarus',
+  NarcissusA: 'narcissus',
+  BaseCurse: 'medea',
+}
+
+function groupOf(id: string): string | null {
+  const parents = strings(dictOf(externalTables.traits[id]).InheritFrom)
+  for (const parent of parents) {
+    const family = FAMILY[parent]
+    if (family) return family
+  }
+  return null
+}
+
+/**
+ * How Poms treat a trait, where `stacking.json` states a curve.
+ *
+ * One entry per distinct curve, fewest levels first. Only Buried Treasure has
+ * two. **A trait with no entry gets nothing**, not "stacks evenly":
+ * `AbsoluteStackValues` gives some boons a stacking table of their own, and
+ * Heaven Strike is one, so absence says only that no curve is stated.
+ */
+const stacking = dictOf(read('stacking').data)
+
+function stackOf(id: string): { shape: string; upTo: number | null }[] | null {
+  const curves = dictOf(stacking[id]).curves
+  if (!Array.isArray(curves) || !curves.length) return null
+  const distinct = new Map<string, { shape: string; upTo: number | null }>()
+  for (const curve of curves) {
+    const one = dictOf(curve)
+    const shape = typeof one.shape === 'string' ? one.shape : 'unknown'
+    const upTo = typeof one.worthTaking === 'number' ? one.worthTaking : null
+    distinct.set(`${shape}|${upTo}`, { shape, upTo })
+  }
+  return [...distinct.values()].sort((a, b) => (a.upTo ?? 99) - (b.upTo ?? 99))
+}
+
+/**
+ * Whether a Pom can raise it: `BlockStacking`, which `AddStackToTraits` checks
+ * before it levels anything (TraitLogic.lua:2511). Said only for the kinds a Pom
+ * reaches, since an aspect or a keepsake is never a Pom's target anyway.
+ */
+function noPoms(trait: Trait): boolean {
+  if (trait.kind !== 'boon' && trait.kind !== 'duo' && trait.kind !== 'legendary') return false
+  return dictOf(externalTables.traits[trait.id]).BlockStacking === true
+}
+
+/**
+ * The damage the game calls Olympian, and the three traits that read that list.
+ *
+ * `scripts/olympian.ts` states what counts as making it, what is deliberately
+ * left out, and what the table cannot see. Only the names travel: the field
+ * each one was traced from stays in the script, where the test reads it.
+ */
+const olympian = traceOlympian(read('weapon-sets').data, generated.data)
+
 const records = [...traits.values()]
   // Templates with no display name are never rendered, and 84 of them would be
   // a third of the payload.
   .filter((trait) => trait.name !== null)
-  .map((trait) => ({
-    id: trait.id,
-    name: trait.name ? tidy(trait.name) || trait.name : trait.name,
-    kind: trait.kind,
-    ...(trait.slot ? { slot: trait.slot } : {}),
-    ...(trait.altSlot ? { altSlot: trait.altSlot } : {}),
-    ...(godsFor(trait).length ? { gods: godsFor(trait) } : {}),
-    ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
-    ...(trait.requires ? { requires: trait.requires } : {}),
-    ...(aspectGate(trait.id) ? { needsAspect: aspectGate(trait.id) } : {}),
-    ...(elementsOf(trait.id) ? { elements: elementsOf(trait.id) } : {}),
-    ...(needsElements(trait.id) ? { needsElements: needsElements(trait.id) } : {}),
-    ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
-    ...(describe(trait.id) ? { text: describe(trait.id) } : {}),
-    ...(renderFor(trait) ? { render: renderFor(trait) } : {}),
-  }))
+  .map((trait) => {
+    const said = describe(trait.id)
+    const stats = statLinesOf(trait.id)
+    const group = groupOf(trait.id)
+    const stack = stackOf(trait.id)
+    const makesOlympian = olympian.makes.get(trait.id)?.map((one) => one.name) ?? null
+    return {
+      id: trait.id,
+      name: trait.name ? tidy(trait.name) || trait.name : trait.name,
+      kind: trait.kind,
+      ...(trait.slot ? { slot: trait.slot } : {}),
+      ...(trait.altSlot ? { altSlot: trait.altSlot } : {}),
+      ...(godsFor(trait).length ? { gods: godsFor(trait) } : {}),
+      ...(trait.requiredWeapon ? { weapon: trait.requiredWeapon } : {}),
+      ...(trait.requires ? { requires: trait.requires } : {}),
+      ...(aspectGate(trait.id) ? { needsAspect: aspectGate(trait.id) } : {}),
+      ...(elementsOf(trait.id) ? { elements: elementsOf(trait.id) } : {}),
+      ...(needsElements(trait.id) ? { needsElements: needsElements(trait.id) } : {}),
+      ...(iconFor(trait) ? { icon: iconFor(trait) } : {}),
+      ...(said ? { text: said } : {}),
+      ...(stats ? { stats } : {}),
+      ...(group ? { group } : {}),
+      ...(stack ? { stack } : {}),
+      ...(noPoms(trait) ? { noPoms: true } : {}),
+      ...(makesOlympian ? { olympian: makesOlympian } : {}),
+      ...(olympian.readers.includes(trait.id) ? { readsOlympian: true } : {}),
+      ...(renderFor(trait) ? { render: renderFor(trait) } : {}),
+    }
+  })
 
 const pools = [...godPoolsFrom(loot).entries()].map(([god, pool]) => ({ god, ...pool }))
 
@@ -1045,6 +1342,8 @@ const bundle = {
   arcanaBoard,
   familiars,
   vows,
+  /** How long the game's two Olympian damage lists are, for a record to say so. */
+  olympianList: { projectiles: olympian.projectiles.length, effects: olympian.effects.length },
   traits: records,
 }
 
@@ -1056,7 +1355,27 @@ const bytes = readFileSync(path).length
 const withArt = records.filter((record) => 'icon' in record).length
 console.log(`data/app/app-data.json  ${(bytes / 1024).toFixed(0)} KB`)
 console.log(`  ${records.length} named traits of ${traits.size}, ${withArt} with art`)
+{
+  // The two numbers this projection is held to: how much of the game's own
+  // text still has a hole in it, where a `#` stands for a value not read.
+  const holes = (texts: string[]) => texts.reduce((n, one) => n + (one.match(/#/g)?.length ?? 0), 0)
+  const lines = records.flatMap((record) => (record as { stats?: StatLine[] }).stats ?? [])
+  const said = records.flatMap((record) => {
+    const one = (record as { text?: unknown }).text
+    return typeof one === 'string' ? [one] : []
+  })
+  console.log(
+    `  ${lines.length} stat lines on ${records.filter((record) => 'stats' in record).length} traits, ` +
+      `${lines.filter((line) => line.ladder).length} with a rarity ladder, ${holes(lines.map((line) => line.value))} values unread`,
+  )
+  console.log(`  ${holes(said)} values unread across ${said.length} descriptions`)
+}
 console.log(`  ${bundle.olympians.length} Olympians, ${bundle.weapons.length} weapons, ${pools.length} god pools`)
+console.log(
+  `  ${olympian.makes.size} traits make Olympian damage, ` +
+    `out of ${olympian.projectiles.length + olympian.effects.length} listed names, ` +
+    `and ${olympian.readers.length} read the list`,
+)
 console.log(
   `  ${arcanaBoard.length}x${arcanaBoard[0]?.length ?? 0} Arcana board, ` +
     `${arcanaCards.filter((c) => Object.keys(c.requires).length).length} cards switch themselves on`,

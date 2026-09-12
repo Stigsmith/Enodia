@@ -28,6 +28,7 @@ import { arcanaById, iconOf, olympians, traits, weaponById } from '../data/app.t
 import { CORE_SLOTS } from '../engine/slots.ts'
 import { readRepeat, reachName } from '../engine/repeat.ts'
 import { FRAME, SLOT_GLYPH } from './build-pieces.ts'
+import { keepsakesOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const W = 620
@@ -136,7 +137,7 @@ export async function cardImage(build: ShownBuild): Promise<Blob | null> {
   }
 
   // --- the kit -------------------------------------------------------------
-  const kit = [build.hex, ...build.hammers, build.keepsake].filter((id): id is string => !!id)
+  const kit = [build.hex, ...build.hammers, ...keepsakesOf(build)].filter((id): id is string => !!id)
   if (kit.length) y = await band(ctx, load, 'Before you go', y + 18, await marks(kit, load))
 
   // --- the Arcana, which are tall cards rather than square marks -----------

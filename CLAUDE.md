@@ -76,6 +76,10 @@ and only then something we invent.
 
 UI strings use the left column. Code identifiers may use the right.
 
+**"Olympian" names two different sets in the source.** The cap's nine are the loot sets with
+`GodLoot`. The damage lists in `WeaponSets` include Artemis and Athena, who have no `LootData`
+entry at all. A sentence using the word has to say which one it means.
+
 ---
 
 ## Verified mechanics, with their sources
@@ -104,6 +108,11 @@ Do not restate these without the citation. Do not extend them without checking.
 | Only **45 boons occupy a core slot**, nine per slot, one per Olympian. Everything else a god offers occupies no slot at all | `Slot` over `traits-resolved.json` |
 | The Huntress fires below **99%** Magick, not "when low" | `LowManaThreshold = 0.99` in `TraitData_MetaUpgrade.lua` |
 | **Maximum Fear is 67, and 55 before Vow of Rivals is unlocked.** 17 vows over 40 ranks. `Points` is the cost *of* a rank rather than the Fear *at* it, because `GetTotalSpentShrinePoints` sums `Ranks[1..activeRank]`; and `GetMaxShrinePoints` skips any rank with unmet `GameStateRequirements`, which is all four Boss Difficulty ranks and 12 of the 67 | `ShrineLogic.lua:408` and `:424`, `ShrineUpgradeOrder` in `ShrineData.lua:49`, pinned by `src/data/vows.test.ts` |
+| **"Damaging effects from Olympians" is a list, not a set of gods.** A projectile in `WeaponSets.OlympianProjectileNames` (63) or an effect in `OlympianEffectNames` (3). Three records read it: Extended Family, the Earth infusion `ElementalOlympianDamageBoon`, and Argent Skull's Persephone aspect. **The list names Artemis and Athena projectiles** | `WeaponSets.lua:377`, `:395`, `:413-419`; `TraitData_Hera.lua:1878`; `TraitData_Elementals.lua:227`; `TraitData_Aspect.lua:2053` |
+| **Extended Family counts the nine Olympians plus Hermes, Artemis, Athena and Dionysus, and not Hades, Chaos or Selene.** `UniqueGodCount` counts distinct sources passing `IsGodTrait(..., ForShop, ForLastRunBoon)`, which takes `GodLoot` or `TreatAsGodLootByShops` and drops `ExcludeFromLastRunBoon` | `CombatLogic.lua:664-665`, `TraitLogic.lua:736` and `:1547`, `NPCData_Hades.lua:18` |
+| **A boon's numbers are its `BaseValue`s times its rarity's multiplier**, at any depth, rounded to two places. Heaven Strike's Common is 0.8, so its Blitz is 80, 120, 160, 200. The Codex shows Common, Duo or Legendary. **A number can roll twice**, its base and its multiplier independently, so a range has four corners | `ProcessTraitData` and `GetProcessedValue`, `TraitLogic.lua:152-345`; `GetBoonRarityFromData`, `BoonInfoLogic.lua:71`; pinned by `scripts/values.test.ts` |
+| **Projectile base values are text**, in `Game/Projectiles/*.sjson`, which is what `GetBaseDataValue({ Type = "Projectile" })` reads for both `MultiplyByBase` and `ProjectileBase` | `TraitLogic.lua:2063`, `:2200`; `PlayerProjectiles.sjson:7987` |
+| **A run passes four Regions in order, except in two modes.** A Chaos Trial can start in the second or third, and a Dream run visits four in random order across both routes. No vow changes the order | `BountyData.lua:158-235`, `DreamRunLogic.lua:1-41`, `NarrativeData.lua:9077` |
 
 ### What the files cannot tell you
 
@@ -146,6 +155,14 @@ the play experience cannot see.
    **`InheritFrom` in the animation files is the same rule as `InheritFrom` in the trait
    files**, which is error 3 and the `GodLoot` note and this, three times in three different
    file formats. Read the base before believing a record is complete
+9. Recorded for weeks, in `scripts/values.ts`, `scripts/extract.mjs` and `ROADMAP.md`, that
+   `ProjectileBase` "is not, and never will be" answerable, because `ProjectileData` in
+   Scripts states no `Damage`. That was true and the conclusion was not: the engine's
+   projectile records are text in `Game/Projectiles/*.sjson`, one folder from the animations
+   that gave up the vow icons. Heaven Strike read "Your Attacks inflict Blitz." with no number
+   the whole time, and not one of the game's stat lines was ever drawn. **A negative result from a search proves
+   something about the search**, the fourth time, and the first time it was written down as
+   settled
 
 ---
 
@@ -253,6 +270,41 @@ the play experience cannot see.
 - **The asset join lives in `src/data/icons.ts` and nowhere else.** Slug from display name,
   one rule, shared by the validator, the fill script and the UI
 - `extracted/` holds 364 MB of `GUI.pkg` output and is scratch, not source
+- **A boon's numbers go through `atRarity` first** (`scripts/values.ts`), which is
+  `ProcessTraitData` and `GetProcessedValue` for one copy. What the Codex lists is read at the
+  Codex's rarity and at all four corners of a roll, and a range prints lowest first.
+  `extractedValues` with no `rarity` option still reads the record as written, which the format
+  tests rely on
+- **`scripts/sjson.ts` is a real parser, and the projectile pass needs it.** A projectile
+  record nests `Effects` whose entries carry a `Name` of their own, so the `Id`-to-`Id` walk the
+  text pass uses would split records. The text and animation passes still walk, because their
+  blocks are flat
+- **`{$TooltipData.X}` in game text is field X of the processed trait**, the Codex's
+  `LuaValue`. `StatDisplayN` and `NewTotalN` are the Nth extract value, dressed by
+  `statDisplays`. `:P` and `:F` belong to the engine and were inferred from how the text uses
+  them; `formatCode` says how, and one look in game would confirm it
+- **The wiki is the only screen with an address.** `/wiki` and `/wiki/<kind>/<id>` load through
+  `not_found_handling`, and `App.tsx` pushes history for them and follows `popstate`. Every
+  other view is state. A record is keyed by the game's internal id, never a display name,
+  because six aspects share one. `src/ui/wiki-route.ts`
+- **A mention is `@[Name](t:Id)` inside plain text**, with `a:` for an Arcana card and `f:` for
+  a familiar. `src/ui/mentions.ts` parses it and `Prose` and `ProseText` draw it. The id is the
+  meaning and the name only a fallback: a mention is drawn with the current display name,
+  never the stored one, so it cannot relabel anything. **A build's notes on its picks share 500
+  characters**, because the whole build rides in the link and 2000 is where a Discord message
+  stops. `transfer.test.ts` fails if the worst case goes over
+- **The Olympian damage table is traced out of each trait's own record**, in
+  `scripts/olympian.ts`: a stat line reading a listed projectile (`ExtractValues` with
+  `BaseType` `Projectile`), a function argument spawning one, or a `PropertyChanges` entry
+  setting a weapon's `Projectile`. **`AddOutgoingDamageModifiers` and a `PropertyChanges`
+  entry naming a `ProjectileName` are refused**, because both mean somebody else fires it:
+  Master Conductor boosts Static Shock's spark, Coffin Nail moves Stabbing Rush's fuse. It
+  covers 51 of the 66 names and **undercounts on purpose**, so anything built on it states
+  only the positive. The readers are found by their records holding the list, never by id
+- **The per-weapon `WeaponData_*.lua` files are not loaded.** A number reading a weapon's own
+  record stays a `#`: Selene's Hex costs, a hammer's charge stage. And `values.ts` reads
+  `BaseType = "Weapon"`, which is engine data, out of Lua `WeaponData`. Fix both together, and
+  look in `Game/Weapons/` first
 
 ---
 

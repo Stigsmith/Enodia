@@ -30,7 +30,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { godsOf, keepsakeForGod, olympians, traits } from '../data/app.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import { Stamp } from './Stamp.tsx'
-import { PLAYSTYLES, SAMPLE_BUILDS } from '../data/builds.ts'
+import { PLAYSTYLES, SAMPLE_BUILDS, keepsakesOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
@@ -50,6 +50,11 @@ import { BuildFilters } from './BuildFilters.tsx'
 import { assemble } from './build-pieces.ts'
 import { useBackdrop, useEscape } from './escape.ts'
 import type { Piece } from './build-pieces.ts'
+import { ElementWord } from './Elements.tsx'
+import { StatLines } from './StatLines.tsx'
+import { WikiLink } from './WikiLink.tsx'
+import { PickNotes } from './PickNotes.tsx'
+import { Prose } from './Prose.tsx'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
 import { Card } from './variants/Card.tsx'
@@ -367,16 +372,23 @@ export function Builds({
           {open.how ? (
             <section className="builds-how" aria-label="How it works">
               <h3>How it works</h3>
-              <p>{open.how}</p>
+              <p>
+                <Prose text={open.how} />
+              </p>
             </section>
           ) : null}
 
           {open.luck ? (
             <section className="builds-how builds-luck" aria-label="If the run goes your way">
               <h3>If the run goes your way</h3>
-              <p>{open.luck}</p>
+              <p>
+                <Prose text={open.luck} />
+              </p>
             </section>
           ) : null}
+
+          {/* The reason for each pick that has one, all together. */}
+          <PickNotes built={built} onOpen={setPiece} />
 
           {/* The tool's read, next to the player's own. They answer the same
             * question in the same three words and they are allowed to disagree:
@@ -1043,11 +1055,31 @@ function PieceCard({ piece, onClose }: { piece: Piece; onClose: () => void }) {
             <h3>{piece.name}</h3>
             <p>
               {piece.slotName ? <span>{piece.slotName}</span> : null}
+              {piece.when ? <span>{piece.when}</span> : null}
               {piece.gods.length ? <span>{piece.gods.join(' + ')}</span> : null}
+              {piece.elements?.map((element) => <ElementWord key={element} element={element} />)}
             </p>
           </div>
         </header>
         {piece.text ? <p className="piececard-text">{piece.text}</p> : <p className="piececard-gap">No text.</p>}
+        {/* The dialog has the room to name each rung of a ladder, so it does. */}
+        <StatLines lines={piece.stats} spelled />
+        {/* The author's, under the game's own words and never mixed into them. */}
+        {piece.note ? (
+          <div className="piececard-note">
+            <span className="piececard-note-by">{piece.note.by}</span>
+            <p>
+              <Prose text={piece.note.text} />
+            </p>
+          </div>
+        ) : null}
+        {/* Everything else there is to know about it, at its own address. */}
+        <WikiLink
+          className="piececard-record"
+          at={{ kind: piece.kind === 'arcana' ? 'arcana' : piece.kind === 'familiar' ? 'familiar' : 'trait', id: piece.id }}
+        >
+          The full record
+        </WikiLink>
         <button type="button" onClick={onClose}>
           Close
         </button>
@@ -1180,10 +1212,10 @@ function Playstyle({ build }: { build: ShownBuild }) {
  *
  * **Only when the build has not chosen one.** An author who set a keepsake has
  * answered the question, and repeating the options underneath their answer
- * would read as second-guessing it.
+ * would read as second-guessing it. A swap at the rack counts as choosing.
  */
 function KeepsakeHint({ build }: { build: ShownBuild }) {
-  if (build.keepsake) return null
+  if (keepsakesOf(build).length) return null
 
   const wanted = godsOf(build)
     .map((god) => ({ god, id: keepsakeForGod.get(god as never) }))

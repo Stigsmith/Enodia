@@ -53,6 +53,24 @@ export const ELEMENT_ICON: Record<string, string> = Object.fromEntries(
   ELEMENTS.map((one) => [one.id, one.icon]),
 )
 
+/**
+ * An element as a boon's kind line says it: the game's glyph, then the word.
+ *
+ * The hover and the dialog both put it on the line with the slot and the gods,
+ * and both use this, so pointing at a boon and opening it name its element the
+ * same way. The data has carried `Elements` since the extractor learned it; no
+ * description of a boon ever said it.
+ */
+export function ElementWord({ element }: { element: string }) {
+  const icon = ELEMENT_ICON[element]
+  return (
+    <span className="element-word">
+      {icon ? <img src={`/${icon}`} alt="" aria-hidden="true" /> : null}
+      {element}
+    </span>
+  )
+}
+
 /** How many of each element a build's boons carry. */
 export function elementTally(build: ShownBuild): Record<string, number> {
   const out: Record<string, number> = {}

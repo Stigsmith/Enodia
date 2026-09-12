@@ -21,6 +21,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   acceptOffer,
+  clearedByAnother,
   fingerprint,
   followBuild,
   listShelf,
@@ -36,6 +37,7 @@ import { packBuild } from './transfer.ts'
 import { DEFAULT_PREFS, loadPrefs, savePrefs } from './prefs.ts'
 import { duplicateBuild, loadBuilds, saveBuild } from './builds.ts'
 import { declineOffer, loadOffers } from './offers.ts'
+import type { Listed, Stats } from './exchange.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 const BUILD: ShownBuild = {
@@ -95,6 +97,10 @@ describe('what a fingerprint is taken of', () => {
     expect(shapeOf({ ...BUILD, play: { runs: 3, clears: 1 } })).toBe(shapeOf(BUILD))
   })
 
+  it('ignores the notes on the picks, which are prose like the write-up', () => {
+    expect(shapeOf({ ...BUILD, notes: { ZeusWeaponBoon: 'Why this one.' } })).toBe(shapeOf(BUILD))
+  })
+
   it('moves when a boon is swapped, which is the whole point', () => {
     expect(shapeOf({ ...BUILD, boons: ['ZeusWeaponBoon', 'HestiaSpecialBoon'] })).not.toBe(
       shapeOf(BUILD),
@@ -105,6 +111,34 @@ describe('what a fingerprint is taken of', () => {
     expect(shapeOf({ ...BUILD, boons: ['ZeusSpecialBoon', 'ZeusWeaponBoon'] })).not.toBe(
       shapeOf(BUILD),
     )
+  })
+
+  /**
+   * **A build that swaps nothing must hash exactly as it did before swaps
+   * existed**, or every listing's counts reset the moment they shipped. The
+   * literal is the shape as it stood on 11 September 2026, and it must not move.
+   */
+  it('reads a build with no swaps exactly as it did before swaps existed', () => {
+    const before = [
+      'weapon=WeaponAxe',
+      'aspect=AxeAspectCharon',
+      'playstyle=',
+      'centrepiece=ZeusWeaponBoon',
+      'boons=ZeusWeaponBoon,ZeusSpecialBoon',
+      'optional=',
+      'hex=',
+      'hammers=',
+      'keepsake=',
+      'familiar=',
+      'arcana=Death,Strength',
+    ].join('\n')
+    expect(shapeOf(BUILD)).toBe(before)
+    expect(shapeOf({ ...BUILD, swaps: [null, null, null] })).toBe(before)
+    expect(shapeOf({ ...BUILD, swaps: 'nonsense' as never })).toBe(before)
+  })
+
+  it('moves when a keepsake is swapped at the rack, because that is a pick', () => {
+    expect(shapeOf({ ...BUILD, swaps: [null, 'ForceZeusBoonKeepsake', null] })).not.toBe(shapeOf(BUILD))
   })
 
   /**
@@ -323,6 +357,47 @@ describe('the off switch', () => {
     const outcome = await rateBuild('pub1', 4)
     expect(outcome.ok).toBe(false)
     expect(seen).toEqual([])
+  })
+})
+
+/**
+ * The evidence filter on the exchange, which is the only claim about quality
+ * the tool makes, and it is a count rather than a judgement.
+ *
+ * What makes one clear mean one other player is the worker: it refuses an
+ * author's own runs before counting them, and it groups the counts by `shape`
+ * so a republished build starts again. Both of those are pinned in
+ * `worker/exchange.test.ts`, inside workerd against a real database. This holds
+ * the reading of the number, which is the half that ships to the screen.
+ */
+describe('cleared by somebody else', () => {
+  const stats = (over: Partial<Stats> = {}): Stats => ({
+    takes: 0,
+    players: 0,
+    runs: 0,
+    clears: 0,
+    bestFear: null,
+    rating: null,
+    raters: 0,
+    ...over,
+  })
+
+  it('is one clear, because an author cannot log one against their own', () => {
+    expect(clearedByAnother({ stats: stats({ clears: 1, runs: 1, players: 1 }) })).toBe(true)
+  })
+
+  it('is not runs, and not follows', () => {
+    // Played and not finished is not evidence that it can be finished, and a
+    // take is somebody deciding to try it rather than a result.
+    expect(clearedByAnother({ stats: stats({ runs: 9, players: 3 }) })).toBe(false)
+    expect(clearedByAnother({ stats: stats({ takes: 12 }) })).toBe(false)
+  })
+
+  /* `stats` is the version on the shelf now; `before` is what earlier versions
+     earned. A build whose author replaced the picks has to earn it again. */
+  it('reads the current version only', () => {
+    const republished: Pick<Listed, 'stats' | 'before'> = { stats: stats(), before: stats({ clears: 40 }) }
+    expect(clearedByAnother(republished)).toBe(false)
   })
 })
 

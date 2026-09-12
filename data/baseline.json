@@ -10,7 +10,8 @@
     "gated": 32,
     "linkedSets": 26,
     "arcanaCards": 27,
-    "stackingCurves": 20
+    "stackingCurves": 20,
+    "projectiles": 68
   },
   "coverage": {
     "traitsWithDisplayName": 567,

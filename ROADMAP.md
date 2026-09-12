@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 8 September 2026, game build `138174`.
+Last updated 11 September 2026, game build `138174`.
 
 ---
 
@@ -14,7 +14,7 @@ Last updated 8 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 646 in node across 35 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 728 in node across 41 files, and **153 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026. Also `enodia.stigly-official.workers.dev` |
@@ -134,7 +134,11 @@ already true.
 | | |
 |---|---|
 | `npm run prune` | Ships what the app references. **55 MB and 940 files down to 10 MB and 518** |
-| Boon text | 259 of 567 descriptions were wrong. `#` placeholders **422 down to 193** |
+| Boon text | 259 of 567 descriptions were wrong. `#` placeholders **422 down to 193**, then **27** on 11 September |
+| Stat lines | The lines the game draws under a boon's sentence, which the tool never drew. **275 on 275 traits**, 149 with a Common to Heroic ladder, on the hover and in the dialog. `decisions/2026-09-11-competitor-gap-analysis.md` |
+| Projectile values | `Game/Projectiles/*.sjson`, read through `scripts/sjson.ts`: **68 projectiles**, every one a trait asks for. Heaven Strike's Blitz is 80, 120, 160 and 200 |
+| Notes and mentions | A line on each pick, on the hover, the dialog and the offer at an Exit. `@` names a game thing in any write-up, stored by id, and it links to its record |
+| Olympian damage | What "damaging effects from Olympians" actually covers: 63 projectiles and 3 effects, traced to **62 traits**. A warning on a build holding one of the three readers, and a line on every record |
 | Corrections | "This did not happen" on every station, replaying the run |
 | Keyboard | An `h1`, a skip link, named landmarks |
 | Arcana and familiars | 25 cards and 5 familiars in the bundle, all 30 with art |
@@ -354,8 +358,23 @@ It is fixed as of 11 September; see below.
 
 ## Corrections since Phase 1
 
-Four things the tool asserted that were wrong. Each was believed for a while and each shaped
+Six things the tool asserted that were wrong. Each was believed for a while and each shaped
 code or copy that shipped.
+
+**A run could never be going for a build.** Setup's "Going for a build" step and the run screen
+read `SAMPLE_BUILDS` alone, and the library ships empty, so the step said nothing was on the
+aspect however many builds you had, and the header counted no builds at all.
+`src/data/roadmap.ts` had said since 6 September that the list "is whatever you have made on
+that aspect", which was the correction in 4a below being wrong in turn. Found on 11 September
+because the author's notes on the Exit card need a run to be going for something. Both read
+your library now, your own builds and the ones you follow.
+
+**Projectile numbers were always readable.** This file, `scripts/values.ts` and
+`scripts/extract.mjs` said `ProjectileBase` was settled as unanswerable, because `ProjectileData`
+in Scripts states no `Damage`. The engine's projectile records are text in
+`Game/Projectiles/*.sjson`, and reading them is what put a number on Heaven Strike and drew the
+game's stat lines at all. `CLAUDE.md` error 9. Found on 11 September by the competitor gap
+analysis, which went looking for where Mobalytics' "80/120/160/200" could have come from.
 
 **A run is about forty Exits, not twelve.** Four Regions of eight to twelve. `RoomDataN/O/P/Q`
 and `RoomDataF/G/H/I` give the structure; the per-Region count is generated rather than
@@ -382,6 +401,81 @@ not been re-read against the transcript yet and probably carry the same fault.
 
 ---
 
+## The competitor gap analysis, and what came of it
+
+On 11 September 2026 the owner asked for a gap analysis against Mobalytics: hover cards, guide
+authoring, tagging game data into text, Verified and Community tiers, guides, tier lists, a
+wiki, and whether a build should say anything per Region. Every verdict, option and mechanic is
+in `decisions/2026-09-11-competitor-gap-analysis.md`. Here only where it stands.
+
+**Done the same day:** the game's stat lines with a rarity ladder, the element on a boon's kind
+line, projectile values, and numbers read at the rarity the Codex shows, which took the `#`
+holes in descriptions from 193 to 27.
+
+**The owner said yes to all of it** the same day, with four calls of their own: records **and an
+index**, so a wiki; the keepsake filter matches any of the four; an author's note appears on the
+Exit card when the build is the run's target; and the evidence filter needs one other player.
+**All six landed, on 11 and 12 September.** In the order they were built:
+
+1. ~~Keepsakes as an ordered four, by position.~~ **Done, 11 September.** `ShownBuild.swaps`
+   holds the keepsake taken at the rack after each of the first three Guardians, read through
+   `swapsOf` and `keepsakesOf` in `src/data/builds.ts`. A build with no swaps hashes exactly as
+   before, pinned by a literal in `src/state/exchange.test.ts`, so no listing's counts moved
+2. ~~Every entity's full record at an address, and an index of them.~~ **Done, 11 September.**
+   `src/ui/Wiki.tsx` at `/wiki` and `/wiki/<kind>/<id>`: 597 entries in 38 sections, every
+   named trait in exactly one, which `src/ui/wiki.test.ts` holds it to. The first screen whose
+   address is kept, so `App.tsx` pushes history for it and follows the back button.
+   `REQUIREMENTS.md` 4 "Not a wiki" is struck through with the reason
+3. ~~A short note on each pick, shown on the Exit card when the build is the run's target, and
+   `@` mentions stored as ids.~~ **Done, 11 September.** `ShownBuild.notes`, keyed by pick id and
+   read through `notesOf`, which drops a note on a pick the build no longer holds. Prose, so
+   outside `shapeOf`. Shown in the hover, the dialog, a list under How it works, the exchange's
+   reading view, and on the offer card when the run is going for the build. A mention is
+   `@[Name](t:Id)` in the plain fields, typed through the `@` list in `src/ui/MentionField.tsx`
+   and drawn by `src/ui/Prose.tsx`. **Notes share 500 characters**, measured rather than picked:
+   the worst link is 1627 characters with no notes, about 1960 with 500 and past 2000 with 600.
+   **It needed a fix underneath it.** A run could only go for a shipped build and none ship, so
+   no build could be a run's target; see Corrections. And the hover measures its own height
+   now: it was placed as though never taller than 160 pixels, which stat lines and a note both
+   break, so a mark near the foot of the screen put the end of the panel below it
+4. ~~An Olympian damage warning on builds holding Extended Family, the Earth infusion or Argent
+   Skull's Persephone aspect, from a traced per-trait table.~~ **Done, 12 September.**
+   `scripts/olympian.ts` traces it out of each trait's own record: a stat line reading a listed
+   projectile, a function argument spawning one, or a property change making a weapon fire one.
+   **62 traits and 51 of the 66 names**, and the three readers are found by their records holding
+   the list rather than by being named in our code. Two shapes are refused, both meaning somebody
+   else fires it: `AddOutgoingDamageModifiers`, which is how Master Conductor boosts Static
+   Shock's spark, and a `PropertyChanges` entry naming a projectile, which is how Coffin Nail
+   moves Stabbing Rush's fuse. The table **undercounts by design**, so the note states only the
+   positive: what in the build is on the list, or that no pick's record says it is.
+   `scripts/olympian.test.ts` pins all of it
+5. ~~"Under the hood" brought back from `de818c7^:placeholder/index.html`, re-verified. One of its
+   five entries states error 6.~~ **Done, 12 September.** It is a screen of the app now,
+   `src/data/underhood.ts` behind `Pages.tsx`, reached from the menu beside the Wiki. **Seven
+   entries in the three tiers**, every one re-read against the game, each citing the symbols it
+   rests on, and the two that are ours marked as ours. `src/data/underhood.test.ts` holds both
+   of those lines.
+   **The error 6 entry is rewritten and pinned.** It said a fourth Olympian made every other god
+   impossible for the rest of the run; it now says the random pool freezes and a keepsake
+   overwrites that choice, citing `RewardLogic.lua:242` beside `ReachedMaxGods`. The test fails
+   if the old sentence comes back. The aside asking "so is this going to be a wiki?" is not
+   revived: the answer changed on 11 September and `REQUIREMENTS.md` 4 carries the reversal.
+   Two entries gained numbers the tool did not have when the page was written, and one entry is
+   new: what "damaging effects from Olympians" actually covers
+6. ~~An evidence filter on the exchange: cleared by at least one other player on this version.~~
+   **Done, 12 September.** "Cleared by somebody else", a toggle in the exchange's filter bar
+   carrying the count it would leave, over `Listed.stats.clears` through `clearedByAnother` in
+   `src/state/exchange.ts`. **No worker change**: the counts were already per version and
+   already refused an author's own runs, so one clear is one other player, and a republished
+   build starts again rather than inheriting evidence for different picks. Never the word
+   Verified. When it empties a shelf it says why, because nothing cleared by anybody else yet
+   is a real state early on
+
+**Recommended against:** a sectioned long-form editor, rich text, a `/` menu, a guide type, tier
+lists and staff verification.
+
+---
+
 ## What I would pick up next
 
 Phase 1 is done and nothing below blocks anything else. In the order I would take them.
@@ -401,9 +495,11 @@ the daily 100k Worker invocations and has already cost a D1 write. An edge rule 
 a Worker is invoked at all. It is free, and `worker/auth.ts` has said the same thing about the
 auth routes since they were written.
 
-**3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**, and half
-of it turned out to be impossible: `WeaponData` and `EffectData` answer, `ProjectileData`
-does not have the numbers at all. See above.
+**3. The `feeds` tag.** ~~Extract `ProjectileData` and `WeaponData`~~ is **done**. This said
+half of it was impossible because `ProjectileData` has none of the numbers, and that half was
+done on 11 September from `Game/Projectiles/*.sjson` instead. What remains is the per-weapon
+`WeaponData_*.lua` files, which are still not loaded: Selene's Hex costs and a hammer's charge
+stage read from them.
 
 The `feeds` tag is the largest hand-authoring job in the project and the owner's, and three
 separate features wait on it: the briefing's centre of mass, any rule about what a boon
@@ -951,6 +1047,9 @@ make a Cast build a Cast build mostly occupy none. That wants the curated `feeds
 `Briefing.position` reports `path` and `exitsLeft` and leaves `region` and `nextBoss` null,
 for the reason already in this file: `RoomData` places three Encounter gods in lettered room
 sets and says nothing about Athena, so the letter to region mapping is not established.
+**The order of the letters is, though**: the bounty bases in `BountyData.lua:158-235` state
+`BiomesReached` for each starting Region, F then G, H, I, and N then O, P, Q. `NextRoomSets`,
+which `DreamRunLogic` reads, is the table to read next. Where Athena appears is still open.
 
 **The boon text, and the one gap left in it**
 
@@ -999,17 +1098,17 @@ emitted; `WeaponData` was added; `hero.json` was already there. 168 of the 236 E
 entries resolve now, and the seven descriptions it fixed are **every one of Selene's Hexes**,
 which all read "for # Sec." before.
 
-**`ProjectileBase` is not answerable from the Lua, and that is settled.** It is 50 of the
-236 and asks for `Damage`, `Fuse` and `TotalFuse`. `ProjectileData` and its hero files were
-loaded to find them, gave 134 entries, and **not one declares any of the three**:
-`ProjectileData_Gods.lua` carries overrides and mostly colours, and
-`GetBaseDataValue({ Type = "Projectile" })` is an engine call reading the binary data beside
-the Scripts folder. The files were dropped again rather than left loading for nothing, and
-the reason is in `scripts/values.ts` so nobody goes looking twice.
+~~**`ProjectileBase` is not answerable from the Lua, and that is settled.**~~ **Not settled,
+and wrong.** It is not in the Lua. `ProjectileData` and its hero files were loaded to find
+`Damage`, `Fuse` and `TotalFuse`, gave 134 entries, and not one declares any of the three.
+What `GetBaseDataValue({ Type = "Projectile" })` reads is not binary either: it is
+`Game/Projectiles/*.sjson`, text, one folder from the animations that resolved the vow icons.
+Read from 11 September, all 68 projectiles the traits name. `CLAUDE.md` error 9.
 
 **What is left is `#` because it depends on a run**: `SlottedBoon` wants what is in a slot
-right now, `ResourceAmount` a count, `MultiplyByBase` a projectile's damage. **422 down to
-193.**
+right now, `ResourceAmount` a count. **422 down to 193**, and **27** on 11 September, once a
+projectile's damage, the `:P` and `:F` percent codes, `{$TooltipData.X}` fields and rolled ranges
+were read. `MultiplyByBase` was on this list and should not have been.
 
 **A mis-tap no longer costs a run**
 

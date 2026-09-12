@@ -19,6 +19,7 @@ import { useState } from 'react'
 
 import { aspectsOf, iconOf, renderOf, traits, weapons } from '../data/app.ts'
 import { SAMPLE_BUILDS } from '../data/builds.ts'
+import { loadBuilds } from '../state/builds.ts'
 import { Radial } from './Radial.tsx'
 import type { RadialItem } from './Radial.tsx'
 import type { RunPath, TraitId, WeaponId } from '../data/types.ts'
@@ -37,9 +38,18 @@ export function Setup({
 
   const chosenAspect = aspect ? traits.get(aspect) : null
 
+  /**
+   * What a run can go for: the shipped builds and your library, your own and
+   * the ones you follow. Read once, when the screen opens.
+   *
+   * **This read the shipped list alone, and that list is empty**, so the step
+   * below said nothing was on the aspect however many builds you had.
+   */
+  const [library] = useState(() => [...SAMPLE_BUILDS, ...loadBuilds()])
+
   // An aspect is what makes the shortlist short. Before one is chosen there is
   // nothing worth showing, and after one there are rarely more than a few.
-  const onAspect = aspect ? SAMPLE_BUILDS.filter((one) => one.aspect === aspect) : []
+  const onAspect = aspect ? library.filter((one) => one.aspect === aspect) : []
 
   // The weapon settles into the middle and its four aspects take the ring,
   // shown as the large cutouts rather than the 90 pixel icons. Once an aspect

@@ -50,6 +50,12 @@ describe('what a build is made of', () => {
     expect(facetsOf(FIRST_BUILD)).toEqual([...facetsOf(FIRST_BUILD)].sort())
   })
 
+  it('names every keepsake the run carries, the swaps as well', () => {
+    const found = facetsOf({ ...FIRST_BUILD, swaps: [null, 'ForceZeusBoonKeepsake', null] })
+    expect(found).toContain(`keepsake:${FIRST_BUILD.keepsake}`)
+    expect(found).toContain('keepsake:ForceZeusBoonKeepsake')
+  })
+
   /* Sending nothing is better than sending an empty value: `keepsake:` would
      become a board row counting builds that carry no keepsake. */
   it('leaves out what a build has not chosen', () => {

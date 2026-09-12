@@ -40,7 +40,16 @@ import {
   weapons,
 } from '../data/app.ts'
 
-import { ASSEMBLES, PLAYSTYLES } from '../data/builds.ts'
+import {
+  ASSEMBLES,
+  KEEPSAKE_POSITIONS,
+  NOTE_MAX,
+  NOTES_BUDGET,
+  PLAYSTYLES,
+  notesLength,
+  swapsOf,
+  withNotesPruned,
+} from '../data/builds.ts'
 import type { PlayRecord, ShownBuild } from '../data/builds.ts'
 import { blankBuild } from '../state/builds.ts'
 import { MAX_CARDS, MAX_GRASP, checkBuild, blockers } from '../engine/build-check.ts'
@@ -67,6 +76,8 @@ import { ElementPanel } from './Elements.tsx'
 import type { Tray } from './BoonSort.tsx'
 import type { TrayTarget } from './BuildTray.tsx'
 import { assemble } from './build-pieces.ts'
+import type { Piece } from './build-pieces.ts'
+import { MentionField } from './MentionField.tsx'
 import { Dropdown } from './Dropdown.tsx'
 import type { DropdownOption } from './Dropdown.tsx'
 import { PickList } from './PickList.tsx'
@@ -143,6 +154,58 @@ const TABS = (build: ShownBuild): Tab<TrayTarget | 'notes'>[] => [
 ]
 
 
+
+/**
+ * One pick and its note, or a way to start one.
+ *
+ * A finished build has around thirty picks and most need no note, so a pick
+ * with nothing written shows a button, and the field opens in place with the
+ * cursor in it. Emptied and left, it closes again.
+ */
+function PickNoteRow({
+  piece,
+  text,
+  room,
+  build,
+  onChange,
+}: {
+  piece: Piece
+  text: string
+  /** how long this note may be, which the others' share of the budget decides */
+  room: number
+  build: ShownBuild
+  onChange: (text: string) => void
+}) {
+  const [writing, setWriting] = useState(false)
+  return (
+    <li className="editor-note">
+      <span className="editor-note-pick">
+        {piece.icon ? (
+          <img src={`/${piece.icon}`} alt="" loading="lazy" />
+        ) : (
+          <span className="editor-note-blank" aria-hidden="true" />
+        )}
+        <span>{piece.name}</span>
+      </span>
+      {writing || text ? (
+        <MentionField
+          value={text}
+          rows={2}
+          maxLength={Math.max(0, room)}
+          build={build}
+          label={`Note on ${piece.name}`}
+          autoFocus={writing && !text}
+          onChange={onChange}
+          onBlur={() => setWriting(false)}
+        />
+      ) : (
+        <button type="button" className="quiet editor-note-add" disabled={room <= 0} onClick={() => setWriting(true)}>
+          {room > 0 ? 'Add a note' : 'No characters left'}
+        </button>
+      )}
+    </li>
+  )
+}
 
 export function BuildEditor({
   initial,
@@ -478,6 +541,45 @@ export function BuildEditor({
   const reorder = (id: TraitId, before: TraitId | null) =>
     setBuild((was) => reorderOptional(was, id, before))
 
+  /**
+   * One of the three swaps at the rack. Kept absent rather than three nulls
+   * when a build swaps nothing, which is what keeps its `shapeOf` the same as
+   * it was before swaps existed.
+   */
+  const setSwap = (at: number, id: TraitId | null) =>
+    setBuild((was) => {
+      const swaps = swapsOf(was)
+      swaps[at] = id
+      return { ...was, swaps: swaps.some(Boolean) ? swaps : undefined }
+    })
+
+  /**
+   * The notes on the picks. Kept as typed while the form is open, so a pick
+   * taken out and put back keeps its note; `withNotesPruned` drops the ones on
+   * picks that are gone when the build is saved.
+   */
+  const noteOf = (id: string) => {
+    const text = build.notes?.[id]
+    return typeof text === 'string' ? text : ''
+  }
+  const setNote = (id: string, text: string) =>
+    setBuild((was) => {
+      const notes = { ...was.notes }
+      if (text) notes[id] = text
+      else delete notes[id]
+      return { ...was, notes: Object.keys(notes).length ? notes : undefined }
+    })
+  const notesUsed = notesLength(build)
+  /** Every pick once, in the order the tray draws them, for a line each. */
+  const notable = useMemo(() => {
+    const seen = new Set<string>()
+    return [...built.all, ...built.optional].filter((piece) => {
+      if (seen.has(piece.id)) return false
+      seen.add(piece.id)
+      return true
+    })
+  }, [built])
+
   const toggleArcana = (id: string) =>
     setBuild((was) => ({
       ...was,
@@ -554,12 +656,29 @@ export function BuildEditor({
             onChoose={(value) => set('hex', value)}
           />
           <Dropdown
-            label="Keepsake"
+            label={`Keepsake, ${KEEPSAKE_POSITIONS[0].toLowerCase()}`}
             all="No keepsake"
             chosen={build.keepsake}
             options={keepsakes}
             onChoose={(value) => set('keepsake', value)}
           />
+          {/* The other three keepsakes a run gives you. Each defaults to keeping
+            * whatever you are carrying, which is what a build that never swaps
+            * has always meant. */}
+          {KEEPSAKE_POSITIONS.slice(1).map((position, at) => (
+            <Dropdown
+              key={position}
+              label={position}
+              all="Keep the one you have"
+              chosen={swapsOf(build)[at] ?? null}
+              options={keepsakes}
+              onChoose={(value) => setSwap(at, value)}
+            />
+          ))}
+          <p className="editor-hint">
+            The rack after each Guardian comes with the Kindred Keepsakes incantation, and it is
+            where the other three keepsakes are chosen.
+          </p>
           <Dropdown
             label="Familiar"
             all="No familiar"
@@ -645,12 +764,13 @@ export function BuildEditor({
           />
           <label className="editor-field">
             <span>How it works</span>
-            <textarea
+            <MentionField
               value={build.how}
               rows={7}
               maxLength={900}
-              onChange={(event) => set('how', event.target.value)}
-              placeholder="What feeds what, and why the pieces are where they are."
+              build={build}
+              onChange={(value) => set('how', value)}
+              placeholder="What feeds what, and why the pieces are where they are. Type @ to name a boon."
             />
           </label>
 
@@ -660,14 +780,37 @@ export function BuildEditor({
             * if you happen upon them, which costs nothing and helps more. */}
           <label className="editor-field">
             <span>If the run goes your way</span>
-            <textarea
+            <MentionField
               value={build.luck ?? ''}
               rows={4}
               maxLength={700}
-              onChange={(event) => set('luck', event.target.value || undefined)}
+              build={build}
+              onChange={(value) => set('luck', value || undefined)}
               placeholder="Upside worth taking if you meet it, and what to skip if you do not. A Hex, a fifth god on a keepsake, a boon from somebody who turns up when they feel like it."
             />
           </label>
+
+          {/* The reason for a pick, next to the pick. How it works is the
+            * overview; this is the line a reader wants while looking at one
+            * boon, and at an Exit while deciding whether to take it. */}
+          <h3 className="editor-rule">Notes on the picks</h3>
+          <p className="editor-hint">
+            A line on why, for any pick that needs one. It shows wherever the pick is described, and on
+            the offer at an Exit when a run is going for this build. {notesUsed} of {NOTES_BUDGET}{' '}
+            characters used across all of them, which is what keeps the whole build inside one link.
+          </p>
+          <ul className="editor-notes">
+            {notable.map((piece) => (
+              <PickNoteRow
+                key={piece.id}
+                piece={piece}
+                text={noteOf(piece.id)}
+                room={Math.min(NOTE_MAX, NOTES_BUDGET - notesUsed + noteOf(piece.id).length)}
+                build={build}
+                onChange={(text) => setNote(piece.id, text)}
+              />
+            ))}
+          </ul>
 
           </TabPanel>
 
@@ -794,7 +937,7 @@ export function BuildEditor({
               type="button"
               className="quiet"
               disabled={stopping.length > 0 || !acknowledged}
-              onClick={() => onSave(build)}
+              onClick={() => onSave(withNotesPruned(build))}
             >
               {stopping.length
                 ? `${stopping.length} to fix`

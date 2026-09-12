@@ -85,7 +85,7 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Build exchange',
     proof: 'src/ui/Exchange.tsx',
-    say: 'Four shelves: everything anybody has published, builds from people you swapped codes with, your own listings, and the ones you follow. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs.',
+    say: 'Four shelves: everything anybody has published, builds from people you swapped codes with, your own listings, and the ones you follow. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs. One filter narrows the shelf to builds somebody other than the author has actually finished a run with.',
   },
   {
     stage: 'now',
@@ -117,6 +117,24 @@ export const ROADMAP: Plan[] = [
     proof: 'src/ui/Friends.tsx',
     say: 'Swap an eight character code and you see each other’s published builds. There is no way to search for a person, so nobody can be found who did not want to be.',
   },
+  {
+    stage: 'now',
+    title: 'Wiki',
+    proof: 'src/ui/Wiki.tsx',
+    say: 'Every boon, Hex, keepsake, aspect, hammer, Arcana card and familiar the tool knows, each with a record at its own address and an index of them all. All of it is read out of the game’s files, including what a duo needs, what a boon counts toward and whether a Pom can raise it.',
+  },
+  {
+    stage: 'now',
+    title: 'Under the hood',
+    proof: 'src/data/underhood.ts',
+    say: 'Rules the game never states, sorted by how likely you were to find them yourself, and nothing opens unless you open it. Every entry names the code it was read from, and the two that are our opinion rather than the game’s rule say so.',
+  },
+  {
+    stage: 'now',
+    title: 'Notes on the picks',
+    proof: 'src/ui/MentionField.tsx',
+    say: 'A line on any pick that needs one, shown wherever the pick is described and on its card at an Exit when a run is going for that build. Type @ in a build’s write-up to name a boon, a keepsake, an Arcana card or a familiar, and it links to its record in the wiki.',
+  },
 
   // ---- next --------------------------------------------------------------
   {
@@ -136,8 +154,8 @@ export const ROADMAP: Plan[] = [
     stage: 'next',
     title: 'Owner builds in the run',
     proof: null,
-    why: 'The step exists in Setup.tsx. What is missing is builds to choose from, which is the item above.',
-    say: 'Starting a run already asks which build you are going for, and the run tracks it from there. What is missing is anything to choose from that is not your own: the library ships empty, so the list is whatever you have made on that aspect.',
+    why: 'The step exists in Setup.tsx and lists your own builds. What is missing is builds that ship with the tool, which is the item above.',
+    say: 'Starting a run asks which build you are going for, out of your own builds and the ones you follow on that aspect, and the run tracks it from there. What is missing is anything that ships with the tool: the library ships empty.',
   },
 
   // ---- planned -----------------------------------------------------------
@@ -158,7 +176,7 @@ export const ROADMAP: Plan[] = [
     title: 'Boon interaction data',
     proof: null,
     why: 'The deliverable is a curated data file rather than a module, and the validator only reads src/.',
-    say: 'The game states each boon’s numbers but not how boons feed each other. That has to be written by hand. Three features depend on it, including build archetypes.',
+    say: 'The game states each boon’s numbers, and in a few places it states what feeds what: the lists behind Olympian damage are read out of the files and are in the wiki already. What it never states is the rest of it, which boon makes another worth taking, and that has to be written by hand. Three features depend on it, including build archetypes.',
   },
 
   // ---- stalled -----------------------------------------------------------

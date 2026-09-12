@@ -3944,6 +3944,43 @@
   color: var(--lit-hot);
 }
 
+/* A person's: the author of the build the run is going for, on this pick. Not
+ * the game's fact and not our judgement, so it has its own label and a neutral
+ * rule rather than the lit one. */
+.offer-note {
+  display: grid;
+  gap: 0.1rem;
+  margin-top: 0.2rem;
+  padding-left: 0.55rem;
+  border-left: 2px solid var(--bone-faint);
+}
+
+.offer-note-by {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.offer-note-text {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--bone);
+}
+
+/* That there is a note, beside the name, where it can be seen without a hover. */
+.offer-noted {
+  padding: 0.02rem 0.35rem;
+  border: 1px solid var(--div-5);
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+}
+
 .offer-closes {
   margin-top: 0.15rem;
   font-family: var(--body);
@@ -4227,11 +4264,14 @@
 
 /**
  * Touch: no hover to open a panel with, so the game's own sentence goes back
- * on the card and nothing else does.
+ * on the card, and so does the author's note when the run is going for a build
+ * that has one on this pick. Nothing else does.
  *
  * That is the "less text" half of the same note. Our judgement, the
  * completions and the cost are all still computed and all still reachable on a
- * pointer; on a phone the card is a name, a slot and what the game says.
+ * pointer; on a phone the card is a name, a slot and what the game says. The
+ * note is the exception because the player chose that build for this run, the
+ * note is about this one card, and it only exists where its author wrote one.
  */
 @media (hover: none) {
   /* The card has to wrap, or the panel becomes a third column in the row and

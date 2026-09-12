@@ -17,7 +17,8 @@ import { useMemo, useState } from 'react'
 import { godPools, olympians, traits } from '../data/app.ts'
 import { completionOdds, formatOdds } from '../engine/odds.ts'
 import { godPriority, reachable } from '../engine/reachability.ts'
-import { buildStanding, buildTally, sayOf } from '../engine/build-run.ts'
+import { buildTally, sayOf } from '../engine/build-run.ts'
+import type { BuildStanding } from '../engine/build-run.ts'
 import type { Verdict } from '../engine/reachability.ts'
 import type { RunContext, TraitId } from '../data/types.ts'
 
@@ -26,10 +27,16 @@ const RATED = 6
 
 export function Standing({
   run,
+  standing,
   pinned,
   onPin,
 }: {
   run: RunContext
+  /**
+   * Every build the run could be going for, judged. Worked out once in
+   * `App.tsx`, which reads the same list for the header, rather than twice.
+   */
+  standing: readonly BuildStanding[]
   pinned: TraitId | null
   onPin: (target: TraitId | null) => void
 }) {
@@ -43,7 +50,7 @@ export function Standing({
    * because "you are two picks off Killer Current" is worth knowing. They are
    * the detail under the answer rather than the answer.
    */
-  const builds = buildStanding(run, traits)
+  const builds = standing
   const buildsOpen = builds.filter((one) => one.verdict.state !== 'DEAD')
   const counted = buildTally(builds)
 

@@ -48,6 +48,7 @@ export function BuildFilters({
   onQuery,
   showing,
   total,
+  evidence,
 }: {
   facets: Facet[]
   onChoose: (facet: FacetId, value: string | null) => void
@@ -61,6 +62,15 @@ export function BuildFilters({
   onQuery: (query: string) => void
   showing: number
   total: number
+  /**
+   * The one filter that is not about what is in a build, and the only one the
+   * library never gets: whether anybody else has finished a run with this.
+   *
+   * Passed by the exchange alone, because it is the only screen whose rows
+   * carry counts. `matches` is how many rows would survive it, so the control
+   * says what it costs before it is pressed.
+   */
+  evidence?: { on: boolean; matches: number; onToggle: (on: boolean) => void }
 }) {
   const [open, setOpen] = useState(false)
   const paneId = useId()
@@ -96,6 +106,32 @@ export function BuildFilters({
             onChange={(event) => onQuery(event.target.value)}
           />
         </label>
+
+        {/**
+          * Evidence, and it says what the evidence is.
+          *
+          * Never the word Verified: nobody grants this and nobody can be asked
+          * for it. It is a count the worker already keeps, of clears logged
+          * against the version on the shelf now, and an author's own runs are
+          * refused before they reach it (`worker/exchange.ts`), so one clear
+          * means one other player finished a run with it.
+          */}
+        {evidence ? (
+          <button
+            type="button"
+            className={`bfilter-evidence${evidence.on ? ' is-on' : ''}`}
+            aria-pressed={evidence.on}
+            /* The name has to start with the words on the button, or a reader
+               using speech asks for the control they can see and is answered
+               about one they cannot. The tooltip stays as the description. */
+            aria-label={`Cleared by somebody else: ${evidence.matches} ${evidence.matches === 1 ? 'build' : 'builds'}`}
+            title="At least one clear logged against this version of the build, by somebody other than whoever published it"
+            onClick={() => evidence.onToggle(!evidence.on)}
+          >
+            Cleared by somebody else
+            <span className="bfilter-badge">{evidence.matches}</span>
+          </button>
+        ) : null}
 
         <button
           type="button"
