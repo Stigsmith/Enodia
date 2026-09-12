@@ -55,13 +55,13 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Build manager',
     proof: 'src/ui/Builds.tsx',
-    say: 'Browse builds with filters for arm, aspect, gods, keepsake and familiar. Create your own, duplicate any build, and record how each has performed.',
+    say: 'Browse builds with filters for arm, aspect, gods, keepsake and familiar. Create your own, duplicate any build, and record how each has performed. A build names all four keepsakes a run gives you, in the order you take them, and the editor says out loud what the game would not allow rather than refusing to save.',
   },
   {
     stage: 'now',
     title: 'Run companion',
     proof: 'src/engine/build-run.ts',
-    say: 'Log each Exit as you take it. Duos and legendaries are evaluated live, completion odds are simulated, and the header counts builds you can still complete.',
+    say: 'Log each Exit as you take it. Duos and legendaries are evaluated live, completion odds are simulated, and the header counts builds you can still complete. Say at the start which build you are going for, out of your own and the ones you follow, and its author’s note on a boon shows on that boon’s card at the Exit where you are offered it.',
   },
   {
     stage: 'now',
@@ -121,7 +121,13 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Wiki',
     proof: 'src/ui/Wiki.tsx',
-    say: 'Every boon, Hex, keepsake, aspect, hammer, Arcana card and familiar the tool knows, each with a record at its own address and an index of them all. All of it is read out of the game’s files, including what a duo needs, what a boon counts toward and whether a Pom can raise it.',
+    say: 'Every boon, Hex, keepsake, aspect, hammer, Arcana card and familiar the tool knows, each with a record at its own address and an index of them all. All of it is read out of the game’s files, including what a duo needs, what a boon counts toward, whether a Pom can raise it, and whether its damage is on the list the game calls Olympian.',
+  },
+  {
+    stage: 'now',
+    title: 'What a boon actually does',
+    proof: 'src/ui/StatLines.tsx',
+    say: 'The lines the game prints under a boon’s sentence, which this tool never drew: Heaven Strike’s Blitz damage, Storm Ring’s bolts, Extended Family’s bonus for each god. 275 things carry at least one. A build does not know what rarity you will find a boon at, so where the number moves with rarity you get all four, in the game’s own colours. The holes in the game’s own sentences, where a # stood for a number, went from 193 to 27.',
   },
   {
     stage: 'now',
@@ -152,10 +158,10 @@ export const ROADMAP: Plan[] = [
   },
   {
     stage: 'next',
-    title: 'Owner builds in the run',
+    title: 'The last numbers that still read #',
     proof: null,
-    why: 'The step exists in Setup.tsx and lists your own builds. What is missing is builds that ship with the tool, which is the item above.',
-    say: 'Starting a run asks which build you are going for, out of your own builds and the ones you follow on that aspect, and the run tracks it from there. What is missing is anything that ships with the tool: the library ships empty.',
+    why: 'A pass in the extractor rather than a screen, so no file’s existence answers it.',
+    say: 'Eleven values in the game’s own text still show a # where a number belongs, because they are read from the per-weapon files and those are not loaded yet. Ten are Hex costs and one is a hammer’s charge stage. A # rather than a guess is the deliberate half of that.',
   },
 
   // ---- planned -----------------------------------------------------------
@@ -180,6 +186,14 @@ export const ROADMAP: Plan[] = [
   },
 
   // ---- stalled -----------------------------------------------------------
+  {
+    stage: 'waiting',
+    title: 'Collections',
+    proof: null,
+    why: 'Waiting on a decision rather than on code, so nothing exists to point at yet.',
+    say: 'A named, ordered list of published builds with a line on each: what to play first, what to try once that is boring. Every piece it needs now exists, so what is left is one question rather than one engine.',
+    on: 'Needs a call on whether your note about somebody else’s build should be public.',
+  },
   {
     stage: 'waiting',
     title: 'Build quality ratings',

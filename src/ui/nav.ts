@@ -53,6 +53,17 @@ export type View =
    * did, which nothing recorded until the gap analysis went looking for it.
    */
   | 'underhood'
+  /**
+   * Three things on the roadmap that will be screens and are not built.
+   *
+   * They open onto Dora's empty room rather than being greyed out, for the
+   * reason the four Phase 4 rooms opened: a disabled row says a thing exists
+   * and then refuses to say anything else. `src/data/roadmap.ts` is where each
+   * one says what it will be and what it waits on.
+   */
+  | 'byaspect'
+  | 'playhistory'
+  | 'suggested'
   | 'themes'
   | 'settings'
   | 'help'

@@ -5,141 +5,154 @@
  * and they belong in that order: a reader who does not know the rules were read
  * out of the game's own files has no reason to trust the definitions under them.
  *
- * The first section arrived here when the About page was binned. About had four
- * sections and three of them were already said elsewhere: the disclaimer word
- * for word in the landing fine print, the refusal to judge a build in the
- * roadmap, and a "your things stay here" promise that the landing page had
- * already dropped for making a promise with an expiry date. Provenance was the
- * one thing only About said, so provenance is the one thing that moved.
- *
  * **Every definition here is the one the engine actually implements**, not a
  * friendly approximation of it: a help page that rounds off a rule is worse than
  * none, because it is believed.
+ *
+ * ## Rewritten on 12 September 2026, for two faults
+ *
+ * **It had gone out of date without anybody noticing.** It described the run
+ * screen, the exchange and the leaderboards, and said nothing about the wiki,
+ * the stat lines under a boon, the four keepsakes a build can name, the notes on
+ * a build's picks, or what the game means by damage from Olympians. A help page
+ * that stops at the features it was written for is worse than a short one.
+ *
+ * **And it was a wall.** Ten sections of paragraphs, the exchange alone running
+ * to eight of them, at a length nobody reads twice. It is the same material in
+ * lists and short sections now, and three things are shown rather than
+ * described: the five slots wear the game's own glyphs, the rarity ladder is
+ * the real component drawing Heaven Strike's real numbers, and the mention is a
+ * real mention. **Nothing here is a screenshot**: every example is the live
+ * component reading the live data, so a page that goes stale shows it.
  */
 
-import { gameVersion } from '../data/app.ts'
+import { gameVersion, traits } from '../data/app.ts'
+import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
+import { SLOT_GLYPH } from './build-pieces.ts'
 import { Page } from './Pages.tsx'
+import { Prose } from './Prose.tsx'
+import { StatLines } from './StatLines.tsx'
+
+/** Heaven Strike, which is the example everywhere else in the documents too. */
+const EXAMPLE = 'ZeusWeaponBoon'
 
 export function Help() {
+  const example = traits.get(EXAMPLE)
+
   return (
     <Page
       measure="broad"
       title="Help"
-      standfirst="Where the numbers come from, and what each term on the run screen means. These are the rules as the tool implements them."
+      standfirst="Where the numbers come from, and what each word on the screen means. These are the rules as the tool implements them, and the examples are live rather than drawn."
     >
-      {/* Two columns on a wide screen, because **this page was never too narrow**.
-        * Measured before any of it: a line of body copy here ran to 113
-        * characters at 1600px, against the 45 to 75 a reader is comfortable
-        * with. It was two screens tall because there is a lot of it, not
-        * because the column was thin, so widening would have made the reading
-        * worse and the scrolling barely better. Columns put half of it beside
-        * the other half: 104 characters a line now, and one screen. */}
+      {/* Two columns on a wide screen. Measured before any of it: a line of body
+        * copy here ran to 113 characters at 1600px, against the 45 to 75 a
+        * reader is comfortable with, so this is about the number of sections
+        * rather than the width of one. */}
       <div className="ref-cols">
         <section className="ref">
           <h3 className="ref-rule">Where the numbers come from</h3>
           <p className="ref-say">
-            Hades II ships its logic as plain-text Lua. Everything mechanical in this tool is read
-            out of those files rather than from a wiki or a guide: which boons occupy which slot,
-            what every duo requires, how many Olympians a run allows, and how a boon&rsquo;s value
-            changes as you stack it.
+            Hades II ships its logic as plain-text Lua, and everything mechanical here is read out
+            of those files rather than from a wiki or a guide: which boons occupy which slot, what
+            every duo needs, how a boon&rsquo;s numbers change with rarity, and what a Pom is worth
+            to it.
           </p>
           <p className="ref-say">
             Read from game build <span className="ref-mono">{gameVersion}</span>. When the game
             patches, the data is extracted again and the differences are reviewed rather than
-            accepted.
+            accepted. Every image is the game&rsquo;s own, used to point at the thing it depicts.
           </p>
+        </section>
+
+        <section className="ref">
+          <h3 className="ref-rule">The five slots, and why a boon closes</h3>
           <p className="ref-say">
-            Every image here is the game&rsquo;s own, used to point at the thing it depicts.
+            This is the thing the tool exists for. Only 45 boons occupy a slot, nine per slot, one
+            per Olympian, and each slot holds one for the whole run.
+          </p>
+          <ul className="ref-slots">
+            {CORE_SLOTS.map((slot) => (
+              <li key={slot}>
+                {SLOT_GLYPH[slot] ? <img src={`/${SLOT_GLYPH[slot]}`} alt="" /> : null}
+                <span>{slotLabel(slot)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="ref-say">
+            So taking a Cast from one god quietly closes the Cast from every other god, and with it
+            every duo that needed one. It is not a proof of impossible: a swap can still arrive, at
+            long odds, and only while what you hold can still be upgraded. A boon already at its
+            best rarity locks its slot outright.
+          </p>
+        </section>
+
+        <section className="ref">
+          <h3 className="ref-rule">What a boon&rsquo;s numbers mean</h3>
+          <p className="ref-say">
+            A boon&rsquo;s tooltip in the game is its sentence plus the lines under it, and both are
+            here. A build cannot know what rarity you will find a boon at, so where the number moves
+            with rarity you get the whole ladder in the game&rsquo;s own colours. This is Heaven
+            Strike, drawn by the same component the hover uses:
+          </p>
+          {example?.stats?.length ? (
+            <figure className="ref-figure">
+              <StatLines lines={example.stats} spelled />
+              <figcaption>{example.name}. Common, Rare, Epic, Heroic.</figcaption>
+            </figure>
+          ) : null}
+          <p className="ref-say">
+            A <span className="ref-mono">#</span> in one of the game&rsquo;s sentences is a number
+            the tool cannot read yet. There are eleven left, and a <span className="ref-mono">#</span>{' '}
+            rather than a guess is deliberate.
           </p>
         </section>
 
         <section className="ref">
           <h3 className="ref-rule">The four states</h3>
           <p className="ref-say">
-            Every duo and legendary sits in one of four, judged against what you are holding and how
-            many Exits you have left.
+            Every duo and legendary sits in one of four, judged against what you hold and how many
+            Exits are left.
           </p>
           <dl className="ref-list">
             <div className="ref-item is-good">
               <dt>Yours</dt>
-              <dd>Every prerequisite is in hand. There is nothing left to do about it.</dd>
+              <dd>Every prerequisite is in hand.</dd>
             </div>
             <div className="ref-item">
               <dt>Open</dt>
-              <dd>
-                Still reachable. There are enough Exits left, and every god it needs can still turn
-                up.
-              </dd>
+              <dd>Enough Exits left, and every god it needs can still turn up.</dd>
             </div>
             <div className="ref-item is-risk">
               <dt>At risk</dt>
               <dd>
-                Reachable, and only just. Either it needs as many picks as you have Exits, or it
-                needs a god who has not appeared yet and you have nothing to spare.
+                Reachable and only just: it needs as many picks as you have Exits, or a god who has
+                not appeared and nothing to spare.
               </dd>
             </div>
             <div className="ref-item is-dead">
               <dt>Closed</dt>
               <dd>
-                Not reachable this run. A slot is taken by something else, or the four Olympian
-                places are settled and the god it needs is not among them.
+                A slot it needed is taken by something else, or the god it needs is out of the
+                random pool for the rest of the run.
               </dd>
             </div>
           </dl>
         </section>
 
         <section className="ref">
-          <h3 className="ref-rule">The three bands</h3>
+          <h3 className="ref-rule">Likely, possible, long shot</h3>
           <p className="ref-say">
-            A rough read on how comfortable an open target is, before any simulation is run.
-          </p>
-          <dl className="ref-list">
-            <div className="ref-item">
-              <dt>Likely</dt>
-              <dd>
-                You have at least twice as many Exits left as the picks it needs, and every god it
-                wants has already turned up.
-              </dd>
-            </div>
-            <div className="ref-item">
-              <dt>Possible</dt>
-              <dd>The Exits are there, but not many to spare.</dd>
-            </div>
-            <div className="ref-item">
-              <dt>Long shot</dt>
-              <dd>
-                It needs a swap, or it needs more than the Exits comfortably allow. Not impossible,
-                which is a different word.
-              </dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="ref">
-          <h3 className="ref-rule">The percentages</h3>
-          <p className="ref-say">
-            A percentage next to a target is <strong>measured, not asserted</strong>. The tool plays
-            out hundreds of legal runs from where you are standing, following the game&rsquo;s own
-            rules about what an Exit can offer, and reports how often that target came together.
+            A rough read on an open target before anything is simulated: twice as many Exits as
+            picks and every god already seen is <strong>likely</strong>; enough Exits with little to
+            spare is <strong>possible</strong>; needing a swap, or more Exits than you comfortably
+            have, is a <strong>long shot</strong>. Not impossible, which is a different word.
           </p>
           <p className="ref-say">
-            Only the closest handful get one, because each is real work, and none of them appears
-            until you open the drawer that shows them.
-          </p>
-        </section>
-
-        <section className="ref">
-          <h3 className="ref-rule">Why a boon can be closed</h3>
-          <p className="ref-say">
-            This is the thing the tool exists for. There are five core slots, and only 45 boons
-            occupy one: nine per slot, one per Olympian. <strong>A filled slot blocks every other
-            god&rsquo;s boon for that slot</strong>, so taking a Cast from one god quietly closes the
-            Cast from all the others, and with it every duo that needed one.
-          </p>
-          <p className="ref-say">
-            It is not quite a proof of impossible. A swap can still arrive, at long odds, and only
-            while what you hold can still be upgraded. A boon already at its best rarity locks its
-            slot outright.
+            A percentage beside a target is <strong>measured, not asserted</strong>. The tool plays
+            out hundreds of legal runs from where you are standing, by the game&rsquo;s own rules
+            about what an Exit can offer, and reports how often that target came together. Only the
+            closest handful get one, because each is real work.
           </p>
         </section>
 
@@ -148,8 +161,60 @@ export function Help() {
           <p className="ref-say">
             The number at the top of a run counts <strong>builds you could still finish</strong>,
             not duos. Nobody sits at an Exit chasing a prerequisite; they chase a build that happens
-            to want one. Choosing an aspect settles most of the field before the first Exit, which
-            is the point of the number.
+            to want one. Choosing an aspect settles most of the field before the first Exit.
+          </p>
+        </section>
+
+        <section className="ref">
+          <h3 className="ref-rule">What a build can say</h3>
+          <dl className="ref-list">
+            <div className="ref-item">
+              <dt>Four keepsakes</dt>
+              <dd>
+                One at the Crossroads and a swap at the rack after each of the first three
+                Guardians, in the order a run gives them to you.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>A line on any pick</dt>
+              <dd>
+                Why it is there, shown wherever that pick is described, and on its card at the Exit
+                where it is offered when a run is going for that build.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>Worth adding</dt>
+              <dd>
+                Picks that raise the ceiling without being the build. Nothing over there is counted
+                against how hard the build is to assemble.
+              </dd>
+            </div>
+          </dl>
+          <p className="ref-say">
+            Type <span className="ref-mono">@</span> in any of a build&rsquo;s writing to name
+            something from the game. It is stored as the thing rather than as its name, so it
+            survives a patch renaming it, and it becomes a link to that thing&rsquo;s record:
+          </p>
+          <figure className="ref-figure">
+            <p className="ref-say">
+              <Prose text={`Take @[Heaven Strike](t:${EXAMPLE}) before anything else.`} />
+            </p>
+            <figcaption>A mention, as it is drawn.</figcaption>
+          </figure>
+        </section>
+
+        <section className="ref">
+          <h3 className="ref-rule">The wiki, and Under the hood</h3>
+          <p className="ref-say">
+            Every boon, Hex, keepsake, aspect, Daedalus Hammer, Arcana card and familiar the tool
+            knows has a record at its own address, so a link to one opens it. The records are
+            generated: what a duo needs, what a boon counts toward, how much of an element it takes,
+            whether a Pom can raise it, and whether its damage is on the list the game calls
+            Olympian.
+          </p>
+          <p className="ref-say">
+            Under the hood is the other half: rules the game never states, sorted by how likely you
+            were to find them yourself, and nothing opens unless you open it.
           </p>
         </section>
 
@@ -157,92 +222,74 @@ export function Help() {
           <h3 className="ref-rule">Grasp, and the six free cards</h3>
           <p className="ref-say">
             Six Arcana cost nothing and switch themselves on when the rest of the board satisfies
-            them. You choose what you pay Grasp for; the board works out the rest and every card
-            that stays dark says why.
-          </p>
-          <p className="ref-say">
-            Two of them can never be on together: one wants three cards or fewer, the other wants at
-            least five. That conflict is most of the reason there are only a few shapes worth having.
+            them. You choose what you pay Grasp for, the board works out the rest, and every card
+            that stays dark says why. Two of them can never be on together: one wants three cards or
+            fewer and the other wants at least five.
           </p>
         </section>
 
         <section className="ref">
-          <h3 className="ref-rule">The exchange, and its four shelves</h3>
-          <p className="ref-say">
-            <strong>All</strong> is everything anybody has published and not taken back down.
-            <strong> From friends</strong> is the people whose codes you swapped.{' '}
-            <strong>Mine</strong> is your own listings, and <strong>Followed</strong> is the
-            builds you took up. Those last two keep the ones that have been taken down, because
-            they are about your own relationship with a build rather than about browsing.
-          </p>
-          <p className="ref-say">
-            There used to be a fifth, a shelf of builds picked by hand with a note saying why,
-            and it was the only one a stranger could see. It made sense while there was no way
-            to browse. Once there was, it was a second answer to a question that already had
-            one, so it is gone: you find what you want yourself.
-          </p>
-          <p className="ref-say">
-            A shelf of everybody was closed for a long time, on the argument that it needs a way
-            to report a listing and a way to hide one first. It is open now and those still do
-            not exist. What tipped it was that the old arrangement put your own published builds
-            on no shelf at all, and what makes it defensible is that a listing carries a
-            build&rsquo;s name and its author&rsquo;s name and no other writing. If that stops
-            being enough, it changes.
-          </p>
-          <p className="ref-say">
-            You <strong>follow</strong> a build rather than copying it. It stays the person who
-            made it and it sits in your library marked as theirs. Changing anything about it is
-            what makes it yours: that forks it into an ordinary build of your own and ends the
-            following.
-          </p>
-          <p className="ref-say">
-            When they change it, what reaches you depends on what they changed. A better note or
-            a clearer name simply arrives, because being asked about a typo is worse than not
-            being told. A change to the <strong>picks</strong> is a different build, so that one
-            waits: you are told, you can see what they did, and you choose between their version
-            and the one you have. Nothing anybody else does rewrites a build in your library
-            without you.
-          </p>
-          <p className="ref-say">
-            Taking a build down removes it from these shelves so nobody new finds it. It does not
-            delete it: if you already follow it, it stays in your library and goes on working,
-            and the link keeps opening for anybody who has it. The runs and ratings people logged
-            against it stay too.
-          </p>
-          <p className="ref-say">
-            If an author replaces a build with a substantially different one, its counts start
-            again. What the old version earned is still shown, marked as being from before the
-            change, because forty people rating the build that used to be here is true and is not
-            a claim about this one.
-          </p>
-          <p className="ref-say">
-            The numbers under a listing are counts and never a score. How many people took it,
-            how many runs and clears they logged, the best Fear anybody cleared with it, and
-            what they rated it out of five with the number of raters beside the average. Rating
-            needs a run behind it, so a rating is always somebody saying how a build went rather
-            than how it read.
-          </p>
+          <h3 className="ref-rule">The exchange</h3>
+          <dl className="ref-list">
+            <div className="ref-item">
+              <dt>Four shelves</dt>
+              <dd>
+                Everything published, builds from people whose codes you swapped, your own listings,
+                and the ones you follow. The last two keep builds that have been taken down.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>Follow, not copy</dt>
+              <dd>
+                A build you follow stays its author&rsquo;s and sits in your library marked as
+                theirs. Changing anything forks it into a build of your own and ends the following.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>What reaches you</dt>
+              <dd>
+                A better note or a clearer name simply arrives. A change to the picks is a different
+                build, so you are told, shown what changed, and asked.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>Taken down</dt>
+              <dd>
+                Off the shelves so nobody new finds it. It stays in the library of everybody
+                following it, the link keeps working, and the counts stay.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>Counts, never a score</dt>
+              <dd>
+                Takes, runs, clears, the best Fear anybody cleared with it, and a rating with the
+                number of raters beside it. A rating needs a run behind it. Replace a build with a
+                substantially different one and its counts start again, with the old ones still
+                shown and marked as from before.
+              </dd>
+            </div>
+            <div className="ref-item">
+              <dt>Cleared by somebody else</dt>
+              <dd>
+                One filter, over one count: at least one clear on the version on the shelf now,
+                logged by somebody other than whoever published it. Nobody grants it, and it is
+                never called Verified.
+              </dd>
+            </div>
+          </dl>
         </section>
 
         <section className="ref">
           <h3 className="ref-rule">Leaderboards, and what they do not say</h3>
           <p className="ref-say">
-            The same counts, put beside each other. What has been followed most, played most and
-            cleared most, at the highest Fear, and who published it. Everybody, or just the
-            people whose codes you swapped. You are on your own friends board, because a board
-            of your circle that leaves you off it does not answer the question.
+            The same counts, put beside each other: followed most, played most, cleared most, at the
+            highest Fear, everybody or just the people whose codes you swapped.
           </p>
           <p className="ref-say">
-            <strong>Every board counts one thing.</strong> None of them is a rate and none of
-            them adds two numbers together into a score. A clear rate would read as a ranking of
-            how good a build is, and it is not one: five clears from five runs would beat ninety
-            from a hundred, which is a claim about how much evidence there is rather than about
-            the builds. So the boards say what happened and stop there.
-          </p>
-          <p className="ref-say">
-            A board with nothing in it is not drawn, so the page is short while there are few
-            people here. There are no zeroes on it: a build nobody has followed has not come
-            tenth in a following contest.
+            <strong>Every board counts one thing.</strong> None is a rate and none adds two numbers
+            into a score. Five clears from five runs would beat ninety from a hundred, which is a
+            claim about how much evidence there is rather than about the builds. A board with
+            nothing in it is not drawn, and there are no zeroes on any of them.
           </p>
         </section>
       </div>
