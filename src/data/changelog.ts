@@ -20,6 +20,17 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-09-12',
+    title: 'Help is half the length and twice as current, and the menu says what is coming',
+    say: 'The help page had stopped keeping up, and three things on the roadmap had nowhere to go.',
+    points: [
+      'Help was written for the run screen and the exchange and never caught up: nothing in it mentioned the wiki, the lines under a boon, the four keepsakes a build can name, the notes on its picks, or what the game means by damage from Olympians. All of that is in it now, and it is about half as many words as before.',
+      'It shows things rather than describing them where it can. The five slots wear the game’s own glyphs, the rarity ladder is the real one drawing Heaven Strike’s real numbers, and the example mention is a real mention. Nothing in it is a screenshot, so an example that goes out of date shows it instead of quietly lying.',
+      'Builds by aspect, Play history and Suggested builds are in the menu now. None of them is built, and each one opens on Dora saying so and what it is waiting for. A menu that only lists what exists hides the shape of the thing.',
+      'The roadmap has caught up with the last two days, including what is left: the eleven numbers that still read #, and Collections, which is waiting on one decision rather than on any code.',
+    ],
+  },
+  {
+    date: '2026-09-12',
     title: 'Show me the ones somebody else has actually finished',
     say: 'One filter on the exchange, over a count rather than a badge.',
     points: [

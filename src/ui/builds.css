@@ -4397,6 +4397,84 @@ button.mark {
   color: var(--bone-faint);
 }
 
+/**
+ * The five core slots, wearing the game's own glyphs.
+ *
+ * The page was all paragraphs, and the slots are the one idea in it that is
+ * about position: five places, one boon each. Five marks in a row say that
+ * before the sentence under them does.
+ */
+.ref-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ref-slots li {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+}
+
+/**
+ * Brightened, because the art is nearly black and so is the page.
+ *
+ * Measured off `slots/attack.webp`: 91% of it is opaque, 79% of those pixels
+ * sit between 0 and 31, and the symbol itself peaks at 104, against this
+ * page's background of 8, 13, 15. It is drawn to sit on a lit slot plate, and
+ * the rail fades it further to 0.3 on purpose, as a placeholder inside a frame
+ * that is doing the work.
+ *
+ * Inverting was tried first and was wrong: the plate is 79% of the image, so
+ * flipping turns five symbols into five pale tiles. Brightness leaves the plate
+ * near-black and lifts the symbol off it, which is the shape the game draws.
+ */
+.ref-slots img {
+  width: 1.9rem;
+  height: 1.9rem;
+  object-fit: contain;
+  filter: brightness(2.8) contrast(1.1);
+}
+
+.ref-slots span {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/**
+ * A live example, boxed and captioned.
+ *
+ * Not a screenshot: what is inside is the same component the rest of the tool
+ * draws, reading the same data, so an example that has gone stale says so
+ * rather than sitting there being wrong.
+ */
+.ref-figure {
+  margin: 0.8rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+}
+
+.ref-figure .ref-say {
+  margin: 0;
+}
+
+.ref-figure figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
 /* ------------------------------------------------------------ changelog -- */
 
 .log {

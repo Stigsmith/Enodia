@@ -194,6 +194,42 @@ export function Menu({
             leave()
           },
         },
+        /**
+         * What the roadmap promises and the tool does not have yet.
+         *
+         * Here rather than left off the menu, because a menu that only lists
+         * what exists hides the shape of the product, which is the argument
+         * this file opens with. Each one opens onto Dora's empty room saying
+         * what it will be. The mark beside the label is what says they are not
+         * built, and `Entry.unbuilt` is what draws it.
+         */
+        {
+          label: 'Builds by aspect',
+          here: view === 'byaspect',
+          unbuilt: true,
+          action: () => {
+            onGo('byaspect')
+            leave()
+          },
+        },
+        {
+          label: 'Play history',
+          here: view === 'playhistory',
+          unbuilt: true,
+          action: () => {
+            onGo('playhistory')
+            leave()
+          },
+        },
+        {
+          label: 'Suggested builds',
+          here: view === 'suggested',
+          unbuilt: true,
+          action: () => {
+            onGo('suggested')
+            leave()
+          },
+        },
       ],
     },
     {

@@ -633,6 +633,12 @@ export function App() {
   const unbuilt: Partial<Record<View, { title: string; phase: string }>> = {
     account: { title: 'Account', phase: 'Phase 4' },
     friends: { title: 'Friends', phase: 'Phase 4' },
+    /* The three screens the roadmap promises and does not have. The marker is
+       the roadmap's own word for the stage rather than a phase number, because
+       that is the word the Roadmap page uses two clicks away. */
+    byaspect: { title: 'Builds by aspect', phase: 'Next on the roadmap' },
+    playhistory: { title: 'Play history', phase: 'Next on the roadmap' },
+    suggested: { title: 'Suggested builds', phase: 'Planned' },
   }
   const room = unbuilt[screen]
   if (room) {
