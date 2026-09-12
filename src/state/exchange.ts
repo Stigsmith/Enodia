@@ -30,6 +30,7 @@
  * not, so a copy is comparable to its original from the moment it is made.
  */
 
+import { swapsOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { duplicateBuild, loadBuilds, newBuildId, saveBuild } from './builds.ts'
 import { clearOffer, loadOffers, offerFor, setOffers } from './offers.ts'
@@ -89,6 +90,23 @@ export type Listed = {
    */
   before?: Before
 }
+
+/**
+ * Whether somebody other than the author has finished a run with this listing,
+ * on the version that is on the shelf now.
+ *
+ * **One clear is one other player**, and that rests on two things the worker
+ * does rather than on anything here. `worker/exchange.ts` returns a quiet ok to
+ * an author reporting a run against their own build and counts nothing, so no
+ * clear in this number is the author's own. And the counts are grouped by
+ * `shape`, so an author who replaces the picks starts from zero rather than
+ * inheriting evidence somebody else earned for a different build.
+ *
+ * It is deliberately not a tier, a badge, or the word Verified. Nobody grants
+ * it and nobody can be asked for it: the label on the filter names the count it
+ * rests on, and this is that count.
+ */
+export const clearedByAnother = (listing: Pick<Listed, 'stats'>): boolean => listing.stats.clears > 0
 
 /**
  * Which shelf is open.
@@ -157,9 +175,9 @@ export function fingerprint(text: string): string {
  * - **Identity.** `id`, `by`, `author`, `created`, `modified`, `schemaVersion`,
  *   `derivedFrom`, `derivedHash`. A copy differs in all of them by definition.
  * - **The name.** Calling your copy something else is not changing the build.
- * - **The prose**, `say`, `how` and `luck`. You played the picks, not the
- *   write-up, and rewriting somebody's paragraph in your own words is a normal
- *   thing to do to a build you took.
+ * - **The prose**, `say`, `how`, `luck` and the `notes` on each pick. You
+ *   played the picks, not the write-up, and rewriting somebody's paragraph in
+ *   your own words is a normal thing to do to a build you took.
  * - **`play`.** Logging a run must not itself change the answer, or the first
  *   run reported would be the last.
  *
@@ -189,6 +207,15 @@ export function shapeOf(build: ShownBuild): string {
    * nobody drags those into place by hand.
    */
   const ranked = (ids: readonly string[] | undefined) => [...(ids ?? [])].sort().join(',')
+  /**
+   * **The swaps line exists only when a build swaps something.** Every build
+   * published before swaps existed has none, and writing an empty line for them
+   * would move every one of their hashes and reset every listing's counts at
+   * once. So a build with no swaps hashes exactly as it did, and adding one is
+   * a change to the picks, which is right: which keepsake you carry into the
+   * second Region is part of what you played.
+   */
+  const swaps = swapsOf(build)
   return [
     `weapon=${build.weapon}`,
     `aspect=${build.aspect}`,
@@ -199,6 +226,7 @@ export function shapeOf(build: ShownBuild): string {
     `hex=${build.hex ?? ''}`,
     `hammers=${list(build.hammers)}`,
     `keepsake=${build.keepsake ?? ''}`,
+    ...(swaps.some(Boolean) ? [`swaps=${swaps.map((id) => id ?? '').join(',')}`] : []),
     `familiar=${build.familiar ?? ''}`,
     `arcana=${list(build.arcana)}`,
   ].join('\n')

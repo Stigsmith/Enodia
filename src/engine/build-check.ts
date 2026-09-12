@@ -22,7 +22,7 @@
  * tool telling a player they are using it wrong.
  */
 
-import { arcanaById, olympians, traits } from '../data/app.ts'
+import { arcanaById, olympianList, olympians, traits } from '../data/app.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { CORE_SLOTS, slotLabel } from './slots.ts'
 import { requirementSets, satisfiesRequirement } from './reachability.ts'
@@ -351,6 +351,49 @@ export function checkBuild(build: ShownBuild): Problem[] {
       severity: 'notes',
       say: `Nothing in your ${empty.map(slotLabel).join(', ')} yet.`,
     })
+  }
+
+  /**
+   * Holding something that reads the game's Olympian damage list, and what in
+   * the build is on that list.
+   *
+   * Three traits read it: Extended Family and the Earth infusion multiply it,
+   * and Argent Skull's Persephone aspect charges off it. **The list is names,
+   * not gods**: 63 projectiles and 3 effects, including Artemis and Athena
+   * projectiles, and Artemis and Athena have no `LootData` entry and never
+   * spend an Olympian slot. So which gods a build holds does not answer it,
+   * which is the whole reason this is worth saying out loud.
+   *
+   * **It only ever states the positive.** `scripts/olympian.ts` traces what
+   * makes listed damage out of each trait's own record, and it cannot see a
+   * projectile whose link to a boon lives in the per-weapon data, so a pick it
+   * does not name may still count. The empty case says that rather than
+   * claiming the build gets nothing.
+   */
+  const picks = [
+    build.aspect,
+    ...build.boons,
+    ...(build.optional ?? []),
+    ...(build.hex ? [build.hex] : []),
+    ...build.hammers,
+  ]
+  const readers = picks.filter((id) => traits.get(id)?.readsOlympian)
+  if (readers.length) {
+    const makers = picks.filter((id) => (traits.get(id)?.olympian ?? []).length)
+    const shown = makers.slice(0, 3).map(name)
+    const rest = makers.length - shown.length
+    if (rest) shown.push(rest === 1 ? 'one more' : `${rest} more`)
+    const named = shown.length > 1 ? `${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}` : shown[0]
+    const list = `the game's Olympian list, ${olympianList.projectiles} projectiles and ${olympianList.effects} effects`
+    for (const reader of readers) {
+      out.push({
+        field: 'boons',
+        severity: 'notes',
+        say: makers.length
+          ? `${name(reader)} only counts damage on ${list}. Among this build's picks: ${named}.`
+          : `${name(reader)} only counts damage on ${list}. No pick here is on it, as far as each pick's own record says.`,
+      })
+    }
   }
 
   return out

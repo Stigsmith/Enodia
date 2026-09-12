@@ -58,7 +58,7 @@ import {
   weaponById,
   weapons,
 } from '../data/app.ts'
-import { MAX_FEAR, PLAYSTYLES, winRate } from '../data/builds.ts'
+import { MAX_FEAR, PLAYSTYLES, keepsakesOf, winRate } from '../data/builds.ts'
 import { readRepeat } from '../engine/repeat.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
@@ -225,7 +225,9 @@ function valuesFor(build: ShownBuild, facet: FacetId): string[] {
     case 'playstyle':
       return build.playstyle ? [build.playstyle] : []
     case 'keepsake':
-      return build.keepsake ? [build.keepsake] : []
+      // Any of the four, the owner's call: filtering on Fig Leaf finds the
+      // builds that swap to it after a Guardian as well as those starting on it.
+      return keepsakesOf(build)
     case 'familiar':
       return build.familiar ? [build.familiar] : []
     case 'fear':

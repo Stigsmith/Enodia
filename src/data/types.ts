@@ -94,6 +94,61 @@ export type Trait = {
    * find out what it is without leaving the tool.
    */
   text: string | null
+  /**
+   * The lines the game draws under that sentence, "Blitz Damage: 80" and the
+   * like. 193 of the 203 boons, duos, legendaries and Hexes carry at least one,
+   * and until 11 September 2026 the tool drew none of them.
+   */
+  stats?: StatLine[] | null
+  /**
+   * Which of the game's own families this belongs to, where its template says:
+   * `talent` for the Path of Stars, `outfit`, `shop`, and the characters who
+   * offer their own (`circe`, `echo`, `icarus`, `narcissus`, `medea`). What the
+   * wiki's index groups by for everything no god hands out.
+   */
+  group?: string | null
+  /**
+   * How Poms treat it, for the twenty traits with an explicit curve in
+   * `stacking.json`. Absent means no curve is stated, which is not the same as
+   * stacking evenly: `AbsoluteStackValues` stacks some boons by a table.
+   */
+  stack?: { shape: string; upTo: number | null }[] | null
+  /** `BlockStacking`: a Pom never raises it (`AddStackToTraits`, TraitLogic.lua:2511) */
+  noPoms?: boolean
+  /**
+   * The projectiles and effects this trait's damage comes out of, where they
+   * are on the game's Olympian damage lists.
+   *
+   * Traced from each record by `scripts/olympian.ts`, which states what counts
+   * as making one and what it cannot see. **Absence is not a denial**: the
+   * table undercuts rather than overreaches, so an empty field means no record
+   * said so, never that the damage does not count.
+   */
+  olympian?: string[] | null
+  /**
+   * It multiplies damage from those lists, or charges off it. Three traits do:
+   * Extended Family, the Earth infusion, and Argent Skull's Persephone aspect.
+   */
+  readsOlympian?: boolean
+}
+
+/**
+ * One stat line, as the game's Codex prints it: a label on the left, a number
+ * on the right (`StatLineLeft` and `StatLineRight`, BoonInfoLogic.lua:181-195).
+ *
+ * `value` is the number at the rarity the Codex shows. `ladder` is the same
+ * number at Common, Rare, Epic and Heroic, present only for a boon whose number
+ * actually moves with rarity. A build stores no rarity, so the ladder is the
+ * honest answer there, and a rung that rolls inside a range reads "12 to 15".
+ *
+ * `tail` is the words every rung shares after its number, " Sec." or
+ * " (every 0.35 Sec.)", said once after the ladder rather than four times.
+ */
+export type StatLine = {
+  label: string
+  value: string
+  ladder?: string[]
+  tail?: string
 }
 
 /** The game's internal weapon name, for example `WeaponStaffSwing`. */

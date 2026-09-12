@@ -31,6 +31,7 @@ import { useEffect, useRef } from 'react'
 
 import { iconOf, traits } from '../data/app.ts'
 import { Picker } from './Picker.tsx'
+import type { Advice } from './Offer.tsx'
 import type { RunEntry } from '../state/run.ts'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
 
@@ -48,6 +49,7 @@ export function Timeline({
    * been read, which is the whole of the feature.
    */
   scrollToPresent = true,
+  advice = null,
 }: {
   entries: RunEntry[]
   run: RunContext
@@ -56,6 +58,8 @@ export function Timeline({
   /** take a logged entry back out, replaying everything after it */
   onForget: (exit: number, kind: RunEntry['kind']) => void
   scrollToPresent?: boolean
+  /** the notes of the build this run is going for, for the offer at the present Exit */
+  advice?: Advice | null
 }) {
   const present = useRef<HTMLLIElement>(null)
 
@@ -77,7 +81,7 @@ export function Timeline({
         <span className="station-mark" aria-hidden="true" />
         <div className="station-body">
           <p className="station-exit">Exit {entries.filter((entry) => entry.kind === 'exit').length + 1}</p>
-          <Picker run={run} onTake={onTake} onSkip={onSkip} />
+          <Picker run={run} onTake={onTake} onSkip={onSkip} advice={advice} />
         </div>
       </li>
 

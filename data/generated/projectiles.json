@@ -1,0 +1,315 @@
+{
+ "_provenance": {
+  "extractedOn": "2026-09-11",
+  "gameVersion": "138174",
+  "source": "Game/Projectiles/*.sjson",
+  "generatedBy": "scripts/extract.mjs",
+  "warning": "Generated. Never hand edit. Re-run npm run extract after a game patch.",
+  "note": "What GetBaseDataValue({ Type = \"Projectile\" }) reads, for the projectiles and properties a trait extract entry names. InheritFrom is followed; inherited says which record a value came from.",
+  "sha256": "8778191af247cc7890ee3d007401651e326471dc3e9753cd5c1abfc53af16a8a"
+ },
+ "data": {
+  "AphroditeBurst": {
+   "Damage": 80,
+   "Fuse": 6
+  },
+  "AphroditeCastProjectile": {
+   "Damage": 10
+  },
+  "AphroditeRushProjectile": {
+   "Damage": 20,
+   "Fuse": 0
+  },
+  "ApolloCast": {
+   "Damage": 10,
+   "Fuse": 0.1334,
+   "TotalFuse": 2
+  },
+  "ApolloRetaliateStrike": {
+   "Damage": 50
+  },
+  "ApolloSingleCastStrike": {
+   "Damage": 80
+  },
+  "AresProjectile": {
+   "Damage": 6,
+   "Fuse": 0.2,
+   "NumJumps": 999,
+   "TotalFuse": 3
+  },
+  "ArtemisCastVolley": {
+   "Damage": 50,
+   "Fuse": 1
+  },
+  "ArtemisSupportingFire": {
+   "Damage": 10
+  },
+  "AthenaCastProjectile": {
+   "Damage": 40,
+   "Fuse": 0
+  },
+  "AthenaDeflectingProjectile": {
+   "Damage": 10,
+   "Fuse": 2
+  },
+  "BurnNova": {
+   "Damage": 60,
+   "Fuse": 0.01
+  },
+  "DemeterCastBlast": {
+   "Damage": 10,
+   "Fuse": 0,
+   "inherited": {
+    "Fuse": "HephCastBlast"
+   }
+  },
+  "DemeterCastStorm": {
+   "Damage": 4,
+   "Fuse": 0.25,
+   "SpeedMultiplierOfEnemyProjectilesInside": 0.4,
+   "TotalFuse": 3,
+   "inherited": {
+    "Fuse": "DemeterSprintStorm",
+    "SpeedMultiplierOfEnemyProjectilesInside": "DemeterSprintStorm",
+    "TotalFuse": "DemeterSprintStorm"
+   }
+  },
+  "DemeterChillKill": {
+   "Damage": 100,
+   "Fuse": 0.1
+  },
+  "DemeterMiniStorm": {
+   "Damage": 70,
+   "Fuse": 0.5,
+   "ImmunityDuration": 0.5,
+   "NumJumps": 99999
+  },
+  "DemeterSprintDefense": {
+   "Damage": 0,
+   "SpeedMultiplierOfEnemyProjectilesInside": 0.4,
+   "TotalFuse": 3
+  },
+  "DemeterSprintStorm": {
+   "Damage": 4,
+   "Fuse": 0.25,
+   "SpeedMultiplierOfEnemyProjectilesInside": 0.4,
+   "TotalFuse": 3
+  },
+  "DionysusField": {
+   "Damage": 0,
+   "Fuse": 0.25,
+   "ImmunityDuration": 0.25,
+   "TotalFuse": 5
+  },
+  "FamiliarLinkLaser": {
+   "Damage": 10,
+   "Fuse": 5,
+   "ImmunityDuration": 0.2
+  },
+  "HadesUrnDeath": {
+   "Damage": 200,
+   "Fuse": 0.3
+  },
+  "HammerAxeNova": {
+   "Damage": 60,
+   "Fuse": 0
+  },
+  "HephCastBlast": {
+   "Damage": 60,
+   "Fuse": 0
+  },
+  "HephLeapBlast": {
+   "Damage": 800,
+   "Fuse": 0
+  },
+  "HephSprintBlast": {
+   "Damage": 100,
+   "Fuse": 0
+  },
+  "HeraCastDamageProjectile": {
+   "Damage": 20
+  },
+  "HeraCastSummonProjectile": {
+   "Damage": 60
+  },
+  "HeraSprintProjectile": {
+   "Damage": 60
+  },
+  "HestiaSprintPuddle": {
+   "Damage": 10,
+   "Fuse": 0.25,
+   "TotalFuse": 0.75
+  },
+  "IcarusArmorExplosion": {
+   "Damage": 4000,
+   "Fuse": 0,
+   "ImmunityDuration": 0.7,
+   "inherited": {
+    "Fuse": "IcarusExplosion",
+    "ImmunityDuration": "IcarusExplosion"
+   }
+  },
+  "IcarusExplosion": {
+   "Damage": 50,
+   "Fuse": 0,
+   "ImmunityDuration": 0.7
+  },
+  "IcarusHazardExplosion": {
+   "Damage": 500,
+   "Fuse": 4,
+   "ImmunityDuration": 0.7
+  },
+  "MassiveSlamBlast": {
+   "Damage": 200,
+   "Fuse": 0
+  },
+  "MedeaStatusStrike": {
+   "Damage": 50,
+   "Fuse": 0.05
+  },
+  "MorphDamageProjectile": {
+   "Damage": 80
+  },
+  "NyxSprintBlast": {
+   "Damage": 250,
+   "Fuse": 0
+  },
+  "PolymorphNova": {
+   "Damage": 300,
+   "Fuse": 0.01
+  },
+  "PoseidonCastSplashSplinter": {
+   "Damage": 60,
+   "Fuse": 0
+  },
+  "PoseidonEffectFont": {
+   "Damage": 50,
+   "Fuse": 0.2
+  },
+  "PoseidonOmegaWave": {
+   "Damage": 40,
+   "Fuse": 0.6
+  },
+  "PoseidonSplashSplinter": {
+   "Damage": 20,
+   "Fuse": 0.14
+  },
+  "PoseidonSprintBlast": {
+   "Damage": 80,
+   "Fuse": 0,
+   "ImmunityDuration": 0.7
+  },
+  "ProjectileAresSwordCast": {
+   "Damage": 120,
+   "Fuse": 1.1,
+   "ImmunityDuration": 0.1
+  },
+  "ProjectileAresSwordEx": {
+   "Damage": 90,
+   "Fuse": 1.1,
+   "ImmunityDuration": 0.1,
+   "inherited": {
+    "Fuse": "ProjectileAresSwordCast",
+    "ImmunityDuration": "ProjectileAresSwordCast"
+   }
+  },
+  "ProjectileAresSwordGenerated": {
+   "Damage": 30,
+   "Fuse": 1.1,
+   "ImmunityDuration": 0.1,
+   "inherited": {
+    "Fuse": "ProjectileAresSwordCast",
+    "ImmunityDuration": "ProjectileAresSwordCast"
+   }
+  },
+  "ProjectileAresSwordWake": {
+   "Damage": 30,
+   "Fuse": 0.7,
+   "ImmunityDuration": 0.5
+  },
+  "ProjectileAthenaManaSpear": {
+   "Damage": 150,
+   "Fuse": 0.1
+  },
+  "ProjectileFireball": {
+   "Damage": 100,
+   "Fuse": -1
+  },
+  "ProjectileHeraOmega": {
+   "Damage": 120,
+   "Fuse": 0.05
+  },
+  "ProjectileMoonBeam": {
+   "Damage": 50,
+   "ImmunityDuration": 0.05
+  },
+  "ProjectileSpellMiniMeteor": {
+   "Damage": 100,
+   "Fuse": 1
+  },
+  "ProjectileSpellPolymorph": {
+   "Damage": 0,
+   "Fuse": 5,
+   "NumJumps": 4
+  },
+  "ProjectileSprintBall": {
+   "Damage": 300,
+   "TotalFuse": 3
+  },
+  "ProjectileTorchGhost": {
+   "Damage": 30,
+   "NumJumps": 0,
+   "TotalFuse": 2
+  },
+  "ProjectileTorchRepeatStrike": {
+   "Damage": 75,
+   "Fuse": 0.35
+  },
+  "ProjectileZeusSpark": {
+   "Damage": 10,
+   "NumJumps": 3
+  },
+  "SpearWeaponSpin": {
+   "Damage": 40,
+   "Fuse": 0
+  },
+  "SpellLaserStartAoE": {
+   "Damage": 50,
+   "ImmunityDuration": 0.2,
+   "TotalFuse": 3
+  },
+  "SteamBlast": {
+   "Damage": 20,
+   "Fuse": 0.25,
+   "ImmunityDuration": 0.2,
+   "TotalFuse": 2
+  },
+  "WomboStrike": {
+   "Damage": 111
+  },
+  "ZeusApolloSynergyStrike": {
+   "Damage": 20
+  },
+  "ZeusCastStrike": {
+   "Damage": 25
+  },
+  "ZeusEchoStrike": {
+   "Damage": 100
+  },
+  "ZeusPolymorphStrike": {
+   "Damage": 80
+  },
+  "ZeusRetaliateStrike": {
+   "Damage": 100
+  },
+  "ZeusRootStrike": {
+   "Damage": 30
+  },
+  "ZeusSprintStrike": {
+   "Damage": 20
+  },
+  "ZeusZeroManaStrike": {
+   "Damage": 30
+  }
+ }
+}

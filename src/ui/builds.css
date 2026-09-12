@@ -480,6 +480,34 @@
   transform: rotate(90deg);
 }
 
+/* The exchange's evidence filter. A toggle rather than a badge on a card,
+ * because nobody grants this: it is a count, and the button carries the count
+ * so pressing it is never a surprise. Lit when on, the way the density switch
+ * marks its live half. */
+.bfilter-evidence {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.bfilter-evidence:hover {
+  border-color: var(--div-5);
+  color: var(--bone);
+}
+
+.bfilter-evidence.is-on {
+  border-color: var(--lit);
+  color: var(--lit-hot);
+}
+
 /* A count on the shut disclosure, so a filter left on somewhere out of sight
  * cannot narrow the list with nothing on screen saying why. */
 .bfilter-badge {
@@ -1164,6 +1192,225 @@
 @media (min-width: 100rem) {
   .builds-how {
     max-width: 48rem;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * MENTIONS AND NOTES ON THE PICKS
+ *
+ * A mention is a game thing named inside a write-up: its art and its name,
+ * inline, with a dotted rule under the name where it is a link. A note on a
+ * pick is the author's register: a neutral rule down the left and a small
+ * label saying whose, kept apart from the game's quiet text and from the
+ * tool's own judgement, which wears the lit colour.
+ * ------------------------------------------------------------------------- */
+
+.mention {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2em;
+  color: var(--bone);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mention-art {
+  width: 1.2em;
+  height: 1.2em;
+  align-self: center;
+  object-fit: contain;
+}
+
+a.mention .mention-name {
+  border-bottom: 1px dotted var(--lit-dim);
+}
+
+a.mention:hover .mention-name,
+a.mention:focus-visible .mention-name {
+  color: var(--lit-hot);
+  border-bottom-color: var(--lit-hot);
+}
+
+.mention-field {
+  position: relative;
+}
+
+.mention-list {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 0.2rem);
+  left: 0;
+  right: 0;
+  max-height: 16rem;
+  margin: 0;
+  padding: 0.25rem;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--div-4);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  box-shadow: 0 0.6rem 1.4rem rgb(0 0 0 / 0.45);
+}
+
+.mention-row {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: var(--r-hair);
+  cursor: pointer;
+}
+
+.mention-row.is-active {
+  background: var(--ink-800);
+}
+
+.mention-row-art img {
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  object-fit: contain;
+}
+
+.mention-row-name {
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--bone);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mention-row-sub {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--bone-faint);
+}
+
+.mention-status {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--bone-faint);
+}
+
+.mention-status:empty {
+  display: none;
+}
+
+/* The note in the hover. */
+.peek-note {
+  display: block;
+  margin-top: 0.45rem;
+  padding-left: 0.55rem;
+  border-left: 2px solid var(--bone-faint);
+}
+
+.peek-note-by,
+.piececard-note-by {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.peek-note-text {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--bone);
+}
+
+/* And in the dialog. */
+.piececard-note {
+  margin: 0 0 1rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--bone-faint);
+}
+
+.piececard-note p {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--bone);
+}
+
+/* All of them as a list, under How it works. */
+.picknotes {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.picknotes-one {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.picknotes-name {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.picknotes-body p {
+  margin: 0.15rem 0 0;
+}
+
+/* The editor's list of picks, a line each. */
+.editor-notes {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-note {
+  display: grid;
+  grid-template-columns: minmax(8rem, 13rem) minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.editor-note-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  font-size: 0.8rem;
+  color: var(--bone);
+}
+
+.editor-note-pick img,
+.editor-note-blank {
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: none;
+  object-fit: contain;
+}
+
+.editor-note-add {
+  justify-self: start;
+  min-height: 2rem;
+}
+
+@media (max-width: 34rem) {
+  .editor-note {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
   }
 }
 
@@ -1878,7 +2125,10 @@ button.mark {
   align-items: center;
 }
 
-.piececard-body header img {
+/* The art, and only the art: it is the header's own child. Written as a plain
+ * descendant this also caught the element glyph on the line under the name and
+ * drew it at the size of the boon. */
+.piececard-body header > img {
   width: 3.2rem;
   height: 3.2rem;
   object-fit: contain;
@@ -2045,7 +2295,8 @@ button.mark {
 }
 
 .editor-field input,
-.editor-field textarea {
+.editor-field textarea,
+.editor-note textarea {
   width: 100%;
   padding: 0.4rem 0.5rem;
   border: 1px solid var(--div-3);
@@ -2059,7 +2310,8 @@ button.mark {
 }
 
 .editor-field input:focus,
-.editor-field textarea:focus {
+.editor-field textarea:focus,
+.editor-note textarea:focus {
   outline: none;
   border-color: var(--lit);
 }
@@ -3988,6 +4240,98 @@ button.mark {
   text-wrap: pretty;
 }
 
+/* ----------------------------------------------------- under the hood -- */
+
+/**
+ * Three tiers of spoiler, and the tier is the whole interface: a reader has to
+ * be able to tell what kind of thing is inside before deciding to know it. So
+ * the level sits above the heading in mono, and the entries under it stay shut.
+ *
+ * The bar down the left carries the tier's colour, which goes from the lit
+ * green of something you could never have found to the quiet bone of something
+ * you were going to work out anyway.
+ */
+.hood {
+  margin-top: 2.4rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--div-4);
+}
+
+.hood.is-level-1 {
+  border-left-color: var(--lit);
+}
+
+.hood.is-level-2 {
+  border-left-color: var(--lit-dim);
+}
+
+.hood-level {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.hood-head h3 {
+  margin: 0.2rem 0 0;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  color: var(--bone);
+}
+
+.hood-head p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+}
+
+.hood-entry {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--div-2);
+  padding-top: 0.7rem;
+}
+
+.hood-entry summary {
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--lit-hot);
+}
+
+.hood-entry summary::marker {
+  color: var(--bone-faint);
+}
+
+.hood-body p {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--bone-dim);
+}
+
+/* Ours, said out loud. `REQUIREMENTS.md` 10: a judgement and a sourced fact
+ * must never look equally weighed, so this wears the tool's own colour and the
+ * source line below stays in the game's register. */
+.hood-body .hood-ours {
+  color: var(--lit-hot);
+}
+
+.hood-source {
+  margin-top: 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+.hood-source span {
+  margin-right: 0.4rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--div-5);
+}
+
 /* ------------------------------------------------------- help and about -- */
 
 .ref {
@@ -5435,7 +5779,8 @@ button.mark {
    * panel and letting it halve that again gave 199px rows. It takes the width. */
   .tabpanel > .bsort,
   .tabpanel > .editor-plays,
-  .tabpanel > .editor-field:has(textarea) {
+  .tabpanel > .editor-field:has(textarea),
+  .tabpanel > .editor-notes {
     grid-column: 1 / -1;
   }
 }
@@ -6433,6 +6778,131 @@ button.mark {
   content: '\00b7';
   margin-right: 0.5rem;
   color: var(--bone-faint);
+}
+
+/* The element on a kind line: the game's glyph, then the word. Shared by the
+ * hover and the dialog through `ElementWord`. */
+.element-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.element-word img {
+  width: 1.05em;
+  height: 1.05em;
+  object-fit: contain;
+}
+
+/* -------------------------------------------------------------------------
+ * STAT LINES
+ *
+ * What the game draws under a boon's sentence, as its Codex draws it: the
+ * label on the left, the number on the right. The hover shows them small; the
+ * dialog, `.is-spelled`, names each rung of a ladder under its number.
+ *
+ * A rung's rarity is a bar under the number in the game's own colour, never
+ * the number's colour, which stays the reading colour. See `--rarity-*`.
+ * ---------------------------------------------------------------------- */
+
+.stats {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0;
+}
+
+.stats-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.stats-line dt {
+  font-size: 0.7rem;
+  color: var(--bone-faint);
+}
+
+.stats-line dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--bone);
+  text-align: right;
+}
+
+.ladder {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.2rem 0.5rem;
+}
+
+.ladder-rung {
+  display: inline-grid;
+  justify-items: center;
+  padding-bottom: 0.1rem;
+  border-bottom: 2px solid var(--rarity-common);
+}
+
+.ladder-rung.is-rare {
+  border-bottom-color: var(--rarity-rare);
+}
+
+.ladder-rung.is-epic {
+  border-bottom-color: var(--rarity-epic);
+}
+
+.ladder-rung.is-heroic {
+  border-bottom-color: var(--rarity-heroic);
+}
+
+.ladder-name {
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.ladder-tail {
+  color: var(--bone-faint);
+}
+
+/* The dialog reads at a larger size, and the rung names sit under the bar. */
+.stats.is-spelled {
+  margin: -0.4rem 0 1rem;
+  gap: 0.45rem;
+}
+
+.stats.is-spelled .stats-line dt {
+  font-size: 0.8rem;
+}
+
+.stats.is-spelled .stats-line dd {
+  font-size: 0.82rem;
+}
+
+.stats.is-spelled .ladder-rung {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.stats.is-spelled .ladder-value {
+  padding-bottom: 0.1rem;
+  border-bottom: 2px solid var(--rarity-common);
+}
+
+.stats.is-spelled .is-rare .ladder-value {
+  border-bottom-color: var(--rarity-rare);
+}
+
+.stats.is-spelled .is-epic .ladder-value {
+  border-bottom-color: var(--rarity-epic);
+}
+
+.stats.is-spelled .is-heroic .ladder-value {
+  border-bottom-color: var(--rarity-heroic);
 }
 
 /* An Arcana the board can no longer afford. Shown and greyed rather than

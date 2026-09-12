@@ -163,6 +163,15 @@ describe('matching', () => {
     expect(countSelected(EMPTY_SELECTION)).toBe(0)
   })
 
+  /* Any of the four keepsakes, the owner's call on 11 September 2026. */
+  it('matches a keepsake the build swaps to, not only the one it starts with', () => {
+    const swapping: ShownBuild = { ...FIRST_BUILD, swaps: [null, 'ForceZeusBoonKeepsake', null] }
+    const cloud = choose(EMPTY_SELECTION, 'keepsake', 'ForceZeusBoonKeepsake')
+    expect(matches(swapping, cloud)).toBe(true)
+    expect(matches(FIRST_BUILD, cloud)).toBe(false)
+    expect(matches(swapping, choose(EMPTY_SELECTION, 'keepsake', FIRST_BUILD.keepsake ?? ''))).toBe(true)
+  })
+
   it('ignores the facet it is told to ignore', () => {
     const first = SAMPLE_BUILDS[0]
     if (!first) throw new Error('no builds')

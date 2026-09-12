@@ -154,6 +154,27 @@ export function Menu({
             leave()
           },
         },
+        /* Everything the tool knows, a record each. Beside the Arcana because
+         * both are reference rather than your own work. */
+        {
+          label: 'Wiki',
+          here: view === 'wiki',
+          action: () => {
+            onGo('wiki')
+            leave()
+          },
+        },
+        /* Beside the wiki, because it is the same material read the other way
+         * round: the wiki answers what a thing is, this answers what the game
+         * never says out loud. */
+        {
+          label: 'Under the hood',
+          here: view === 'underhood',
+          action: () => {
+            onGo('underhood')
+            leave()
+          },
+        },
         {
           label: 'Build exchange',
           here: view === 'exchange',

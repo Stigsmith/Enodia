@@ -39,6 +39,20 @@ export type View =
   | 'landing'
   | 'builds'
   | 'arcana'
+  /**
+   * Every entity the tool knows, each with a record at an address of its own,
+   * and an index of them all. **The only screen whose address stays in the bar**:
+   * a record is a thing people send each other, so `/wiki/t/ZeusWeaponBoon`
+   * has to reopen it. `wiki-route.ts` says how, and `App.tsx` keeps the
+   * address and the back button in step with it.
+   */
+  | 'wiki'
+  /**
+   * Rules the game never states, in three tiers of spoiler. It lived on the
+   * page that stood in front of the app and left the product when that page
+   * did, which nothing recorded until the gap analysis went looking for it.
+   */
+  | 'underhood'
   | 'themes'
   | 'settings'
   | 'help'

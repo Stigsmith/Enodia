@@ -134,7 +134,7 @@ export const TOURS: Record<string, Step[]> = {
     {
       press: 'tab-notes',
       at: 'editor-panel',
-      say: 'Notes. Its name lives here, which is the one thing it will refuse to save without.',
+      say: 'Notes. Its name lives here, which is the one thing it will refuse to save without. Further down there is a line for each pick, for why it is there. Type @ and you can name a boon right in the middle of a sentence.',
     },
     {
       press: 'tab-play',

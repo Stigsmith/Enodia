@@ -461,6 +461,10 @@ export function countsOf(bundle: Bundle): Record<string, number> {
     linkedSets: Object.keys(generatedData(bundle, 'linked-trait-sets')).length,
     arcanaCards: Object.keys(generatedData(bundle, 'arcana-cards')).length,
     stackingCurves: Object.keys(generatedData(bundle, 'stacking')).length,
+    // The projectiles a trait's numbers read a base value from, out of
+    // `Game/Projectiles/`. Every one the traits name was found on 11
+    // September 2026, so a patch that renames one moves this.
+    projectiles: Object.keys(generatedData(bundle, 'projectiles')).length,
   }
 }
 

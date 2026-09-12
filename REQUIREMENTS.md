@@ -43,7 +43,7 @@ Researched 22 August 2026. The build-planner space is crowded. The in-run space 
 
 | Tool | What it does | Where it stops |
 |---|---|---|
-| [Mobalytics](https://mobalytics.gg/hades-2/planner/builds) | Full planner: aspects, arcana, keepsakes, familiar, hex, boons bucketed by pool, hammers, NPC offerings, poms. Community builds, creator program. Actively maintained | A publishing platform. Rich-text boxes with no guidance on *how* to make a build. Nothing conditional, nothing live |
+| [Mobalytics](https://mobalytics.gg/hades-2/planner/builds) | Full planner: aspects, arcana, a starting keepsake and three more, familiar, hex, boons bucketed by pool, hammers, NPC offerings, poms. Community builds with a staff-granted Verified tier, creator program, tier lists, a small wiki. Actively maintained | A publishing platform. ~~Rich-text boxes with no guidance on *how* to make a build.~~ Six prose sections per build, each prompted, with game data tagged inline (checked 11 September 2026). Nothing conditional, nothing live. `decisions/2026-09-11-competitor-gap-analysis.md` |
 | [BrokenBuilds](https://brokenbuilds.gg/hades-ii) | Boon Synergy Explorer, DPS Calculator, Arcana Grid Planner. Builds tagged by Fear level and tier | All three tools are pre-run and static. Tells you what the ceiling outputs, never how to reach it. Wall of text, numbers, filters and sliders, almost no game imagery |
 | [hades2builder](https://hades2builder.vercel.app/) | Visual build creator using real game art. The best-looking of the three | **"Updated as of Early Access Patch 4."** Missing Ares, Artemis, Athena, Dionysus, Selene and Hades entirely. Its author asks visitors to send him image files |
 | [orlp duo chart](https://orlp.github.io/hades-boons/duo_boons.html), [JustinLove/hades-boons](https://github.com/JustinLove/hades-boons) | Static prerequisite charts, data extracted from game files | Reference only. No run state, no reachability |
@@ -125,7 +125,12 @@ user's own data.
 
 ## 4. Non-goals
 
-- **Not a wiki.** Reference data exists to feed the engines, not to be browsed for its own sake.
+- ~~**Not a wiki.** Reference data exists to feed the engines, not to be browsed for its own sake.~~
+  **Reversed on 11 September 2026, the owner's call.** There is a wiki: every named thing the tool
+  knows has a record at `/wiki/<kind>/<id>`, and an index lists them all. What stands of the old
+  line is the reason behind it: nothing in the wiki is written by hand, so there is no
+  encyclopedia to keep up. It is generated from the game's files like everything else and read
+  again after a patch. `decisions/2026-09-11-competitor-gap-analysis.md` 7
 - **Not a DPS simulator.** See section 8.
 - **No stated probabilities in v1.** See section 6.2.
 - **No accounts, server or social features before Phase 4.** ~~Held through Phases 1 to 3.~~
@@ -350,6 +355,18 @@ Two rules, both load bearing:
 This doubles as the honest version of a wiki. Existing sites publish everything flat, at
 the same volume, with no view on whether you wanted to know it yet.
 
+> **11 September 2026.** This shipped on the pre-app page, `placeholder/index.html`, and left
+> with it in `de818c7`. No screen carries it now, and nothing recorded that it had gone. The
+> five entries are recoverable with `git show de818c7^:placeholder/index.html`, and one of them
+> needs rewriting before it returns: it says every other Olympian becomes impossible at the
+> fourth, which is `CLAUDE.md` error 6.
+>
+> **12 September 2026. Built, as a screen of the app.** `src/data/underhood.ts` behind
+> `Pages.tsx`, in the menu beside the Wiki. Seven entries across the three tiers, each citing
+> its symbols, the two that are judgement marked as ours, and the error 6 entry rewritten
+> around `RewardLogic.lua:242`. Both rules above are held by `src/data/underhood.test.ts`,
+> which also fails if the old sentence returns.
+
 ### Phase 2: Before the run
 
 - 30 to 40 archetypes, each anchored on one or two duo or legendary boons, generated from
@@ -360,8 +377,12 @@ the same volume, with no view on whether you wanted to know it yet.
   always. It goes dark only in a build whose regen pins you at full, which is a property of
   the build and not of the card. Static Arcana ratings are wrong for the same reason static
   boon ratings are
-- **Keepsake sequencing.** A build implies a per-region swap order, not one keepsake.
-  No competitor does this
+- **Keepsake sequencing.** A build implies four keepsakes, not one: one at the start and one
+  at the rack after each of the first three bosses. ~~No competitor does this~~: Mobalytics'
+  planner has held a starting keepsake and three more since at least September 2026. Keyed by
+  position rather than by Region name, because a Dream run visits Regions out of order
+  (`DreamRunLogic.lua`). A build can hold all four since 11 September 2026
+  (`ShownBuild.swaps`). Recommending an order is still to do
 - Hammer recommendations per aspect
 - Fear and vow model. Fear is a vector, not a scalar. Keep the vow list, derive the total
   for display
@@ -433,6 +454,14 @@ assembled itself, which is the question nobody is actually asking at an Exit.
 > column around one. D.D.S. rests on u.gg publishing per-faction community votes. If
 > nothing equivalent exists here there is no left-hand column, and every opinion the tool
 > holds must be labelled as ours. Do not manufacture a consensus by averaging YouTubers.
+>
+> **12 September 2026.** Still no consensus to point at, and the exchange now has the one
+> thing that is not an opinion: **Cleared by somebody else**, a filter over the single list.
+> It asks the count the worker already keeps, clears logged against the version on the shelf
+> now, and an author's own runs never reach that number. Not a tier, not a badge, and never
+> the word Verified: nobody grants it and nobody can be asked for it. The competitor's
+> Verified tier is granted by staff on Discord, which is the shelf this project removed on
+> 8 September under another name.
 
 ---
 

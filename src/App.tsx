@@ -10,7 +10,7 @@
  * Setup is its own screen and happens once.
  */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { gameVersion, iconOf, traits, weapons } from './data/app.ts'
@@ -24,7 +24,7 @@ import { Hecate } from './ui/Hecate.tsx'
 import { Arcana } from './ui/Arcana.tsx'
 import { Themes } from './ui/Themes.tsx'
 import { Settings } from './ui/Settings.tsx'
-import { Changelog, Roadmap } from './ui/Pages.tsx'
+import { Changelog, Roadmap, UnderHood } from './ui/Pages.tsx'
 import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
@@ -41,10 +41,16 @@ import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
 import { openPublished, publishedInUrl, reconnectPublished } from './state/publish.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
+import { SAMPLE_BUILDS } from './data/builds.ts'
+import { adviceFrom } from './ui/Offer.tsx'
 import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
+import { Wiki } from './ui/Wiki.tsx'
+import { WikiProvider } from './ui/WikiLink.tsx'
+import { wikiInUrl, wikiPath } from './ui/wiki-route.ts'
+import type { WikiAt } from './ui/wiki-route.ts'
 import { HelpProvider, PageHelp } from './ui/PageHelp.tsx'
 import { Rail } from './ui/Rail.tsx'
 import { Landing } from './ui/Landing.tsx'
@@ -114,6 +120,10 @@ export function App() {
    * The run wins on arrival when there is one. Everything else lands on Builds.
    */
   const [view, setView] = useState<View>(() => {
+    /* An address in the wiki is somebody asking for one record, and it wins
+     * over a run in progress the way a share link wins over the landing page:
+     * they clicked through to see this thing. */
+    if (wikiInUrl(window.location.pathname)) return 'wiki'
     if (run) return 'run'
     /**
      * The landing page, once, and never in front of somebody who came for a
@@ -228,6 +238,60 @@ export function App() {
       live = false
       window.removeEventListener(ACCOUNT_CHANGED, check)
     }
+  }, [])
+
+  /**
+   * Which wiki record is open, or null for its index.
+   *
+   * **The wiki is the one screen whose address is kept.** Every other view is
+   * state, and the paths that arrive from outside, `/b/<id>` and a build in the
+   * fragment, are read once and cleared. A record is a thing people send each
+   * other, so its address has to reopen it and the back button has to walk
+   * between records the way it does on any other site.
+   */
+  const [wikiAt, setWikiAt] = useState<WikiAt>(() => wikiInUrl(window.location.pathname)?.at ?? null)
+
+  /** Where the back button returns to from the wiki, since other screens keep no address. */
+  const beforeWiki = useRef<View>('builds')
+  useEffect(() => {
+    if (view !== 'wiki') beforeWiki.current = view
+  }, [view])
+
+  const openWiki = useCallback((at: WikiAt) => {
+    const path = wikiPath(at)
+    if (window.location.pathname !== path) history.pushState(null, '', path)
+    setWikiAt(at)
+    setView('wiki')
+  }, [])
+
+  /**
+   * Go to a screen from the menu or the corner control.
+   *
+   * Leaving the wiki puts the address back to `/` as a new history entry, so
+   * the back button returns to the record that was open rather than skipping it.
+   */
+  const go = (next: View) => {
+    if (next === 'wiki') {
+      openWiki(null)
+      return
+    }
+    if (wikiInUrl(window.location.pathname)) history.pushState(null, '', '/')
+    setView(next)
+  }
+
+  /* The back and forward buttons, which only the wiki writes history for. */
+  useEffect(() => {
+    const moved = () => {
+      const found = wikiInUrl(window.location.pathname)
+      if (found) {
+        setWikiAt(found.at)
+        setView('wiki')
+        return
+      }
+      setView((was) => (was === 'wiki' ? beforeWiki.current : was))
+    }
+    window.addEventListener('popstate', moved)
+    return () => window.removeEventListener('popstate', moved)
   }, [])
 
   /** Walked through, so it stops being a screen and becomes a menu entry. */
@@ -411,7 +475,9 @@ export function App() {
    */
   const frame = (children: ReactNode) => (
     /* Every `Mark` on every screen reads its hover handlers out of here, so
-     * this wraps the whole app rather than any one layout. */
+     * this wraps the whole app rather than any one layout. The wiki's links
+     * work the same way, from the build dialog as much as from the wiki. */
+    <WikiProvider value={openWiki}>
     <PeekProvider>
     {/* The editor is a mode inside Builds rather than a view of its own, so it
       * names its own help topic from in there. This is what it names it to. */}
@@ -421,7 +487,7 @@ export function App() {
       <Menu
         view={screen}
         hasRun={Boolean(run)}
-        onGo={setView}
+        onGo={go}
         onEndRun={endRun}
         onShowBriefing={run ? openBriefing : undefined}
       />
@@ -429,7 +495,7 @@ export function App() {
         * on every screen, which is the split that makes two of them worth
         * having. `ui/You.tsx` says why it is the full convention rather than a
         * quiet link. */}
-      {ACCOUNTS_LIVE ? <You onGo={setView} /> : null}
+      {ACCOUNTS_LIVE ? <You onGo={go} /> : null}
       <div className="app-view">{children}</div>
 
       {/* One mark, every screen, because `frame` wraps all of them. It draws
@@ -458,6 +524,7 @@ export function App() {
     </div>
     </HelpProvider>
     </PeekProvider>
+    </WikiProvider>
   )
 
   /**
@@ -488,12 +555,21 @@ export function App() {
     )
   }
 
+  if (screen === 'wiki') {
+    return frame(
+      <div className="shell is-wide">
+        <Wiki at={wikiAt} />
+      </div>,
+    )
+  }
+
   /* The reading screens. Nothing on them is interactive, so they share one
    * branch and one shell rather than four of each. */
   const reading: Partial<Record<View, () => React.JSX.Element>> = {
     help: Help,
     roadmap: Roadmap,
     changelog: Changelog,
+    underhood: UnderHood,
   }
   const Reading = reading[screen]
   if (Reading) {
@@ -647,7 +723,18 @@ export function App() {
    * that wants it. `engine/build-run.ts` asks the same question of a whole
    * build, and an aspect closes most of the field before the first Exit.
    */
-  const standing = buildStanding(run, traits)
+  /**
+   * The builds a run can be going for: the shipped ones and your library, your
+   * own and the ones you follow.
+   *
+   * **This read the shipped list alone, which is empty**, so no run could be
+   * going for anything: Setup's step said nothing was on the aspect whatever
+   * you had written, and the header counted no builds. Read on every render of
+   * the run screen, because the library is not held up here and a build saved
+   * a minute ago has to count at the next Exit.
+   */
+  const library = [...SAMPLE_BUILDS, ...loadBuilds()]
+  const standing = buildStanding(run, traits, library)
   const tally = buildTally(standing)
 
   /**
@@ -658,6 +745,8 @@ export function App() {
    * ago. The verdict carries its own sentence, so this only has to show it.
    */
   const chasing = run.build ? (standing.find((one) => one.build.id === run.build) ?? null) : null
+  /* Its author's notes on its own picks, for the offer cards at each Exit. */
+  const advice = adviceFrom(chasing?.build ?? null)
 
   return frame(
     <div className="surface">
@@ -772,6 +861,7 @@ export function App() {
         <Timeline
           entries={entries}
           run={run}
+          advice={advice}
           onTake={take}
           onSkip={skip}
           onForget={forget}
@@ -780,7 +870,7 @@ export function App() {
         <Colophon />
       </main>
 
-      <Standing run={run} pinned={pinned} onPin={pin} />
+      <Standing run={run} standing={standing} pinned={pinned} onPin={pin} />
     </div>,
   )
 }

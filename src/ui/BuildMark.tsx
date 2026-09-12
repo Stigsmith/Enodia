@@ -16,6 +16,7 @@
 import { usePeekBind } from './Peek.tsx'
 import type { Peeked } from './Peek.tsx'
 import type { Piece } from './build-pieces.ts'
+import type { StatLine } from '../data/types.ts'
 
 /**
  * A piece, as the hover panel describes it.
@@ -42,12 +43,19 @@ const BOON_KINDS = new Set(['core', 'boon', 'duo'])
 const peekOf = (piece: Piece): Peeked => ({
   name: piece.name,
   text: piece.text,
-  kind: piece.slotName ?? KIND_WORD[piece.kind] ?? null,
+  // A keepsake taken at the rack says when: "Keepsake, after the first Guardian".
+  kind:
+    piece.slotName ??
+    (piece.when ? `${KIND_WORD[piece.kind] ?? 'Keepsake'}, ${piece.when.toLowerCase()}` : KIND_WORD[piece.kind]) ??
+    null,
   boon: BOON_KINDS.has(piece.kind),
   // Only a boon draws them, and `Peek` decides that from `boon` rather than
   // from whether these are here, so passing them always is the simpler rule.
   icon: piece.icon,
   gods: piece.gods,
+  elements: piece.elements ?? [],
+  stats: piece.stats ?? [],
+  ...(piece.note ? { note: piece.note } : {}),
 })
 
 /**
@@ -87,7 +95,13 @@ export function useTraitPeek() {
   return (
     /* `name` is nullable because `Trait.name` is: 84 of 651 traits have no
      * display name, and a slate headed by an id would be worse than none. */
-    what: { name: string | null; text?: string | null; gods?: string[] } | null,
+    what: {
+      name: string | null
+      text?: string | null
+      gods?: string[]
+      elements?: string[] | null
+      stats?: StatLine[] | null
+    } | null,
     slotName: string | null,
     icon?: string | null,
   ) =>
@@ -100,6 +114,8 @@ export function useTraitPeek() {
             boon: true,
             icon: icon ?? null,
             gods: what.gods ?? [],
+            elements: what.elements ?? [],
+            stats: what.stats ?? [],
           }
         : null,
     )
@@ -185,7 +201,7 @@ export function Named({
       <Mark piece={piece} size={size} onOpen={onOpen} />
       <span className="named-text">
         <span className="named-name">{piece.name}</span>
-        {piece.slotName ? <span className="named-slot">{piece.slotName}</span> : null}
+        {(piece.slotName ?? piece.when) ? <span className="named-slot">{piece.slotName ?? piece.when}</span> : null}
       </span>
     </div>
   )

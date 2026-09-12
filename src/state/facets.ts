@@ -32,7 +32,7 @@
  */
 
 import { arcanaById, familiarById, godsOf, traits, weaponById } from '../data/app.ts'
-import { PLAYSTYLES } from '../data/builds.ts'
+import { PLAYSTYLES, keepsakesOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
 
 /** Matches `MAX_FACETS` in `worker/publish.ts`. */
@@ -53,7 +53,8 @@ export function facetsOf(build: ShownBuild): string[] {
   out.add(`aspect:${build.aspect}`)
   for (const god of godsOf(build)) out.add(`god:${god}`)
   if (build.playstyle) out.add(`play:${build.playstyle}`)
-  if (build.keepsake) out.add(`keepsake:${build.keepsake}`)
+  // Every keepsake the run carries, the swaps as well as the one it starts with.
+  for (const id of keepsakesOf(build)) out.add(`keepsake:${id}`)
   if (build.familiar) out.add(`familiar:${build.familiar}`)
   if (build.hex) out.add(`hex:${build.hex}`)
   for (const card of build.arcana) out.add(`arcana:${card}`)

@@ -231,6 +231,134 @@ export function winRate(play: PlayRecord | undefined): number | null {
   return clears / runs
 }
 
+/**
+ * Where each of a run's four keepsakes is taken, in the game's own words.
+ *
+ * A Guardian ends each Region (`Boss` in the glossary reads "Guardian"), and
+ * the rack comes after it. The first entry is the one chosen at the Crossroads.
+ */
+export const KEEPSAKE_POSITIONS = [
+  'To start',
+  'After the first Guardian',
+  'After the second Guardian',
+  'After the third Guardian',
+] as const
+
+/**
+ * A build's swaps, always three long, with anything that is not an id read as
+ * keeping the one you have.
+ *
+ * A stored build or a link can carry anything in the field, and both
+ * `looksLikeBuild` checks predate it, so nothing downstream reads `swaps`
+ * directly.
+ */
+export function swapsOf(build: Pick<ShownBuild, 'swaps'>): (TraitId | null)[] {
+  const raw = Array.isArray(build.swaps) ? build.swaps : []
+  return [0, 1, 2].map((at) => {
+    const id = raw[at]
+    return typeof id === 'string' && id ? id : null
+  })
+}
+
+/**
+ * Every keepsake a build carries at some point in a run, the one it starts with
+ * first, each once. What the keepsake filter, the facets and the shared image
+ * read, because a build that swaps to Fig Leaf is a build that uses Fig Leaf.
+ */
+export function keepsakesOf(build: Pick<ShownBuild, 'keepsake' | 'swaps'>): TraitId[] {
+  const out: TraitId[] = []
+  for (const id of [build.keepsake, ...swapsOf(build)]) {
+    if (id && !out.includes(id)) out.push(id)
+  }
+  return out
+}
+
+/**
+ * How long one note on a pick may be, and how long all of a build's notes may
+ * be together. Both count the text as stored, a mention included.
+ *
+ * **The total is what keeps a build inside one link.** `DESIGN.md` 9 carries
+ * the whole build in the address, and 2000 characters is where a Discord
+ * message stops. The worst build the tests know, 29 picks with every other
+ * field of prose at its limit, packs to 1627 characters with no notes. 500
+ * characters of notes brings it to about 1960 and 600 goes past 2000, measured
+ * with `packBuild` using the game's own sentences as stand-in notes.
+ * `transfer.test.ts` holds it under.
+ */
+export const NOTE_MAX = 140
+export const NOTES_BUDGET = 500
+
+/**
+ * Every id in a build that can carry a note, each once: the aspect, the boons,
+ * the ones worth adding, the Hex, the hammers, every keepsake, the familiar and
+ * the Arcana.
+ */
+export function picksOf(build: ShownBuild): string[] {
+  const out: string[] = []
+  const add = (id: string | null | undefined) => {
+    if (id && !out.includes(id)) out.push(id)
+  }
+  add(build.aspect)
+  for (const id of build.boons) add(id)
+  for (const id of build.optional ?? []) add(id)
+  add(build.hex)
+  for (const id of build.hammers) add(id)
+  for (const id of keepsakesOf(build)) add(id)
+  add(build.familiar)
+  for (const id of build.arcana) add(id)
+  return out
+}
+
+/** The stored text of a note, or nothing when the field holds anything else. */
+const noteText = (build: ShownBuild, id: string): string | null => {
+  const raw: unknown = build.notes
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw) || !Object.hasOwn(raw, id)) return null
+  const text = (raw as Record<string, unknown>)[id]
+  return typeof text === 'string' ? text : null
+}
+
+/**
+ * A build's notes, for the picks it still holds and nothing else.
+ *
+ * Read through this rather than off `build.notes`. A note on a pick that has
+ * since been taken out is shown nowhere, and a link or a stored build can carry
+ * anything in the field, so a value that is not a string is dropped and one
+ * longer than `NOTE_MAX` is cut there.
+ */
+export function notesOf(build: ShownBuild): Map<string, string> {
+  const out = new Map<string, string>()
+  for (const id of picksOf(build)) {
+    const kept = noteText(build, id)?.trim().slice(0, NOTE_MAX)
+    if (kept) out.set(id, kept)
+  }
+  return out
+}
+
+/** How much of `NOTES_BUDGET` the notes on a build's picks take, as typed. */
+export function notesLength(build: ShownBuild): number {
+  return picksOf(build).reduce((total, id) => total + (noteText(build, id)?.length ?? 0), 0)
+}
+
+/**
+ * The build with its notes cut down to the picks it holds, or with no `notes`
+ * at all when none are left. What the editor saves, so a note on a pick that
+ * was taken out does not go on travelling in links where nobody can see it.
+ */
+export function withNotesPruned(build: ShownBuild): ShownBuild {
+  const kept = notesOf(build)
+  const { notes: _notes, ...rest } = build
+  return kept.size ? { ...rest, notes: Object.fromEntries(kept) } : rest
+}
+
+/**
+ * Whose note it is, the way the reader would say it: "Your note" on a build of
+ * yours, "Ana's note" on one somebody else wrote.
+ */
+export function noteLabel(build: Pick<ShownBuild, 'by' | 'author'>): string {
+  if (build.by === 'owner') return 'Your note'
+  return build.author ? `${build.author}'s note` : "The author's note"
+}
+
 export type ShownBuild = {
   id: string
   name: string
@@ -296,9 +424,41 @@ export type ShownBuild = {
    * Optional, so every build written before it loads unchanged.
    */
   luck?: string
+  /**
+   * A line on any pick that needs one, keyed by the pick's id: why this aspect,
+   * why that keepsake after the second Guardian, what a boon is there to feed.
+   *
+   * **Prose, like `how` and `luck`**, so it is outside `shapeOf`: rewording a
+   * note is not changing the build, and it reaches a follower without asking.
+   * Shown under the game's own text wherever the pick is described, in the
+   * author's register rather than the game's, and on the offer at an Exit when
+   * a run is going for this build.
+   *
+   * Read it through `notesOf`, which keeps only the picks the build still holds.
+   * Optional, so every build written before it loads unchanged.
+   */
+  notes?: Record<string, string>
   hex: TraitId | null
   hammers: TraitId[]
+  /** the keepsake the run starts with */
   keepsake: TraitId | null
+  /**
+   * What to swap to at the rack after each of the first three Guardians, in
+   * order, with null for keeping the one you have.
+   *
+   * **A run has four keepsakes, not one.** The rack stands "in the spaces
+   * separating each Region" once Kindred Keepsakes is cast
+   * (`WorldUpgradePostBossGiftRack`), and `RoomDataF`, `G`, `H`, `N`, `O` and
+   * `P` each place one while the final Regions do not. Keyed by position rather
+   * than by Region, because a Dream run visits Regions out of order
+   * (`DreamRunLogic.lua`) and a Chaos Trial starts partway through.
+   *
+   * Optional, so every build written before it loads unchanged, and absent
+   * rather than three nulls when a build swaps nothing, which is what keeps
+   * `shapeOf` exactly as it was for every build that exists. Read it through
+   * `swapsOf`, which the shape checks on the way in do not know about.
+   */
+  swaps?: (TraitId | null)[]
   familiar: FamiliarId | null
   /** the Grasp holds five by default, and the order on the board is the player's */
   arcana: ArcanaId[]

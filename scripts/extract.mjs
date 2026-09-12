@@ -11,6 +11,8 @@ import { readFileSync, writeFileSync, readdirSync, mkdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join, resolve } from 'node:path'
 
+import { parseSjson } from './sjson.ts'
+
 const GAME = 'C:/Program Files (x86)/Steam/steamapps/common/Hades II/Content'
 const SCRIPTS = join(GAME, 'Scripts')
 const OUT = resolve('data/generated')
@@ -225,11 +227,14 @@ function loadOrder() {
      *
      * **`ProjectileData` was tried and does not answer.** Its three hero files
      * load cleanly and give 134 entries, and **not one of them declares
-     * `Damage` or `Fuse`**, which is what the 50 `ProjectileBase` entries ask
-     * for. `ProjectileData_Gods.lua` only carries overrides, mostly colours;
-     * `GetBaseDataValue({ Type = "Projectile" })` is an engine call reading
-     * the binary data beside the Lua. So those numbers are not in Scripts at
-     * all and no amount of loading will find them.
+     * `Damage` or `Fuse`**, which is what the `ProjectileBase` entries ask
+     * for. `ProjectileData_Gods.lua` only carries overrides, mostly colours.
+     *
+     * That much was right, and the conclusion drawn from it was not. This
+     * comment used to end "no amount of loading will find them". The numbers
+     * are not in Scripts, and they are in `Game/Projectiles/`, as sjson, which
+     * is where `GetBaseDataValue({ Type = "Projectile" })` reads them. See
+     * the projectile pass below.
      */
     'WeaponData.lua',
     'LootData.lua',
@@ -583,6 +588,134 @@ if (keepsakeGods) {
   writeGenerated('keepsake-gods', { source: 'Scripts/KeepsakeData.lua' }, keepsakeGods)
 }
 console.log(`  keepsake gods: ${keepsakeGods ? Object.keys(keepsakeGods).length : 0} gods give a keepsake`)
+
+// ---------------------------------------------------------------------------
+// Projectile base values, for the numbers a boon's stat line multiplies.
+//
+// Heaven Strike's stat line is `MultiplyByBase` over the projectile
+// `ZeusEchoStrike`. `FormatExtractedValue` multiplies the trait's own number by
+// `GetBaseDataValue({ Type = "Projectile" ... })` (TraitLogic.lua:2200), and an
+// `External` entry with `BaseType = "ProjectileBase"` makes the same engine call
+// directly (TraitLogic.lua:2063).
+//
+// This project concluded for weeks that the engine call was out of reach,
+// because `ProjectileData` in Scripts declares no `Damage` anywhere. That is
+// true. **The engine's projectile data is in `Game/Projectiles/`, as text:**
+//
+//     Name = "ZeusEchoStrike"
+//     InheritFrom = "ZeusLightningStrikeBase"
+//     Damage = 100
+//
+// It is the vow icons again: a negative result from a search proves something
+// about the search.
+//
+// A record nests `Effects` and `Thing` tables whose entries carry a `Name` of
+// their own, so this is parsed (`scripts/sjson.ts`) rather than walked from one
+// `Name` to the next. And `InheritFrom` is followed to the base, which is
+// CLAUDE.md error 8 in a third format: a record that does not state a property
+// takes it from its parent. A value that came from a parent says which one, so
+// the file can be checked against the game's.
+//
+// Only what some trait asks for is written: the projectiles named by a
+// `ProjectileBase` or `Projectile` extract entry, and the properties those
+// entries read. The full set would be most of a megabyte of committed file for
+// numbers nothing reads.
+// ---------------------------------------------------------------------------
+
+function projectileQuestions(traits) {
+  const names = new Set()
+  const props = new Set()
+  for (const trait of Object.values(traits ?? {})) {
+    const list = Array.isArray(trait?.ExtractValues) ? trait.ExtractValues : []
+    for (const entry of list) {
+      if (!entry || typeof entry !== 'object') continue
+      if (entry.BaseType !== 'ProjectileBase' && entry.BaseType !== 'Projectile') continue
+      if (typeof entry.BaseName === 'string') names.add(entry.BaseName)
+      if (typeof entry.BaseProperty === 'string') props.add(entry.BaseProperty)
+      if (typeof entry.BaseFuseProperty === 'string') props.add(entry.BaseFuseProperty)
+    }
+  }
+  return { names, props }
+}
+
+function readProjectiles({ names, props }) {
+  const dir = join(GAME, 'Game/Projectiles')
+  let files
+  try {
+    files = readdirSync(dir).filter((file) => file.endsWith('.sjson')).sort()
+  } catch {
+    return null
+  }
+
+  const records = new Map()
+  const repeated = []
+  for (const file of files) {
+    const root = parseSjson(readFileSync(join(dir, file), 'utf8'))
+    const list = root && typeof root === 'object' && !Array.isArray(root) ? root.Projectiles : null
+    if (!Array.isArray(list)) continue
+    for (const record of list) {
+      if (!record || typeof record !== 'object' || typeof record.Name !== 'string') continue
+      if (records.has(record.Name)) repeated.push(record.Name)
+      records.set(record.Name, record)
+    }
+  }
+
+  // A property, and the record that states it. A record that states the
+  // property as anything but a number has overridden its parent with nothing
+  // readable, so the walk stops there rather than reaching past it.
+  const lookup = (name, prop, seen = new Set()) => {
+    if (seen.has(name)) return null
+    seen.add(name)
+    const record = records.get(name)
+    if (!record) return null
+    if (prop in record) return typeof record[prop] === 'number' ? { value: record[prop], from: name } : null
+    const parents = Array.isArray(record.InheritFrom) ? record.InheritFrom : [record.InheritFrom]
+    for (const parent of parents) {
+      if (typeof parent !== 'string') continue
+      const found = lookup(parent, prop, seen)
+      if (found) return found
+    }
+    return null
+  }
+
+  const out = {}
+  const missing = []
+  for (const name of [...names].sort()) {
+    if (!records.has(name)) {
+      missing.push(name)
+      continue
+    }
+    const entry = {}
+    const inherited = {}
+    for (const prop of [...props].sort()) {
+      const found = lookup(name, prop)
+      if (!found) continue
+      entry[prop] = found.value
+      if (found.from !== name) inherited[prop] = found.from
+    }
+    if (Object.keys(inherited).length) entry.inherited = inherited
+    out[name] = entry
+  }
+  return { out, files: files.length, records: records.size, repeated, missing }
+}
+
+const projectiles = readProjectiles(projectileQuestions(resolvedTraits))
+if (projectiles) {
+  writeGenerated(
+    'projectiles',
+    {
+      source: 'Game/Projectiles/*.sjson',
+      note:
+        'What GetBaseDataValue({ Type = "Projectile" }) reads, for the projectiles and properties a trait extract entry names. InheritFrom is followed; inherited says which record a value came from.',
+    },
+    projectiles.out,
+  )
+  console.log(
+    `  projectiles: ${Object.keys(projectiles.out).length} asked for, read from ${projectiles.records} records in ${projectiles.files} files` +
+      (projectiles.missing.length ? `, ${projectiles.missing.length} not found: ${projectiles.missing.join(', ')}` : '') +
+      (projectiles.repeated.length ? `, ${projectiles.repeated.length} names defined twice` : ''),
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Stacking curves. Poms raise a trait's StackNum, and TraitLogic.GetProcessedValue

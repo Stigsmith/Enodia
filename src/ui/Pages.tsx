@@ -12,6 +12,7 @@
 
 import { CHANGELOG } from '../data/changelog.ts'
 import { ROADMAP, STAGES } from '../data/roadmap.ts'
+import { UNDER_HOOD } from '../data/underhood.ts'
 import { DoraWatching } from './Dora.tsx'
 import type { Stage } from '../data/roadmap.ts'
 
@@ -176,6 +177,57 @@ export function Roadmap() {
           )
         })}
       </div>
+    </Page>
+  )
+}
+
+/**
+ * Things the game never tells you, in three tiers of spoiler.
+ *
+ * A closed `<details>` per entry, because the page's own promise is that
+ * nothing opens unless the reader opens it, and the tier says what kind of
+ * thing is inside before anybody commits to knowing it. The same reason the
+ * changelog uses them: there is nothing here to remember, so the browser can
+ * own the keyboard and the ARIA.
+ *
+ * **The source line is not decoration.** Every entry that states a rule carries
+ * the symbols it was read from, and the two that are ours are marked as ours.
+ * `underhood.test.ts` fails if either of those slips.
+ */
+export function UnderHood() {
+  return (
+    <Page
+      title="Under the hood"
+      standfirst="Building this means reading the game's own code, and that turns up rules nobody is told. Some you would never have found. Some you would get to eventually, and finding those yourself is the better way round, so nothing opens unless you open it."
+    >
+      {UNDER_HOOD.map((tier) => (
+        <section key={tier.level} className={`hood is-level-${tier.level}`}>
+          <header className="hood-head">
+            <span className="hood-level">Level {tier.level}</span>
+            <h3>{tier.title}</h3>
+            <p>{tier.say}</p>
+          </header>
+
+          {tier.entries.map((entry) => (
+            <details key={entry.summary} className="hood-entry">
+              <summary>{entry.summary}</summary>
+              <div className="hood-body">
+                {entry.body.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+                {entry.ours ? (
+                  <p className="hood-ours">Ours: how to play it, rather than a rule stated in the files.</p>
+                ) : null}
+                {entry.source ? (
+                  <p className="hood-source">
+                    <span>source</span> {entry.source}
+                  </p>
+                ) : null}
+              </div>
+            </details>
+          ))}
+        </section>
+      ))}
     </Page>
   )
 }

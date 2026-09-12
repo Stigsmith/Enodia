@@ -19,6 +19,89 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-12',
+    title: 'Show me the ones somebody else has actually finished',
+    say: 'One filter on the exchange, over a count rather than a badge.',
+    points: [
+      'The filter bar on the exchange has Cleared by somebody else. It carries the number of builds it would leave, so pressing it is never a surprise.',
+      'One clear means one other player: your own runs have never counted toward your own listing, and the counts are kept per version, so an author who changes the picks starts again rather than keeping evidence earned by a different build.',
+      'It is not a tier and there is no badge. Nobody grants it, nobody can be asked for it, and it is never called Verified. It is a count, and the button says which count.',
+      'Turn it on when nothing qualifies and the shelf says so, because early on that is the true answer rather than a mistake in your filters.',
+    ],
+  },
+  {
+    date: '2026-09-12',
+    title: 'Under the hood is back, and one of it was wrong',
+    say: 'Rules the game never tells you, sorted by how likely you were to find them yourself.',
+    points: [
+      'It is a screen in the menu now, beside the Wiki. It used to be on the page that stood in front of the app, and it left when that page did in early September.',
+      'Three tiers, and nothing opens unless you open it: things no number of runs would surface, things you might get to eventually, and things you will work out yourself and are better off working out yourself.',
+      'One entry was wrong for the whole time it was live. It said that taking a fourth Olympian made every other god impossible for the rest of the run. The cap is on the random pool: a keepsake overwrites that choice outright, and all nine Olympians have one, so a fifth god is a keepsake away. The corrected entry says so and names the line.',
+      'Every entry names the code it was read from, and the two that are our opinion about how to play rather than a rule in the files are marked as ours.',
+    ],
+  },
+  {
+    date: '2026-09-12',
+    title: 'What counts as Olympian damage, and what does not',
+    say: 'Three things in the game multiply damage from Olympians, and the game means a list of names rather than a set of gods.',
+    points: [
+      'Extended Family, the Earth infusion Rallying Cry and Argent Skull’s Aspect of Persephone all read the same two lists in the game’s files: 63 projectiles and 3 effects. A build holding one of them now gets a line saying which of its picks are on that list, or that none of them are.',
+      'Every boon, Hex and aspect whose damage is on the list says so in its wiki record, and names the projectile or effect it comes out of, so the claim can be checked against the game.',
+      'The list is not the four Olympian cap. It includes Artemis and Athena projectiles, and neither of them ever spends an Olympian slot, so which gods you hold does not answer it.',
+      'It is read out of each pick’s own record, so it can miss one: a pick it does not name may still count. It never claims the other way round, and it never says your damage does not count.',
+    ],
+  },
+  {
+    date: '2026-09-11',
+    title: 'A line on each pick, and names that lead somewhere',
+    say: 'Say why a pick is in a build, next to the pick, and name a boon in your write-up so it opens its record.',
+    points: [
+      'The Notes tab has a line for each pick in the build: why it is there, what it feeds, what to take instead. A note shows when somebody points at that pick or opens it, and all of a build’s notes are listed under How it works.',
+      'When a run is going for a build, the note on a boon is on its card at the Exit, marked as the author’s, so the reason is there at the moment you choose. A card with a note says so beside its name.',
+      'Starting a run can go for your own builds and the ones you follow. The step only ever read the builds that ship with the tool, and none do yet, so it said nothing was on your aspect whatever you had written.',
+      'Type @ in How it works, If the run goes your way or a note, and a list offers what you might mean, the build’s own picks first. What goes in is drawn as the thing itself, with its art, its hover and a link to its record in the wiki.',
+      'A build’s notes share 500 characters, so the whole build still fits in one link short enough to paste into Discord.',
+      'Rewording a note is not changing the build. Runs keep counting toward a build you follow, and its author’s new notes reach you without asking.',
+      'Pointing at something near the bottom of the screen no longer puts the end of its description below the edge.',
+    ],
+  },
+  {
+    date: '2026-09-11',
+    title: 'A wiki, read out of the game',
+    say: 'Everything the tool knows, a record each, and an index of them all.',
+    points: [
+      'The menu has a Wiki. Every boon, Hex, keepsake, aspect, Daedalus Hammer, Arcana card and familiar the tool knows is in it, 597 in all, filed where you would look: by god, duos and legendaries, Hexes and the Path of Stars, each arm’s aspects and hammers, and what Circe, Echo, Icarus, Medea and Narcissus offer along the way.',
+      'Each one has a record at its own address, so sending somebody the link opens it. A record gives the game’s own description and the numbers under it, then what the game never tells you: what a duo needs, which duos and legendaries a boon counts toward, how much of an element it takes, whether a Pom can raise it, and which of your builds use it.',
+      'All of it comes out of the game’s files and is read again after a patch. Nothing in it is written by hand.',
+      'Opening any piece of a build now has a link to its full record.',
+    ],
+  },
+  {
+    date: '2026-09-11',
+    title: 'A build carries all four keepsakes',
+    say: 'A run gives you four keepsakes and a build could only name one.',
+    points: [
+      'You choose one keepsake at the Crossroads, and once Kindred Keepsakes is cast you can swap at the rack after each of the first three Guardians. A build can name all four now. The Before you go tab has a picker for each rack, and each one keeps what you are carrying until you change it.',
+      'A build that swaps shows its keepsakes in order, each saying when it is taken. A build that does not swap looks exactly as it did.',
+      'Filtering by a keepsake finds the builds that swap to it as well as the ones that start with it.',
+      'Builds already on the exchange keep their runs and ratings. Adding a swap to one counts as changing its picks, the same as changing a boon, because the keepsake you carry into a Region is part of what you played.',
+    ],
+  },
+  {
+    date: '2026-09-11',
+    title: 'A boon says how much, not only what',
+    say: 'The lines the game draws under a boon, which the tool had never shown, and most of the holes in its sentences filled.',
+    points: [
+      'Pointing at a boon, or opening one, now shows the lines the game prints under its description: Heaven Strike’s Blitz damage, Storm Ring’s bolt damage, Extended Family’s bonus for each god. 275 things in the tool carry at least one, and until today not one of them was shown.',
+      'A build does not know what rarity you will find a boon at, so where the number changes with rarity you get all four, each marked in the game’s own colour for Common, Rare, Epic and Heroic. Opening the boon names each one.',
+      'The element a boon carries is now on the line with its slot and its gods, with the game’s own mark for it.',
+      'Numbers are read at the rarity the game’s own Codex shows. That is why Heaven Strike’s Blitz reads 80 at Common rather than the 100 underneath it.',
+      'Sentences that showed # where a number belonged now mostly have the number: 193 holes are down to 27. What is left needs something only a run in progress knows, or a table the tool does not read yet, and stays a # rather than a guess.',
+      'Chaos boons roll their numbers, so their sentences now give the range they can land in, smallest first.',
+      'Three of Narcissus’s gifts used to promise +1 health or +1 Magick. That was the number of drops, not what they are worth, so they show # until the tool reads what a drop restores. Giga Moonburst’s Magick cost shows # for a similar reason: the game subtracts one charge stage from another, and the tool does not read that weapon’s stages yet.',
+    ],
+  },
+  {
     date: '2026-09-11',
     title: 'Coming back to the tab no longer loses what you had open',
     say: 'A background sync was throwing away the build you were reading and the edit you had not saved.',

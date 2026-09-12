@@ -47,6 +47,21 @@
   --silver-deep: #22232e;
 
   /* ---------------------------------------------------------------
+   * RARITY. Stated by the game rather than sampled: `BoonPatchCommon` to
+   * `BoonPatchHeroic` in ColorData.lua:213-217, which the Codex reads to
+   * tint a boon's name by its rarity (BoonInfoLogic.lua:151).
+   *
+   * Literal, not positional, and no theme touches them: Rare is blue in
+   * every theme because it is blue in the game. Used as a mark beside a
+   * number and never as the colour of small text, because Epic's violet
+   * on --ink-850 measures about 3.3 to 1.
+   * ------------------------------------------------------------- */
+  --rarity-common: rgb(255 255 255);
+  --rarity-rare: rgb(0 138 255);
+  --rarity-epic: rgb(157 18 255);
+  --rarity-heroic: rgb(248 96 89);
+
+  /* ---------------------------------------------------------------
    * THE LIVING LIGHT. Jade here, because the default theme is Unseen and
    * jade came out of Hecate's portrait. Every glow, border, highlight,
    * mote and focus ring in the app reads off these three, which is why

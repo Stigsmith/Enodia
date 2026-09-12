@@ -1,0 +1,297 @@
+/* =========================================================================
+ * THE WIKI
+ *
+ * An index of everything, and a record for each thing. The index is a grid of
+ * names under headings, dense on purpose: it is a list to find something in,
+ * and the search above it narrows it by name. A record is a reading page, so it
+ * takes the reading measure.
+ * ====================================================================== */
+
+.wiki-search {
+  display: block;
+  margin: 0 0 0.8rem;
+}
+
+.wiki-search input {
+  width: min(24rem, 100%);
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  color: var(--bone);
+  font-family: var(--body);
+  font-size: 0.9rem;
+}
+
+.wiki-search input:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: 1px;
+}
+
+.wiki-found {
+  margin: 0 0 1rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--bone-faint);
+}
+
+/* The sections, as a line of links that wraps. */
+.wiki-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0 0 1.4rem;
+  font-size: 0.78rem;
+}
+
+.wiki-toc a {
+  color: var(--bone-dim);
+  text-decoration: none;
+}
+
+.wiki-toc a:hover,
+.wiki-toc a:focus-visible {
+  color: var(--lit-hot);
+}
+
+.wiki-part {
+  margin: 2rem 0 0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--div-3);
+  font-family: var(--display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+
+.wiki-section {
+  scroll-margin-top: 1rem;
+}
+
+.wiki-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 1.1rem 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lit-hot);
+}
+
+.wiki-count {
+  color: var(--bone-faint);
+}
+
+.wiki-entries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: 0.15rem 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wiki-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.25rem 0.35rem;
+  border-radius: var(--r-hair);
+  color: var(--bone);
+  text-decoration: none;
+}
+
+.wiki-entry:hover,
+.wiki-entry:focus-visible {
+  background: color-mix(in srgb, var(--lit-dim) 25%, transparent);
+}
+
+.wiki-entry img,
+.wiki-stub {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  object-fit: contain;
+}
+
+.wiki-stub {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  font-family: var(--display);
+  color: var(--bone-faint);
+}
+
+.wiki-entry-text {
+  display: grid;
+  min-width: 0;
+}
+
+.wiki-entry-name {
+  overflow: hidden;
+  font-size: 0.84rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wiki-entry-sub {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+/* -------------------------------------------------------------------------
+ * A record
+ * ---------------------------------------------------------------------- */
+
+.wiki-record {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+.wiki-back {
+  margin: 0 0 1.2rem;
+  font-size: 0.8rem;
+}
+
+.wiki-back a,
+.wiki-facts a,
+.wiki-text a {
+  color: var(--lit-hot);
+}
+
+.wiki-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.wiki-art {
+  width: 5rem;
+  height: 5rem;
+  flex: none;
+  object-fit: contain;
+}
+
+/* An Arcana card is tall and painted, and a square crop loses the figure. */
+.wiki-card {
+  width: 6rem;
+  flex: none;
+  border-radius: var(--r-hair);
+}
+
+.wiki-name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  color: var(--bone);
+}
+
+.wiki-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.1rem 0.5rem;
+  margin: 0.25rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lit-hot);
+}
+
+.wiki-line > span + span::before {
+  content: '\00b7';
+  margin-right: 0.5rem;
+  color: var(--bone-faint);
+}
+
+.wiki-text {
+  margin: 1.2rem 0 0.9rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--bone-dim);
+}
+
+.wiki-text.is-gap {
+  font-style: italic;
+  color: var(--bone-faint);
+}
+
+/* The derived facts, in the tool's register: labels in mono, set apart from the
+ * game's own sentence above them. */
+.wiki-facts {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.4rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-3);
+}
+
+.wiki-facts > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 36rem) {
+  .wiki-facts > div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}
+
+.wiki-facts dt {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.wiki-facts dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--bone);
+}
+
+/* A symbol inside a fact: the projectile a boon's damage comes out of. Mono,
+ * because it is the game's own name for the thing rather than a word we chose,
+ * and the reader is meant to be able to go and look it up. */
+.wiki-facts code {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  color: var(--bone-dim);
+}
+
+.wiki-sets {
+  margin: 0.3rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.wiki-source {
+  margin: 1.8rem 0 0;
+  font-size: 0.72rem;
+  color: var(--bone-faint);
+}
+
+.wiki-source code {
+  font-family: var(--mono);
+  color: var(--bone-dim);
+}
+
+/* The dialog's way into a record. */
+.piececard-record {
+  display: block;
+  margin: 0 0 0.8rem;
+  font-size: 0.8rem;
+  color: var(--lit-hot);
+}

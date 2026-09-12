@@ -55,7 +55,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
-import { followBuild, listShelf } from '../state/exchange.ts'
+import { clearedByAnother, followBuild, listShelf } from '../state/exchange.ts'
 import { loadBuilds } from '../state/builds.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
@@ -69,6 +69,8 @@ import { Page } from './Pages.tsx'
 import { Tabs } from './Tabs.tsx'
 import { useBackdrop, useEscape } from './escape.ts'
 import { assemble } from './build-pieces.ts'
+import { PickNotes } from './PickNotes.tsx'
+import { Prose } from './Prose.tsx'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
 
@@ -153,7 +155,32 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   )
 
   const bar = useMemo(() => facets(builds, selection), [builds, selection])
-  const shown = useMemo(() => {
+
+  /**
+   * Evidence, which is the one thing a shelf can say that a library cannot.
+   *
+   * **Not a tier and not a badge.** `REQUIREMENTS.md` 8 wants a credible
+   * consensus before any second opinion, and the owner removed the one curated
+   * shelf on 8 September on the grounds that people find what they want
+   * themselves. So this is a filter over the one list rather than a second
+   * list, and what it filters on is a count the worker already keeps: clears
+   * logged against the version on the shelf now.
+   *
+   * **One clear is one other player.** `worker/exchange.ts` refuses an author's
+   * own runs before they are counted, and the counts are per version, so a
+   * listing whose author replaced the picks starts again rather than carrying
+   * somebody else's evidence forward.
+   *
+   * Not persisted. A filter that survives a visit is one somebody can leave on
+   * and forget, and this one can empty a shelf.
+   */
+  const [cleared, setCleared] = useState(false)
+  const hasClear = (build: ShownBuild) => {
+    const listing = listingOf.get(build.id)
+    return listing ? clearedByAnother(listing) : false
+  }
+
+  const { shown, evidenceMatches } = useMemo(() => {
     const found = apply(builds, selection)
     const needle = query.trim().toLowerCase()
     const narrowed = needle
@@ -163,8 +190,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
           ),
         )
       : found
-    return sortBuilds(narrowed, sort)
-  }, [builds, selection, sort, query, listingOf])
+    const matches = narrowed.filter(hasClear)
+    return { shown: sortBuilds(cleared ? matches : narrowed, sort), evidenceMatches: matches.length }
+  }, [builds, selection, sort, query, listingOf, cleared])
 
   /* Escape closes the listing. It is read-only, so there is nothing here to
      lose by leaving, and this is the screen the owner asked for it on. */
@@ -261,6 +289,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             onClear={() => {
               setSelection(EMPTY_SELECTION)
               setQuery('')
+              setCleared(false)
             }}
             sort={sort}
             onSort={setSort}
@@ -270,6 +299,7 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
             onQuery={setQuery}
             showing={shown.length}
             total={builds.length}
+            evidence={{ on: cleared, matches: evidenceMatches, onToggle: setCleared }}
           />
 
           {said ? (
@@ -304,6 +334,14 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                 )
               })}
             </ul>
+          ) : cleared && evidenceMatches === 0 ? (
+            /* A real state rather than a filter mistake, and worth saying
+               plainly: early on, nothing here has been played by anybody but
+               the people who published it. */
+            <p className="builds-none">
+              Nothing on this shelf has been cleared by another player yet. Turn that filter off to
+              see the rest.
+            </p>
           ) : (
             <p className="builds-none">
               Nothing matches all of those. Drop a filter, or clear them and start again.
@@ -334,15 +372,24 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
               {readingRow.build.how ? (
                 <section className="xchange-read-how" aria-label="How it works">
                   <h4>How it works</h4>
-                  <p>{readingRow.build.how}</p>
+                  <p>
+                    <Prose text={readingRow.build.how} />
+                  </p>
                 </section>
               ) : null}
               {readingRow.build.luck ? (
                 <section className="xchange-read-how" aria-label="If the run goes your way">
                   <h4>If the run goes your way</h4>
-                  <p>{readingRow.build.luck}</p>
+                  <p>
+                    <Prose text={readingRow.build.luck} />
+                  </p>
                 </section>
               ) : null}
+              <PickNotes
+                built={assemble(readingRow.build)}
+                className="xchange-read-how xchange-read-notes"
+                heading="h4"
+              />
               <Counted stats={readingRow.stats} {...(readingRow.before ? { before: readingRow.before } : {})} />
               <div className="xchange-read-actions">
                 <Relation

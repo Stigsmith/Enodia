@@ -14,13 +14,15 @@
  *
  * 1. the art, because a player recognises a boon by its icon before its name
  * 2. what it does, in the game's own words
- * 3. **one sentence about this run**, from `engine/offer.ts`
- * 4. what taking it would close, when it would close anything
+ * 3. **the author's note on it**, when the run is going for a build that has one
+ * 4. **one sentence about this run**, from `engine/offer.ts`
+ * 5. what taking it would close, when it would close anything
  *
- * Three registers again, and kept apart the way `DESIGN.md` 8 requires. The
- * game's sentence is a fact and is quiet. Our sentence is a judgement and is
- * marked as ours. What a pick closes is a proof, and it is the loudest thing on
- * the card because it is the only part that is irreversible.
+ * Four registers, and kept apart the way `DESIGN.md` 8 requires. The game's
+ * sentence is a fact and is quiet. The author's note is a person's advice and
+ * says whose it is. Our sentence is a judgement and is marked as ours. What a
+ * pick closes is a proof, and it is the loudest thing on the card because it is
+ * the only part that is irreversible.
  *
  * **Silence is the normal state.** Most boons draw no sentence at all, and a
  * card with nothing to say shows the art, the name and the game's own text. A
@@ -45,18 +47,38 @@ import { ruleContext } from '../engine/rules.ts'
 import { rules } from '../data/rules.ts'
 import type { Judged } from '../engine/offer.ts'
 import type { HeldTrait, RunContext, TraitId } from '../data/types.ts'
+import { noteLabel, notesOf } from '../data/builds.ts'
+import type { ShownBuild } from '../data/builds.ts'
+import { ProseText } from './ProseText.tsx'
+
+/**
+ * What the build a run is going for says about its own picks, for the cards to
+ * show under the game's text, with whose note it is and on which build.
+ */
+export type Advice = { label: string; notes: ReadonlyMap<TraitId, string> }
+
+/** Null when the run is going for nothing, or for a build with no notes. */
+export function adviceFrom(build: ShownBuild | null): Advice | null {
+  if (!build) return null
+  const notes = notesOf(build)
+  if (!notes.size) return null
+  return { label: build.name ? `${noteLabel(build)} on ${build.name}` : noteLabel(build), notes }
+}
 
 export function Offer({
   run,
   candidates,
   god,
   rarity,
+  advice = null,
   onTake,
 }: {
   run: RunContext
   candidates: readonly TraitId[]
   god: string | null
   rarity: HeldTrait['rarity']
+  /** what the build this run is going for says about its own picks */
+  advice?: Advice | null
   onTake: (trait: TraitId) => void
 }) {
   /**
@@ -86,7 +108,14 @@ export function Offer({
 
       <ul className="offer">
         {cards.map((entry) => (
-          <Card key={entry.subject.id} judged={entry} rarity={rarity} onTake={() => onTake(entry.subject.id)} />
+          <Card
+            key={entry.subject.id}
+            judged={entry}
+            rarity={rarity}
+            note={advice?.notes.get(entry.subject.id) ?? null}
+            noteBy={advice?.label ?? ''}
+            onTake={() => onTake(entry.subject.id)}
+          />
         ))}
       </ul>
     </>
@@ -128,10 +157,16 @@ function Common({ common, god }: { common: ReturnType<typeof differentiate>['com
 function Card({
   judged,
   rarity,
+  note,
+  noteBy,
   onTake,
 }: {
   judged: Judged
   rarity: HeldTrait['rarity']
+  /** the author's note on this pick, from the build the run is going for */
+  note: string | null
+  /** whose, and on which build: "Your note on Every Pair" */
+  noteBy: string
   onTake: () => void
 }) {
   const trait = traits.get(judged.subject.id)
@@ -183,6 +218,13 @@ function Card({
                 unrated
               </span>
             ) : null}
+            {/* Says there is a note without a hover, so the one card the
+                build's author wrote about stands out in the list. */}
+            {note ? (
+              <span className="offer-noted" title={noteBy}>
+                note
+              </span>
+            ) : null}
           </span>
 
         </span>
@@ -199,11 +241,25 @@ function Card({
           *
           * Nothing is lost, it moved. On a phone there is no hover to move it
           * to, so the game's own sentence stays on the card and the rest does
-          * not: that is the "less text" half of the same note.
+          * not: that is the "less text" half of the same note. The author's
+          * note stays as well, and `surface.css` says why.
           */}
         <span className="offer-detail">
           {/* Fact: the game's own sentence. */}
           {trait?.text ? <span className="offer-text">{trait.text}</span> : null}
+
+          {/* A person's: the author of the build this run is going for, on
+            * this pick. Not the game's fact and not our judgement, so it
+            * carries its own label, and its mentions are drawn without links
+            * because the whole card is already a button. */}
+          {note ? (
+            <span className="offer-note">
+              <span className="offer-note-by">{noteBy}</span>
+              <span className="offer-note-text">
+                <ProseText text={note} />
+              </span>
+            </span>
+          ) : null}
 
           {/* Judgement: ours, and marked as ours. */}
           {judged.say ? <span className="offer-say">{judged.say}</span> : null}

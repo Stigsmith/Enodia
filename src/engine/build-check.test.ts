@@ -177,6 +177,48 @@ describe('what it only notes', () => {
   })
 })
 
+/**
+ * "Damaging effects from Olympians" is two lists of projectile and effect
+ * names, not a set of gods, and the projectile list includes Artemis and
+ * Athena, who never spend an Olympian slot. So a build holding something that
+ * reads those lists cannot answer "does my damage count" from its gods, and
+ * this is the only place the tool says so. `scripts/olympian.test.ts` pins the
+ * table underneath it.
+ */
+describe('the Olympian damage warning', () => {
+  const olympianSay = (build: ShownBuild) =>
+    checkBuild(build)
+      .map((problem) => problem.say)
+      .find((say) => /Olympian list/.test(say))
+
+  it('says nothing on a build that holds none of the three readers', () => {
+    expect(olympianSay(bend({ boons: ['ZeusWeaponBoon', 'HestiaWeaponBoon'] }))).toBeUndefined()
+  })
+
+  it('names what in the build is on the list', () => {
+    const said = olympianSay(bend({ boons: ['DamageShareRetaliateBoon', 'ZeusWeaponBoon', 'HestiaWeaponBoon'] }))
+    expect(said).toContain('Extended Family')
+    expect(said).toContain('63 projectiles and 3 effects')
+    expect(said).toContain('Heaven Strike')
+    expect(said).toContain('Flame Strike')
+  })
+
+  /* The warning worth having: the reader is held and nothing feeds it. It says
+     what no record claims rather than claiming the build gets nothing, because
+     the table undercounts by design. */
+  it('says so when nothing in the build is traced to the list', () => {
+    const said = olympianSay(bend({ boons: ['DamageShareRetaliateBoon'], hex: null, hammers: [] }))
+    expect(said).toContain('No pick here is on it')
+    expect(said).toContain("as far as each pick's own record says")
+  })
+
+  it('fires for the aspect that charges off the list, not only for boons', () => {
+    const said = olympianSay(bend({ weapon: 'WeaponLob', aspect: 'LobImpulseAspect', boons: ['ZeusWeaponBoon'] }))
+    expect(said).toContain('Aspect of Persephone')
+    expect(said).toContain('Heaven Strike')
+  })
+})
+
 describe('the helpers', () => {
   it('counts only Olympians', () => {
     // Read off the build rather than written down here, so this keeps checking
