@@ -14,7 +14,7 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 755 in node across 43 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 771 in node across 45 files, and **153 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
@@ -49,6 +49,19 @@ reading real responses rather than trusting that they carried over.
 the CSP forbade exactly that, which nobody saw because the CSP was never applied. `npm run
 fonts` vendors all 38 faces into `assets/fonts/`, so the policy ships unchanged and the page
 loads nothing from anybody else. 680 KB, of which a first paint fetches two files.
+
+**A window too small for Dora no longer downloads her, 17 September 2026.** `DoraWatching`
+rendered her `<img>` at every size while `builds.css` hid her outside 96rem by 58rem, so a
+phone or a short window that opened the Roadmap fetched `dora-hardhat.webp`, 71 KB, and never
+drew it. Measured under `wrangler dev` at 375x812: a 200, 71,518 bytes over the wire, and the
+wrapper `display: none`. The gate is now `DORA_ROOM` in `src/ui/Dora.tsx`, written once, and
+outside it she is not in the page. Checked the same way afterwards: at 375x812 no Dora image is
+ever added and nothing is requested, and at 1600x950 her boxes and styles match the old build to
+two decimal places and the tour lights the same box. The Roadmap tour read "1 of 2" on a phone
+before and after, because `Tour` already dropped her hidden 0x0 anchor. Crossing 1535 to 1536
+wide or 927 to 928 tall takes her away and brings her back without a reload, still on the line
+she was saying. `src/ui/Dora.test.tsx` holds six tests. Three were seen failing against the old
+code, and the one about her line was seen failing against a version that forgot it.
 
 **Accounts are open**, and the thing that had held them shut is fixed rather than waived. An
 account you can be locked out of permanently is a trap with a nice form on it, so the flag

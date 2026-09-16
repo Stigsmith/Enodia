@@ -230,6 +230,19 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
 }
 
 /**
+ * Where there is room for her on the Roadmap, and the only place the numbers
+ * are written.
+ *
+ * `DoraWatching` renders nothing outside it, so this one query decides whether
+ * her picture is fetched at all. `builds.css` used to state it as well, and the
+ * two were answering different questions: the stylesheet decided whether she
+ * showed, after the markup had already decided that she loaded. Why it is 96rem
+ * wide and 58rem tall is still written beside her rules in `builds.css`, with
+ * the measurements.
+ */
+const DORA_ROOM = '(min-width: 96rem) and (min-height: 58rem)'
+
+/**
  * The mascot alone, for a page that has content of its own.
  *
  * Fixed to the viewport, so whatever it stands beside scrolls and she does not.
@@ -243,9 +256,39 @@ export function Unbuilt({ title, phase }: { title: string; phase?: string }) {
  * She stays out of the accessibility tree until she has something to say. A
  * screen reader announcing a decorative image beside every roadmap item is
  * noise; a line of dialogue somebody deliberately asked for is not.
+ *
+ * **Not drawn means not in the page at all.** The stylesheet used to hide her
+ * outside `DORA_ROOM` while this rendered her picture regardless, so every
+ * phone and every short window that opened the Roadmap downloaded
+ * `dora-hardhat.webp`, 71 KB, and never showed it. Measured under
+ * `wrangler dev` on 17 September 2026 at 375x812: requested with a 200, 71,518
+ * bytes over the wire, `complete` true, `naturalWidth` 427, and the wrapper
+ * `display: none`. `Dora.test.tsx` pins it.
+ *
+ * **The Roadmap tour loses nothing by it.** `Tour` drops a step whose anchor is
+ * missing, and it already dropped one whose anchor measures under 2px, which is
+ * what `display: none` made hers. So on a phone her step was gone before this
+ * and is gone now.
+ *
+ * The poke loop is called before the gate, and not only because hooks have to
+ * run in the same order on every render. It keeps her count while she is away,
+ * as it was kept when the stylesheet hid her.
  */
 export function DoraWatching() {
   const { say, roaring, poke } = usePoke(PLAN_POKES)
+  const [room, setRoom] = useState(() => window.matchMedia(DORA_ROOM).matches)
+
+  useEffect(() => {
+    const query = window.matchMedia(DORA_ROOM)
+    const sync = () => setRoom(query.matches)
+    // Once on subscribing, for a window that crossed the line between the first
+    // render and this effect.
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  if (!room) return null
 
   return (
     <div className="dora-watching">

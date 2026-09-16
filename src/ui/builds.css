@@ -8209,10 +8209,6 @@ button.mark {
  * actually use take it back: her, and whatever she has just said.
  * ---------------------------------------------------------------------- */
 
-.dora-watching {
-  display: none;
-}
-
 /**
  * Only where there is room for her, and **the room is mostly vertical.**
  *
@@ -8239,43 +8235,47 @@ button.mark {
  * either number down and text goes behind her, and the first thing to go is the
  * amber line saying what a stalled item is waiting on, which is the honest half
  * of the page.
+ *
+ * **Neither number is in this file now.** Both are in `DORA_ROOM` in
+ * `Dora.tsx`, and `DoraWatching` renders her only where that query matches, so
+ * none of these rules needs a media query: they apply exactly when she exists.
+ * This used to be `display: none` with the gate in a query while the component
+ * rendered her picture anyway, and every phone that opened the Roadmap
+ * downloaded 71 KB it never showed.
  */
-@media (min-width: 96rem) and (min-height: 58rem) {
-  .dora-watching {
-    display: grid;
-    justify-items: center;
-    gap: 0.4rem;
-    position: fixed;
-    /* 4rem rather than 2.5rem: the help mark owns the bottom right corner and
-     * spans 1rem to 3.4rem, which put it on her rightmost 0.9rem. Changed here
-     * rather than in a later override, because a later block at this
-     * specificity also beat the `min-width: 100rem` rule below and dragged her
-     * back in on wide screens. Same cascade trap as `.tab.is-open`. */
-    right: 4rem;
-    bottom: 0;
-    /**
-     * The box is as wide as what she says; **she is not.**
-     *
-     * Her width used to be this rule, and the button under it was `width:
-     * 100%`. In a grid the column sizes to its widest child, which is the
-     * speech box at 22rem, so `100%` made her 352px rather than the 240 this
-     * said. She was half again too big and the number here was fiction.
-     *
-     * So the container is the speech box's width and she gets her own, below.
-     */
-    width: min(22rem, 88vw);
-    /* Above the page so she can be clicked, below the drawer, the menu and
-     * every modal. Same layer as the help mark, and for the same reason. */
-    z-index: 12;
-    /* The box she stands in is click-through; the parts you can use are not. */
-    pointer-events: none;
-  }
+.dora-watching {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  position: fixed;
+  /* 4rem rather than 2.5rem: the help mark owns the bottom right corner and
+   * spans 1rem to 3.4rem, which put it on her rightmost 0.9rem. Changed here
+   * rather than in a later override, because a later block at this
+   * specificity also beat the `min-width: 100rem` rule below and dragged her
+   * back in on wide screens. Same cascade trap as `.tab.is-open`. */
+  right: 4rem;
+  bottom: 0;
+  /**
+   * The box is as wide as what she says; **she is not.**
+   *
+   * Her width used to be this rule, and the button under it was `width:
+   * 100%`. In a grid the column sizes to its widest child, which is the
+   * speech box at 22rem, so `100%` made her 352px rather than the 240 this
+   * said. She was half again too big and the number here was fiction.
+   *
+   * So the container is the speech box's width and she gets her own, below.
+   */
+  width: min(22rem, 88vw);
+  /* Above the page so she can be clicked, below the drawer, the menu and
+   * every modal. Same layer as the help mark, and for the same reason. */
+  z-index: 12;
+  /* The box she stands in is click-through; the parts you can use are not. */
+  pointer-events: none;
+}
 
-  .dora-watching .dora-says,
-  .dora-watching-poke {
-    pointer-events: auto;
-  }
-
+.dora-watching .dora-says,
+.dora-watching-poke {
+  pointer-events: auto;
 }
 
 @media (min-width: 100rem) {
