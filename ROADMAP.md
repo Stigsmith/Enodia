@@ -753,6 +753,21 @@ different mistakes, and `src/ui/charon-coins.test.ts` pins two of them: 41 of 60
 to a cell edge against a limit of 15, and the exact old step put back failing that assertion
 alone.
 
+**And every phone downloaded him without drawing him, 15 September 2026.** `CharonShop`
+rendered its `<img>` at any width while `builds.css` hid him below 96rem, so a phone that
+opened the exchange fetched `charon-shop.png`, 348 KB, and never showed it. It was seen on
+enodia.me at 375x812: the image fully loaded, its wrapper `display: none`. The markup decided
+the download and the stylesheet decided the showing. Now `CHARON_ROOM` in `Exchange.tsx` is the
+only place the gate is stated. Below it he is not rendered at all, and the shelf's inset is
+`.xchange-charon + .xchange-shelf`, so it follows whether he is there. Checked under
+`wrangler dev`: at 375x812 there is no request for either Charon file, and at 1600x950 his box
+and the coins' box match enodia.me to two decimal places. Crossing 1535 to 1536 wide without a
+reload removes him and brings him back. `src/ui/Exchange.test.tsx` holds three tests, and all
+three were seen failing against the old code. The portrait stays PNG: `build-lib.ps1` deletes
+any `.webp` in `characters/`, so WebP was left out on purpose. Measuring at the gate also
+showed its comment is out of date. At 96rem the 33rem inset leaves three card columns, not
+four. The gate is unchanged, and moving it is the owner's call.
+
 **Escape closes what is on top, 7 September 2026.** `src/ui/escape.ts` is `useEscape(active,
 close)`, on `document` because nothing here traps focus, and it stands aside for an Escape
 that `defaultPrevented` says something nearer the keyboard already answered. Wired into the

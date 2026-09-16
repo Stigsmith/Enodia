@@ -258,7 +258,8 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
       {/* Everything the shelf is, inset past him where he is drawn. The grid
         * alone was not enough: the scope line and the filter bar are full width
         * and sit above it, and at 1600x950 both crossed his box. Measured, not
-        * noticed. */}
+        * noticed. The inset is `.xchange-charon + .xchange-shelf`, so nothing
+        * goes between him and this. */}
       <div className="xchange-shelf">
       <Tabs tabs={SHELVES} open={shelf} onOpen={setShelf} label="Which shelf" />
 
@@ -620,6 +621,18 @@ function Relation({
 }
 
 /**
+ * Where there is room for Charon, and the only place the number is written.
+ *
+ * `CharonShop` renders nothing outside it, so this one query decides whether his
+ * portrait is fetched and, through `.xchange-charon + .xchange-shelf`, whether
+ * the shelf is inset to clear him. `builds.css` used to state it as well, and
+ * the two were answering different questions: the stylesheet decided whether
+ * he showed, after the markup had already decided that he loaded. The
+ * reasoning for 96rem is still written beside his rules in `builds.css`.
+ */
+const CHARON_ROOM = '(min-width: 96rem)'
+
+/**
  * Charon, standing at the foot of his own shop.
  *
  * The exchange was the build manager with a different list behind it: same
@@ -636,13 +649,35 @@ function Relation({
  * content fills its width has no free corner to put a figure in. Dora got a
  * `min-height` gate; that works there because the roadmap's columns end where
  * their content does. The exchange is a grid that fills, so the fix is to give
- * him room instead: `.xchange-grid` is inset by his width where he is drawn,
- * and he is not drawn where that inset would cost a card column.
+ * him room instead: `.xchange-shelf` is inset by his width whenever he is
+ * drawn, and he is not drawn where that inset would cost a card column.
+ *
+ * **Not drawn means not in the page at all.** The stylesheet used to hide him
+ * below 96rem while this rendered the portrait regardless, so every phone that
+ * opened the exchange downloaded `charon-shop.png`, 348 KB, and never showed
+ * it. Measured on enodia.me on 13 September 2026 at 375x812: requested, with
+ * `complete` true, `naturalWidth` 768 and the wrapper `display: none`. The coins
+ * never had the problem, because a background inside a hidden box is not
+ * fetched. `Exchange.test.tsx` pins it.
  *
  * `aria-hidden` and `pointer-events: none`. He is scenery, and a screen reader
  * announcing a decorative portrait between the filters and the shelf is noise.
  */
 function CharonShop() {
+  const [room, setRoom] = useState(() => window.matchMedia(CHARON_ROOM).matches)
+
+  useEffect(() => {
+    const query = window.matchMedia(CHARON_ROOM)
+    const sync = () => setRoom(query.matches)
+    // Once on subscribing, for a window that crossed the line between the first
+    // render and this effect.
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  if (!room) return null
+
   return (
     <div className="xchange-charon" aria-hidden="true">
       {/**
