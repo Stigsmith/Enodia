@@ -9681,89 +9681,100 @@ p.landing-say {
  * Roadmap and it spent a session covering text: a page whose content fills its
  * width has no free corner. Dora's answer was a `min-height` gate, which works
  * there because the roadmap's columns end where their content does. A grid
- * fills, so this reserves room instead and hides him where reserving it would
- * cost a card column.
+ * fills, so this reserves room instead and leaves him out where reserving it
+ * would cost a card column.
  *
  * 96rem, and that is the arithmetic rather than a guess. `.builds-grid` is
  * `repeat(auto-fill, minmax(14rem, 1fr))`; at 96rem the page holds five
  * columns, so taking 15rem for him leaves four. Below that it would leave
  * three, and a shelf is worth more than a portrait.
+ *
+ * **That arithmetic is out of date, measured on 15 September 2026.** It was
+ * written when he took 15rem, and the inset below is 33rem. At exactly 96rem,
+ * 1536 by 950 with the menu popped out, the page is 1312px wide, the shelf
+ * inside the inset is 720px, and that holds three card columns against five
+ * without him. Whether the gate should move is the owner's call, and it has not
+ * moved.
+ *
+ * **The number is not in this file.** It is `CHARON_ROOM` in `Exchange.tsx`,
+ * which renders him only where it matches, so none of these rules needs a
+ * media query: they apply exactly when he exists. This used to be
+ * `display: none` with the gate in a query while the component rendered the
+ * portrait anyway, and every phone that opened the exchange downloaded 348 KB
+ * it never showed.
  */
 .xchange-charon {
-  display: none;
+  position: fixed;
+  /* The owner's call, and the art agrees: he faces slightly left, so on the
+     right he looks into the shelf rather than out of the window. */
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  /* Scenery. Nothing here is clickable and nothing here should catch a drag
+     aimed at the shelf behind it. */
+  pointer-events: none;
 }
 
-@media (min-width: 96rem) {
-  .xchange-charon {
-    display: block;
-    position: fixed;
-    /* The owner's call, and the art agrees: he faces slightly left, so on the
-       right he looks into the shelf rather than out of the window. */
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    /* Scenery. Nothing here is clickable and nothing here should catch a drag
-       aimed at the shelf behind it. */
-    pointer-events: none;
-  }
-
-  .xchange-charon-art {
-    display: block;
-    /**
-     * Height, because a figure standing on an edge is sized by how tall it is.
-     * Capped against the viewport so a short window crops him further rather
-     * than pushing him up off the floor.
-     *
-     * **34rem and not the 47 he started at, and the difference is the shelf.**
-     * `charon-shop.png` is 768 by 760 and fully opaque to all four edges: the
-     * drawn box is the element box, so every pixel of his height is 1.01
-     * pixels of shelf given up. At 47rem he was 760 wide, over a fifth of a
-     * 1600px window taken back out of a list the owner wants twelve rows of.
-     * At 34rem he is 550, still 57% of a 950px window tall, which is what
-     * standing on the floor of a screen looks like.
-     */
-    height: min(34rem, 62dvh);
-    width: auto;
-    /* The file's own 768 by 760, stated so the wrapper has a width on the first
-       frame rather than after the image decodes. Without it the coins, which
-       are positioned as a percentage of that width, start at zero wide and
-       snap into place. */
-    aspect-ratio: 768 / 760;
-    /* He is behind a dark page and lit from behind in the art. Left at full
-       strength he reads as a second subject; this puts him where a painted
-       backdrop sits. */
-    opacity: 0.9;
-  }
-
+.xchange-charon-art {
+  display: block;
   /**
-   * The floor he stands on.
+   * Height, because a figure standing on an edge is sized by how tall it is.
+   * Capped against the viewport so a short window crops him further rather
+   * than pushing him up off the floor.
    *
-   * On the whole shelf rather than on the grid, and that was measured rather
-   * than assumed: with the inset on `.builds-grid` alone, no card touched him
-   * and the scope paragraph and the filter bar both did, because they are full
-   * width and sit above the cards.
+   * **34rem and not the 47 he started at, and the difference is the shelf.**
+   * `charon-shop.png` is 768 by 760 and fully opaque to all four edges: the
+   * drawn box is the element box, so every pixel of his height is 1.01
+   * pixels of shelf given up. At 47rem he was 760 wide, over a fifth of a
+   * 1600px window taken back out of a list the owner wants twelve rows of.
+   * At 34rem he is 550, still 57% of a 950px window tall, which is what
+   * standing on the floor of a screen looks like.
    */
-  .xchange-shelf {
-    /**
-     * **The number is his width minus how far the page stops short of the
-     * window**, and it is one value now for two reasons rather than one.
-     *
-     * He is fixed to the window's right edge; the shelf is inside a page that
-     * stops `--page-pad` short of it. So the inset that clears him is his
-     * rendered width less that padding, plus room to breathe. At his tallest,
-     * 34rem, he is 550px wide, and the page's padding is 48px above 100rem and
-     * 32px below it. 550 - 32 + 10 rounds to **33rem**, which covers the
-     * narrower padding and therefore both.
-     *
-     * The nav mode used to need its own number, when he stood on the left: a
-     * pinned pane sits on that side and the page starts 136px further right
-     * unpinned. On this side the pane is nowhere near him and the page's right
-     * edge lands in the same place either way. Checked at 1600x950 in both
-     * modes rather than reasoned about, because that is the mistake this
-     * comment exists to record.
-     */
-    padding-right: 33rem;
-  }
+  height: min(34rem, 62dvh);
+  width: auto;
+  /* The file's own 768 by 760, stated so the wrapper has a width on the first
+     frame rather than after the image decodes. Without it the coins, which
+     are positioned as a percentage of that width, start at zero wide and
+     snap into place. */
+  aspect-ratio: 768 / 760;
+  /* He is behind a dark page and lit from behind in the art. Left at full
+     strength he reads as a second subject; this puts him where a painted
+     backdrop sits. */
+  opacity: 0.9;
+}
+
+/**
+ * The floor he stands on.
+ *
+ * On the whole shelf rather than on the grid, and that was measured rather
+ * than assumed: with the inset on `.builds-grid` alone, no card touched him
+ * and the scope paragraph and the filter bar both did, because they are full
+ * width and sit above the cards.
+ *
+ * **Keyed on him being there**, which is what keeps the breakpoint written
+ * once: the shelf is inset exactly when he is drawn. That needs the shelf to
+ * follow him directly in `Exchange.tsx`, and `Exchange.test.tsx` checks it.
+ */
+.xchange-charon + .xchange-shelf {
+  /**
+   * **The number is his width minus how far the page stops short of the
+   * window**, and it is one value now for two reasons rather than one.
+   *
+   * He is fixed to the window's right edge; the shelf is inside a page that
+   * stops `--page-pad` short of it. So the inset that clears him is his
+   * rendered width less that padding, plus room to breathe. At his tallest,
+   * 34rem, he is 550px wide, and the page's padding is 48px above 100rem and
+   * 32px below it. 550 - 32 + 10 rounds to **33rem**, which covers the
+   * narrower padding and therefore both.
+   *
+   * The nav mode used to need its own number, when he stood on the left: a
+   * pinned pane sits on that side and the page starts 136px further right
+   * unpinned. On this side the pane is nowhere near him and the page's right
+   * edge lands in the same place either way. Checked at 1600x950 in both
+   * modes rather than reasoned about, because that is the mistake this
+   * comment exists to record.
+   */
+  padding-right: 33rem;
 }
 
 /**
