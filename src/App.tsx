@@ -28,7 +28,6 @@ import { Changelog, Roadmap, UnderHood } from './ui/Pages.tsx'
 import { Help } from './ui/Reference.tsx'
 import { Unbuilt } from './ui/Dora.tsx'
 import { Account, ResetPassword } from './ui/Account.tsx'
-import { Exchange } from './ui/Exchange.tsx'
 import { You } from './ui/You.tsx'
 import { Friends } from './ui/Friends.tsx'
 import { Leaderboards } from './ui/Leaderboards.tsx'
@@ -44,7 +43,8 @@ import { loadBuilds, saveBuild } from './state/builds.ts'
 import { SAMPLE_BUILDS } from './data/builds.ts'
 import { adviceFrom } from './ui/Offer.tsx'
 import type { ShownBuild } from './data/builds.ts'
-import { Builds } from './ui/Builds.tsx'
+import { BuildsScreen } from './ui/BuildsScreen.tsx'
+import type { BuildSide } from './state/prefs.ts'
 import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
 import { LiveRunProvider, OpenBuildProvider } from './ui/BuildMention.tsx'
@@ -141,6 +141,18 @@ export function App() {
     }
     return 'builds'
   })
+
+  /**
+   * Which side of Builds is showing, yours or everybody's.
+   *
+   * `ui/BuildsScreen.tsx` has the switch, and the menu and a mentioned build
+   * set it too. Stored, so Builds opens on the side it was left on.
+   */
+  const [side, setSide] = useState<BuildSide>(() => loadPrefs().buildSide ?? 'mine')
+  const chooseSide = useCallback((next: BuildSide) => {
+    setSide(next)
+    savePrefs({ ...loadPrefs(), buildSide: next })
+  }, [])
 
   /**
    * Somebody arriving from a password reset letter.
@@ -419,10 +431,12 @@ export function App() {
    * library, and a taken-down one says so.
    */
   const [reveal, setReveal] = useState<string | null>(null)
+  const clearReveal = useCallback(() => setReveal(null), [])
   const openBuild = useCallback((at: BuildAt) => {
     if ('local' in at) {
       if (wikiInUrl(window.location.pathname)) history.pushState(null, '', '/')
       setReveal(at.local)
+      chooseSide('mine')
       setView('builds')
       return
     }
@@ -515,8 +529,13 @@ export function App() {
       <Hecate />
       <Menu
         view={screen}
+        side={side}
         hasRun={Boolean(run)}
         onGo={go}
+        onBuilds={(next) => {
+          chooseSide(next)
+          go('builds')
+        }}
         onEndRun={endRun}
         onShowBriefing={run ? openBriefing : undefined}
       />
@@ -542,6 +561,7 @@ export function App() {
             saveBuild(received(arrived))
             setArrived(null)
             setLibraryAt((was) => was + 1)
+            chooseSide('mine')
             setView('builds')
           }}
           onDismiss={() => {
@@ -635,24 +655,10 @@ export function App() {
     )
   }
 
-  /**
-   * The exchange, which is no longer one of Dora's empty rooms.
-   *
-   * Above the `unbuilt` map on purpose: that map still lists the rooms that are
-   * genuinely empty, and leaving `exchange` in it with a branch above would be
-   * two places disagreeing about whether a thing exists.
-   */
-  if (screen === 'exchange') {
-    return frame(
-      <div className="shell is-wide">
-        <Exchange onGo={setView} />
-      </div>,
-    )
-  }
-
-  /* Above the `unbuilt` map for the same reason the exchange is: that map lists
-     the rooms that are genuinely empty, and a room with a branch above it is
-     not one of them. */
+  /* Above the `unbuilt` map on purpose: that map lists the rooms that are
+     genuinely empty, and a room with a branch above it is not one of them. The
+     exchange used to have a branch here too, and is everybody's side of Builds
+     now. */
   if (screen === 'leaderboards') {
     return frame(
       <div className="shell is-wide">
@@ -728,7 +734,16 @@ export function App() {
   if (screen === 'builds') {
     return frame(
       <div className="shell is-wide">
-        <Builds libraryAt={libraryAt} onGo={setView} reveal={reveal} onRevealed={() => setReveal(null)} />
+        <BuildsScreen
+          side={side}
+          onSide={chooseSide}
+          onGo={setView}
+          libraryAt={libraryAt}
+          onLibrary={() => setLibraryAt((was) => was + 1)}
+          reveal={reveal}
+          onRevealed={clearReveal}
+          signedIn={signedIn}
+        />
       </div>,
     )
   }

@@ -68,6 +68,10 @@ export const TOURS: Record<string, Step[]> = {
   builds: [
     { say: 'Everything you have made, as cards. This is the shelf.' },
     {
+      at: 'side-switch',
+      say: 'Yours on this side. Everybody else is on the other one, same cards and same filters.',
+    },
+    {
       at: 'builds-tools',
       say: 'Filters up here. Arm, aspect, which gods are in it. And the order they come in.',
     },
@@ -278,6 +282,17 @@ export const TOURS: Record<string, Step[]> = {
    * squatting from a Location. Reworded rather than escaped, which is the call
    * `Dora.tsx` made and the better one.
    */
+  /* Everybody's side of Builds. It borrowed the empty room's lines while it
+     was a screen of its own, which was a joke about a page with nothing on it
+     told on a page full of builds. */
+  exchange: [
+    { say: 'Everybody else’s builds. What they published, and what happened when people played them.' },
+    {
+      at: 'side-switch',
+      say: 'Yours are back on the other side of this.',
+    },
+  ],
+
   unbuilt: [
     { say: 'You pressed the help mark. On a page with nothing on it. To find out about the page with nothing on it.' },
     { at: 'unbuilt-dora', say: 'There is nothing here. Just me, and a hat I did not pick.' },

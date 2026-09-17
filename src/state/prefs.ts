@@ -40,6 +40,15 @@ export type BuildDetail = 'poster' | 'constellation'
  */
 export type BuildDensity = 'cards' | 'list'
 
+/**
+ * Which side of Builds is showing: yours, or everybody's.
+ *
+ * The build manager and the exchange were two screens drawing the same cards
+ * with a different list behind them. They are one screen now with a switch in
+ * its heading, and this is where the switch was left.
+ */
+export type BuildSide = 'mine' | 'all'
+
 export type Prefs = {
   version: number
   /**
@@ -62,6 +71,13 @@ export type Prefs = {
    * their answer and both screens obey it.
    */
   buildDensity?: BuildDensity
+  /**
+   * The side Builds opens on, which is the side it was last left on.
+   *
+   * Absent means yours. Builds is where the app opens, and somebody's first
+   * sight of it should be their own shelf, even while that shelf is empty.
+   */
+  buildSide?: BuildSide
   /**
    * Whether the "these live in this browser" warning has been read and dismissed.
    *
@@ -152,6 +168,7 @@ function migrate(stored: unknown): Prefs | null {
     ...(record.buildDensity === 'cards' || record.buildDensity === 'list'
       ? { buildDensity: record.buildDensity }
       : {}),
+    ...(record.buildSide === 'mine' || record.buildSide === 'all' ? { buildSide: record.buildSide } : {}),
     // Same reasoning as buildDetail above: absent in anything stored before the
     // warning existed, and absent means "not seen yet", which is the default.
     // No version bump for an additive field.

@@ -102,6 +102,189 @@
   color: var(--bone);
 }
 
+/* -------------------------------------------------------------------------
+ * BUILDS, BOTH SIDES
+ *
+ * `BuildsScreen.tsx` draws one heading over yours and everybody's, with the
+ * switch between them in it. The heading sits in its own `.builds` box so it
+ * lines up with both sides below; each side keeps its own box and loses the
+ * top padding the heading now stands in.
+ * ---------------------------------------------------------------------- */
+
+/* `clip` and not `hidden`: the side sliding in starts 1.5rem off its place,
+   which put a horizontal scrollbar on a phone for the length of the slide.
+   `clip` makes no scroll container, and a fixed Charon is not clipped by it. */
+.sides {
+  overflow-x: clip;
+}
+
+.builds.sides-head {
+  padding-bottom: 0;
+}
+
+.sides-pane > .builds:not(.is-detail),
+.sides-pane > .page {
+  padding-top: 0.6rem;
+}
+
+/* The row that belongs to your side alone: the line under the title and the
+   button that starts a build. The title moved up into the shared heading. */
+.builds-mine-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+/**
+ * The side coming into view, in the same beat as the switch's plate.
+ *
+ * `left` and not a transform, deliberately. A transform on an ancestor becomes
+ * the box a `position: fixed` descendant is placed against, and Charon is a
+ * fixed descendant of everybody's side: he would ride along with the page for
+ * the length of the slide and then jump back to the window's corner.
+ */
+.sides-pane {
+  position: relative;
+}
+
+.sides-pane.is-from-left {
+  animation: sides-from-left var(--t-response) var(--e-response);
+}
+
+.sides-pane.is-from-right {
+  animation: sides-from-right var(--t-response) var(--e-response);
+}
+
+@keyframes sides-from-left {
+  from {
+    left: -1.5rem;
+    opacity: 0;
+  }
+}
+
+@keyframes sides-from-right {
+  from {
+    left: 1.5rem;
+    opacity: 0;
+  }
+}
+
+/**
+ * The switch. Two halves of one pill, and a lit plate behind the side you are
+ * on that slides to the other when you press it.
+ *
+ * The halves are a two-column grid of equal tracks, so the plate is exactly
+ * half the inside and moving it by its own width lands it on the other half,
+ * whatever the labels say.
+ */
+.side-switch {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.2rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+}
+
+.side-switch-plate {
+  position: absolute;
+  z-index: -1;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  left: 0.2rem;
+  width: calc(50% - 0.2rem);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--lit) 24%, transparent);
+  box-shadow: inset 0 0 0 1px var(--lit-dim);
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.side-switch.is-right .side-switch-plate {
+  transform: translateX(100%);
+}
+
+.side-switch-half {
+  padding: 0.35rem 1.1rem;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--bone-faint);
+  font-family: var(--body);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--t-response) var(--e-response);
+}
+
+.side-switch-half:hover {
+  color: var(--bone-dim);
+}
+
+.side-switch-half[aria-pressed='true'] {
+  color: var(--bone);
+  cursor: default;
+}
+
+.side-switch-half:focus-visible {
+  outline: 2px solid var(--lit-hot);
+  outline-offset: -2px;
+}
+
+/* Under the title, the whole width, where there is no room beside it.
+ *
+ * The whole width of the page and not of the heading row: the row is inset on
+ * both sides to clear the menu button and the account corner, and on its own
+ * line the switch is already below both. Measured at 375 wide, the inset row
+ * left it 235px of 343. */
+@media (max-width: 59.99rem) {
+  .sides-top .side-switch {
+    display: grid;
+    flex: 0 0 calc(100% + var(--nav-inset) + var(--you-inset));
+    margin-left: calc(-1 * var(--nav-inset));
+    margin-right: calc(-1 * var(--you-inset));
+  }
+}
+
+/* Response tier: an instant change, not no change. Where the plate is says
+   which side you are on. */
+@media (prefers-reduced-motion: reduce) {
+  .side-switch-plate,
+  .side-switch-half {
+    transition: none;
+  }
+
+  .sides-pane.is-from-left,
+  .sides-pane.is-from-right {
+    animation: none;
+  }
+}
+
+/* Listings of yours with no build here. The bin's own shape, because it is the
+   same kind of thing: something that was yours, and a way back to it. */
+.builds-unheld-say {
+  margin: 0 0 0.5rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--bone-faint);
+}
+
+.builds-unheld ul + .builds-unheld-say {
+  margin: 0.6rem 0 0;
+  color: var(--lit-hot);
+}
+
+.builds-unheld-down,
+.builds-unheld-note {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
 .builds-back {
   padding: 0.3rem 0.75rem;
   border: 1px solid var(--div-3);

@@ -31,7 +31,6 @@ import type { View } from './nav.ts'
 
 /** Views that share a topic rather than owning one. */
 const ALIAS: Partial<Record<View, string>> = {
-  exchange: 'unbuilt',
   account: 'unbuilt',
   friends: 'unbuilt',
 }

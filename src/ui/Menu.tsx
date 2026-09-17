@@ -21,6 +21,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import type { BuildSide } from '../state/prefs.ts'
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
@@ -60,15 +61,21 @@ type Entry = {
 
 export function Menu({
   view,
+  side,
   hasRun,
   onGo,
+  onBuilds,
   onEndRun,
   onShowBriefing,
 }: {
   /** which screen is showing, so the menu can mark where you already are */
   view: View
+  /** which side of Builds is showing, for the same reason */
+  side: BuildSide
   hasRun: boolean
   onGo: (view: View) => void
+  /** Builds, on the side asked for */
+  onBuilds: (side: BuildSide) => void
   onEndRun: (outcome?: 'died' | 'finished') => void
   /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
   onShowBriefing?: () => void
@@ -138,11 +145,16 @@ export function Menu({
     {
       title: 'Builds',
       entries: [
+        /**
+         * Builds, which was the build manager, and the exchange is its other
+         * side now. Two rows into one screen until the exchange's row becomes
+         * Guides, so each row opens its own side and is marked on it.
+         */
         {
-          label: 'Build manager',
-          here: view === 'builds',
+          label: 'Builds',
+          here: view === 'builds' && side === 'mine',
           action: () => {
-            onGo('builds')
+            onBuilds('mine')
             leave()
           },
         },
@@ -177,9 +189,9 @@ export function Menu({
         },
         {
           label: 'Build exchange',
-          here: view === 'exchange',
+          here: view === 'builds' && side === 'all',
           action: () => {
-            onGo('exchange')
+            onBuilds('all')
             leave()
           },
         },

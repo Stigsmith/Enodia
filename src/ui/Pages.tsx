@@ -22,7 +22,12 @@ export function Page({
   measure,
   children,
 }: {
-  title: string
+  /**
+   * Absent on a page drawn under a heading it does not own: everybody's side
+   * of Builds, where `BuildsScreen` draws the title and the switch once for
+   * both sides.
+   */
+  title?: string
   standfirst: string
   /**
    * How wide the page is allowed to be. Absent is the 44rem reading measure.
@@ -48,9 +53,11 @@ export function Page({
 }) {
   return (
     <div className={`page${measure ? ` is-${measure}` : ''}`}>
-      <header className="builds-top">
-        <h2>{title}</h2>
-      </header>
+      {title ? (
+        <header className="builds-top">
+          <h2>{title}</h2>
+        </header>
+      ) : null}
       <p className="page-standfirst" data-tour="page-standfirst">{standfirst}</p>
       {children}
     </div>
