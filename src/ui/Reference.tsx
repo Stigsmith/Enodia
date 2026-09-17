@@ -201,6 +201,11 @@ export function Help() {
             </p>
             <figcaption>A mention, as it is drawn.</figcaption>
           </figure>
+          <p className="ref-say">
+            A build you published or follow can be named the same way, and so can any build whose
+            short link you paste. While you are logging a run, a named build carries how that run
+            stands with it, in the same words the run screen uses.
+          </p>
         </section>
 
         <section className="ref">
@@ -232,10 +237,12 @@ export function Help() {
           <h3 className="ref-rule">The exchange</h3>
           <dl className="ref-list">
             <div className="ref-item">
-              <dt>Four shelves</dt>
+              <dt>Two sides of Builds</dt>
               <dd>
-                Everything published, builds from people whose codes you swapped, your own listings,
-                and the ones you follow. The last two keep builds that have been taken down.
+                The switch at the top of Builds crosses between yours and everybody&rsquo;s. The
+                exchange has everything published and builds from people whose codes you swapped.
+                Your own listings and the builds you follow are on your side, with their counts on
+                their cards, taken-down ones included.
               </dd>
             </div>
             <div className="ref-item">

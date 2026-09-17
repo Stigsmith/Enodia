@@ -14,9 +14,10 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 771 in node across 45 files, and **153 inside workerd** against a real D1. `npm test` runs both |
-| **Validator** | 0 failures, 2 warnings, across 10 checks |
-| **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
+| **Tests** | 836 in node across 50 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
+| **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
+| **Guides** | **Under way on `worktree-guides`**, three of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, and the figures. The backend waits on two calls of the owner's. See the gap analysis below |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -486,6 +487,48 @@ Exit card when the build is the run's target; and the evidence filter needs one 
 
 **Recommended against:** a sectioned long-form editor, rich text, a `/` menu, a guide type, tier
 lists and staff verification.
+
+### Section 5 is superseded: collections became guides
+
+The analysis proposed **collections**, a named list of published builds with a note on each,
+deferred until notes and `@` mentions existed. They did from `6bf2695`. On 12 September the
+owner redirected it: a list of builds adds little over the All shelf and its filters, which is
+the argument that retired the curated shelf on 8 September. What is worth building is a
+**guide**, sectioned prose with builds named inside it. That reverses two of the verdicts above,
+a guide type and a sectioned editor, and the decision record for it waits on the moderation call
+below.
+
+**The reason to build it at all is run state.** A build named in a guide carries its live verdict
+during a run, so a guide reads differently at the fourth Exit than at the Crossroads. Without
+that it would be a wiki article.
+
+Where it stands, 17 September 2026, on the `worktree-guides` branch:
+
+1. ~~Build mentions with a live verdict.~~ **Done.** `b:` joins the mention kinds, keyed on the
+   short id. `src/state/mentioned.ts` finds the build, library first, and only a 404 or a
+   takedown reads as withdrawn; a 429 or an offline read draws the stored name. The run reaches a
+   mention through `LiveRunProvider`, because `useRun` is local state. **Found on the way:** the
+   2000 guard on a build's link has only held for How it works and If the run goes your way
+   written as words. Eight mentions at the front of those two fields reach 2022 with boons, which
+   the editor already allowed, and 2035 with builds. Whether to cap them is the owner's call
+2. ~~Builds, with the side switch.~~ **Done.** `src/ui/BuildsScreen.tsx`, one heading and one
+   switch over `Builds.tsx` and `Exchange.tsx`. The `exchange` view is gone, Mine and Followed
+   moved to your side as counts on the library's cards, and a listing whose build was deleted can
+   be put back from there with `reclaimListing`. The labels, Yours and The exchange, are
+   placeholders until the owner names them
+3. **The guide backend. Waits on two calls:** whether a listed guide ships with a hide column and
+   a report route, without them, or unlisted; and whether guides get likes beside saves
+4. **The Guides screen. Waits on the prompted sections**, which are proposed to the owner before
+   the editor is built
+5. **The seed guide, "How to beat the RNG". Waits on two names**: what the upgrade token and the
+   Hermes shrine are called on screen, so both can be traced in the scripts
+6. ~~Figures.~~ **Done.** Charon's phone download was fixed in `45670df`. Schelemeus stands on
+   your side of Builds and Odysseus on the Wiki, each with the game's own blink, in
+   `src/ui/Figures.tsx`. The pinned pane's width is `--pane-width` now, and a left-hand figure
+   stands at `--pane-left`. Odysseus is 457 KB of PNG and Schelemeus 330, both measured against
+   palette versions that showed rings or dither; `assets/README.md` has the numbers
+7. **The record.** This section, the roadmap entries, the changelog and Help are done; the
+   decision record and `REQUIREMENTS.md` 5 wait on the moderation call
 
 ---
 
