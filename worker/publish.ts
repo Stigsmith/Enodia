@@ -135,8 +135,9 @@ const ID_LENGTH = 10
  * A counter would let anybody walk every build ever published by adding one,
  * which turns an unlisted thing into a public feed that nobody designed and
  * nobody moderates. 57^10 is about 58 bits, so guessing one is not a strategy.
+ * Guides take their ids from here too, so the two kinds read alike.
  */
-function shortId(): string {
+export function shortId(): string {
   const bytes = new Uint8Array(ID_LENGTH)
   crypto.getRandomValues(bytes)
   let out = ''

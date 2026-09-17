@@ -212,6 +212,13 @@ the play experience cannot see.
   matters is true in node: no D1 binding, no `cf-connecting-ip`, no workerd. **Every backend
   bug so far was invisible to a type check and a green build**, so each of those is now a
   test that was proven to fail before it was kept
+- **Guides are moderated with SQL, on purpose.** `guide.hidden_at` is written by no route:
+  a moderator reads `guide_report` and sets the column with the statements at the top of
+  `worker/guides.ts`, so there is no moderator route or session to attack. A hidden guide
+  answers only its author. Do not add an admin route without the owner asking. Builds still
+  have no report and no hide; `REQUIREMENTS.md` 5 says why the two differ
+- **Reading a guide withholds a taken-down build's payload**, while `/api/b/<id>` keeps
+  serving it to followers. Both are deliberate, and `worker/guides.test.ts` pins the first
 - **`worker/schema.ts` is generated and `worker/schema-app.ts` is not.** Anything of ours
   put in the generated file survives until the next `npm run db:schema` and then vanishes
   without a word, taking the migration history's idea of reality with it. `drizzle.config.ts`

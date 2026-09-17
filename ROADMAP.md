@@ -14,10 +14,10 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 836 in node across 50 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 836 in node across 50 files, and **180 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
-| **Guides** | **Under way on `worktree-guides`**, three of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, and the figures. The backend waits on two calls of the owner's. See the gap analysis below |
+| **Guides** | **Under way on `worktree-guides`**, five of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the figures, and the record. The screen waits on the prompted sections, and the seed guide on two names. See the gap analysis below and `decisions/2026-09-13-guides.md` |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -495,8 +495,7 @@ deferred until notes and `@` mentions existed. They did from `6bf2695`. On 12 Se
 owner redirected it: a list of builds adds little over the All shelf and its filters, which is
 the argument that retired the curated shelf on 8 September. What is worth building is a
 **guide**, sectioned prose with builds named inside it. That reverses two of the verdicts above,
-a guide type and a sectioned editor, and the decision record for it waits on the moderation call
-below.
+a guide type and a sectioned editor. `decisions/2026-09-13-guides.md` is the record.
 
 **The reason to build it at all is run state.** A build named in a guide carries its live verdict
 during a run, so a guide reads differently at the fourth Exit than at the Crossroads. Without
@@ -516,8 +515,15 @@ Where it stands, 17 September 2026, on the `worktree-guides` branch:
    moved to your side as counts on the library's cards, and a listing whose build was deleted can
    be put back from there with `reclaimListing`. The labels, Yours and The exchange, are
    placeholders until the owner names them
-3. **The guide backend. Waits on two calls:** whether a listed guide ships with a hide column and
-   a report route, without them, or unlisted; and whether guides get likes beside saves
+3. ~~The guide backend.~~ **Done.** The owner chose listed, with a report and a hide, and saves
+   and likes. `worker/guides.ts` over four tables in `worker/schema-app.ts`: `guide`,
+   `guide_build`, `guide_stat` and `guide_report`, in `migrations/0012_serious_kylun.sql`.
+   Reading a guide returns every build it names in one response and **withholds the payload of
+   a build its author took down**. A report is stored and never returned; a hide is a column no
+   route writes, set with the statements in that file. Reads and lists count on the address,
+   publishing shares `publish` with builds, reports have their own rule at ten an hour.
+   `worker/guides.test.ts` holds 27 tests, and seven deliberate breaks each failed the one
+   written for it
 4. **The Guides screen. Waits on the prompted sections**, which are proposed to the owner before
    the editor is built
 5. **The seed guide, "How to beat the RNG". Waits on two names**: what the upgrade token and the
@@ -527,8 +533,9 @@ Where it stands, 17 September 2026, on the `worktree-guides` branch:
    `src/ui/Figures.tsx`. The pinned pane's width is `--pane-width` now, and a left-hand figure
    stands at `--pane-left`. Odysseus is 457 KB of PNG and Schelemeus 330, both measured against
    palette versions that showed rings or dither; `assets/README.md` has the numbers
-7. **The record.** This section, the roadmap entries, the changelog and Help are done; the
-   decision record and `REQUIREMENTS.md` 5 wait on the moderation call
+7. ~~The record.~~ **Done**, for what has shipped: this section, the roadmap entries, the
+   changelog, Help, `decisions/2026-09-13-guides.md`, and `REQUIREMENTS.md` 5, which records the
+   moderation answer as a reversal for guides only. The Guides screen will need its own entries
 
 ---
 
