@@ -35,7 +35,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { deleteBuild, duplicateBuild, emptyBin, loadBin, loadBuilds, restoreBuild, saveBuild } from '../state/builds.ts'
 import { linkFor } from '../state/transfer.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
-import { publishBuild, putBackBuild, republishBuild, takeDownBuild } from '../state/publish.ts'
+import { publishBuild, putBackBuild, reclaimListing, republishBuild, takeDownBuild } from '../state/publish.ts'
 import { cardImage } from './card-image.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
@@ -43,7 +43,9 @@ import { readName } from '../state/identity.ts'
 import type { BuildDetail } from '../state/prefs.ts'
 import type { View } from './nav.ts'
 import { BuildEditor } from './BuildEditor.tsx'
-import { acceptOffer, forkFollowed, republishChangesTheBuild } from '../state/exchange.ts'
+import { acceptOffer, forkFollowed, listShelf, republishChangesTheBuild } from '../state/exchange.ts'
+import type { Listed } from '../state/exchange.ts'
+import { Counted } from './Counted.tsx'
 import { declineOffer, loadOffers, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -77,6 +79,8 @@ export function Builds({
   libraryAt = 0,
   reveal = null,
   onRevealed,
+  signedIn = false,
+  onMode,
 }: {
   onClose?: () => void
   onGo?: (view: View) => void
@@ -89,6 +93,19 @@ export function Builds({
    */
   reveal?: string | null
   onRevealed?: () => void
+  /**
+   * Whether an account is behind this browser, which is what decides whether
+   * your listings are asked for. Signed out, the answer is a 401 every time,
+   * and each one is a metered Worker invocation.
+   */
+  signedIn?: boolean
+  /**
+   * Whether the shelf is showing, or one build or the editor is.
+   *
+   * `BuildsScreen` draws the heading and the side switch over the shelf, and a
+   * single build has a heading of its own with a way back.
+   */
+  onMode?: (mode: 'shelf' | 'build') => void
 }) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
@@ -142,6 +159,38 @@ export function Builds({
     setOpenId(reveal)
     onRevealed?.()
   }, [reveal, onRevealed])
+
+  /**
+   * Your listings and the ones you follow, for the counts on their cards.
+   *
+   * **These were two shelves on the exchange, Mine and Followed**, and both
+   * kinds of build were already here: a followed build is an ordinary build
+   * with `by: 'community'`, a published one carries `publishedAs`. What the
+   * shelves added was the counts, so the counts came here and the shelves went.
+   *
+   * Asked again whenever the library moves or a listing changes, and never
+   * while signed out.
+   */
+  const [listedAt, setListedAt] = useState(0)
+  const [yours, setYours] = useState<{ mine: Listed[]; followed: Listed[] }>({ mine: [], followed: [] })
+  useEffect(() => {
+    if (!signedIn) {
+      setYours({ mine: [], followed: [] })
+      return
+    }
+    let live = true
+    void Promise.all([listShelf('mine'), listShelf('followed')]).then(([mineListed, followedListed]) => {
+      if (live) setYours({ mine: mineListed, followed: followedListed })
+    })
+    return () => {
+      live = false
+    }
+  }, [signedIn, libraryAt, listedAt])
+
+  const relisted = () => {
+    setMine(loadBuilds())
+    setListedAt((was) => was + 1)
+  }
 
   /**
    * Cards or a list. Absent in prefs means nobody has chosen, and the library's
@@ -228,6 +277,39 @@ export function Builds({
   }, [library, selection, sort, query])
 
   const open = openId ? library.find((build) => build.id === openId) : null
+
+  /** Each build's listing, by the build's own id: yours by `publishedAs`, a followed one by `derivedFrom`. */
+  const listingFor = useMemo(() => {
+    const published = new Map(yours.mine.map((one) => [one.id, one] as const))
+    const following = new Map(yours.followed.map((one) => [one.id, one] as const))
+    const out = new Map<string, Listed>()
+    for (const one of mine) {
+      const listing = one.publishedAs
+        ? published.get(one.publishedAs)
+        : one.by === 'community' && one.derivedFrom
+          ? following.get(one.derivedFrom)
+          : undefined
+      if (listing) out.set(one.id, listing)
+    }
+    return out
+  }, [mine, yours])
+
+  /**
+   * Listings of yours that no build here is published as.
+   *
+   * The Mine shelf was the one place these showed, and a build deleted after
+   * it was published leaves exactly this: a listing still read by everybody
+   * following it, holding one of your slots, with nothing on your side that
+   * can replace it or take it down. `reconnectPublished` rejoins the ones whose
+   * picks match a build here; these are the ones it could not.
+   */
+  const unheld = useMemo(() => {
+    const claimed = new Set(mine.map((one) => one.publishedAs).filter(Boolean))
+    return yours.mine.filter((one) => !claimed.has(one.id))
+  }, [mine, yours])
+
+  const mode = editing || open ? 'build' : 'shelf'
+  useEffect(() => onMode?.(mode), [mode, onMode])
 
   if (editing) {
     return (
@@ -327,7 +409,7 @@ export function Builds({
             ) : null}
             <BuildMenu
               build={open}
-              onListed={() => setMine(loadBuilds())}
+              onListed={relisted}
               onDuplicate={() => {
                 const { builds, copy } = duplicateBuild(open)
                 setMine(builds)
@@ -451,13 +533,14 @@ export function Builds({
 
   return (
     <div className="builds">
-      <header className="builds-top">
+      {/* No title here: `BuildsScreen` draws it, with the side switch, above
+        * both sides. This row is what belongs to your side alone. */}
+      <header className="builds-top builds-mine-top">
         {onClose ? (
           <button type="button" className="builds-back" onClick={onClose}>
             Back
           </button>
         ) : null}
-        <h2>Builds</h2>
         <p className="builds-note">
           {library.length
             ? 'Pick an arm, or open one to see how it works.'
@@ -495,6 +578,8 @@ export function Builds({
           </button>
         </p>
       ) : null}
+
+      {unheld.length ? <Unheld listings={unheld} bin={bin} onBack={relisted} /> : null}
 
       {bin.length ? (
         <p className="builds-binline">
@@ -614,7 +699,13 @@ export function Builds({
               * The grid is most of the viewport, which leaves Dora nowhere to
               * stand outside the thing she is describing, and she is describing
               * one card's reading anyway. */
-            <Card key={build.id} built={assemble(build)} onOpen={setOpenId} first={at === 0} />
+            <Card
+              key={build.id}
+              built={assemble(build)}
+              onOpen={setOpenId}
+              first={at === 0}
+              foot={<ListingFoot build={build} listing={listingFor.get(build.id)} />}
+            />
           ))}
         </ul>
       ) : library.length === 0 ? (
@@ -632,6 +723,112 @@ export function Builds({
 
       {library.length ? <SampleTag full /> : null}
     </div>
+  )
+}
+
+/**
+ * What a card on your side says about its listing, when it has one.
+ *
+ * The counts the Mine and Followed shelves used to show, and whether the
+ * listing is off the shelves, which only those shelves could say. Nothing at
+ * all for a build with no listing, or one nobody has touched, because a row of
+ * zeroes reads as a verdict.
+ */
+function ListingFoot({ build, listing }: { build: ShownBuild; listing: Listed | undefined }) {
+  if (!listing) return null
+  const { stats, before, takenDown } = listing
+  const counted = stats.takes > 0 || stats.runs > 0 || stats.raters > 0 || stats.bestFear !== null || Boolean(before)
+  if (!counted && !takenDown) return null
+  return (
+    <div className="xchange-foot">
+      <Counted stats={stats} {...(before ? { before } : {})} />
+      {takenDown ? (
+        <p className="xchange-down">
+          {build.by === 'community'
+            ? 'Its author took it off the shelves. It stays in your builds.'
+            : 'Off the shelves. The link still works and anybody following it keeps it.'}
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+/**
+ * Listings of yours with no build here, and the way back to each.
+ *
+ * Mentioned only when there are some, as the bin is. A listing whose build is
+ * in the bin says so rather than offering a second way back, because putting
+ * the binned one back keeps what you changed after publishing, and the
+ * published version is older.
+ */
+function Unheld({
+  listings,
+  bin,
+  onBack,
+}: {
+  listings: Listed[]
+  bin: readonly ShownBuild[]
+  onBack: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [said, setSaid] = useState<string | null>(null)
+  const [working, setWorking] = useState<string | null>(null)
+  const binned = new Set(bin.map((one) => one.publishedAs).filter(Boolean))
+
+  return (
+    <>
+      <p className="builds-binline builds-unheld-line">
+        <button type="button" aria-expanded={open} onClick={() => setOpen((was) => !was)}>
+          {open
+            ? 'Hide them'
+            : listings.length === 1
+              ? 'One of your listings has no build here'
+              : `${listings.length} of your listings have no build here`}
+        </button>
+      </p>
+      {open ? (
+        <section className="builds-bin builds-unheld" aria-label="Listings with no build here">
+          <p className="builds-unheld-say">
+            Published, and still read by anybody following them, but not in this library, so
+            nothing here can replace them or take them down.
+          </p>
+          <ul>
+            {listings.map((one) => (
+              <li key={one.id}>
+                <span className="builds-bin-name">
+                  {one.build.name || 'Untitled build'}
+                  {one.takenDown ? <span className="builds-unheld-down"> off the shelves</span> : null}
+                </span>
+                {binned.has(one.id) ? (
+                  <span className="builds-unheld-note">In the bin</span>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={working !== null}
+                    onClick={() => {
+                      setWorking(one.id)
+                      setSaid(null)
+                      void reclaimListing(one.id).then((outcome) => {
+                        setWorking(null)
+                        setSaid(outcome.ok ? `${outcome.build.name} is back in your builds.` : outcome.say)
+                        if (outcome.ok) onBack()
+                      })
+                    }}
+                  >
+                    {working === one.id ? 'One moment' : 'Put it back'}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+          {said ? (
+            <p className="builds-unheld-say" role="status">
+              {said}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+    </>
   )
 }
 

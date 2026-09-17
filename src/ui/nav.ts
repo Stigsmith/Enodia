@@ -77,8 +77,10 @@ export type View =
    * now, onto a page holding a phase marker and Dora in a hard hat. Nothing
    * pretends the feature is closer than it is; "not yet" is just somewhere you
    * can walk into.
+   *
+   * The exchange was one of them, then a screen of its own, and is now the
+   * other side of `builds`, so it has no view.
    */
-  | 'exchange'
   | 'account'
   | 'friends'
   | 'leaderboards'

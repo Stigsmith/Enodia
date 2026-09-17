@@ -37,15 +37,22 @@
  * named the same thing. A listing now says whether it is yours, and following
  * twice is following once.
  *
- * ## Four shelves
+ * ## Two shelves, and the other two moved to your side
  *
- * **All**, everything published. **From friends**, the people whose codes you
- * swapped. **Mine**, your own listings including any you took down. And
- * **Followed**, the builds you took up, including ones their authors withdrew.
+ * **All**, everything published, and **From friends**, the people whose codes
+ * you swapped.
  *
- * It used to be two, Picked and From friends, on the argument that both had
- * passed a human before they were listed. What that missed is that it left your
- * own builds on no shelf: the owner published nine and saw one.
+ * There were four. **Mine** and **Followed** held your own listings and the
+ * builds you took up, and both kinds were already in your library: a followed
+ * build is an ordinary build with `by: 'community'`, and a published one carries
+ * `publishedAs`. So they were the library a second time with counts on it. This
+ * is everybody's side of Builds now, `BuildsScreen.tsx` has the switch, and the
+ * counts went onto the library's own cards. A listing of yours whose build is
+ * no longer in the library is listed there too, with a way to bring it back.
+ *
+ * Before that it was two, Picked and From friends, on the argument that both
+ * had passed a human before they were listed. What that missed is that it left
+ * your own builds on no shelf: the owner published nine and saw one.
  *
  * **The curated shelf is gone entirely**, table and route and owner gate. It
  * was the default and the only thing a stranger could see, which made sense
@@ -59,10 +66,12 @@ import { clearedByAnother, followBuild, listShelf } from '../state/exchange.ts'
 import { loadBuilds } from '../state/builds.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
 import type { BuildDensity } from '../state/prefs.ts'
-import type { Before, Listed, Shelf, Stats } from '../state/exchange.ts'
+import type { Listed } from '../state/exchange.ts'
 import { ACCOUNTS_LIVE } from '../state/account.ts'
+import { reclaimListing } from '../state/publish.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { BuildFilters } from './BuildFilters.tsx'
+import { Counted } from './Counted.tsx'
 import { Card } from './variants/Card.tsx'
 import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
@@ -74,23 +83,28 @@ import { Prose } from './Prose.tsx'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
 
+type Everybody = 'all' | 'friends'
+
 const SHELVES = [
   { id: 'all' as const, label: 'All' },
   { id: 'friends' as const, label: 'From friends' },
-  { id: 'mine' as const, label: 'Mine' },
-  { id: 'followed' as const, label: 'Followed' },
 ]
 
 /** One line per shelf, saying what you are looking at rather than why. */
-const SCOPE: Record<Shelf, string> = {
+const SCOPE: Record<Everybody, string> = {
   all: 'Everything anybody has published and not taken back down.',
   friends: 'Published by the people whose codes you swapped.',
-  mine: 'Your own listings. Ones you have taken down are still here.',
-  followed: 'Builds you took up. Ones the author withdrew are still here.',
 }
 
-export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'friends') => void }) {
-  const [shelf, setShelf] = useState<Shelf>('all')
+export function Exchange({
+  onGo,
+  onReclaimed,
+}: {
+  onGo?: (view: 'account' | 'friends') => void
+  /** a listing of yours was put back in the library, which the other side has to re-read */
+  onReclaimed?: () => void
+}) {
+  const [shelf, setShelf] = useState<Everybody>('all')
   const [listed, setListed] = useState<Listed[] | null>(null)
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
@@ -214,13 +228,30 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
    * build and the library is where builds live. Recomputed whenever `said`
    * changes, which is what following sets.
    */
-  const followed = useMemo(() => {
-    const ids = new Set<string>()
+  const { followed, held } = useMemo(() => {
+    const following = new Set<string>()
+    const published = new Set<string>()
     for (const one of loadBuilds()) {
-      if (one.by === 'community' && one.derivedFrom) ids.add(one.derivedFrom)
+      if (one.by === 'community' && one.derivedFrom) following.add(one.derivedFrom)
+      if (one.publishedAs) published.add(one.publishedAs)
     }
-    return ids
+    return { followed: following, held: published }
   }, [said])
+
+  /**
+   * A listing of yours whose build is not in this library, put back in it.
+   *
+   * The All shelf is where somebody who deleted a build and emptied the bin
+   * would still see its listing, and it used to tell them "It is already in
+   * your builds", which was then false.
+   */
+  const reclaim = async (listing: Listed) => {
+    setSaid(null)
+    setReading(null)
+    const outcome = await reclaimListing(listing.id)
+    setSaid(outcome.ok ? `${outcome.build.name} is back in your builds.` : outcome.say)
+    if (outcome.ok) onReclaimed?.()
+  }
 
   /**
    * Follow one, which is what this screen offers instead of a copy.
@@ -249,11 +280,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   }
 
   return (
-    <Page
-      measure="shelf"
-      title="Build exchange"
-      standfirst="Builds other people published, and what happened when people played them."
-    >
+    /* A page with no title of its own: `BuildsScreen` draws the heading, and
+       the switch in it, above both sides. */
+    <Page measure="shelf" standfirst="Builds other people published, and what happened when people played them.">
       <CharonShop />
       {/* Everything the shelf is, inset past him where he is drawn. The grid
         * alone was not enough: the scope line and the filter bar are full width
@@ -326,7 +355,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                           <Relation
                             listing={listing}
                             following={followed.has(listing.id)}
+                            held={held.has(listing.id)}
                             onFollow={() => void follow(build)}
+                            onReclaim={() => void reclaim(listing)}
                           />
                         </div>
                       ) : null
@@ -396,7 +427,9 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
                 <Relation
                   listing={readingRow}
                   following={followed.has(readingRow.id)}
+                  held={held.has(readingRow.id)}
                   onFollow={() => void follow(readingRow.build)}
+                  onReclaim={() => void reclaim(readingRow)}
                 />
                 <button type="button" className="quiet" onClick={() => setReading(null)}>
                   Close
@@ -411,146 +444,14 @@ export function Exchange({ onGo }: { onGo?: (view: 'account' | 'builds' | 'frien
   )
 }
 
-/**
- * What happened when people played this, as counts.
- *
- * **Every number here is a tally and none of them is combined.** Runs beside
- * clears rather than a percentage on its own, because "38 of 61" carries how
- * much evidence there is and "62%" does not. The rating carries its own count
- * for the same reason: an average of two is a different thing from an average of
- * two hundred and a reader has to be able to tell them apart.
- *
- * Draws nothing at all for a build nobody has touched, which on a new shelf is
- * every build. A row of zeroes reads as a verdict.
- */
-function Counted({ stats, before }: { stats: Stats; before?: Before }) {
-  const anything =
-    stats.takes > 0 || stats.runs > 0 || stats.raters > 0 || stats.bestFear !== null
-  if (!anything && !before) return null
-
-  return (
-    <>
-      {anything ? (
-        <Tally stats={stats} />
-      ) : (
-        /**
-         * **A build whose counts reset must not read as one nobody has touched.**
-         *
-         * With no current counts `Tally` draws nothing, which is right for a
-         * build nobody has played and wrong for one whose author replaced the
-         * picks: those look identical, and on the shelf in list view, where the
-         * old counts are not drawn at all, that was the only thing on screen.
-         * One line, on the row rather than under it, so it costs no height.
-         */
-        <p className="xchange-counts xchange-fresh">
-          Nothing logged since the author changed this build
-        </p>
-      )}
-      {/**
-        * What the build earned before its author changed it.
-        *
-        * Kept rather than thrown away, and kept apart rather than added in. Four
-        * stars from forty people is a claim about the picks those forty played,
-        * and once the author replaces the picks it stops being a claim about
-        * this build. Deleting it would lose real evidence; folding it in would
-        * quietly transfer it. So it is shown, quieter, and said to be old.
-        *
-        * No player count and no follows in here: see `Before`. Players folded
-        * across versions would count somebody who played both of them twice,
-        * and a follow is about the listing rather than a version, so it stays
-        * on the current line and is never repeated down here.
-        */}
-      {before ? (
-        <p className="xchange-was">
-          Before the author changed this build:{' '}
-          <Tally stats={{ ...before, players: 0, takes: 0 }} bare />
-        </p>
-      ) : null}
-    </>
-  )
-}
-
-/** One set of counts, current or old. */
-function Tally({ stats, bare }: { stats: Stats; bare?: boolean }) {
-  return (
-    <p className="xchange-counts">
-      {/* One coin, and none on the quieter line for the old counts. `bare` was
-          added around the existing image rather than replacing it, so it drew
-          two here and one there: the inverse of what the flag means. */}
-      {bare ? null : (
-        <img className="xchange-coin" src="/shell/coins.png" alt="" aria-hidden="true" />
-      )}
-      {/* "Taken" was the copy era's word for it. The row records somebody
-        * adding this build to their library from this listing, which is what
-        * following is; the rows written before following existed are the same
-        * act under the older name. */}
-      {stats.takes ? <span>Followed by {stats.takes}</span> : null}
-      {stats.runs ? (
-        <span>
-          {stats.clears} of {stats.runs} cleared
-          {stats.players > 1 ? `, ${stats.players} people` : null}
-        </span>
-      ) : null}
-      {stats.bestFear ? <span>Best Fear {stats.bestFear}</span> : null}
-      {/* Never the average on its own. `raters` is not a footnote to it: two
-        * people saying four is a different claim from two hundred saying four,
-        * and a bare 4.0 hides which one you are reading. */}
-      {stats.rating !== null ? (
-        <span>
-          ★ {stats.rating.toFixed(1)} from {stats.raters}{' '}
-          {stats.raters === 1 ? 'player' : 'players'}
-        </span>
-      ) : null}
-    </p>
-  )
-}
-
 /** Each shelf is empty for its own reason, and the reason is what to say. */
-function Empty({
-  shelf,
-  onGo,
-}: {
-  shelf: Shelf
-  onGo?: (view: 'account' | 'builds' | 'friends') => void
-}) {
-  if (shelf === 'followed') {
-    return (
-      <div>
-        <p className="ref-say">
-          You are not following anything yet. Following a build from one of the other shelves
-          puts it in your library and keeps it up to date with what its author does next.
-        </p>
-        {ACCOUNTS_LIVE && onGo ? (
-          <button type="button" className="quiet" onClick={() => onGo('builds')}>
-            Go to your builds
-          </button>
-        ) : null}
-      </div>
-    )
-  }
-
+function Empty({ shelf, onGo }: { shelf: Everybody; onGo?: (view: 'account' | 'friends') => void }) {
   if (shelf === 'all') {
     return (
       <p className="ref-say">
         Nothing published yet. This shelf holds every build anybody has published and not taken
         back down.
       </p>
-    )
-  }
-
-  if (shelf === 'mine') {
-    return (
-      <div>
-        <p className="ref-say">
-          You have not published anything yet. Publishing a build gives it a short link and puts
-          it here, and it stays yours to replace or take back down.
-        </p>
-        {ACCOUNTS_LIVE && onGo ? (
-          <button type="button" className="quiet" onClick={() => onGo('builds')}>
-            Go to your builds
-          </button>
-        ) : null}
-      </div>
     )
   }
 
@@ -570,41 +471,48 @@ function Empty({
 }
 
 /**
- * What you can do with a listing: follow it, or nothing, because it is yours.
+ * What you can do with a listing: follow it, bring it back, or nothing,
+ * because it is yours and you have it.
  *
- * Three states and one of them used to be impossible to express. The worker
- * never told the screen whose build a listing was, so it offered "Take a copy"
- * on the reader's own builds and the owner duly took copies of their own, and
- * then copies of those. A listing carries `mine` now, a boolean computed in the
+ * One of these states used to be impossible to express. The worker never told
+ * the screen whose build a listing was, so it offered "Take a copy" on the
+ * reader's own builds and the owner duly took copies of their own, and then
+ * copies of those. A listing carries `mine` now, a boolean computed in the
  * worker against a session it never sends back.
+ *
+ * **Yours is two states, and it said one.** "It is already in your builds" was
+ * printed for every listing of yours, including one whose build had been
+ * deleted and the bin emptied, where the listing is the only copy left. `held`
+ * is whether the library has a build published as this listing.
+ *
+ * There is no taken-down branch any more. Only the Mine shelf returned those
+ * rows, and it moved to your side of Builds.
  */
 function Relation({
   listing,
   following,
+  held,
   onFollow,
+  onReclaim,
 }: {
   listing: Listed
   following: boolean
+  held: boolean
   onFollow: () => void
+  onReclaim: () => void
 }) {
-  /**
-   * Off the shelves, which only the Mine shelf can say.
-   *
-   * Every other query filters these rows out, so `takenDown` is absent there
-   * rather than false and this branch cannot fire by accident. It comes first
-   * because it is the more useful fact: "yours" is true of every row on that
-   * shelf and tells you nothing, while this one tells you why a listing you
-   * remember publishing is not on the other shelves.
-   */
-  if (listing.takenDown) {
-    return (
-      <p className="xchange-down">
-        Off the shelves. The link still works and anybody following it keeps it.
-      </p>
-    )
+  if (listing.mine && held) {
+    return <p className="xchange-yours">This one is yours. It is in your builds.</p>
   }
   if (listing.mine) {
-    return <p className="xchange-yours">This one is yours. It is already in your builds.</p>
+    return (
+      <p className="xchange-yours">
+        This one is yours, and its build is not in your builds.{' '}
+        <button type="button" className="quiet xchange-take" onClick={onReclaim}>
+          Put it back
+        </button>
+      </p>
+    )
   }
   if (following) {
     return (

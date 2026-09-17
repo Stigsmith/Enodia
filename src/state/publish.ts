@@ -22,11 +22,11 @@
  * here for exactly this reason.
  */
 
-import type { ShownBuild } from '../data/builds.ts'
-import { loadBuilds, saveBuild } from './builds.ts'
+import type { SavedBuild, ShownBuild } from '../data/builds.ts'
+import { loadBin, loadBuilds, newBuildId, saveBuild } from './builds.ts'
 import { fingerprint, shapeOf } from './exchange.ts'
 import { facetsOf } from './facets.ts'
-import { packBuild, unpackBuild } from './transfer.ts'
+import { packBuild, received, unpackBuild } from './transfer.ts'
 
 /**
  * One of your listings, as `worker/publish.ts listMine` returns it.
@@ -253,6 +253,47 @@ export async function openPublished(id: string): Promise<Opened | null> {
  * quiet.
  */
 export type Opened = { build: ShownBuild; takenDown: boolean }
+
+/**
+ * Put a listing of yours back in the library, when its build is not there.
+ *
+ * **The way back for a build you deleted after publishing.** The listing keeps
+ * going on the server, holding one of your slots and read by everybody
+ * following it, and once the bin was emptied nothing on your side named it:
+ * the Mine shelf did, and that shelf is now your side of Builds. This reads the
+ * published version and writes it as yours, stamped as that listing, so
+ * Replace and Take it down work on it again.
+ *
+ * The published version is what comes back, not what you last had, which is
+ * the only version anywhere to be had. A build still in the bin is refused,
+ * because putting that one back keeps whatever you changed after publishing.
+ */
+export async function reclaimListing(
+  id: string,
+): Promise<{ ok: true; build: SavedBuild } | { ok: false; say: string }> {
+  if (loadBuilds().some((one) => one.publishedAs === id)) {
+    return { ok: false, say: 'That build is already in your builds.' }
+  }
+  if (loadBin().some((one) => one.publishedAs === id)) {
+    return { ok: false, say: 'That build is in the bin. Put it back from there to keep your own version.' }
+  }
+  const opened = await openPublished(id)
+  if (!opened) return { ok: false, say: 'That did not work. The listing could not be read.' }
+  const taken = loadBuilds().some((one) => one.id === opened.build.id)
+  const base = received(opened.build)
+  const build: SavedBuild = {
+    ...base,
+    // A build already here under the same id is a different build now, and
+    // writing over it would lose it.
+    id: taken ? newBuildId() : base.id,
+    by: 'owner',
+    publishedAs: id,
+    publishedHash: fingerprint(shapeOf(opened.build)),
+    publishedDown: opened.takenDown,
+  }
+  saveBuild(build)
+  return { ok: true, build }
+}
 
 /**
  * Reconnect listings to the builds they were published from.

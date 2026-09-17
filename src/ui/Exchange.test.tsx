@@ -19,6 +19,9 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FIRST_BUILD } from '../data/builds.fixture.ts'
+import { saveBuild } from '../state/builds.ts'
+import { packBuild } from '../state/transfer.ts'
 import { Exchange } from './Exchange.tsx'
 
 const CSS = readFileSync(join(import.meta.dirname, 'builds.css'), 'utf8')
@@ -102,5 +105,44 @@ describe('Charon in the exchange', () => {
 
     act(() => size.narrow())
     expect(charon()).toBeNull()
+  })
+})
+
+/**
+ * A listing of yours on the All shelf.
+ *
+ * It said "It is already in your builds" whatever the library held, so a build
+ * deleted after publishing, with the bin emptied, was described as present
+ * while its listing was the only copy left.
+ */
+describe('a listing of yours', () => {
+  async function shelfWith(held: boolean) {
+    aWindow(false)
+    window.localStorage.clear()
+    if (held) saveBuild({ ...FIRST_BUILD, id: 'mine-1', by: 'owner', publishedAs: 'KmUkC9VotY' })
+    const payload = await packBuild({ ...FIRST_BUILD, id: 'mine-1', by: 'owner' })
+    const row = {
+      id: 'KmUkC9VotY',
+      name: 'My Listing',
+      payload,
+      by: 'Owner',
+      createdAt: 0,
+      mine: true,
+      stats: { takes: 0, players: 0, runs: 0, clears: 0, bestFear: null, rating: null, raters: 0 },
+    }
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ builds: [row] }), { status: 200 })))
+    const view = render(<Exchange />)
+    await view.findByText('My Listing')
+  }
+
+  it('says so when its build is in your builds', async () => {
+    await shelfWith(true)
+    expect(document.querySelector('.xchange-yours')?.textContent).toBe('This one is yours. It is in your builds.')
+  })
+
+  it('offers it back when its build is not', async () => {
+    await shelfWith(false)
+    expect(document.querySelector('.xchange-yours')?.textContent).toMatch(/not in your builds/)
+    expect(document.querySelector('.xchange-yours button')?.textContent).toBe('Put it back')
   })
 })

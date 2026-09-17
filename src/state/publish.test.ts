@@ -273,3 +273,85 @@ describe('the shape a listing goes up as', () => {
     expect(loadBuilds()[0]?.publishedHash).toBe(sent.shape)
   })
 })
+
+/**
+ * The way back for a listing whose build is not in the library.
+ *
+ * The Mine shelf was where these showed, and it moved to your side of Builds.
+ * What has to hold is that the build comes back as yours and stamped as that
+ * listing, so Replace and Take it down work on it again, and that nothing
+ * already here is written over on the way.
+ */
+describe('putting a listing of yours back in the library', () => {
+  const reclaim = async (id: string) => (await import('./publish.ts')).reclaimListing(id)
+
+  it('writes the published version as yours, stamped as the listing', async () => {
+    const published = mine({ id: 'mine-gone', name: 'Gone Build' })
+    shelve([])
+    stubServer([], { KmUkC9VotY: await packBuild(published) })
+
+    const outcome = await reclaim('KmUkC9VotY')
+
+    expect(outcome.ok).toBe(true)
+    const back = loadBuilds()[0]!
+    expect(back).toMatchObject({ id: 'mine-gone', by: 'owner', publishedAs: 'KmUkC9VotY', publishedDown: false })
+    expect(back.publishedHash).toBe(fingerprint(shapeOf(published)))
+  })
+
+  it('remembers that the listing is off the shelves', async () => {
+    shelve([])
+    const payload = await packBuild(mine({ id: 'mine-gone' }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ payload, name: 'X', revision: 0, takenDown: true }), { status: 200 }),
+      ),
+    )
+    await reclaim('KmUkC9VotY')
+    expect(loadBuilds()[0]?.publishedDown).toBe(true)
+  })
+
+  it('gives it a new id rather than writing over a build that has its old one', async () => {
+    shelve([mine({ id: 'mine-gone', name: 'Something else entirely' })])
+    stubServer([], { KmUkC9VotY: await packBuild(mine({ id: 'mine-gone', name: 'Gone Build' })) })
+
+    await reclaim('KmUkC9VotY')
+
+    const after = loadBuilds()
+    expect(after).toHaveLength(2)
+    expect(after.find((one) => one.id === 'mine-gone')?.name).toBe('Something else entirely')
+    expect(after.find((one) => one.publishedAs === 'KmUkC9VotY')?.id).not.toBe('mine-gone')
+  })
+
+  it('refuses a listing a build here is already published as', async () => {
+    shelve([mine({ publishedAs: 'KmUkC9VotY' })])
+    const fetched = vi.fn()
+    vi.stubGlobal('fetch', fetched)
+    expect(await reclaim('KmUkC9VotY')).toMatchObject({ ok: false })
+    expect(fetched).not.toHaveBeenCalled()
+  })
+
+  /* Putting the binned build back keeps whatever changed after publishing,
+     and the published version is older, so the bin is the way back. */
+  it('points at the bin when the build is in it', async () => {
+    shelve([])
+    window.localStorage.setItem(
+      'enodia.bin',
+      JSON.stringify({
+        version: 1,
+        builds: [{ ...mine({ publishedAs: 'KmUkC9VotY' }), binnedAt: '2026-09-02T00:00:00.000Z' }],
+      }),
+    )
+    const outcome = await reclaim('KmUkC9VotY')
+    expect(outcome.ok ? '' : outcome.say).toMatch(/bin/)
+    expect(loadBuilds()).toHaveLength(0)
+  })
+
+  it('writes nothing when the listing cannot be read', async () => {
+    shelve([])
+    stubServer([], {})
+    expect(await reclaim('KmUkC9VotY')).toMatchObject({ ok: false })
+    expect(loadBuilds()).toHaveLength(0)
+  })
+})
