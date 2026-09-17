@@ -136,8 +136,7 @@ describe('the two sides', () => {
     expect(panes()).toHaveLength(1)
 
     await act(async () => half('The exchange').click())
-    await settle()
-    expect(asked.filter((one) => one === '/api/exchange')).toHaveLength(1)
+    await vi.waitFor(() => expect(asked.filter((one) => one === '/api/exchange')).toHaveLength(1))
   })
 
   it('keeps the side not showing as it was, hidden rather than gone', async () => {
@@ -162,9 +161,8 @@ describe('the two sides', () => {
   it('opens on everybody’s side when that is where it was left', async () => {
     aServer({ '/api/exchange': [] })
     render(<Screen start="all" />)
-    await settle()
     expect(half('The exchange').getAttribute('aria-pressed')).toBe('true')
-    expect(panes().find((one) => !one.hidden)?.textContent).toContain('Nothing published yet')
+    await vi.waitFor(() => expect(panes().find((one) => !one.hidden)?.textContent).toContain('Nothing published yet'))
   })
 })
 
@@ -187,9 +185,10 @@ describe('your listings, on your side', () => {
       '/api/exchange/followed': [],
     })
     render(<Screen signedIn />)
-    await settle()
-    const card = [...document.querySelectorAll('.bcard')].find((one) => one.textContent?.includes('Listed Build'))
-    expect(card?.querySelector('.xchange-counts')?.textContent).toContain('3 of 5 cleared')
+    await vi.waitFor(() => {
+      const card = [...document.querySelectorAll('.bcard')].find((one) => one.textContent?.includes('Listed Build'))
+      expect(card?.querySelector('.xchange-counts')?.textContent).toContain('3 of 5 cleared')
+    })
   })
 
   it('says a listing is off the shelves on its card', async () => {
@@ -199,8 +198,9 @@ describe('your listings, on your side', () => {
       '/api/exchange/followed': [],
     })
     render(<Screen signedIn />)
-    await settle()
-    expect(document.querySelector('.bcard .xchange-down')?.textContent).toMatch(/^Off the shelves/)
+    await vi.waitFor(() =>
+      expect(document.querySelector('.bcard .xchange-down')?.textContent).toMatch(/^Off the shelves/),
+    )
   })
 
   it('offers back a listing whose build is not in the library', async () => {
@@ -213,9 +213,12 @@ describe('your listings, on your side', () => {
       '/api/exchange/followed': [],
     })
     render(<Screen signedIn />)
-    await settle()
+    await vi.waitFor(() =>
+      expect(document.querySelector('.builds-unheld-line button')?.textContent).toBe(
+        'One of your listings has no build here',
+      ),
+    )
     const line = document.querySelector<HTMLButtonElement>('.builds-unheld-line button')
-    expect(line?.textContent).toBe('One of your listings has no build here')
     await act(async () => line?.click())
     const rows = [...document.querySelectorAll('.builds-unheld li')]
     expect(rows).toHaveLength(1)
