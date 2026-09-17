@@ -2,8 +2,11 @@
 # Re-create with the deppth2 commands in assets/README.md.
 extracted/
 
-# Reference art pulled for the mascot work. Regenerable from extracted/.
-reference/
+# The owner's reference art for the mascot work. Not regenerable: none of it is
+# a byte copy of anything in extracted/. Anchored to the root, because the
+# unanchored pattern also hid assets/reference/, and scripts/assets.ts put those
+# files in the committed manifest. Every clean clone then failed the build.
+/reference/
 
 node_modules/
 

@@ -12,6 +12,7 @@
  * Runs on bare node, which strips the types. No build step, no extra runtime.
  */
 
+import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
@@ -173,6 +174,31 @@ function loadAssetFiles(): string[] {
   return out.sort()
 }
 
+/**
+ * The images under assets/ that git ignores, or null when git cannot be asked.
+ *
+ * Only git knows what a clone will carry. The walk above cannot tell, and
+ * neither can `scripts/assets.ts`, which is how ten sheets in an ignored
+ * `assets/reference/` reached the committed manifest and failed every clean
+ * checkout while the owner's machine built fine. `checkAssets` has the rest.
+ *
+ * `-z` keeps paths unquoted. Without it git escapes any name outside ASCII and
+ * the path would no longer match the walk.
+ */
+function loadIgnoredAssetFiles(): string[] | null {
+  const git = spawnSync('git', ['ls-files', '-z', '--others', '--ignored', '--exclude-standard', '--', 'assets'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  })
+  if (git.error || git.status !== 0) return null
+  return git.stdout
+    .split('\0')
+    .filter((path) => IMAGE.test(path))
+    .map((path) => path.replace(/^assets\//, ''))
+    .sort()
+}
+
 function loadBaseline(): Baseline | null {
   if (!existsSync(BASELINE)) return null
   const raw = JSON.parse(readFileSync(BASELINE, 'utf8')) as Partial<Baseline>
@@ -218,6 +244,7 @@ const bundle: Bundle = {
   baseline: loadBaseline(),
   manifest: loadManifest(),
   assetFiles: loadAssetFiles(),
+  ignoredAssetFiles: loadIgnoredAssetFiles(),
 }
 
 if (!bundle.generated.length) {

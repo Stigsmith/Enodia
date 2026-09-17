@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 12 September 2026, game build `138174`.
+Last updated 17 September 2026, game build `138174`.
 
 ---
 
@@ -14,7 +14,7 @@ Last updated 12 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 752 in node across 43 files, and **153 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 755 in node across 43 files, and **153 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 10 checks |
 | **Build** | `dist/` is **30 MB and 685 files**, and it runs from a plain static server |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
@@ -863,6 +863,13 @@ These are real and none of them block step 2.
   The owner will hunt for one personally. The game's aspect icon carries it until then
 - 17 wiki images lost their manifest row when someone moved them between categories.
   `npm run assets` names them
+- ~~A clean clone could not build~~. **Fixed 17 September 2026.** From 29 August the
+  committed manifest named ten sheets in `assets/reference/`, which `.gitignore` hid, so
+  `prebuild` failed in every checkout except the main one. The sheets moved to `reference/`
+  at the root, the ignore rule is anchored there, and the validator now fails on any image
+  under `assets/` that git ignores. The same rebuild corrected the row for
+  `characters/charon-coins.png`, stale since the image changed on 7 September. Nothing
+  compares the manifest's hashes with the files, so nothing noticed
 
 **The open product question, 28 August 2026**
 

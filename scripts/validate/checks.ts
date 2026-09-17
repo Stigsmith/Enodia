@@ -1299,9 +1299,12 @@ export function checkAssets(bundle: Bundle): Finding[] {
   // 1. The manifest has to describe the directory. It went stale once already,
   //    when the wiki Arcana were replaced with game art and nothing rewrote it.
   const onDisk = new Set(bundle.assetFiles)
+  const ignored = new Set(bundle.ignoredAssetFiles ?? [])
   const inManifest = new Set((bundle.manifest.assets ?? []).map((entry) => entry.file))
   const vanished = [...inManifest].filter((file) => !onDisk.has(file))
-  const unlisted = [...onDisk].filter((file) => !inManifest.has(file))
+  // An ignored image is reported below instead. "Rebuild it with npm run
+  // assets" is the wrong advice for one, because that puts it in the manifest.
+  const unlisted = [...onDisk].filter((file) => !inManifest.has(file) && !ignored.has(file))
 
   if (vanished.length) {
     out.push(
@@ -1316,6 +1319,24 @@ export function checkAssets(bundle: Bundle): Finding[] {
       fail('assets', `${unlisted.length} images on disk are not in the manifest`, [
         ...cap(unlisted),
         'Rebuild it with npm run assets.',
+      ]),
+    )
+  }
+
+  //    Nothing git ignores belongs on this shelf. npm run assets describes
+  //    whatever is on disk, so an ignored image reaches the committed manifest,
+  //    the machine holding it passes, and every clean clone fails above on a
+  //    row it cannot match. assets/reference/ did that from 29 August to 17
+  //    September 2026, hidden by an unanchored `reference/` in .gitignore.
+  if (bundle.ignoredAssetFiles === null) {
+    out.push(
+      warn('assets', 'git could not be asked what it ignores, so ignored images under assets/ were not looked for'),
+    )
+  } else if (bundle.ignoredAssetFiles.length) {
+    out.push(
+      fail('assets', `${bundle.ignoredAssetFiles.length} images under assets/ are ignored by git, so no clone will have them`, [
+        ...cap(bundle.ignoredAssetFiles),
+        'Move them out of assets/, then run npm run assets. Reference art goes in reference/ at the root.',
       ]),
     )
   }

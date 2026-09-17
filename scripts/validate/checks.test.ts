@@ -52,6 +52,7 @@ function bundle(parts: Partial<Bundle> = {}): Bundle {
     baseline: null,
     manifest: null,
     assetFiles: [],
+    ignoredAssetFiles: [],
     ...parts,
   }
 }
@@ -744,6 +745,42 @@ describe('assets', () => {
   it('fails an image on disk that the manifest does not list', () => {
     const findings = checkAssets(withAssets({ assetFiles: ['boons/heaven-strike.webp', 'boons/stray.webp'] }))
     expect(messages(findings, 'fail')).toContain('1 images on disk are not in the manifest')
+  })
+
+  it('fails an image git ignores, even where the manifest and the disk agree', () => {
+    // The state from 29 August to 17 September 2026. npm run assets described
+    // assets/reference/, which .gitignore hid, so the one machine holding the
+    // files passed and every clean clone failed on rows it could not match.
+    const described = {
+      assets: [...manifest.assets, { id: 'hecate-full', category: 'reference', file: 'reference/hecate-full.png' }],
+    }
+    const findings = checkAssets(
+      withAssets({
+        manifest: described,
+        assetFiles: ['boons/heaven-strike.webp', 'reference/hecate-full.png'],
+        ignoredAssetFiles: ['reference/hecate-full.png'],
+      }),
+    )
+    expect(messages(findings, 'fail')).toContain('1 images under assets/ are ignored by git, so no clone will have them')
+  })
+
+  it('does not tell you to put an ignored image in the manifest', () => {
+    // That advice is how the reference rows got in.
+    const findings = checkAssets(
+      withAssets({
+        assetFiles: ['boons/heaven-strike.webp', 'reference/hecate-full.png'],
+        ignoredAssetFiles: ['reference/hecate-full.png'],
+      }),
+    )
+    expect(messages(findings, 'fail')).toContain('1 images under assets/ are ignored by git, so no clone will have them')
+    expect(messages(findings, 'fail')).not.toContain('1 images on disk are not in the manifest')
+  })
+
+  it('warns when git could not be asked what it ignores', () => {
+    const findings = checkAssets(withAssets({ ignoredAssetFiles: null }))
+    expect(messages(findings, 'warn')).toContain(
+      'git could not be asked what it ignores, so ignored images under assets/ were not looked for',
+    )
   })
 
   it('warns when one slug is claimed by two different images', () => {

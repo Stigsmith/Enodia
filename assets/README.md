@@ -42,6 +42,20 @@ above.
 > Game art is copyright Supergiant Games. This is an unofficial, non-commercial fan
 > project, not affiliated with or endorsed by Supergiant Games.
 
+## Nothing git ignores goes in here
+
+`npm run assets` describes whatever is on disk, ignored or not. So an ignored image lands in
+the committed manifest, the machine holding it builds fine, and every clean clone fails
+`prebuild` on a manifest row it has no file for.
+
+`assets/reference/` did exactly that from 29 August to 17 September 2026. An unanchored
+`reference/` in `.gitignore` hid it, and the main checkout, the only place the files
+existed, never failed. Those sheets live in `reference/` at the repo root now, and the ignore rule
+names only that folder.
+
+`npm run validate` asks git which images under here it ignores and fails on any of them.
+If that check fires, move the files out, then run `npm run assets`.
+
 ## Naming convention
 
 ```

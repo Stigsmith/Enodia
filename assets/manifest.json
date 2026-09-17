@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-07",
+ "generated": "2026-09-16",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1035,
+ "count": 1025,
  "categories": [
   {
    "name": "arcana",
@@ -107,13 +107,6 @@
    "name": "rarity",
    "count": 4,
    "source": "game"
-  },
-  {
-   "name": "reference",
-   "count": 10,
-   "source": "mixed",
-   "wiki": 1,
-   "game": 9
   },
   {
    "name": "shell",
@@ -4244,8 +4237,8 @@
    "id": "charon-coins",
    "category": "characters",
    "file": "characters/charon-coins.png",
-   "bytes": 188560,
-   "sha256": "dc069071b7f53c6d74adde0dfbb7452a895ea0e70e1cd27ccfdd11ba5872b239",
+   "bytes": 345405,
+   "sha256": "405407b86f390682ad1fce3f08320c79695ecd9e77d376c2b6e4bd720537bc6d",
    "source": "game"
   },
   {
@@ -8079,87 +8072,6 @@
    "bytes": 4481,
    "sha256": "92478af57eeea7f9745945fae2b7247d40a8deaf82fe433e526fb30e0cb66bb8",
    "source": "game"
-  },
-  {
-   "id": "dora-bath",
-   "category": "reference",
-   "file": "reference/dora-bath.png",
-   "bytes": 181754,
-   "sha256": "aa8f0a13b400ce68d9fbe32fd0fc4fcb340cbc9837fa25295698f50b09279b62",
-   "source": "game"
-  },
-  {
-   "id": "dora-default",
-   "category": "reference",
-   "file": "reference/dora-default.png",
-   "bytes": 118855,
-   "sha256": "4b175d40f179ceb83b2869906554da7dde3d5bf2fdb242b95b933eddba18b2ae",
-   "source": "game"
-  },
-  {
-   "id": "dora-expressions",
-   "category": "reference",
-   "file": "reference/dora-expressions.png",
-   "bytes": 887018,
-   "sha256": "d00deccbed1a1e523015be10b677ed4a7a4837e8f97f49784e0dd520ff9b8afa",
-   "source": "game"
-  },
-  {
-   "id": "dora-hardhat",
-   "category": "reference",
-   "file": "reference/dora-hardhat.png",
-   "bytes": 158807,
-   "sha256": "5f096d80321c001d2e00b93a75713a7603b11dc15633b0ca3c6c8bc1115b3710",
-   "source": "game"
-  },
-  {
-   "id": "dora-spooky",
-   "category": "reference",
-   "file": "reference/dora-spooky.png",
-   "bytes": 97728,
-   "sha256": "dd8d73ff934c4b787b62f8cb8ac45d9b5ed1b552486652556ba9d6071ffafaaf",
-   "source": "game"
-  },
-  {
-   "id": "dora-thoughtful",
-   "category": "reference",
-   "file": "reference/dora-thoughtful.png",
-   "bytes": 132201,
-   "sha256": "46b8f27c184a64897bc50ac256e831bed202904c9e1ad0234593b11f288b7e15",
-   "source": "game"
-  },
-  {
-   "id": "hecate-averted",
-   "category": "reference",
-   "file": "reference/hecate-averted.png",
-   "bytes": 1038844,
-   "sha256": "d1d1941cd0b758ad8d59814acb9ac1a76b7291ac8188ae1d9a30a30eb1e285b4",
-   "source": "game"
-  },
-  {
-   "id": "hecate-baby",
-   "category": "reference",
-   "file": "reference/hecate-baby.png",
-   "bytes": 1099998,
-   "sha256": "8d69b20cefff09231c1c766a274e50aa4457e6dd48272a332ef3cd6776be5377",
-   "source": "game"
-  },
-  {
-   "id": "hecate-full",
-   "category": "reference",
-   "file": "reference/hecate-full.png",
-   "bytes": 1079352,
-   "sha256": "3e2a74b1dc6b0495d1a39467f9794c1df063468de5d8df66fde3d43ef5be4745",
-   "source": "game"
-  },
-  {
-   "id": "hecate-reference-sheet",
-   "category": "reference",
-   "file": "reference/hecate-reference-sheet.jpg",
-   "bytes": 399359,
-   "sha256": "bf9bc028d897b8087c75e108e4166c09710aedc391388af2cdc5dbc9e5867e87",
-   "source": "wiki",
-   "needsProvenance": true
   },
   {
    "id": "backdrop-mel",
