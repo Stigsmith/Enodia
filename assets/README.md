@@ -99,7 +99,7 @@ their source pages the first time, which is how that got noticed.
 | `duos/` | 48 | mixed, 46 wiki and 2 game | Duo boon icons | complete, 37 of 37 |
 | `keepsakes/` | 33 | wiki | Keepsake icons | complete |
 | `aspects/` | 56 | mixed, 30 wiki and 26 game | Aspect icons from the game, the wiki's large renders, and the Black Coat candidates | complete, 24 icons and 24 renders |
-| `characters/` | 27 | wiki | Non-boon-granting character portraits | good |
+| `characters/` | 31 | mixed, 27 wiki and 4 game | Non-boon-granting character portraits, and the standing figures of Charon and Schelemeus with their animated layers | good |
 | `gods/` | 16 | wiki | Boon-granting god portraits | complete |
 | `infusions/` | 11 | wiki | Elemental infusion boons | unverified count |
 | `artifacts/` | 11 | wiki | Consumables and run items | partial |
@@ -615,6 +615,57 @@ floated in a panel.
 The coin on the counts is `GUI/Icons/Currency`, 70x70, copied to
 `assets/shell/coins.png`. `assets/shell/selector-coin.png` was the other
 candidate and is a token on a plinth rather than a coin.
+
+### Schelemeus, who is filed as Skelly
+
+There is no package called Schelemeus. `HelpText.en.sjson` names
+`NPC_Skelly_01` "Schelemeus, Training Master", and his art is `Skelly.pkg`,
+7.5 MB, extracted with `deppth2 ex -s` to `textures/Portraits/Skelly/`. It was
+extracted into session scratch rather than `extracted/`, so run it again to
+rebuild anything below.
+
+| | | |
+|---|---|---|
+| `Portraits_Skelly_01.png` | 1250x1350 canvas, trimmed rect 1000x1250 at (24, 100) | the portrait |
+| `SkellyBlink` | 6 frames on the same 1250x1350 canvas | the blink, and frame 1 is a 1x1 empty sprite |
+| `SkellyWiggle1` to `4` | 30 frames each | light-rim overlays across the whole body, not a small detail |
+| `SkellyMoonGlow` | 50 frames, 534x528 | additive, `Scale = 1.6` |
+| `SkellyGlint` | 42 frames | additive |
+| `SkellyGlowMain` | 1 frame | additive, pulsed by alpha |
+
+**`Portrait_Skelly_Default_01` states no offset and no scale**, so all of it
+comes from `Portrait_Base_01`: `Scale = 0.8`, `OffsetY = -100`, no `OffsetX`.
+That is error 8 in `CLAUDE.md`, read the base first, and it pays here: the blink
+record states `Scale = 0.8` and `OffsetY = -100` itself, and its frames are on
+the portrait's own canvas, so they lie on the portrait one to one with no
+arithmetic at all. Composited that way, the shut frame covers both eye sockets
+exactly.
+
+**`assets/characters/schelemeus-stand.png`, 330 KB**, is the portrait cropped to
+its alpha, which is the sidecar's rect to the pixel, and saved 760 tall: 608 by
+760, Charon's height. Full colour, because the palette versions were measured
+and seen and both lost:
+
+| | bytes | on the app's dark ground |
+|---|---|---|
+| full colour | 330,323 | clean |
+| 256 colours, RGBA octree | 61,334 | dithered rings round the soft cyan and pink glows at head, arm and belt |
+| 256 colours, alpha kept exact | 216,462 | dither across the beard and skull at 2x |
+
+PNG, not WebP, for the reason Charon's portrait is: `build-lib.ps1` deletes
+`.webp` in `characters/`, and the `.webp` files there are the wiki half.
+
+**`assets/characters/schelemeus-blink.png`, 5 KB**, is frames two to six cropped
+to their union plus a pixel, (559, 240) to (711, 320), at twice the portrait's
+scale: five cells of 185 by 97, 64 colours, indistinguishable from full colour
+at 2x. Against the stand that box is left 53.5%, top 11.2%, width 15.2% and
+height 6.4%.
+
+The record's timing is a gap of 120 to 250 frames and then frames two to six
+for 2, 4, 2, 2 and 2. The gap is fixed at 185 in `builds.css`, because a
+keyframe cannot be random. **The rate is an inference**: the blink states no
+`PlaySpeed`, and every layer on this portrait that states one says 30.
+`src/ui/schelemeus-art.test.ts` pins the frame moments and the cells.
 
 Extract with [`deppth2`](https://github.com/SGG-Modding/deppth), the SGG modding
 community's tool. The `-s` flag splits individual sprites out of the atlases rather than
