@@ -19,6 +19,19 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-17',
+    title: 'Builds is one screen, and a build named in a note says how your run stands with it',
+    say: 'The first half of guides, and two figures to go with Charon.',
+    points: [
+      'The build manager and the exchange are one screen now, called Builds, with a switch at the top: yours on one side, everybody’s on the other. The side you left it on is the side it opens on, and whatever you had filtered or opened on the other side is still there when you come back.',
+      'Mine and Followed are gone from the exchange, because both kinds of build were in your library already. Their counts are on your own cards instead, and a card says when its listing is off the shelves.',
+      'A build you published and then deleted used to be findable only on the Mine shelf. Your side now says when a listing of yours has no build behind it, and puts the published version back in your library in one press.',
+      'Type @ in a build’s write-up to name a build you published or follow, or paste a build’s short link. While a run is being logged, the name carries how that run stands with the build: “Killer Current (needs 4 more picks, with 40 Exits left)”. A build that is gone says withdrawn, and one that simply could not be reached just shows its name.',
+      'Schelemeus stands on your side of Builds and Odysseus stands on the Wiki, both out of the game’s own portraits, and both blink now and then. Like Charon, neither is drawn, or downloaded, on a screen too narrow to fit him.',
+      'Phones no longer download Charon or Dora, who were hidden on small screens but fetched anyway.',
+    ],
+  },
+  {
     date: '2026-09-12',
     title: 'Help is half the length and twice as current, and the menu says what is coming',
     say: 'The help page had stopped keeping up, and three things on the roadmap had nowhere to go.',

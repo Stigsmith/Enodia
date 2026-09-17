@@ -53,9 +53,9 @@ export const ROADMAP: Plan[] = [
   // ---- built -------------------------------------------------------------
   {
     stage: 'now',
-    title: 'Build manager',
-    proof: 'src/ui/Builds.tsx',
-    say: 'Browse builds with filters for arm, aspect, gods, keepsake and familiar. Create your own, duplicate any build, and record how each has performed. A build names all four keepsakes a run gives you, in the order you take them, and the editor says out loud what the game would not allow rather than refusing to save.',
+    title: 'Builds',
+    proof: 'src/ui/BuildsScreen.tsx',
+    say: 'One screen with two sides and a switch between them: yours, and everybody’s. Your side is your library, with filters for arm, aspect, gods, keepsake and familiar, the builds you follow beside your own, and the counts from the exchange on any of them that are published. Create your own, duplicate any build, and record how each has performed. A build names all four keepsakes a run gives you, in the order you take them, and the editor says out loud what the game would not allow rather than refusing to save.',
   },
   {
     stage: 'now',
@@ -85,7 +85,7 @@ export const ROADMAP: Plan[] = [
     stage: 'now',
     title: 'Build exchange',
     proof: 'src/ui/Exchange.tsx',
-    say: 'Four shelves: everything anybody has published, builds from people you swapped codes with, your own listings, and the ones you follow. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs. One filter narrows the shelf to builds somebody other than the author has actually finished a run with.',
+    say: 'Everybody’s side of Builds. Two shelves: everything anybody has published, and builds from people you swapped codes with. Your own listings and the builds you follow are on your side, where they always were, with their counts on their cards, and a listing of yours whose build you deleted is listed there with a way to put it back. You follow a build rather than copying it, so it stays theirs and their improvements reach you, and changing anything about it is what makes it your own. Runs you log count toward the build you followed while your picks still match theirs. One filter narrows the shelf to builds somebody other than the author has actually finished a run with.',
   },
   {
     stage: 'now',
@@ -141,6 +141,12 @@ export const ROADMAP: Plan[] = [
     proof: 'src/ui/MentionField.tsx',
     say: 'A line on any pick that needs one, shown wherever the pick is described and on its card at an Exit when a run is going for that build. Type @ in a build’s write-up to name a boon, a keepsake, an Arcana card or a familiar, and it links to its record in the wiki.',
   },
+  {
+    stage: 'now',
+    title: 'Builds named in a write-up',
+    proof: 'src/ui/BuildMention.tsx',
+    say: 'Type @ to name a build you published or follow, or paste a build’s short link, and it links to the build. While you are logging a run, the name carries how that run stands with the build, the same sentence the run screen would give it. A build its author took down, or that is gone, says withdrawn.',
+  },
 
   // ---- next --------------------------------------------------------------
   {
@@ -155,6 +161,12 @@ export const ROADMAP: Plan[] = [
     title: 'Builds by aspect',
     proof: 'src/ui/BuildsByAspect.tsx',
     say: 'The filters can answer this now, one selection at a time. A dedicated view would show which builds remain available for a given aspect at a glance.',
+  },
+  {
+    stage: 'next',
+    title: 'Guides',
+    proof: 'src/ui/Guides.tsx',
+    say: 'A write-up in a few sections with builds named inside it, published like a build and read like one. It is what Collections became: a list of builds added little over the shelf and its filters, and a guide read during a run shows how that run stands with every build it names, so it reads differently at the fourth Exit than at the Crossroads. Its builds are whatever it names, in that order, and a note about somebody else’s build stays inside the guide.',
   },
   {
     stage: 'next',
@@ -186,14 +198,6 @@ export const ROADMAP: Plan[] = [
   },
 
   // ---- stalled -----------------------------------------------------------
-  {
-    stage: 'waiting',
-    title: 'Collections',
-    proof: null,
-    why: 'Waiting on a decision rather than on code, so nothing exists to point at yet.',
-    say: 'A named, ordered list of published builds with a line on each: what to play first, what to try once that is boring. Every piece it needs now exists, so what is left is one question rather than one engine.',
-    on: 'Needs a call on whether your note about somebody else’s build should be public.',
-  },
   {
     stage: 'waiting',
     title: 'Build quality ratings',
