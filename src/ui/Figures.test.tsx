@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 /**
- * Schelemeus on your side of Builds, and the phones that must not download him.
+ * The standing figures, and the phones that must not download them.
  *
  * The same checks `Exchange.test.tsx` makes of Charon, for the same reason: a
  * figure the stylesheet hides and the markup still renders is a figure every
@@ -13,6 +13,7 @@ import { act, cleanup, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Builds } from './Builds.tsx'
+import { Wiki } from './Wiki.tsx'
 
 function aWindow(wide: boolean) {
   let matches = wide
@@ -32,7 +33,7 @@ function aWindow(wide: boolean) {
   return { widen: () => resize(true), narrow: () => resize(false) }
 }
 
-const stand = () => document.querySelector('.skelly-stand')
+const stand = () => document.querySelector('.figure-stand.is-schelemeus')
 const portrait = () => document.querySelector('img[src*="schelemeus-stand"]')
 
 beforeEach(() => {
@@ -100,5 +101,36 @@ describe('Schelemeus on your side', () => {
     render(<Builds reveal="mine-1" />)
     expect(document.querySelector('.builds.is-detail')).not.toBeNull()
     expect(stand()).toBeNull()
+  })
+})
+
+describe('Odysseus on the Wiki', () => {
+  const odysseus = () => document.querySelector('.figure-stand.is-odysseus')
+  const his = () => document.querySelector('img[src*="odysseus-stand"]')
+
+  it('is not in the page, and so not downloaded, where there is no room for him', () => {
+    aWindow(false)
+    render(<Wiki at={null} />)
+    expect(odysseus()).toBeNull()
+    expect(his()).toBeNull()
+  })
+
+  it('stands before the index and before a record, directly before what makes room for him', () => {
+    aWindow(true)
+    const view = render(<Wiki at={null} />)
+    expect(his()?.getAttribute('src')).toBe('/characters/odysseus-stand.png')
+    expect(odysseus()?.nextElementSibling?.classList.contains('wiki-shelf')).toBe(true)
+
+    view.rerender(<Wiki at={{ kind: 'trait', id: 'ZeusWeaponBoon' }} />)
+    expect(odysseus()?.nextElementSibling?.querySelector('.wiki-record')).not.toBeNull()
+  })
+
+  it('arrives and leaves as the window crosses the breakpoint', () => {
+    const size = aWindow(false)
+    render(<Wiki at={null} />)
+    act(() => size.widen())
+    expect(his()).not.toBeNull()
+    act(() => size.narrow())
+    expect(odysseus()).toBeNull()
   })
 })

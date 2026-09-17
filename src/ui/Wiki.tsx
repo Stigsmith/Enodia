@@ -27,6 +27,7 @@ import type { Requirement, Trait, TraitId } from '../data/types.ts'
 import { loadBuilds } from '../state/builds.ts'
 import { CORE_SLOTS, slotLabel } from '../engine/slots.ts'
 import { ElementWord } from './Elements.tsx'
+import { OdysseusStand } from './Figures.tsx'
 import { Page } from './Pages.tsx'
 import { StatLines } from './StatLines.tsx'
 import { WikiLink } from './WikiLink.tsx'
@@ -44,7 +45,14 @@ export function Wiki({ at }: { at: WikiAt }) {
     top.current?.closest('.shell')?.scrollTo?.(0, 0)
   }, [at])
 
-  return <div ref={top}>{at ? <Record at={at} /> : <Index />}</div>
+  return (
+    <div ref={top}>
+      {/* Odysseus, directly before what makes room for him: `.is-odysseus +
+        * .wiki-shelf`. `Figures.tsx` says why. */}
+      <OdysseusStand />
+      <div className="wiki-shelf">{at ? <Record at={at} /> : <Index />}</div>
+    </div>
+  )
 }
 
 // ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1027,
+ "count": 1029,
  "categories": [
   {
    "name": "arcana",
@@ -41,10 +41,10 @@
   },
   {
    "name": "characters",
-   "count": 31,
+   "count": 33,
    "source": "mixed",
    "wiki": 27,
-   "game": 4
+   "game": 6
   },
   {
    "name": "duos",
@@ -4418,6 +4418,22 @@
    "source": "wiki",
    "sourceFile": "FP_Nyx_II.webp",
    "sourcePage": "Characters-Hades II"
+  },
+  {
+   "id": "odysseus-blink",
+   "category": "characters",
+   "file": "characters/odysseus-blink.png",
+   "bytes": 2777,
+   "sha256": "b858d83902428a06ae169448563737952c183f223ae237fb4cc0f846a5726fbc",
+   "source": "game"
+  },
+  {
+   "id": "odysseus-stand",
+   "category": "characters",
+   "file": "characters/odysseus-stand.png",
+   "bytes": 457043,
+   "sha256": "706b90cc50ac2086328c3e725f0a3a99c5853f6b4f5f3017c454def0cccfa4ab",
+   "source": "game"
   },
   {
    "id": "odysseus",
