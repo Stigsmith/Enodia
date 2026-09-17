@@ -1248,6 +1248,17 @@
    * pane is on the left; the corner is where it always was.
    */
   --you-inset: 7rem;
+  /**
+   * How wide the pinned pane is, and how far a figure standing on the left has
+   * to stand from the window's edge to clear it.
+   *
+   * One number for both, because a figure fixed to `left: 0` stands under the
+   * pinned pane, and a figure at a hand-copied offset stands in the wrong place
+   * the moment the pane changes width. `--pane-left` is nothing until the pane
+   * is pinned, below.
+   */
+  --pane-width: 17rem;
+  --pane-left: 0rem;
 }
 
 .app {
@@ -1301,11 +1312,12 @@
 @media (min-width: 60rem) {
   :root[data-nav='pane'] {
     --nav-inset: 0rem;
+    --pane-left: var(--pane-width);
   }
 
   :root[data-nav='pane'] .app {
     display: grid;
-    grid-template-columns: 17rem minmax(0, 1fr);
+    grid-template-columns: var(--pane-width) minmax(0, 1fr);
     align-items: start;
   }
 

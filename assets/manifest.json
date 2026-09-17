@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-16",
+ "generated": "2026-09-17",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1025,
+ "count": 1027,
  "categories": [
   {
    "name": "arcana",
@@ -41,10 +41,10 @@
   },
   {
    "name": "characters",
-   "count": 29,
+   "count": 31,
    "source": "mixed",
    "wiki": 27,
-   "game": 2
+   "game": 4
   },
   {
    "name": "duos",
@@ -4458,6 +4458,22 @@
    "source": "wiki",
    "sourceFile": "FP_Prometheus.webp",
    "sourcePage": "Characters-Hades II"
+  },
+  {
+   "id": "schelemeus-blink",
+   "category": "characters",
+   "file": "characters/schelemeus-blink.png",
+   "bytes": 5338,
+   "sha256": "dc0ec81371c03f6fac9ca7d3b4e042823ab999e2f140e5833aa71f244c1f620a",
+   "source": "game"
+  },
+  {
+   "id": "schelemeus-stand",
+   "category": "characters",
+   "file": "characters/schelemeus-stand.png",
+   "bytes": 330323,
+   "sha256": "1789904589084f8c24dfcb4484853b0abf3146448060ed680b6ec03fad1f466b",
+   "source": "game"
   },
   {
    "id": "scylla",

@@ -46,6 +46,7 @@ import { BuildEditor } from './BuildEditor.tsx'
 import { acceptOffer, forkFollowed, listShelf, republishChangesTheBuild } from '../state/exchange.ts'
 import type { Listed } from '../state/exchange.ts'
 import { Counted } from './Counted.tsx'
+import { SchelemeusStand } from './Schelemeus.tsx'
 import { declineOffer, loadOffers, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -533,6 +534,11 @@ export function Builds({
 
   return (
     <div className="builds">
+      {/* Before the shelf and directly before it: `.skelly-stand +
+        * .builds-shelf` is what makes room for him, so the room follows
+        * whether he is drawn. */}
+      <SchelemeusStand />
+      <div className="builds-shelf">
       {/* No title here: `BuildsScreen` draws it, with the side switch, above
         * both sides. This row is what belongs to your side alone. */}
       <header className="builds-top builds-mine-top">
@@ -722,6 +728,7 @@ export function Builds({
       )}
 
       {library.length ? <SampleTag full /> : null}
+      </div>
     </div>
   )
 }
