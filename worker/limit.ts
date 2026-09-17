@@ -72,12 +72,15 @@ export const RULES = {
   read: { window: 60, max: 120 },
 
   /**
-   * Publishing. The only route that creates a row which persists.
+   * Publishing. The routes that write a payload which persists: a build or a
+   * guide, published or replaced, all counted on one budget.
    *
-   * `MAX_PER_USER` in `publish.ts` already caps the total at fifty, but a total
-   * is not a rate: republishing over the same id replaces rather than adds, so
-   * without this an account could write forever without ever holding more than
-   * one build. Thirty an hour is well past anyone deciding what to share.
+   * `MAX_PER_USER` in `publish.ts` already caps live builds at a hundred, and
+   * `MAX_GUIDES` in `guides.ts` caps guides, but a total is not a rate:
+   * republishing over the same id replaces rather than adds, so without this an
+   * account could write forever without ever holding more than one of either.
+   * This said fifty for the builds cap after it was raised to a hundred. Thirty
+   * an hour is well past anyone deciding what to share.
    */
   publish: { window: 3600, max: 30 },
 
@@ -115,6 +118,17 @@ export const RULES = {
    * read, not because the code is weak.
    */
   redeem: { window: 3600, max: 20 },
+
+  /**
+   * Reporting a guide.
+   *
+   * Low, and on its own counter, because a report is the one write on this
+   * API whose whole purpose is to land on somebody else's work. A person who
+   * finds something that should not be there reports it once; ten an hour is
+   * room for a bad afternoon and not for a campaign. Keyed on the account, so a
+   * report always has somebody behind it.
+   */
+  report: { window: 3600, max: 10 },
 } as const satisfies Record<string, Rule>
 
 export type Refused = { retryAfter: number }

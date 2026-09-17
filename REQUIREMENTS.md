@@ -151,7 +151,7 @@ user's own data.
 |---|---|---|
 | Platform | Web app, mobile-first, static host, `localStorage` | Playable second screen. Works for Steam Deck and console players, whom no PC-only tool reaches |
 | Certainty model | Feasibility states plus coarse bands | Section 6.2 |
-| Community | Local-first, URL sharing. Accounts deferred to Phase 4 | Most of the engineering budget. ~~Needs moderation from day one~~, see the note below |
+| Community | Local-first, URL sharing. Accounts deferred to Phase 4 | Most of the engineering budget. ~~Needs moderation from day one~~, see the note below, and the one after it for guides |
 | Auto-tracking | Deferred to Phase 4, manual entry always supported | PC-only, and the manual path must exist anyway |
 | Build library size | 30 to 40 generated archetypes, not 150 to 500 hand-authored | Section 7, Phase 2 |
 | Audience | Public | Sets the confidence register everywhere. Opinions must carry a visible byline or a source |
@@ -187,6 +187,31 @@ assumed:
 **What would change the answer**: any free text a third party can write onto something
 somebody else sees, a display name shown to people who did not choose to see it beyond the
 boards, or enough accounts that the owner cannot read everything published in an evening.
+
+### Guides, which are that free text, ship with a report and a hide
+
+**The first of those three arrived on 17 September 2026**, and the answer changed with it,
+as the paragraph above said it would. A guide is sections of a stranger's writing, listed on
+everybody's side. The owner was asked whether guides should be listed with a way to report
+and hide one, listed without, or unlisted, and chose **listed, with both, in the same
+change**, while a hide is still one column and one clause. Recorded here as a reversal of the
+8 September position for guides only: builds still ship without either, for the reasons
+above, which still hold for them.
+
+What shipped, in `worker/guides.ts`:
+
+- **A report is one row per person per guide**, with a bounded reason. Nothing returns it and
+  nothing acts on it automatically, because a count of reports is something a group can
+  manufacture. An author cannot report their own guide: taking it down is that lever.
+- **A hide is a column no route writes.** A moderator reads the reports and sets `hidden_at`
+  with a statement against the database; the statements are in the file. There is no
+  moderator route, so there is no moderator session to find or forge. A hidden guide leaves
+  every list and its link answers only its author, who sees it marked hidden.
+- **A report has its own low rate limit** on the account, ten an hour, so it cannot be spent
+  from the budget ordinary use needs, nor spend it.
+
+**What would change this answer**: enough reports that reading them by hand is not an evening's
+work, which is when a moderator screen earns its surface.
 
 ### Dead positions, recorded so they are not revived
 

@@ -85,6 +85,13 @@
       "when": 1788874430530,
       "tag": "0011_glorious_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1789628187222,
+      "tag": "0012_serious_kylun",
+      "breakpoints": true
     }
   ]
 }

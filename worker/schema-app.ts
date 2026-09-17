@@ -313,6 +313,147 @@ export const buildFacet = sqliteTable(
 )
 
 /**
+ * A guide: a few sections of writing with builds named inside it.
+ *
+ * **The same bargain as a published build.** The browser packs the sections and
+ * this table stores them as text and hands them back unread, so nothing here
+ * knows what a section is, and the guide format can change without a
+ * migration. The id is the same kind of short random id, for the same reason.
+ *
+ * ## Listed, and so moderated
+ *
+ * Unlike a published build, a guide carries free text a stranger wrote, and it
+ * is listed. `REQUIREMENTS.md` 5 wanted a way to hide one and a way to report
+ * one before anything like that was discoverable, and the owner's call on 17
+ * September 2026 was to ship guides listed **with both, in the same change**,
+ * while a hide is still one column and one clause.
+ *
+ * `hiddenAt` is that column. **Nothing in the API sets it.** A moderator sets it
+ * with a statement against the database, which `worker/guides.ts` spells out,
+ * so there is no moderator route for anybody to find or to forge a session
+ * for. A hidden guide leaves every list and its link stops answering for
+ * everybody but its author, who sees it in their own list marked hidden.
+ *
+ * `takenDownAt` is the author's own lever and behaves as a build's does: off
+ * every list, and the link keeps answering.
+ *
+ * The user reference cascades, and carries `publishedBuild`'s warning with it:
+ * three tables point at this one, so read that docblock before changing it.
+ */
+export const guide = sqliteTable(
+  'guide',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    /** The packed sections. Opaque here. */
+    payload: text('payload').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' }),
+    revision: integer('revision').default(0).notNull(),
+    takenDownAt: integer('taken_down_at', { mode: 'timestamp_ms' }),
+    hiddenAt: integer('hidden_at', { mode: 'timestamp_ms' }),
+  },
+  (table) => [
+    index('guide_userId_idx').on(table.userId),
+    index('guide_createdAt_idx').on(table.createdAt),
+  ],
+)
+
+/**
+ * The builds a guide names, in the order it names them.
+ *
+ * **Derived, never typed.** The browser reads the `b:` mentions out of the
+ * guide as it publishes, and this table is replaced wholesale each time, as
+ * `buildFacet` is. Nobody maintains a second list of a guide's builds.
+ *
+ * `shape` is the build's shape token as the author had it when they wrote the
+ * guide. Compared on read with `publishedBuild.shape`, it says whether the
+ * build has changed its picks since, which is worth a reader knowing before
+ * they take the author's word about it.
+ *
+ * **No foreign key to `publishedBuild`, on purpose.** Every child of that table
+ * is one more thing a future rebuild of it can wipe, which its own docblock
+ * measured. A build id that no longer resolves is simply a build that is gone,
+ * and the guide says so.
+ */
+export const guideBuild = sqliteTable(
+  'guide_build',
+  {
+    guideId: text('guide_id')
+      .notNull()
+      .references(() => guide.id, { onDelete: 'cascade' }),
+    buildId: text('build_id').notNull(),
+    shape: text('shape').default('').notNull(),
+    /** Where in the guide it is first named, from 0. */
+    position: integer('position').notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.guideId, table.buildId] })],
+)
+
+/**
+ * What readers did with a guide, one row per person per guide.
+ *
+ * Saved and liked, each a timestamp or null, and the identity is for arithmetic
+ * only, as it is in `exchangeStat`: every read aggregates, and no user id
+ * leaves this table. An author's own save and like are refused before a row is
+ * written, so neither count can be moved by the person it is about.
+ */
+export const guideStat = sqliteTable(
+  'guide_stat',
+  {
+    guideId: text('guide_id')
+      .notNull()
+      .references(() => guide.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    savedAt: integer('saved_at'),
+    likedAt: integer('liked_at'),
+    updated: integer('updated')
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.guideId, table.userId] }),
+    /* Your saved guides, which is the one read that is by person. */
+    index('guide_stat_user_idx').on(table.userId),
+  ],
+)
+
+/**
+ * A reader saying a guide should not be there, one row per person per guide.
+ *
+ * **Read by a moderator, never by the API.** Nothing returns these, and nothing
+ * acts on them automatically: a count of reports is something a group can
+ * manufacture, and hiding on a threshold would hand them the lever. A person
+ * reads them and decides, with the statements in `worker/guides.ts`.
+ *
+ * Reporting twice replaces the first report rather than adding a second.
+ */
+export const guideReport = sqliteTable(
+  'guide_report',
+  {
+    guideId: text('guide_id')
+      .notNull()
+      .references(() => guide.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    /** What the reader said, bounded, and never shown to anybody but a moderator. */
+    reason: text('reason').default('').notNull(),
+    createdAt: integer('created_at')
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.guideId, table.userId] })],
+)
+
+/**
  * How two people become friends, and why it is a code rather than a search.
  *
  * **You cannot look somebody up here, on purpose.** `name` is not unique, so it

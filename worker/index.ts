@@ -27,6 +27,10 @@
  *   /api/exchange/<id>/...  take a copy, report a run, rate one
  *   /api/friends       your code, redeem one, your list, remove one
  *   /api/friends/feed  what your friends have published
+ *   /api/g/<id>        read a guide, with the builds it names. PUBLIC
+ *   /api/guides        everybody's guides (PUBLIC), or publish one
+ *   /api/guides/mine   the guides you wrote and the ones you saved
+ *   /api/guides/<id>/...  replace, take down, put back, save, like, report
  *
  * **Some of this is discoverable now, and that is a decision rather than a
  * drift.** `REQUIREMENTS.md` 5 wanted moderation designed before anything
@@ -42,10 +46,11 @@
  * shelf came out with them because one person reading everything is not a thing
  * that scales past one person.
  *
- * **There is still no report and no hide, and that is worth stating plainly.**
+ * **Builds still have no report and no hide, and that is worth stating plainly.**
  * The argument for shipping without them is narrow: a listing carries a build
  * name and an author's display name and no other text a stranger wrote, so
- * there is nothing on it to moderate. The one removal lever is the author taking
+ * there is nothing on it to moderate. **Guides are different and have both**,
+ * because a guide is sections of a stranger's writing: see `worker/guides.ts`. The one removal lever is the author taking
  * their own listing down. `worker/exchange.ts` holds the fuller version, and
  * says what adding a hide would cost if it becomes necessary.
  *
@@ -85,6 +90,17 @@ import {
   take,
 } from './exchange.ts'
 import { boards } from './boards.ts'
+import {
+  listGuides,
+  markGuide,
+  myGuides,
+  publishGuide,
+  putBackGuide,
+  readGuide,
+  replaceGuide,
+  reportGuide,
+  takeDownGuide,
+} from './guides.ts'
 import { sync } from './sync.ts'
 import * as schema from './schema.ts'
 
@@ -195,6 +211,104 @@ export default {
       const found = await read(db, shared[1] as string)
       if (!found) return json({ error: 'no such build' }, 404)
       return json(found)
+    }
+
+    /**
+     * Guides, read and listed. Public, as a published build and the exchange
+     * are, and counted on the caller's address for the same reason.
+     *
+     * The session is read only to answer questions about the reader: whether
+     * the guide is theirs, whether they saved or liked it, and whether a hidden
+     * guide is theirs to still see. What goes back is booleans, never the id
+     * they were worked out from.
+     */
+    const aGuide = /^\/api\/g\/([A-Za-z0-9]{1,32})$/.exec(url.pathname)
+    if (aGuide && request.method === 'GET') {
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
+      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
+      const found = await readGuide(db, aGuide[1] as string, who?.user.id ?? null)
+      if (!found) return json({ error: 'no such guide' }, 404)
+      return json(found)
+    }
+
+    if (url.pathname === '/api/guides' && request.method === 'GET') {
+      const over = await take_limit(db, keyFor.address('read', request), RULES.read)
+      if (over) return tooMany(over.retryAfter)
+      const who = await auth.api.getSession({ headers: request.headers }).catch(() => null)
+      return json({ guides: await listGuides(db, who?.user.id ?? null) })
+    }
+
+    /**
+     * Everything else about guides needs an account.
+     *
+     * Three counters: publishing and replacing share `publish` with builds,
+     * because both write a payload; reporting has its own low one; the rest is
+     * `own`. `worker/guides.ts` says why moderation has no route here.
+     */
+    if (url.pathname === '/api/guides' || url.pathname.startsWith('/api/guides/')) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      if (!session) return json({ error: 'not signed in' }, 401)
+      const userId = session.user.id
+
+      const one = /^\/api\/guides\/([A-Za-z0-9]{1,32})(?:\/(restore|save|like|report))?$/.exec(url.pathname)
+      const verb = one?.[2]
+      const mine = url.pathname === '/api/guides/mine'
+      const writes =
+        (url.pathname === '/api/guides' && request.method === 'POST') ||
+        (one !== null && !verb && !mine && request.method === 'PUT')
+      const rule = writes ? 'publish' : verb === 'report' ? 'report' : 'own'
+      const over = await take_limit(db, keyFor.user(rule, userId), RULES[rule])
+      if (over) return tooMany(over.retryAfter)
+
+      if (mine && request.method === 'GET') {
+        return json(await myGuides(db, userId))
+      }
+
+      if (url.pathname === '/api/guides' && request.method === 'POST') {
+        const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+        const outcome = await publishGuide(db, userId, body)
+        if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+        return json(outcome, 201)
+      }
+
+      if (one && !mine) {
+        const id = one[1] as string
+
+        if (!verb && request.method === 'PUT') {
+          const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+          const outcome = await replaceGuide(db, userId, id, body)
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+
+        /* Not found and not yours answer alike, as they do for builds. */
+        if (!verb && request.method === 'DELETE') {
+          if (!(await takeDownGuide(db, userId, id))) return json({ error: 'no such guide' }, 404)
+          return json({ ok: true })
+        }
+
+        if (verb === 'restore' && request.method === 'POST') {
+          if (!(await putBackGuide(db, userId, id))) return json({ error: 'no such guide' }, 404)
+          return json({ ok: true })
+        }
+
+        if ((verb === 'save' || verb === 'like') && request.method === 'POST') {
+          const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+          const outcome = await markGuide(db, userId, id, verb === 'save' ? 'saved' : 'liked', body.on !== false)
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+
+        if (verb === 'report' && request.method === 'POST') {
+          const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
+          const outcome = await reportGuide(db, userId, id, body.reason)
+          if ('status' in outcome) return json({ error: outcome.say }, outcome.status)
+          return json(outcome)
+        }
+      }
+
+      return json({ error: 'no such route' }, 404)
     }
 
     /**
