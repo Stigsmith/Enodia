@@ -433,7 +433,7 @@ The copy in `assets/` is 512x512 and 249 KB. `vite.config.ts` sets `publicDir: '
 so anything on this shelf ships as-is and size here is page weight. The full-resolution
 original is still in `extracted/gui/textures/GUI/Screens/BoonSelect/`, so this is
 reversible; re-run `npm run assets` after touching it, because the manifest records bytes
-and sha256.
+and sha256, and the validator stops the build when they differ from the file.
 
 The same argument applies to the 23 MB of Arcana card art, which is still full size.
 

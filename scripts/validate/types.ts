@@ -62,6 +62,21 @@ export type CodeFile = {
   text: string
 }
 
+/**
+ * An image on disk, measured by scripts/validate.ts.
+ *
+ * The size and hash are here so the manifest's can be held to them. Nothing
+ * compared the two until 17 September 2026, and the manifest row for
+ * `characters/charon-coins.png` had described the image's previous version for
+ * the ten days before that.
+ */
+export type AssetFile = {
+  /** path under assets/, the same string as a manifest entry's `file` */
+  file: string
+  bytes: number
+  sha256: string
+}
+
 export type Bundle = {
   generated: GeneratedFile[]
   curated: CuratedFile[]
@@ -71,8 +86,8 @@ export type Bundle = {
   baseline: Baseline | null
   /** assets/manifest.json, written by scripts/assets.ts */
   manifest: Manifest | null
-  /** every image actually on disk, as a path under assets/ */
-  assetFiles: string[]
+  /** every image actually on disk, with its size and sha256 */
+  assetFiles: AssetFile[]
   /**
    * The images in `assetFiles` that git ignores, so no clone has them. `null`
    * when git could not be asked, which is a check not run rather than a pass.

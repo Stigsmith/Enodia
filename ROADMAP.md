@@ -868,8 +868,12 @@ These are real and none of them block step 2.
   `prebuild` failed in every checkout except the main one. The sheets moved to `reference/`
   at the root, the ignore rule is anchored there, and the validator now fails on any image
   under `assets/` that git ignores. The same rebuild corrected the row for
-  `characters/charon-coins.png`, stale since the image changed on 7 September. Nothing
-  compares the manifest's hashes with the files, so nothing noticed
+  `characters/charon-coins.png`, stale since the image changed on 7 September
+- ~~Nothing compares the manifest's sizes and hashes with the files~~. **Fixed 17 September
+  2026.** `scripts/validate.ts` now reads and hashes every image, and `checkAssets` fails on
+  any row whose `bytes` or `sha256` differs from its file, so the charon-coins row would have
+  stopped the build on 7 September. The duplicate-slug warning now compares the hashes of the
+  files on disk, not the manifest's. The validator takes about 555 ms, up from 405
 
 **The open product question, 28 August 2026**
 

@@ -273,7 +273,10 @@ the play experience cannot see.
   a fresh worktree**, because the main checkout holds files no clone has
 - **`npm run assets` is the only writer of `assets/manifest.json`.** The PowerShell used to
   write it too, which is why the manifest went stale the moment a category held art the
-  PowerShell never sees. `--fill` copies missing icons out of `extracted/` first
+  PowerShell never sees. `--fill` copies missing icons out of `extracted/` first.
+  **Rerun it after changing any image, and commit the manifest with the image.** The
+  validator hashes every file and fails on a row whose `bytes` or `sha256` differs, which
+  it did not do while `characters/charon-coins.png` sat stale from 7 to 17 September 2026
 - **The asset join lives in `src/data/icons.ts` and nowhere else.** Slug from display name,
   one rule, shared by the validator, the fill script and the UI
 - `extracted/` holds 364 MB of `GUI.pkg` output and is scratch, not source

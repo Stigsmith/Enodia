@@ -15,11 +15,22 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { join, relative, resolve } from 'node:path'
 
 import { countsOf, coverageOf, runAllChecks } from './validate/checks.ts'
 import type { Manifest } from '../src/data/icons.ts'
-import type { Baseline, Bundle, CodeFile, CuratedFile, Finding, GeneratedFile, SourceFile, SourceKind } from './validate/types.ts'
+import type {
+  AssetFile,
+  Baseline,
+  Bundle,
+  CodeFile,
+  CuratedFile,
+  Finding,
+  GeneratedFile,
+  SourceFile,
+  SourceKind,
+} from './validate/types.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const GENERATED = join(ROOT, 'data/generated')
@@ -152,14 +163,26 @@ function loadManifest(): Manifest | null {
 }
 
 /**
- * Every image on disk, as a path under assets/.
+ * Every image on disk, as a path under assets/, with its size and sha256.
  *
  * Recurses, and has to: `themes/` holds a directory per theme, so a one-level
  * walk reports every wallpaper in it as a manifest entry naming a file that is
  * not there. `scripts/assets.ts` walks the same way, and the two have to agree
  * or this check is comparing two different questions.
+ *
+ * The size and hash are computed the way `scripts/assets.ts` computes the
+ * manifest's, over the raw bytes, so `checkAssets` can hold every entry to its
+ * file. That reads the whole library, about 80 MB, on every build.
+ *
+ * **The reading costs, not the hashing.** Measured on 17 September 2026 over
+ * 1025 files: 351 ms to read them one after another, 44 ms to hash them. So they
+ * are read sixteen at a time, which took the validator from 405 ms without
+ * hashing to about 555 ms with it, where reading in sequence took about 825.
+ * Sixteen and not all 1025 at once, because that many reads in flight could
+ * hold that many files open, past the 1024 many Linux shells allow. Four was
+ * measured and was slower; sixty-four was no faster.
  */
-function loadAssetFiles(): string[] {
+async function loadAssetFiles(): Promise<AssetFile[]> {
   if (!existsSync(ASSETS)) return []
   const out: string[] = []
   const walk = (dir: string, prefix: string) => {
@@ -171,7 +194,19 @@ function loadAssetFiles(): string[] {
   for (const dir of readdirSync(ASSETS, { withFileTypes: true })) {
     if (dir.isDirectory()) walk(join(ASSETS, dir.name), `${dir.name}/`)
   }
-  return out.sort()
+  const files = out.sort()
+  const measured: AssetFile[] = new Array(files.length)
+  let next = 0
+  const reader = async () => {
+    while (next < files.length) {
+      const i = next++
+      const file = files[i] as string
+      const bytes = await readFile(join(ASSETS, file))
+      measured[i] = { file, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') }
+    }
+  }
+  await Promise.all(Array.from({ length: 16 }, reader))
+  return measured
 }
 
 /**
@@ -243,7 +278,7 @@ const bundle: Bundle = {
   code: loadCode(),
   baseline: loadBaseline(),
   manifest: loadManifest(),
-  assetFiles: loadAssetFiles(),
+  assetFiles: await loadAssetFiles(),
   ignoredAssetFiles: loadIgnoredAssetFiles(),
 }
 

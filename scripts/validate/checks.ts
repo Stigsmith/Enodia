@@ -1287,6 +1287,13 @@ export function iconCuration(bundle: Bundle): { gaps: Set<string>; overrides: Ic
   return { gaps, overrides }
 }
 
+/** "345405 bytes, sha256 405407b86f39", or what is missing. Twelve hex digits tell two images apart. */
+function digest(bytes: unknown, sha256: unknown): string {
+  const size = typeof bytes === 'number' ? `${bytes} bytes` : 'no size'
+  const hash = typeof sha256 === 'string' ? `sha256 ${sha256.slice(0, 12)}` : 'no sha256'
+  return `${size}, ${hash}`
+}
+
 export function checkAssets(bundle: Bundle): Finding[] {
   const out: Finding[] = []
   const traits = generatedData(bundle, 'traits')
@@ -1298,7 +1305,7 @@ export function checkAssets(bundle: Bundle): Finding[] {
 
   // 1. The manifest has to describe the directory. It went stale once already,
   //    when the wiki Arcana were replaced with game art and nothing rewrote it.
-  const onDisk = new Set(bundle.assetFiles)
+  const onDisk = new Set(bundle.assetFiles.map((image) => image.file))
   const ignored = new Set(bundle.ignoredAssetFiles ?? [])
   const inManifest = new Set((bundle.manifest.assets ?? []).map((entry) => entry.file))
   const vanished = [...inManifest].filter((file) => !onDisk.has(file))
@@ -1319,6 +1326,29 @@ export function checkAssets(bundle: Bundle): Finding[] {
       fail('assets', `${unlisted.length} images on disk are not in the manifest`, [
         ...cap(unlisted),
         'Rebuild it with npm run assets.',
+      ]),
+    )
+  }
+
+  //    And each entry has to describe the file it names. Matching names is not
+  //    enough: ca06c15 replaced characters/charon-coins.png and did not rerun
+  //    npm run assets, so its entry kept the old size and hash for ten days.
+  //    The writer always records both, so an entry missing either disagrees
+  //    too. An entry with no file on disk is already reported above.
+  const measured = new Map(bundle.assetFiles.map((image) => [image.file, image]))
+  const drifted: string[] = []
+  for (const entry of bundle.manifest.assets ?? []) {
+    const image = measured.get(entry.file)
+    if (!image || (entry.bytes === image.bytes && entry.sha256 === image.sha256)) continue
+    drifted.push(
+      `${entry.file}: manifest says ${digest(entry.bytes, entry.sha256)}, the file is ${digest(image.bytes, image.sha256)}`,
+    )
+  }
+  if (drifted.length) {
+    out.push(
+      fail('assets', `${drifted.length} manifest entries disagree with the file on disk about its size or sha256`, [
+        ...cap(drifted),
+        'Rebuild it with npm run assets, and commit it with the images it describes.',
       ]),
     )
   }
@@ -1345,11 +1375,16 @@ export function checkAssets(bundle: Bundle): Finding[] {
   //    shadows the other and which one wins is decided by sort order, which is
   //    no way to decide anything. It hid four Black Coat aspects behind wiki
   //    copies filed under hammers/.
+  //
+  //    Same bytes or not is asked of the disk. A stale manifest hash sorts a
+  //    pair into the wrong group, and the entry's own hash is only the fallback
+  //    for a file that is not there, which fails above anyway.
   const bySlug = new Map<string, { file: string; sha256: string }[]>()
   for (const entry of bundle.manifest.assets ?? []) {
     if (typeof entry?.id !== 'string' || typeof entry.file !== 'string') continue
     const copies = bySlug.get(entry.id) ?? []
-    copies.push({ file: entry.file, sha256: typeof entry.sha256 === 'string' ? entry.sha256 : '' })
+    const sha256 = measured.get(entry.file)?.sha256 ?? (typeof entry.sha256 === 'string' ? entry.sha256 : '')
+    copies.push({ file: entry.file, sha256 })
     bySlug.set(entry.id, copies)
   }
   const shadowed = [...bySlug.entries()].filter(([, copies]) => copies.length > 1)

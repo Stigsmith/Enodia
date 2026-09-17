@@ -19,7 +19,7 @@ import {
   extractUiStrings,
   rosterFromLoot,
 } from './checks.ts'
-import type { Bundle, Finding, GeneratedFile, SourceFile } from './types.ts'
+import type { AssetFile, Bundle, Finding, GeneratedFile, SourceFile } from './types.ts'
 
 // ---------------------------------------------------------------------------
 // Fixtures. Small by design: every one is a shape lifted from the real data,
@@ -56,6 +56,25 @@ function bundle(parts: Partial<Bundle> = {}): Bundle {
     ...parts,
   }
 }
+
+/**
+ * An image on disk, as scripts/validate.ts measures one. The content stands in
+ * for the pixels, and the size and hash are really computed from it, so two
+ * images agree on sha256 exactly when their content does.
+ */
+function image(file: string, content = file): AssetFile {
+  const bytes = Buffer.from(content)
+  return { file, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') }
+}
+
+/** The manifest row npm run assets would write for an image. */
+const row = (img: AssetFile) => ({
+  id: img.file.slice(img.file.indexOf('/') + 1).replace(/\.\w+$/, ''),
+  category: img.file.slice(0, img.file.indexOf('/')),
+  file: img.file,
+  bytes: img.bytes,
+  sha256: img.sha256,
+})
 
 const messages = (findings: Finding[], severity: Finding['severity']) =>
   findings.filter((f) => f.severity === severity).map((f) => f.message)
@@ -697,11 +716,10 @@ describe('assets', () => {
     generated('text-traits', names),
     generated('requirements', {}),
   ]
-  const manifest = {
-    assets: [{ id: 'heaven-strike', category: 'boons', file: 'boons/heaven-strike.webp' }],
-  }
+  const heavenStrike = image('boons/heaven-strike.webp')
+  const manifest = { assets: [row(heavenStrike)] }
   const withAssets = (parts: Partial<Bundle> = {}) =>
-    bundle({ generated: generatedFiles, manifest, assetFiles: ['boons/heaven-strike.webp'], ...parts })
+    bundle({ generated: generatedFiles, manifest, assetFiles: [heavenStrike], ...parts })
 
   it('fails a trait that has neither art nor a recorded gap', () => {
     const findings = checkAssets(withAssets())
@@ -743,21 +761,79 @@ describe('assets', () => {
   })
 
   it('fails an image on disk that the manifest does not list', () => {
-    const findings = checkAssets(withAssets({ assetFiles: ['boons/heaven-strike.webp', 'boons/stray.webp'] }))
+    const findings = checkAssets(withAssets({ assetFiles: [heavenStrike, image('boons/stray.webp')] }))
     expect(messages(findings, 'fail')).toContain('1 images on disk are not in the manifest')
+  })
+
+  describe('size and sha256', () => {
+    const drift = '1 manifest entries disagree with the file on disk about its size or sha256'
+
+    it('passes when every entry matches its file', () => {
+      expect(messages(checkAssets(withAssets()), 'fail')).not.toContain(drift)
+      expect(messages(checkAssets(withAssets()), 'fail')).toEqual(['1 traits have neither art nor a recorded gap'])
+    })
+
+    it('fails an entry still describing the file before it was replaced', () => {
+      // characters/charon-coins.png from 7 to 17 September 2026. ca06c15
+      // replaced the image and did not rerun npm run assets, so the row kept
+      // b27add0's size and hash for ten days and nothing noticed.
+      const coins = image('characters/charon-coins.png', 'the coins as ca06c15 drew them')
+      const stale = {
+        ...row(coins),
+        bytes: 188560,
+        sha256: 'dc069071b7f53c6d74adde0dfbb7452a895ea0e70e1cd27ccfdd11ba5872b239',
+      }
+      const findings = checkAssets(
+        withAssets({ manifest: { assets: [...manifest.assets, stale] }, assetFiles: [heavenStrike, coins] }),
+      )
+      expect(messages(findings, 'fail')).toContain(drift)
+
+      const detail = findings.find((f) => f.message === drift)?.detail ?? []
+      expect(detail).toHaveLength(2)
+      expect(detail[0]).toContain('characters/charon-coins.png')
+      expect(detail[0]).toContain('188560 bytes')
+      expect(detail[0]).toContain(`${coins.bytes} bytes`)
+      expect(detail.join('\n')).not.toContain('heaven-strike')
+      expect(detail.at(-1)).toContain('npm run assets')
+    })
+
+    it('fails an entry whose hash is wrong even though its size is right', () => {
+      // Same length, different pixels: a recolour or a crop to the same
+      // canvas. The size alone would pass it.
+      const redrawn = image('boons/heaven-strike.webp', 'boons/heaven-strike.webq')
+      expect(redrawn.bytes).toBe(heavenStrike.bytes)
+      const findings = checkAssets(withAssets({ assetFiles: [redrawn] }))
+      expect(messages(findings, 'fail')).toContain(drift)
+    })
+
+    it('fails an entry whose size is wrong even though its hash is right', () => {
+      const edited = { assets: [{ ...row(heavenStrike), bytes: heavenStrike.bytes + 1 }] }
+      const findings = checkAssets(withAssets({ manifest: edited }))
+      expect(messages(findings, 'fail')).toContain(drift)
+    })
+
+    it('fails an entry that records no size or hash, because the writer always records both', () => {
+      const bare = { assets: [{ id: 'heaven-strike', category: 'boons', file: 'boons/heaven-strike.webp' }] }
+      const findings = checkAssets(withAssets({ manifest: bare }))
+      expect(messages(findings, 'fail')).toContain(drift)
+    })
+
+    it('leaves an entry with no file on disk to the check that already names it', () => {
+      const findings = checkAssets(withAssets({ assetFiles: [] }))
+      expect(messages(findings, 'fail')).toContain('1 manifest entries name a file that is not on disk')
+      expect(messages(findings, 'fail')).not.toContain(drift)
+    })
   })
 
   it('fails an image git ignores, even where the manifest and the disk agree', () => {
     // The state from 29 August to 17 September 2026. npm run assets described
     // assets/reference/, which .gitignore hid, so the one machine holding the
     // files passed and every clean clone failed on rows it could not match.
-    const described = {
-      assets: [...manifest.assets, { id: 'hecate-full', category: 'reference', file: 'reference/hecate-full.png' }],
-    }
+    const hecate = image('reference/hecate-full.png')
     const findings = checkAssets(
       withAssets({
-        manifest: described,
-        assetFiles: ['boons/heaven-strike.webp', 'reference/hecate-full.png'],
+        manifest: { assets: [...manifest.assets, row(hecate)] },
+        assetFiles: [heavenStrike, hecate],
         ignoredAssetFiles: ['reference/hecate-full.png'],
       }),
     )
@@ -768,7 +844,7 @@ describe('assets', () => {
     // That advice is how the reference rows got in.
     const findings = checkAssets(
       withAssets({
-        assetFiles: ['boons/heaven-strike.webp', 'reference/hecate-full.png'],
+        assetFiles: [heavenStrike, image('reference/hecate-full.png')],
         ignoredAssetFiles: ['reference/hecate-full.png'],
       }),
     )
@@ -784,29 +860,31 @@ describe('assets', () => {
   })
 
   it('warns when one slug is claimed by two different images', () => {
-    const shadowing = {
-      assets: [
-        { id: 'coat-melinoe', category: 'aspects', file: 'aspects/coat-melinoe.png', sha256: 'aaa' },
-        { id: 'coat-melinoe', category: 'hammers', file: 'hammers/coat-melinoe.webp', sha256: 'bbb' },
-      ],
-    }
-    const findings = checkAssets(
-      withAssets({ manifest: shadowing, assetFiles: ['aspects/coat-melinoe.png', 'hammers/coat-melinoe.webp'] }),
-    )
+    const files = [image('aspects/coat-melinoe.png', 'game render'), image('hammers/coat-melinoe.webp', 'wiki copy')]
+    const findings = checkAssets(withAssets({ manifest: { assets: files.map(row) }, assetFiles: files }))
     expect(messages(findings, 'warn')).toContain('1 slugs are claimed by two different images')
   })
 
   it('stays quiet about the same picture shelved twice', () => {
-    const twice = {
-      assets: [
-        { id: 'arterial-spray', category: 'boons', file: 'boons/arterial-spray.webp', sha256: 'same' },
-        { id: 'arterial-spray', category: 'duos', file: 'duos/arterial-spray.webp', sha256: 'same' },
-      ],
-    }
-    const findings = checkAssets(
-      withAssets({ manifest: twice, assetFiles: ['boons/arterial-spray.webp', 'duos/arterial-spray.webp'] }),
-    )
+    const files = [image('boons/arterial-spray.webp', 'one picture'), image('duos/arterial-spray.webp', 'one picture')]
+    const findings = checkAssets(withAssets({ manifest: { assets: files.map(row) }, assetFiles: files }))
     expect(messages(findings, 'warn')).not.toContain('1 slugs are claimed by two different images')
+    expect(messages(findings, 'info')).toContain('1 images are shelved in two categories, byte for byte the same')
+  })
+
+  it('sorts a shadowed pair by the bytes on disk, not by a stale manifest hash', () => {
+    // Both rows still carry the hash of the picture they once shared, and one
+    // file has since been redrawn. Reading the manifest would call that the
+    // same picture shelved twice, which is the wrong group.
+    const shared = image('boons/arterial-spray.webp', 'one picture')
+    const redrawn = image('duos/arterial-spray.webp', 'redrawn')
+    const stale = { assets: [row(shared), { ...row(redrawn), bytes: shared.bytes, sha256: shared.sha256 }] }
+    const findings = checkAssets(withAssets({ manifest: stale, assetFiles: [shared, redrawn] }))
+    expect(messages(findings, 'warn')).toContain('1 slugs are claimed by two different images')
+    expect(messages(findings, 'info')).not.toContain('1 images are shelved in two categories, byte for byte the same')
+    expect(messages(findings, 'fail')).toContain(
+      '1 manifest entries disagree with the file on disk about its size or sha256',
+    )
   })
 
   it('fails when there is no manifest at all', () => {
