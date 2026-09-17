@@ -16,24 +16,39 @@
  * there is nothing to clean before a stranger reads it, and a mention whose id
  * stops resolving is drawn as the name it was written with.
  *
- * The letter in front of the id says which kind of record it names, the same
- * three kinds the wiki has: `t` for a trait, `a` for an Arcana card and `f` for
- * a familiar.
+ * The letter in front of the id says which kind of record it names: the three
+ * kinds the wiki has, `t` for a trait, `a` for an Arcana card and `f` for a
+ * familiar, and `b` for a published build.
+ *
+ * **A build is the one kind with no wiki record.** Its id is the short id it
+ * was published under, `@[Killer Current](b:aB3xK9pQmR)`, because that is the
+ * only name a build has that means the same thing in everybody's browser. A
+ * build that was never published has no such name and cannot be mentioned,
+ * and neither can one carried whole inside a long link, which has no id at
+ * all. `state/mentioned.ts` finds the build an id names.
  */
 
-import { traits } from '../data/app.ts'
+import { iconOf, traits } from '../data/app.ts'
 import { picksOf } from '../data/builds.ts'
 import type { ShownBuild } from '../data/builds.ts'
+import { isPublishedId, publishedInUrl } from '../state/publish.ts'
 import { wikiSections } from './wiki-index.ts'
 import type { WikiKind } from './wiki-route.ts'
 
-export type MentionAt = { kind: WikiKind; id: string }
+/** What a mention can name: a wiki record, or a published build. */
+export type MentionKind = WikiKind | 'build'
 
-const CODE: Record<WikiKind, string> = { trait: 't', arcana: 'a', familiar: 'f' }
-const KIND: Record<string, WikiKind> = { t: 'trait', a: 'arcana', f: 'familiar' }
+/**
+ * A mention's meaning. A union rather than one type with a wider `kind`, so a
+ * check for `'build'` leaves the rest typed as what the wiki can open.
+ */
+export type MentionAt = { kind: WikiKind; id: string } | { kind: 'build'; id: string }
+
+const CODE: Record<MentionKind, string> = { trait: 't', arcana: 'a', familiar: 'f', build: 'b' }
+const KIND: Record<string, MentionKind> = { t: 'trait', a: 'arcana', f: 'familiar', b: 'build' }
 
 /** One mention as stored. Global, so `parseProse` walks every one. */
-const TOKEN = /@\[([^\]\n]{1,80})\]\(([taf]):([A-Za-z0-9_]{1,80})\)/g
+const TOKEN = /@\[([^\]\n]{1,80})\]\(([tafb]):([A-Za-z0-9_]{1,80})\)/g
 
 /** A name without the four characters the token is made of, or a line break. */
 const clean = (name: string) => name.replace(/[[\]()\n]/g, '').trim().slice(0, 80)
@@ -41,6 +56,25 @@ const clean = (name: string) => name.replace(/[[\]()\n]/g, '').trim().slice(0, 8
 /** The text a mention is stored as. */
 export function mentionToken(at: MentionAt, name: string): string {
   return `@[${clean(name) || at.id}](${CODE[at.kind]}:${at.id})`
+}
+
+/**
+ * The published build a pasted short link names, or null.
+ *
+ * **Only a link to this site.** The id means something only to the server the
+ * page talks to, so a link to enodia.me pasted into a local copy names a build
+ * that copy has never heard of. Anything other than one bare link, words
+ * around it included, is left as what was pasted.
+ */
+export function linkedBuild(text: string, origin: string): string | null {
+  const bare = text.trim()
+  if (!bare || /\s/.test(bare)) return null
+  try {
+    const url = new URL(bare)
+    return url.origin === origin ? publishedInUrl(url.pathname) : null
+  } catch {
+    return null
+  }
 }
 
 /** A write-up in pieces: runs of text, and the mentions between them. */
@@ -118,6 +152,32 @@ function mentionables(): Mentionable[] {
 }
 
 /**
+ * The builds a mention can name, out of a library: your own that are
+ * published, and the ones you follow.
+ *
+ * Nothing else, on purpose. There is no route that searches the exchange, so
+ * a build you neither wrote nor follow gets in by pasting its short link, and
+ * this list tells nobody about a build they could not already open. Each id
+ * once, because a build you follow and a copy of it can both carry it.
+ */
+export function buildMentionables(library: readonly ShownBuild[]): Mentionable[] {
+  const out: Mentionable[] = []
+  for (const one of library) {
+    const id = one.publishedAs ?? (one.by === 'community' ? one.derivedFrom : undefined)
+    if (!id || !isPublishedId(id) || out.some((was) => was.id === id)) continue
+    out.push({
+      kind: 'build',
+      id,
+      name: one.name,
+      icon: iconOf.get(one.aspect) ?? null,
+      sub: one.by === 'community' ? 'Build you follow' : 'Your build',
+      folded: fold(one.name),
+    })
+  }
+  return out
+}
+
+/**
  * What the list offers for what was typed, best first.
  *
  * **The build's own picks first**, then whatever else the same gods give, then
@@ -127,15 +187,27 @@ function mentionables(): Mentionable[] {
  * before one that merely contains it.
  *
  * An empty query lists the picks, which is what typing a bare `@` should show.
+ *
+ * **Builds are the picks of text that belongs to no build.** A guide is
+ * written about builds, so with no build to rank by, the ones in `builds` come
+ * first and a bare `@` lists them. Inside a build's own text they rank with
+ * everything else, and the build itself is left out.
  */
-export function rankMentions(query: string, build: ShownBuild | null, limit = 8): Mentionable[] {
+export function rankMentions(
+  query: string,
+  build: ShownBuild | null,
+  limit = 8,
+  builds: readonly Mentionable[] = [],
+): Mentionable[] {
   const wanted = fold(query.trim())
   const held = new Set(build ? picksOf(build) : [])
   const gods = new Set(
     build ? [...build.boons, ...(build.optional ?? [])].flatMap((id) => traits.get(id)?.gods ?? []) : [],
   )
+  const others = builds.filter((one) => one.kind === 'build' && one.id !== build?.publishedAs)
 
   const tier = (one: Mentionable) => {
+    if (one.kind === 'build') return build ? 2 : 0
     if (held.has(one.id)) return 0
     if (one.kind === 'trait' && (traits.get(one.id)?.gods ?? []).some((god) => gods.has(god))) return 1
     return 2
@@ -147,7 +219,7 @@ export function rankMentions(query: string, build: ShownBuild | null, limit = 8)
     return one.folded.includes(wanted) ? 2 : -1
   }
 
-  return mentionables()
+  return [...mentionables(), ...others]
     .flatMap((one) => {
       const how = match(one)
       if (how < 0) return []

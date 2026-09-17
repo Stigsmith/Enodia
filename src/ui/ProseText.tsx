@@ -16,6 +16,7 @@
 
 import { Fragment } from 'react'
 
+import { BuildMention } from './BuildMention.tsx'
 import { pieceOf } from './build-pieces.ts'
 import type { Piece } from './build-pieces.ts'
 import { parseProse } from './mentions.ts'
@@ -35,6 +36,7 @@ export function ProseText({ text }: { text: string }) {
     <>
       {parseProse(text).map((bit, at) => {
         if (!('at' in bit)) return <Fragment key={at}>{bit.text}</Fragment>
+        if (bit.at.kind === 'build') return <BuildMention key={at} id={bit.at.id} name={bit.name} linked={false} />
         const piece = pieceOf(bit.at)
         return piece ? (
           <span key={at} className="mention">

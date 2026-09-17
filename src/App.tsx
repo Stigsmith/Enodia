@@ -47,6 +47,8 @@ import type { ShownBuild } from './data/builds.ts'
 import { Builds } from './ui/Builds.tsx'
 import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
+import { LiveRunProvider, OpenBuildProvider } from './ui/BuildMention.tsx'
+import type { BuildAt } from './ui/BuildMention.tsx'
 import { Wiki } from './ui/Wiki.tsx'
 import { WikiProvider } from './ui/WikiLink.tsx'
 import { wikiInUrl, wikiPath } from './ui/wiki-route.ts'
@@ -409,6 +411,29 @@ export function App() {
   }, [])
 
   /**
+   * A build named in a write-up, opened.
+   *
+   * One the library holds opens where the library is, on Builds, and `reveal`
+   * is how Builds is told which. One it does not hold goes through the same
+   * door as a short link, so it is offered rather than written into the
+   * library, and a taken-down one says so.
+   */
+  const [reveal, setReveal] = useState<string | null>(null)
+  const openBuild = useCallback((at: BuildAt) => {
+    if ('local' in at) {
+      if (wikiInUrl(window.location.pathname)) history.pushState(null, '', '/')
+      setReveal(at.local)
+      setView('builds')
+      return
+    }
+    void openPublished(at.published).then((opened) => {
+      if (!opened) return
+      setArrived(opened.build)
+      setArrivedDown(opened.takenDown)
+    })
+  }, [])
+
+  /**
    * There is deliberately no `live` flag around that decode.
    *
    * There was one, and under `StrictMode` it swallowed every shared link:
@@ -478,6 +503,10 @@ export function App() {
      * this wraps the whole app rather than any one layout. The wiki's links
      * work the same way, from the build dialog as much as from the wiki. */
     <WikiProvider value={openWiki}>
+    {/* The run, for a build named in any write-up on any screen, and what
+      * clicking one does. `ui/BuildMention.tsx` says why a context. */}
+    <LiveRunProvider value={run}>
+    <OpenBuildProvider value={openBuild}>
     <PeekProvider>
     {/* The editor is a mode inside Builds rather than a view of its own, so it
       * names its own help topic from in there. This is what it names it to. */}
@@ -524,6 +553,8 @@ export function App() {
     </div>
     </HelpProvider>
     </PeekProvider>
+    </OpenBuildProvider>
+    </LiveRunProvider>
     </WikiProvider>
   )
 
@@ -697,7 +728,7 @@ export function App() {
   if (screen === 'builds') {
     return frame(
       <div className="shell is-wide">
-        <Builds libraryAt={libraryAt} onGo={setView} />
+        <Builds libraryAt={libraryAt} onGo={setView} reveal={reveal} onRevealed={() => setReveal(null)} />
       </div>,
     )
   }

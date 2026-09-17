@@ -58,6 +58,15 @@ export type PublishOutcome = { ok: true; id: string; link: string } | { ok: fals
 export const linkTo = (id: string): string => `${window.location.origin}/b/${id}`
 
 /**
+ * What a published id can look like, as the worker's routes accept it. The ids
+ * it hands out are ten characters of this; the routes allow up to 32.
+ */
+const PUBLISHED_ID = '[A-Za-z0-9]{1,32}'
+
+/** Whether a string could be a published id, before anybody is asked about it. */
+export const isPublishedId = (id: string): boolean => new RegExp(`^${PUBLISHED_ID}$`).test(id)
+
+/**
  * The id in the address, or null.
  *
  * A path rather than a fragment. Both would work and both are short, but a path
@@ -65,7 +74,7 @@ export const linkTo = (id: string): string => `${window.location.origin}/b/${id}
  * address rather than as an address with something bolted on.
  */
 export function publishedInUrl(pathname: string): string | null {
-  const found = /^\/b\/([A-Za-z0-9]{1,32})\/?$/.exec(pathname)
+  const found = new RegExp(`^/b/(${PUBLISHED_ID})/?$`).exec(pathname)
   return found ? (found[1] as string) : null
 }
 

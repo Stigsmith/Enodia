@@ -297,12 +297,20 @@ the play experience cannot see.
   `not_found_handling`, and `App.tsx` pushes history for them and follows `popstate`. Every
   other view is state. A record is keyed by the game's internal id, never a display name,
   because six aspects share one. `src/ui/wiki-route.ts`
-- **A mention is `@[Name](t:Id)` inside plain text**, with `a:` for an Arcana card and `f:` for
-  a familiar. `src/ui/mentions.ts` parses it and `Prose` and `ProseText` draw it. The id is the
+- **A mention is `@[Name](t:Id)` inside plain text**, with `a:` for an Arcana card, `f:` for
+  a familiar and `b:` for a published build, whose id is its short id. `src/ui/mentions.ts`
+  parses it and `Prose` and `ProseText` draw it. The id is the
   meaning and the name only a fallback: a mention is drawn with the current display name,
-  never the stored one, so it cannot relabel anything. **A build's notes on its picks share 500
-  characters**, because the whole build rides in the link and 2000 is where a Discord message
-  stops. `transfer.test.ts` fails if the worst case goes over
+  never the stored one, so it cannot relabel anything. **A build mention carries its verdict
+  while a run is live**, through `LiveRunProvider` in `App.tsx`, because `useRun` is local
+  state and a second call would never hear about the next pick. `state/mentioned.ts` finds
+  the build, library first, and **only a 404 or a takedown is "withdrawn"**: a 429 or an
+  offline read draws the stored name and is asked again later. **A build's notes on its picks
+  share 500 characters**, because the whole build rides in the link and 2000 is where a
+  Discord message stops. `transfer.test.ts` fails if the worst case goes over, **and its worst
+  case writes How it works and If the run goes your way as words.** Eight mentions at the
+  front of those two fields reach 2022 with boons and 2035 with builds, measured on 17
+  September 2026. Four builds in the notes reach 1979 to 1998
 - **The Olympian damage table is traced out of each trait's own record**, in
   `scripts/olympian.ts`: a stat line reading a listed projectile (`ExtractValues` with
   `BaseType` `Projectile`), a function argument spawning one, or a `PropertyChanges` entry

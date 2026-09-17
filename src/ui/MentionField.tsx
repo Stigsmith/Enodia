@@ -15,12 +15,18 @@
  * copy of the text laid out to find where the caret is. Focus never leaves the
  * field: the list is pointed at with `aria-activedescendant`, the way
  * `Dropdown.tsx` does it, so typing carries on where it was.
+ *
+ * **Builds are offered too**: your published ones and the ones you follow,
+ * which are the builds this browser can name by id. Any other published build
+ * gets in by pasting its short link, which becomes a mention on the spot.
  */
 
 import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import type { ShownBuild } from '../data/builds.ts'
-import { mentionQuery, mentionToken, rankMentions } from './mentions.ts'
+import { loadBuilds } from '../state/builds.ts'
+import { fetchMentioned, fromLibrary } from '../state/mentioned.ts'
+import { buildMentionables, linkedBuild, mentionQuery, mentionToken, rankMentions } from './mentions.ts'
 
 type Query = { start: number; query: string }
 
@@ -60,8 +66,17 @@ export function MentionField({
   /** Where the caret goes once a mention is in, which has to wait for the new text to render. */
   const caret = useRef<number | null>(null)
   const id = useId()
+  /** The text as it stands, for a paste whose name arrives after the render that put it in. */
+  const latest = useRef(value)
+  latest.current = value
 
-  const found = useMemo(() => (query ? rankMentions(query.query, build) : []), [query, build])
+  /* Read once when the field opens. A build published while it is open joins
+     the list the next time it opens. */
+  const [builds] = useState(() => buildMentionables(loadBuilds()))
+  const found = useMemo(
+    () => (query ? rankMentions(query.query, build, 8, builds) : []),
+    [query, build, builds],
+  )
 
   /**
    * Whether the list, or its "nothing" line, is showing.
@@ -97,6 +112,43 @@ export function MentionField({
     caret.current = query.start + token.length + (after.startsWith(' ') ? 1 : 0)
     setQuery(null)
     onChange(next)
+  }
+
+  /**
+   * A short link pasted on its own becomes a mention of the build.
+   *
+   * The name comes from the library when it holds the build, and from the
+   * build itself once it has been read. Until then the id stands in, and the
+   * name replaces it in place if the text still holds that mention. The
+   * stored name is only a fallback either way: a mention is drawn with the
+   * build's current name.
+   */
+  const onPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const published = linkedBuild(event.clipboardData.getData('text'), window.location.origin)
+    if (!published) return
+    const area = event.currentTarget
+    const known = fromLibrary(published)
+    const named = known?.state === 'found' ? known.build.name : ''
+    const at = { kind: 'build' as const, id: published }
+    const token = mentionToken(at, named)
+    const from = area.selectionStart
+    const next = value.slice(0, from) + token + value.slice(area.selectionEnd)
+    event.preventDefault()
+    if (next.length > maxLength) {
+      setFull(true)
+      return
+    }
+    caret.current = from + token.length
+    onChange(next)
+    if (named) return
+    void fetchMentioned(published).then((answer) => {
+      if (answer.state !== 'found') return
+      const text = latest.current
+      const better = mentionToken(at, answer.build.name)
+      const where = text.indexOf(token)
+      if (where < 0 || text.length - token.length + better.length > maxLength) return
+      onChange(text.slice(0, where) + better + text.slice(where + token.length))
+    })
   }
 
   useLayoutEffect(() => {
@@ -159,6 +211,7 @@ export function MentionField({
         }}
         onSelect={(event) => look(event.currentTarget)}
         onKeyDown={onKeyDown}
+        onPaste={onPaste}
         onBlur={() => {
           setQuery(null)
           onBlur?.()
