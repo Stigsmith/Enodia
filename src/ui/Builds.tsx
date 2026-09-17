@@ -46,7 +46,7 @@ import { BuildEditor } from './BuildEditor.tsx'
 import { acceptOffer, forkFollowed, listShelf, republishChangesTheBuild } from '../state/exchange.ts'
 import type { Listed } from '../state/exchange.ts'
 import { Counted } from './Counted.tsx'
-import { SchelemeusStand } from './Schelemeus.tsx'
+import { SchelemeusStand } from './Figures.tsx'
 import { declineOffer, loadOffers, offerFor } from '../state/offers.ts'
 import { LogRun } from './LogRun.tsx'
 import { BuildFilters } from './BuildFilters.tsx'
@@ -534,7 +534,7 @@ export function Builds({
 
   return (
     <div className="builds">
-      {/* Before the shelf and directly before it: `.skelly-stand +
+      {/* Before the shelf and directly before it: `.is-schelemeus +
         * .builds-shelf` is what makes room for him, so the room follows
         * whether he is drawn. */}
       <SchelemeusStand />

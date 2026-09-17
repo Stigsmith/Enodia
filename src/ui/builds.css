@@ -10143,89 +10143,131 @@ p.landing-say {
 }
 
 /**
- * Schelemeus, at the foot of your side of Builds.
+ * The standing figures: Schelemeus on your side of Builds, Odysseus on the
+ * Wiki.
  *
- * Charon's rules, mirrored to the left, and `Schelemeus.tsx` says what differs.
- * No media query here either: `SCHELEMEUS_ROOM` renders him only where he has
- * room, and every rule below applies exactly when he exists.
+ * Charon's rules, and `Figures.tsx` says what differs. No media query here
+ * either: `FIGURE_ROOM` renders a figure only where it has room, and every
+ * rule below applies exactly when one exists.
  *
- * **`--pane-left` and not `0`.** A pinned menu is a column on the left of the
- * window, and a figure fixed to the window's left edge stands under it.
- * `surface.css` sets the token to the pane's width while it is pinned.
+ * **Schelemeus stands at `--pane-left` and not at `0`.** A pinned menu is a
+ * column on the left of the window, and a figure fixed to the window's left
+ * edge stands under it. `surface.css` sets the token to the pane's width while
+ * it is pinned. Odysseus faces left as Charon does, so he stands where Charon
+ * stands, on the right, where nothing else is.
  */
-.skelly-stand {
+.figure-stand {
   position: fixed;
-  left: var(--pane-left);
   bottom: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-.skelly-stand-art {
+.figure-stand.is-schelemeus {
+  left: var(--pane-left);
+}
+
+.figure-stand.is-odysseus {
+  right: 0;
+}
+
+.figure-stand-art {
   display: block;
   /**
-   * Charon's height, so the two read as the same kind of thing on the two
-   * sides of one screen. `schelemeus-stand.png` is the portrait cropped to its
-   * own alpha, which is exactly the sprite's trimmed rect, (24, 100) to
-   * (1024, 1350) of a 1250 by 1350 canvas, and saved 760 tall: 608 by 760.
-   * At 34rem he is 435px wide.
+   * Charon's height, so all three read as the same kind of thing. Each file is
+   * the portrait cropped to its own alpha, which is the sprite's trimmed rect
+   * to the pixel, and saved 760 tall:
+   *
+   *   schelemeus-stand.png  (24, 100) to (1024, 1350)   608 by 760   435px wide at 34rem
+   *   odysseus-stand.png    (20, 108) to (1122, 1350)   674 by 760   482px wide at 34rem
    */
   height: min(34rem, 62dvh);
   width: auto;
-  aspect-ratio: 608 / 760;
   opacity: 0.9;
 }
 
-/**
- * The room he stands in: his width at his tallest, less the page's own
- * padding, plus room to breathe. 435 - 32 + 10 is 413px, and 26rem is 416.
- * The same arithmetic as Charon's 33rem, and the same shortfall: at exactly
- * 96rem it leaves the shelf three card columns.
- */
-.skelly-stand + .builds-shelf {
-  padding-left: 26rem;
+.is-schelemeus .figure-stand-art {
+  aspect-ratio: 608 / 760;
+}
+
+.is-odysseus .figure-stand-art {
+  aspect-ratio: 674 / 760;
 }
 
 /**
- * His blink, which is the game's `Portrait_Skelly_Blink` and the one thing on
- * him that moves.
+ * The room each stands in: its width at its tallest, less the page's own
+ * padding, plus room to breathe. Schelemeus is 435 - 32 + 10, 413px, and
+ * 26rem is 416. Odysseus is 482 - 32 + 10, 460px, and 29rem is 464. The same
+ * arithmetic as Charon's 33rem, and the same shortfall: at exactly 96rem the
+ * shelf and the wiki's index are left three columns.
+ */
+.is-schelemeus + .builds-shelf {
+  padding-left: 26rem;
+}
+
+.is-odysseus + .wiki-shelf {
+  padding-right: 29rem;
+}
+
+/**
+ * The blink, which is each portrait's `_Blink` and the one thing on it that
+ * moves.
  *
- * **Where.** The blink frames are drawn on the portrait's own 1250 by 1350
- * canvas, and the blink record states `Scale = 0.8` and `OffsetY = -100`,
+ * **Where.** Each blink's frames are drawn on its portrait's own 1250 by 1350
+ * canvas, and each blink record states `Scale = 0.8` and `OffsetY = -100`,
  * which is exactly what the portrait inherits from `Portrait_Base_01`. So the
- * frames sit on the portrait one to one. Their union, with a pixel of margin,
- * is (559, 240) to (711, 320), and against the crop above that is these four
- * percentages. `schelemeus-blink.png` is the five drawn frames cropped to that
- * box, at twice the portrait's scale, 64 colours.
+ * frames sit on the portrait one to one. The union of frames two to six, with
+ * a pixel of margin, against the crop above, is the four percentages below.
+ * Each sheet is those five frames cropped to that box at twice the portrait's
+ * scale, 64 colours.
  *
- * **When.** The record's slides are: the first frame, an empty sprite, for 1;
- * nothing, `Scale = 0`, for a random 120 to 250; then frames two to six for 2,
- * 4, 2, 2 and 2, and it loops. So a blink is 12 frames and the gap between
- * blinks is 121 to 251. **The random gap is fixed here at its middle, 185**,
- * because a keyframe cannot be random: 198 frames a loop, and the five frames
- * start at 186, 188, 192, 194 and 196.
+ *   Schelemeus  (559, 240) to (711, 320)
+ *   Odysseus    (552, 222) to (647, 255)
  *
- * **The rate is inferred, not stated.** The blink names no `PlaySpeed`. Every
- * layer of this portrait that names one names 30, the wiggles and the moon
- * glow, and at 30 the loop is 6.6 seconds and the blink 0.4. One look in game
- * would settle it.
+ * **When.** Both records are the same shape: the first frame, an empty sprite,
+ * for 1; nothing, `Scale = 0`, for a random 120 to 250; then frames two to six
+ * for 2, 4, 2, 2 and 2, and they loop. So a blink is 12 frames and the gap is
+ * 121 to 251. **The random gap is fixed here at its middle, 185**, because a
+ * keyframe cannot be random: 198 frames a loop, and the five frames start at
+ * 186, 188, 192, 194 and 196. The two figures are never on screen together, so
+ * blinking in step costs nothing.
  *
- * `step-end`, because each keyframe holds until the next, and the sheet is
+ * **The rate is inferred, not stated.** Neither blink names a `PlaySpeed`.
+ * Every layer of either portrait that names one names 30, and at 30 the loop
+ * is 6.6 seconds and the blink 0.4. One look in game would settle it.
+ *
+ * `step-end`, because each keyframe holds until the next, and each sheet is
  * five cells, so cell `k` is `k/4 x 100%` for the reason Charon's coins are
  * `k/59`. Hidden outside the blink, and hidden outright under reduced motion.
  */
-.skelly-blink {
+.figure-blink {
   position: absolute;
+  background-position: 0 0;
+  background-size: 500% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation: portrait-blink 6.6s step-end infinite;
+}
+
+/* The `?v` is Charon's rule for a sheet whose bytes may change under a stable
+   name: bump it whenever the file changes. */
+.is-schelemeus .figure-blink {
   left: 53.5%;
   top: 11.2%;
   width: 15.2%;
   height: 6.4%;
-  background: url('/characters/schelemeus-blink.png?v=1') 0 0 / 500% 100% no-repeat;
-  opacity: 0;
-  animation: schelemeus-blink 6.6s step-end infinite;
+  background-image: url('/characters/schelemeus-blink.png?v=1');
 }
 
-@keyframes schelemeus-blink {
+.is-odysseus .figure-blink {
+  left: 48.276%;
+  top: 9.179%;
+  width: 8.621%;
+  height: 2.657%;
+  background-image: url('/characters/odysseus-blink.png?v=1');
+}
+
+@keyframes portrait-blink {
   0% {
     opacity: 0;
     background-position-x: 0%;
@@ -10252,7 +10294,7 @@ p.landing-say {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skelly-blink {
+  .figure-blink {
     animation: none;
   }
 }

@@ -99,7 +99,7 @@ their source pages the first time, which is how that got noticed.
 | `duos/` | 48 | mixed, 46 wiki and 2 game | Duo boon icons | complete, 37 of 37 |
 | `keepsakes/` | 33 | wiki | Keepsake icons | complete |
 | `aspects/` | 56 | mixed, 30 wiki and 26 game | Aspect icons from the game, the wiki's large renders, and the Black Coat candidates | complete, 24 icons and 24 renders |
-| `characters/` | 31 | mixed, 27 wiki and 4 game | Non-boon-granting character portraits, and the standing figures of Charon and Schelemeus with their animated layers | good |
+| `characters/` | 33 | mixed, 27 wiki and 6 game | Non-boon-granting character portraits, and the standing figures of Charon, Schelemeus and Odysseus with their animated layers | good |
 | `gods/` | 16 | wiki | Boon-granting god portraits | complete |
 | `infusions/` | 11 | wiki | Elemental infusion boons | unverified count |
 | `artifacts/` | 11 | wiki | Consumables and run items | partial |
@@ -665,7 +665,29 @@ The record's timing is a gap of 120 to 250 frames and then frames two to six
 for 2, 4, 2, 2 and 2. The gap is fixed at 185 in `builds.css`, because a
 keyframe cannot be random. **The rate is an inference**: the blink states no
 `PlaySpeed`, and every layer on this portrait that states one says 30.
-`src/ui/schelemeus-art.test.ts` pins the frame moments and the cells.
+`src/ui/figures-art.test.ts` pins the frame moments and the cells.
+
+### Odysseus, the same way
+
+`Odysseus.pkg`, extracted the same way. It also holds a Thoughtful portrait
+with its own layers and a Bath portrait; the Wiki uses the default one,
+`Portrait_Odysseus_Default_01`, which again states no offset or scale and
+takes 0.8 and -100 from `Portrait_Base_01`. Its blink record states the same
+two numbers and the same slides as Schelemeus's, 2, 4, 2, 2 and 2 after a gap
+of 120 to 250, and its six frames are all present on the portrait's 1250 by
+1350 canvas. Composited by the same rule, the shut frame closes both eyes.
+
+**`assets/characters/odysseus-stand.png`, 457 KB**, is the trimmed rect,
+(20, 108) to (1122, 1350), saved 760 tall: 674 by 760. The heaviest of the
+three figures, and full colour for Schelemeus's reason: 256 colours came to
+219 KB with ghost halos round the soft blue glows, and 256 with alpha kept exact
+to 314 KB with dither across the face and cloak at 2x.
+
+**`assets/characters/odysseus-blink.png`, 3 KB**, is frames two to six cropped
+to (552, 222) to (647, 255), five cells of 116 by 40 at 64 colours. Against the
+stand: left 48.276%, top 9.179%, width 8.621%, height 2.657%.
+
+He faces left, as Charon does, so he stands on the right edge of the Wiki.
 
 Extract with [`deppth2`](https://github.com/SGG-Modding/deppth), the SGG modding
 community's tool. The `-s` flag splits individual sprites out of the atlases rather than
