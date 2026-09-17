@@ -73,4 +73,9 @@ export type Bundle = {
   manifest: Manifest | null
   /** every image actually on disk, as a path under assets/ */
   assetFiles: string[]
+  /**
+   * The images in `assetFiles` that git ignores, so no clone has them. `null`
+   * when git could not be asked, which is a check not run rather than a pass.
+   */
+  ignoredAssetFiles: string[] | null
 }

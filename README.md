@@ -47,8 +47,11 @@ worker/               Phase 4. The API under /api/*, accounts and nothing else
 migrations/           D1 schema, generated from worker/schema.ts, never hand written
 ```
 
-Three folders are deliberately absent from version control: `extracted/` is 443 MB of
-`deppth2` output, `reference/` is mascot art pulled from it, and both are regenerable.
+Two folders of art are kept out of version control on purpose. `extracted/` is 443 MB of
+`deppth2` output and can be regenerated. `reference/` is the owner's reference art for the
+mascot work, and no script makes it: none of it is a byte copy of anything in `extracted/`.
+It sits at the root and not in `assets/`, because everything in `assets/` is served, and
+`npm run validate` fails on any image there that git ignores.
 
 ---
 

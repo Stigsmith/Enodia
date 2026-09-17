@@ -264,6 +264,13 @@ the play experience cannot see.
   that is Vite's `publicDir` and therefore the only route into `dist/`. All three scripts
   that walk that directory filter to image extensions, so neither is visible to any of them.
   Check that again before adding a third non-image
+- **Nothing git ignores goes under `assets/`.** `npm run assets` describes what is on disk,
+  so an ignored image reaches the committed manifest and every clean clone fails `prebuild`
+  on a row it has no file for. `assets/reference/` did that from 29 August to 17 September
+  2026, hidden by an unanchored `reference/` in `.gitignore`, and the main checkout never
+  failed because it had the files. That art lives in `reference/` at the root now, and the
+  validator asks git and fails on any ignored image under `assets/`. **Prove a build fix in
+  a fresh worktree**, because the main checkout holds files no clone has
 - **`npm run assets` is the only writer of `assets/manifest.json`.** The PowerShell used to
   write it too, which is why the manifest went stale the moment a category held art the
   PowerShell never sees. `--fill` copies missing icons out of `extracted/` first
