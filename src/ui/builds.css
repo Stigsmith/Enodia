@@ -1231,6 +1231,61 @@ a.mention:focus-visible .mention-name {
   border-bottom-color: var(--lit-hot);
 }
 
+/* A build named in a write-up. Inline rather than a box, so a verdict can wrap
+ * with the sentence around it; the name alone stays in one piece. The verdict
+ * wears the run screen's colours for the same four states, on a rule down its
+ * left, as `.topbar-chasing` does. */
+.mention.mention-build {
+  display: inline;
+  white-space: normal;
+}
+
+.mention-build .mention-art {
+  margin-right: 0.2em;
+  vertical-align: -0.25em;
+}
+
+.mention-build .mention-name {
+  white-space: nowrap;
+}
+
+/* A faint ground as well as the rule, so the verdict ends where it ends and
+ * the author's sentence is visibly picking up again after it. Cloned on each
+ * line when it wraps. */
+.mention-verdict {
+  margin-left: 0.3em;
+  padding: 0 0.35em;
+  border-left: 2px solid var(--lit);
+  border-radius: 0 var(--r-hair) var(--r-hair) 0;
+  background: color-mix(in srgb, var(--lit) 12%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  font-size: 0.88em;
+  color: var(--bone-dim);
+}
+
+.mention-verdict.is-dead {
+  border-left-color: var(--rim-magenta);
+}
+
+.mention-verdict.is-at_risk {
+  border-left-color: var(--unbuilt);
+}
+
+.mention-verdict.is-on_track {
+  border-left-color: var(--lit-hot);
+}
+
+.mention-verdict.is-withdrawn {
+  border-left-color: var(--div-5);
+  font-style: italic;
+  color: var(--bone-faint);
+}
+
+.mention-build.is-withdrawn .mention-name {
+  color: var(--bone-dim);
+}
+
 .mention-field {
   position: relative;
 }

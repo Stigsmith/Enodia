@@ -75,11 +75,20 @@ export function Builds({
   onClose,
   onGo,
   libraryAt = 0,
+  reveal = null,
+  onRevealed,
 }: {
   onClose?: () => void
   onGo?: (view: View) => void
   /** Moves when storage changed underneath this screen. See the effect below. */
   libraryAt?: number
+  /**
+   * A build to open, asked for from outside: a build named in a write-up. Handed
+   * back through `onRevealed` once it is open, so coming back to this screen
+   * later does not open it again.
+   */
+  reveal?: string | null
+  onRevealed?: () => void
 }) {
   const [selection, setSelection] = useState(EMPTY_SELECTION)
   const [sort, setSort] = useState<SortId>('name')
@@ -127,6 +136,12 @@ export function Builds({
     setMine(loadBuilds())
     setBin(loadBin())
   }, [libraryAt])
+
+  useEffect(() => {
+    if (!reveal) return
+    setOpenId(reveal)
+    onRevealed?.()
+  }, [reveal, onRevealed])
 
   /**
    * Cards or a list. Absent in prefs means nobody has chosen, and the library's

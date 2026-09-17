@@ -202,6 +202,33 @@ describe('one build, as a link', () => {
 
     expect(notesLength(full)).toBe(NOTES_BUDGET)
     expect((await linkFor(full, 'https://enodia.example/')).length).toBeLessThan(2000)
+
+    /* The same notes, each naming a different published build instead of a
+       boon. A build id is ten random characters from the worker's alphabet,
+       which packs worse than a trait id made of words, so it is measured
+       rather than assumed. Measured on 17 September 2026: 1963 with the boons,
+       and 1979 to 1998 with four builds across 1000 random sets of ids, none
+       reaching 2000. These ids give 1997. **Two characters of room.**
+
+       **This is a claim about this shape and no stronger one.** The same build
+       with eight mentions of either kind at the front of How it works and If
+       the run goes your way came to 2022 with boons and 2035 with builds, so
+       the 2000 guard has only ever held for those two fields written as words. */
+    let seen = 0
+    const ids = ['aB3xK9pQmR', 'Zz9yX8wV7u', 'Qq2wE3rT4y', 'Hn5jK6mP7s', 'Wd8fG9hJ2k']
+    const asBuilds = Object.fromEntries(
+      Object.entries(notes).map(([pick, note]) => {
+        const said = note.replace(/^@\[[^\]]*\]\(t:\w+\)/, '')
+        if (said === note) return [pick, note]
+        const named = `@[Killer Current](b:${ids[seen++ % ids.length]})`
+        // Topped up from the same sentences, so every note keeps its length.
+        return [pick, `${named}${said} ${words}`.slice(0, note.length)]
+      }),
+    )
+    expect(seen).toBeGreaterThan(2)
+    const withBuilds = build({ ...full, notes: asBuilds })
+    expect(notesLength(withBuilds)).toBe(NOTES_BUDGET)
+    expect((await linkFor(withBuilds, 'https://enodia.example/')).length).toBeLessThan(2000)
   })
 
   it('carries the notes on the picks', async () => {

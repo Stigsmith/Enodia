@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { traits } from '../data/app.ts'
 import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import { picksOf } from '../data/builds.ts'
-import { mentionQuery, mentionToken, parseProse, rankMentions } from './mentions.ts'
+import { buildMentionables, linkedBuild, mentionQuery, mentionToken, parseProse, rankMentions } from './mentions.ts'
 
 describe('a stored mention', () => {
   it('reads back as the thing it names, with the words around it untouched', () => {
@@ -99,5 +99,71 @@ describe('what the list offers first', () => {
     for (const one of rankMentions('a', null, 30)) {
       if (one.kind === 'trait') expect(one.name).toBe(traits.get(one.id)?.name)
     }
+  })
+})
+
+describe('a mentioned build', () => {
+  const mine = { ...FIRST_BUILD, id: 'local-1', name: 'Alpha Build', by: 'owner' as const, publishedAs: 'aB3xK9pQmR' }
+  const followed = { ...FIRST_BUILD, id: 'local-2', name: 'Followed One', by: 'community' as const, derivedFrom: 'Zz9yX8wV7u' }
+  const unpublished = { ...FIRST_BUILD, id: 'local-3', name: 'Never Shared', by: 'owner' as const }
+
+  it('is stored with its published id and reads back as a build', () => {
+    const token = mentionToken({ kind: 'build', id: 'aB3xK9pQmR' }, 'Killer Current')
+    expect(token).toBe('@[Killer Current](b:aB3xK9pQmR)')
+    expect(parseProse(`Try ${token} first.`)).toEqual([
+      { text: 'Try ' },
+      { at: { kind: 'build', id: 'aB3xK9pQmR' }, name: 'Killer Current' },
+      { text: ' first.' },
+    ])
+  })
+
+  it('can be any build of yours that is published, or one you follow, and nothing else', () => {
+    const found = buildMentionables([mine, followed, unpublished])
+    expect(found.map((one) => [one.id, one.sub])).toEqual([
+      ['aB3xK9pQmR', 'Your build'],
+      ['Zz9yX8wV7u', 'Build you follow'],
+    ])
+    expect(found.every((one) => one.kind === 'build')).toBe(true)
+  })
+
+  it('is offered once however many copies carry its id', () => {
+    const copy = { ...followed, id: 'local-4', name: 'A Copy' }
+    expect(buildMentionables([followed, copy]).map((one) => one.id)).toEqual(['Zz9yX8wV7u'])
+  })
+
+  it('refuses an id the worker would never hand out', () => {
+    const sample = { ...followed, derivedFrom: 'sample-killer-current' }
+    expect(buildMentionables([sample])).toEqual([])
+  })
+
+  /* A guide is about builds and has no picks of its own, so a bare @ there
+     lists the builds. Inside a build's own notes the picks still come first. */
+  it('comes first where the text belongs to no build, and not inside one', () => {
+    const builds = buildMentionables([mine, followed])
+    expect(rankMentions('', null, 8, builds).map((one) => one.id)).toEqual(['aB3xK9pQmR', 'Zz9yX8wV7u'])
+    expect(rankMentions('', FIRST_BUILD, 8, builds).some((one) => one.kind === 'build')).toBe(false)
+    expect(rankMentions('followed', FIRST_BUILD, 8, builds).map((one) => one.id)).toContain('Zz9yX8wV7u')
+  })
+
+  it('is never offered inside its own notes', () => {
+    const builds = buildMentionables([mine, followed])
+    const found = rankMentions(mine.name.slice(0, 6), mine, 40, builds)
+    expect(found.map((one) => one.id)).not.toContain('aB3xK9pQmR')
+  })
+})
+
+describe('a pasted link', () => {
+  const origin = 'https://enodia.example'
+
+  it('names the build when it is a short link to this site', () => {
+    expect(linkedBuild(`${origin}/b/aB3xK9pQmR`, origin)).toBe('aB3xK9pQmR')
+    expect(linkedBuild(`  ${origin}/b/aB3xK9pQmR/\n`, origin)).toBe('aB3xK9pQmR')
+  })
+
+  it('names nothing on another site, with words around it, or as a long link', () => {
+    expect(linkedBuild('https://elsewhere.example/b/aB3xK9pQmR', origin)).toBeNull()
+    expect(linkedBuild(`see ${origin}/b/aB3xK9pQmR`, origin)).toBeNull()
+    expect(linkedBuild(`${origin}/#build=zABC`, origin)).toBeNull()
+    expect(linkedBuild('aB3xK9pQmR', origin)).toBeNull()
   })
 })
