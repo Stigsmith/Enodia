@@ -38,6 +38,16 @@ export type View =
    */
   | 'landing'
   | 'builds'
+  /**
+   * Sections of writing with builds named inside them, yours on one side and
+   * everybody's on the other, in the row the build exchange used to hold.
+   *
+   * **A build named in a guide carries its verdict while a run is live**, which
+   * is the reason the screen exists at all rather than being a wiki with a
+   * byline. `decisions/2026-09-13-guides.md` has the argument, and
+   * `ui/BuildMention.tsx` is where it happens.
+   */
+  | 'guides'
   | 'arcana'
   /**
    * Every entity the tool knows, each with a record at an address of its own,

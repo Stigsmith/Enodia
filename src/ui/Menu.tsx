@@ -21,7 +21,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import type { BuildSide } from '../state/prefs.ts'
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
 
@@ -61,21 +60,15 @@ type Entry = {
 
 export function Menu({
   view,
-  side,
   hasRun,
   onGo,
-  onBuilds,
   onEndRun,
   onShowBriefing,
 }: {
   /** which screen is showing, so the menu can mark where you already are */
   view: View
-  /** which side of Builds is showing, for the same reason */
-  side: BuildSide
   hasRun: boolean
   onGo: (view: View) => void
-  /** Builds, on the side asked for */
-  onBuilds: (side: BuildSide) => void
   onEndRun: (outcome?: 'died' | 'finished') => void
   /** absent outside a run. DESIGN.md 6.3 wants the briefing on demand too */
   onShowBriefing?: () => void
@@ -146,15 +139,16 @@ export function Menu({
       title: 'Builds',
       entries: [
         /**
-         * Builds, which was the build manager, and the exchange is its other
-         * side now. Two rows into one screen until the exchange's row becomes
-         * Guides, so each row opens its own side and is marked on it.
+         * Builds, which was the build manager and the build exchange. One row
+         * for one screen: which side of it you are on is the switch in its own
+         * heading, and a menu row that lands you on a particular side would be
+         * a second control saying the same thing from further away.
          */
         {
           label: 'Builds',
-          here: view === 'builds' && side === 'mine',
+          here: view === 'builds',
           action: () => {
-            onBuilds('mine')
+            onGo('builds')
             leave()
           },
         },
@@ -187,11 +181,16 @@ export function Menu({
             leave()
           },
         },
+        /**
+         * Guides, in the row the build exchange held, which is the whole reason
+         * the exchange became a side of Builds: the menu is the same length it
+         * was. `decisions/2026-09-13-guides.md` item 5.
+         */
         {
-          label: 'Build exchange',
-          here: view === 'builds' && side === 'all',
+          label: 'Guides',
+          here: view === 'guides',
           action: () => {
-            onBuilds('all')
+            onGo('guides')
             leave()
           },
         },

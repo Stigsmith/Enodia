@@ -229,31 +229,47 @@ async function through(bytes: Uint8Array, transform: TransformStream): Promise<U
   return out
 }
 
-export async function packBuild(build: ShownBuild): Promise<string> {
-  const json = JSON.stringify(shareable(build))
-  const bytes = new TextEncoder().encode(json)
+/**
+ * Any text, packed the way a build is, and the only place the format lives.
+ *
+ * A guide is the second thing to travel as a payload, and it is text with the
+ * same shape of repetition in it: the same trait ids, spelled out inside
+ * mentions. Rather than a second marker and a second base64 pass, both go
+ * through this, so a payload is one format and there is one thing to get
+ * right. `worker/guides.ts` stores it as opaquely as `worker/publish.ts`
+ * stores a build's.
+ */
+export async function packText(text: string): Promise<string> {
+  const bytes = new TextEncoder().encode(text)
   const Compression = (globalThis as { CompressionStream?: typeof CompressionStream }).CompressionStream
   if (!Compression) return PLAIN + toBase64Url(bytes)
   return PACKED + toBase64Url(await through(bytes, new Compression('deflate-raw')))
 }
 
-export async function unpackBuild(payload: string): Promise<ShownBuild | null> {
+/** The other half. Null for anything that is not one of ours, or will not open. */
+export async function unpackText(payload: string): Promise<string | null> {
   try {
     const marker = payload[0]
     const body = payload.slice(1)
-    let json: string
-    if (marker === PLAIN) {
-      json = new TextDecoder().decode(fromBase64Url(body))
-    } else if (marker === PACKED) {
-      const Decompression = (globalThis as { DecompressionStream?: typeof DecompressionStream })
-        .DecompressionStream
-      if (!Decompression) return null
-      json = new TextDecoder().decode(
-        await through(fromBase64Url(body), new Decompression('deflate-raw')),
-      )
-    } else {
-      return null
-    }
+    if (marker === PLAIN) return new TextDecoder().decode(fromBase64Url(body))
+    if (marker !== PACKED) return null
+    const Decompression = (globalThis as { DecompressionStream?: typeof DecompressionStream })
+      .DecompressionStream
+    if (!Decompression) return null
+    return new TextDecoder().decode(await through(fromBase64Url(body), new Decompression('deflate-raw')))
+  } catch {
+    return null
+  }
+}
+
+export async function packBuild(build: ShownBuild): Promise<string> {
+  return packText(JSON.stringify(shareable(build)))
+}
+
+export async function unpackBuild(payload: string): Promise<ShownBuild | null> {
+  const json = await unpackText(payload)
+  if (json === null) return null
+  try {
     const parsed: unknown = JSON.parse(json)
     return looksLikeBuild(parsed) ? parsed : null
   } catch {

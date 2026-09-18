@@ -89,6 +89,12 @@ export const ROADMAP: Plan[] = [
   },
   {
     stage: 'now',
+    title: 'Guides',
+    proof: 'src/ui/GuidesScreen.tsx',
+    say: 'A write-up in a few sections with builds named inside it, published like a build and read like one, yours on one side and everybody’s on the other. It is what Collections became: a list of builds added little over the shelf and its filters. **A guide read during a run shows how that run stands with every build it names**, so the same paragraph says something different at the fourth Exit than it did at the Crossroads, and one whose author has changed or withdrawn a build says which. Four prompts nobody has to answer and four more sections of your own. The builds it is about are whatever it names, in that order, and what a card says it is about is counted out of the writing rather than typed by anybody.',
+  },
+  {
+    stage: 'now',
     title: 'Leaderboards',
     proof: 'src/ui/Leaderboards.tsx',
     say: 'What people have followed, played and got through, counted. Everybody, or just the people you swapped codes with. Every board counts one thing and none of them is a rate or a score: a build followed more has been followed more, and nothing here knows whether it is good.',
@@ -161,12 +167,6 @@ export const ROADMAP: Plan[] = [
     title: 'Builds by aspect',
     proof: 'src/ui/BuildsByAspect.tsx',
     say: 'The filters can answer this now, one selection at a time. A dedicated view would show which builds remain available for a given aspect at a glance.',
-  },
-  {
-    stage: 'next',
-    title: 'Guides',
-    proof: 'src/ui/Guides.tsx',
-    say: 'A write-up in a few sections with builds named inside it, published like a build and read like one. It is what Collections became: a list of builds added little over the shelf and its filters, and a guide read during a run shows how that run stands with every build it names, so it reads differently at the fourth Exit than at the Crossroads. Its builds are whatever it names, in that order, and a note about somebody else’s build stays inside the guide.',
   },
   {
     stage: 'next',

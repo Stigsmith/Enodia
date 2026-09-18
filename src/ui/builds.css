@@ -10201,12 +10201,19 @@ p.landing-say {
  * arithmetic as Charon's 33rem, and the same shortfall: at exactly 96rem the
  * shelf and the wiki's index are left three columns.
  */
-.is-schelemeus + .builds-shelf {
+.is-schelemeus + .builds-shelf,
+.is-schelemeus + .guides-shelf {
   padding-left: 26rem;
 }
 
 .is-odysseus + .wiki-shelf {
   padding-right: 29rem;
+}
+
+/* Guides is the second screen with two sides and the second with Charon on
+   everybody's, so his 33rem lands here too. The arithmetic is his, above. */
+.xchange-charon + .guides-shelf {
+  padding-right: 33rem;
 }
 
 /**

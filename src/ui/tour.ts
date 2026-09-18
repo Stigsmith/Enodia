@@ -293,6 +293,58 @@ export const TOURS: Record<string, Step[]> = {
     },
   ],
 
+  /* Your side of Guides. The draft line is not in here: it is only on screen
+     when there is one, and a step pointing at nothing walks her into a wall. */
+  guides: [
+    { say: 'Guides. Sections of writing, with builds named inside them. Yours and the ones you kept are on this side.' },
+    {
+      at: 'side-switch',
+      say: 'Everybody else is on the other side of that. Same as your builds.',
+    },
+    {
+      at: 'guides-new',
+      say: 'Start one there. Four things to fill in, and you can leave any of them blank. It is not a form.',
+    },
+  ],
+
+  'guides-all': [
+    { say: 'Guides other people wrote. About a weapon, a boss, one achievement, whatever they felt like.' },
+    {
+      at: 'guide-card',
+      say: 'The row on each one is what it keeps going on about. Nobody typed those. They are counted out of the writing itself.',
+    },
+    {
+      at: 'side-switch',
+      say: 'Yours are back on the other side of this.',
+    },
+  ],
+
+  'guide-read': [
+    { say: 'Somebody wrote this. Not me. I would have used more capitals.' },
+    {
+      say: 'A build named in here says how it stands in your run, while you have one going. Open a guide mid run and it reads differently at the fourth Exit than it did at the start.',
+    },
+    {
+      at: 'guide-marks',
+      say: 'Keep it, like it, or say something is wrong with it. Saving puts it on your side.',
+    },
+  ],
+
+  'guide-editor': [
+    { say: 'Right. Your turn.' },
+    {
+      at: 'guide-title',
+      say: 'Title first. It is the only bit that is not optional, that and writing something somewhere.',
+    },
+    {
+      at: 'guide-add',
+      say: 'Four prompts, and four more of your own if you want them. Leave the ones you have nothing to say about. Empty ones are skipped when anybody reads it.',
+    },
+    {
+      say: 'Type an at sign to name a boon, a card, or a build. Paste a build link and it turns into one. That is the part that does the clever thing later.',
+    },
+  ],
+
   unbuilt: [
     { say: 'You pressed the help mark. On a page with nothing on it. To find out about the page with nothing on it.' },
     { at: 'unbuilt-dora', say: 'There is nothing here. Just me, and a hat I did not pick.' },

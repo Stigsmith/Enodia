@@ -72,6 +72,7 @@ import { reclaimListing } from '../state/publish.ts'
 import type { ShownBuild } from '../data/builds.ts'
 import { BuildFilters } from './BuildFilters.tsx'
 import { Counted } from './Counted.tsx'
+import { CharonStand } from './Figures.tsx'
 import { Card } from './variants/Card.tsx'
 import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
@@ -283,7 +284,7 @@ export function Exchange({
     /* A page with no title of its own: `BuildsScreen` draws the heading, and
        the switch in it, above both sides. */
     <Page measure="shelf" standfirst="Builds other people published, and what happened when people played them.">
-      <CharonShop />
+      <CharonStand />
       {/* Everything the shelf is, inset past him where he is drawn. The grid
         * alone was not enough: the scope line and the filter bar are full width
         * and sit above it, and at 1600x950 both crossed his box. Measured, not
@@ -528,82 +529,3 @@ function Relation({
   )
 }
 
-/**
- * Where there is room for Charon, and the only place the number is written.
- *
- * `CharonShop` renders nothing outside it, so this one query decides whether his
- * portrait is fetched and, through `.xchange-charon + .xchange-shelf`, whether
- * the shelf is inset to clear him. `builds.css` used to state it as well, and
- * the two were answering different questions: the stylesheet decided whether
- * he showed, after the markup had already decided that he loaded. The
- * reasoning for 96rem is still written beside his rules in `builds.css`.
- */
-const CHARON_ROOM = '(min-width: 96rem)'
-
-/**
- * Charon, standing at the foot of his own shop.
- *
- * The exchange was the build manager with a different list behind it: same
- * cards, same grid, same filters, and nothing on screen saying you had gone
- * anywhere. He says it before the heading does.
- *
- * **Anchored to the bottom and cropped by it**, which is how the game draws
- * every character and how this art is drawn: the portrait runs off the bottom
- * of its own frame, so floating it in the middle of a panel would be wrong on
- * the art's own terms. Fixed rather than scrolled, so the shelf goes past him.
- *
- * **He has a column rather than a corner.** `DoraWatching` is the same idea on
- * the Roadmap and it spent a session covering text, because a page whose
- * content fills its width has no free corner to put a figure in. Dora got a
- * `min-height` gate; that works there because the roadmap's columns end where
- * their content does. The exchange is a grid that fills, so the fix is to give
- * him room instead: `.xchange-shelf` is inset by his width whenever he is
- * drawn, and he is not drawn where that inset would cost a card column.
- *
- * **Not drawn means not in the page at all.** The stylesheet used to hide him
- * below 96rem while this rendered the portrait regardless, so every phone that
- * opened the exchange downloaded `charon-shop.png`, 348 KB, and never showed
- * it. Measured on enodia.me on 13 September 2026 at 375x812: requested, with
- * `complete` true, `naturalWidth` 768 and the wrapper `display: none`. The coins
- * never had the problem, because a background inside a hidden box is not
- * fetched. `Exchange.test.tsx` pins it.
- *
- * `aria-hidden` and `pointer-events: none`. He is scenery, and a screen reader
- * announcing a decorative portrait between the filters and the shelf is noise.
- */
-function CharonShop() {
-  const [room, setRoom] = useState(() => window.matchMedia(CHARON_ROOM).matches)
-
-  useEffect(() => {
-    const query = window.matchMedia(CHARON_ROOM)
-    const sync = () => setRoom(query.matches)
-    // Once on subscribing, for a window that crossed the line between the first
-    // render and this effect.
-    sync()
-    query.addEventListener('change', sync)
-    return () => query.removeEventListener('change', sync)
-  }, [])
-
-  if (!room) return null
-
-  return (
-    <div className="xchange-charon" aria-hidden="true">
-      {/**
-        * **Not lazy, and that was a deadlock rather than a preference.** The
-        * wrapper is `position: fixed; right: 0` and takes its width from this
-        * image, so before the image loads the box is zero wide and sits exactly
-        * on the right edge of the window. The lazy loader then sees an element
-        * that is not on screen and does not fetch it, which keeps the box zero
-        * wide. Caught by measuring: `complete` false and `naturalWidth` 0 two
-        * seconds after load, while a plain `new Image()` for the same path
-        * returned 768 by 760 immediately. He is the largest thing on this screen
-        * and is above the fold by construction, so there was nothing to defer.
-        */}
-      <img className="xchange-charon-art" src="/characters/charon-shop.png" alt="" />
-      {/* The coins, over his open palm, where the game puts them. Its own
-        * element rather than part of the picture, because it is sixty frames
-        * and an additive blend. `builds.css` has the arithmetic. */}
-      <span className="xchange-coins" />
-    </div>
-  )
-}

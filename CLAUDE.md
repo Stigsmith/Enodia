@@ -219,6 +219,13 @@ the play experience cannot see.
   have no report and no hide; `REQUIREMENTS.md` 5 says why the two differ
 - **Reading a guide withholds a taken-down build's payload**, while `/api/b/<id>` keeps
   serving it to followers. Both are deliberate, and `worker/guides.test.ts` pins the first
+- **A guide costs one request however many builds it names.** `GuideReader` hands what
+  `/api/g/<id>` returned to `learnMentioned` before drawing a word, so no mention inside it asks
+  `/api/b/<id>`. Draw a guide's text any other way and every build mention spends a read from
+  the address's budget. `GuideReader.test.tsx` counts the requests
+- **`loadPrefs` names every field it keeps, and drops the rest.** A field added to `Prefs` and
+  not to `loadPrefs` is saved faithfully and gone by the next read. `guideSide` shipped that way
+  and was caught in the running app, not by a test; `src/state/prefs.test.ts` holds it now
 - **`worker/schema.ts` is generated and `worker/schema-app.ts` is not.** Anything of ours
   put in the generated file survives until the next `npm run db:schema` and then vanishes
   without a word, taking the migration history's idea of reality with it. `drizzle.config.ts`

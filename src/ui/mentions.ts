@@ -152,6 +152,25 @@ function mentionables(): Mentionable[] {
 }
 
 /**
+ * The name a mention should be drawn with: the thing's current one, falling
+ * back to the one it was written with.
+ *
+ * **The id is the meaning and the stored name is only a fallback**, which is
+ * the rule this file opens with, so anywhere a mention is flattened back to
+ * plain text has to apply it too. A guide's card does exactly that for its
+ * opening line, and drawing the stored name there while the subjects beside it
+ * drew the current one was the two halves of one card disagreeing.
+ *
+ * A build is the one kind with no record to look in, so its written name is
+ * the answer here. `state/mentioned.ts` is what finds the current one, and it
+ * is asynchronous, which a card's first line is not.
+ */
+export function nameOfMention(at: MentionAt, written: string): string {
+  if (at.kind === 'build') return written
+  return mentionables().find((one) => one.kind === at.kind && one.id === at.id)?.name ?? written
+}
+
+/**
  * The builds a mention can name, out of a library: your own that are
  * published, and the ones you follow.
  *

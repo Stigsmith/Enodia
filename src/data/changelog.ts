@@ -19,6 +19,21 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-09-18',
+    title: 'Guides, and a build named in one says how your run stands with it',
+    say: 'The other half of the feature the last batch laid the ground for.',
+    points: [
+      'Guides is a screen now, in the row the build exchange used to have. Yours on one side, everybody’s on the other, same switch as Builds.',
+      'A guide is a title and a few sections of writing with builds named inside it. Four prompts to start you off, none of which you have to answer, and four more sections with headings of your own. The ones you leave blank are skipped when anybody reads it.',
+      '**Read a guide during a run and every build it names says how that run stands with it**, the same reading the run screen gives your own builds. So the same paragraph says something different at the fourth Exit than it did at the Crossroads. Guides open from the menu mid run, like everything else.',
+      'A build whose author has changed its picks since the guide was written says so, and one they have taken off the shelves says withdrawn. A guide hands over every build it names in one go, so a long one costs one request rather than one per name.',
+      'What a guide card says it is about is counted out of the writing itself. Nobody types tags, and there is nothing to go stale.',
+      'Save a guide and it is on your side. Like one, if you want, which is a separate number. Neither of them says who, and neither takes your own guide. There is a way to report one, which goes to a person rather than to a counter.',
+      'A guide you are part way through stays in this browser until you publish it, so a stray reload costs nothing. Writing one does not need an account; publishing one does, which is what gives it an address.',
+      'Charon stands on everybody’s side of Guides as he does on Builds, and Schelemeus on yours.',
+    ],
+  },
+  {
     date: '2026-09-17',
     title: 'Builds is one screen, and a build named in a note says how your run stands with it',
     say: 'The first half of guides, and two figures to go with Charon.',

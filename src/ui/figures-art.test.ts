@@ -22,8 +22,16 @@ const SURFACE = readFileSync(join(ROOT, 'src', 'ui', 'surface.css'), 'utf8')
 
 /** Each portrait's trimmed rect, from its sidecar, and where it stands. */
 const FIGURES = [
-  { who: 'schelemeus', rect: [1000, 1250], file: [608, 760], shelf: 'builds-shelf', side: 'left', room: '26rem' },
-  { who: 'odysseus', rect: [1102, 1242], file: [674, 760], shelf: 'wiki-shelf', side: 'right', room: '29rem' },
+  {
+    who: 'schelemeus',
+    rect: [1000, 1250],
+    file: [608, 760],
+    /* Your side of Builds, and your side of Guides, which share one rule. */
+    shelves: ['builds-shelf', 'guides-shelf'],
+    side: 'left',
+    room: '26rem',
+  },
+  { who: 'odysseus', rect: [1102, 1242], file: [674, 760], shelves: ['wiki-shelf'], side: 'right', room: '29rem' },
 ] as const
 
 /** Frames two to six of each `_Blink`, and how long each is held. */
@@ -47,7 +55,29 @@ const block = (css: string, head: string) => {
   return ''
 }
 
-describe.each(FIGURES)('$who', ({ who, rect, file, shelf, side, room }) => {
+/**
+ * The declarations of the rule whose selector list holds `selector`.
+ *
+ * `block` wants the head of a rule, and a selector that shares its rule with
+ * another one is not the head. Two of them were grouped the moment a second
+ * screen wanted the same inset, which is the right way to write it and broke
+ * the check that the inset exists.
+ */
+const ruleFor = (css: string, selector: string) => {
+  for (let at = css.indexOf(selector); at >= 0; at = css.indexOf(selector, at + 1)) {
+    /* The whole entry, not a prefix of one. `.a + .b` is a substring of
+       `.a + .b-something`, and the first version of this passed against a rule
+       whose selector had been renamed out from under it. */
+    if (!/^\s*[,{]/.test(css.slice(at + selector.length))) continue
+    const open = css.indexOf('{', at)
+    /* A `}` in between means the selector was in an earlier rule's body. */
+    if (open < 0 || css.slice(at, open).includes('}')) continue
+    return block(css.slice(open), '{')
+  }
+  return ''
+}
+
+describe.each(FIGURES)('$who', ({ who, rect, file, shelves, side, room }) => {
   it('is the portrait’s trimmed rect at 760 tall, and the stylesheet says so', async () => {
     const { width, height } = await sharp(art(`${who}-stand.png`)).metadata()
     expect([width, height]).toEqual(file)
@@ -55,8 +85,10 @@ describe.each(FIGURES)('$who', ({ who, rect, file, shelf, side, room }) => {
     expect(block(CSS, `.is-${who} .figure-stand-art {`)).toContain(`aspect-ratio: ${file[0]} / ${file[1]}`)
   })
 
-  it('makes room for itself on its own side, only where it is drawn', () => {
-    expect(block(CSS, `.is-${who} + .${shelf} {`)).toContain(`padding-${side}: ${room}`)
+  it('makes room for itself on its own side, on every shelf it stands beside', () => {
+    for (const shelf of shelves) {
+      expect(ruleFor(CSS, `.is-${who} + .${shelf}`)).toContain(`padding-${side}: ${room}`)
+    }
   })
 
   it('has a blink of five equal cells', async () => {

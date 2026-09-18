@@ -132,8 +132,8 @@ export function Setup({
                 </ul>
               ) : (
                 <p className="step-none">
-                  Nothing in the build manager is on this aspect yet. The run still tracks what you
-                  pick up.
+                  None of your builds is on this aspect yet. The run still tracks what you pick
+                  up.
                 </p>
               )}
             </>

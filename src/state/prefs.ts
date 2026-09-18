@@ -49,6 +49,17 @@ export type BuildDensity = 'cards' | 'list'
  */
 export type BuildSide = 'mine' | 'all'
 
+/**
+ * Which side of Guides is showing. The same pair, and its own setting.
+ *
+ * Its own rather than shared with `buildSide`, because the two screens are
+ * asking different questions of you: which builds you want is a habit, and
+ * where you were last reading a guide is a place. Somebody who keeps their own
+ * builds up and reads everybody's guides would have the two fighting over one
+ * value.
+ */
+export type GuideSide = 'mine' | 'all'
+
 export type Prefs = {
   version: number
   /**
@@ -78,6 +89,15 @@ export type Prefs = {
    * sight of it should be their own shelf, even while that shelf is empty.
    */
   buildSide?: BuildSide
+  /**
+   * The side Guides opens on. Absent means everybody's, which is the opposite
+   * of Builds and for the opposite reason: your own guides start empty and
+   * stay empty for most people, and a screen that opens on nothing of yours
+   * when there is a shelf of other people's next door is a worse first sight
+   * than your own empty build shelf, which is at least a shelf you are about
+   * to fill.
+   */
+  guideSide?: GuideSide
   /**
    * Whether the "these live in this browser" warning has been read and dismissed.
    *
@@ -169,6 +189,11 @@ function migrate(stored: unknown): Prefs | null {
       ? { buildDensity: record.buildDensity }
       : {}),
     ...(record.buildSide === 'mine' || record.buildSide === 'all' ? { buildSide: record.buildSide } : {}),
+    /* Every field is named here or it is dropped on the next read, which is
+       what happened to this one on its first day: saved on every press of the
+       switch, and gone again by the reload after. Seen in the running app, and
+       `src/state/prefs.test.ts` holds it now. */
+    ...(record.guideSide === 'mine' || record.guideSide === 'all' ? { guideSide: record.guideSide } : {}),
     // Same reasoning as buildDetail above: absent in anything stored before the
     // warning existed, and absent means "not seen yet", which is the default.
     // No version bump for an additive field.
