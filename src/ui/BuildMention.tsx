@@ -19,6 +19,10 @@
  * - unknown: the name it was written with, as plain text, the way a mention
  *   of a trait the data no longer knows is drawn
  *
+ * A mention inside a guide says one more thing: that the build's picks have
+ * moved since the guide was written. `ChangedProvider` is how the guide tells
+ * the sentences inside it.
+ *
  * The verdict is `sayOf`, the sentence with the build's name trimmed off the
  * front, so the name and the verdict together read as the run screen's
  * sentence, "Killer Current needs 3 more picks, with 8 Exits left", set apart
@@ -48,6 +52,23 @@ const LiveRun = createContext<RunContext | null>(null)
 export const LiveRunProvider = LiveRun.Provider
 
 export const useLiveRun = () => useContext(LiveRun)
+
+/**
+ * The builds whose picks have moved since the writing around them was written.
+ *
+ * A guide is read long after it was written, and the builds it names are their
+ * authors' to change. The server answers that question for a guide, from the
+ * shape token the writer's browser sent against the one the listing holds now,
+ * and this is how the answer reaches the sentence: the reader puts the ids in
+ * here and every mention inside it says so.
+ *
+ * Empty everywhere else. Nothing else has a version of a build to compare
+ * against: a build's own notes are republished with it, so they can never be
+ * about an older version of themselves.
+ */
+const Changed = createContext<ReadonlySet<string>>(new Set<string>())
+
+export const ChangedProvider = Changed.Provider
 
 /** Where a click on a mentioned build goes: the copy in the library, or the published one. */
 export type BuildAt = { local: string } | { published: string }
@@ -92,6 +113,7 @@ export function BuildMention({ id, name, linked }: { id: string; name: string; l
   const mentioned = useMentioned(id)
   const run = useLiveRun()
   const open = useContext(OpenBuild)
+  const moved = useContext(Changed).has(id)
   const bind = usePeekBind()
 
   const found = mentioned.state === 'found' ? mentioned : null
@@ -125,6 +147,10 @@ export function BuildMention({ id, name, linked }: { id: string; name: string; l
       <span className="mention-name">{shown}</span>
       {standing ? <Aside state={standing.verdict.state.toLowerCase()} text={sayOf(standing)} /> : null}
       {withdrawn ? <Aside state="withdrawn" text="withdrawn" /> : null}
+      {/* After the verdict, because the verdict is about the build as it is now
+        * and this is about the writing around it. Never on a withdrawn one:
+        * there is no current version for it to differ from. */}
+      {moved && !withdrawn ? <Aside state="changed" text="changed since this was written" /> : null}
     </>
   )
 

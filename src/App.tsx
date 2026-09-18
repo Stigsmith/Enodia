@@ -39,12 +39,14 @@ import { KOFI, kofiUrl } from './data/kofi.ts'
 import { Shared } from './ui/Shared.tsx'
 import { buildInUrl, received, unpackBuild } from './state/transfer.ts'
 import { openPublished, publishedInUrl, reconnectPublished } from './state/publish.ts'
+import { guideInUrl } from './state/guides.ts'
 import { loadBuilds, saveBuild } from './state/builds.ts'
 import { SAMPLE_BUILDS } from './data/builds.ts'
 import { adviceFrom } from './ui/Offer.tsx'
 import type { ShownBuild } from './data/builds.ts'
 import { BuildsScreen } from './ui/BuildsScreen.tsx'
-import type { BuildSide } from './state/prefs.ts'
+import { GuidesScreen } from './ui/GuidesScreen.tsx'
+import type { BuildSide, GuideSide } from './state/prefs.ts'
 import { Menu } from './ui/Menu.tsx'
 import { PeekProvider } from './ui/Peek.tsx'
 import { LiveRunProvider, OpenBuildProvider } from './ui/BuildMention.tsx'
@@ -135,7 +137,8 @@ export function App() {
     if (
       !loadPrefs().seenLanding &&
       !buildInUrl(window.location.hash) &&
-      !publishedInUrl(window.location.pathname)
+      !publishedInUrl(window.location.pathname) &&
+      !guideInUrl(window.location.pathname)
     ) {
       return 'landing'
     }
@@ -153,6 +156,20 @@ export function App() {
     setSide(next)
     savePrefs({ ...loadPrefs(), buildSide: next })
   }, [])
+
+  /**
+   * The same for Guides, and its own setting. `state/prefs.ts` says why the two
+   * sides are not one value, and why this one opens on everybody's.
+   */
+  const [guideSide, setGuideSide] = useState<GuideSide>(() => loadPrefs().guideSide ?? 'all')
+  const chooseGuideSide = useCallback((next: GuideSide) => {
+    setGuideSide(next)
+    savePrefs({ ...loadPrefs(), guideSide: next })
+  }, [])
+
+  /** A guide arriving as `/g/<id>`, handed to the shelf to open. */
+  const [guideArrived, setGuideArrived] = useState<string | null>(null)
+  const clearGuideArrived = useCallback(() => setGuideArrived(null), [])
 
   /**
    * Somebody arriving from a password reset letter.
@@ -423,6 +440,26 @@ export function App() {
   }, [])
 
   /**
+   * A guide, arriving as `/g/<id>`.
+   *
+   * Not a dialog over whatever you were doing, the way a shared build is: a
+   * build arriving is a question, keep it or not, and a guide is a page to
+   * read. So this opens the screen it belongs to, on everybody's side, with
+   * that guide up, and the address is cleared for the reason the build's is.
+   *
+   * Mount only, and no listener: a link is a real navigation, so the page
+   * reloads and this runs again on its own.
+   */
+  useEffect(() => {
+    const id = guideInUrl(window.location.pathname)
+    if (!id) return
+    history.replaceState(null, '', '/')
+    setGuideArrived(id)
+    setGuideSide('all')
+    setView('guides')
+  }, [])
+
+  /**
    * A build named in a write-up, opened.
    *
    * One the library holds opens where the library is, on Builds, and `reveal`
@@ -529,13 +566,8 @@ export function App() {
       <Hecate />
       <Menu
         view={screen}
-        side={side}
         hasRun={Boolean(run)}
         onGo={go}
-        onBuilds={(next) => {
-          chooseSide(next)
-          go('builds')
-        }}
         onEndRun={endRun}
         onShowBriefing={run ? openBriefing : undefined}
       />
@@ -743,6 +775,20 @@ export function App() {
           reveal={reveal}
           onRevealed={clearReveal}
           signedIn={signedIn}
+        />
+      </div>,
+    )
+  }
+
+  if (screen === 'guides') {
+    return frame(
+      <div className="shell is-wide">
+        <GuidesScreen
+          side={guideSide}
+          onSide={chooseGuideSide}
+          signedIn={signedIn}
+          reveal={guideArrived}
+          onRevealed={clearGuideArrived}
         />
       </div>,
     )

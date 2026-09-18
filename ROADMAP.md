@@ -14,10 +14,10 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 836 in node across 50 files, and **180 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 889 in node across 55 files, and **180 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
-| **Guides** | **Under way on `worktree-guides`**, five of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the figures, and the record. The screen waits on the prompted sections, and the seed guide on two names. See the gap analysis below and `decisions/2026-09-13-guides.md` |
+| **Guides** | **Under way on `worktree-guides`**, six of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, **the Guides screen and its editor**, the figures, and the record. The seed guide waits on two names. See the gap analysis below and `decisions/2026-09-13-guides.md` |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -501,7 +501,7 @@ a guide type and a sectioned editor. `decisions/2026-09-13-guides.md` is the rec
 during a run, so a guide reads differently at the fourth Exit than at the Crossroads. Without
 that it would be a wiki article.
 
-Where it stands, 17 September 2026, on the `worktree-guides` branch:
+Where it stands, 18 September 2026, on the `worktree-guides` branch:
 
 1. ~~Build mentions with a live verdict.~~ **Done.** `b:` joins the mention kinds, keyed on the
    short id. `src/state/mentioned.ts` finds the build, library first, and only a 404 or a
@@ -524,8 +524,20 @@ Where it stands, 17 September 2026, on the `worktree-guides` branch:
    publishing shares `publish` with builds, reports have their own rule at ten an hour.
    `worker/guides.test.ts` holds 27 tests, and seven deliberate breaks each failed the one
    written for it
-4. **The Guides screen. Waits on the prompted sections**, which are proposed to the owner before
-   the editor is built
+4. ~~The Guides screen.~~ **Done.** `src/ui/GuidesScreen.tsx`, the same switch as Builds, in the
+   menu row the exchange held. The owner chose **four prompts that name no part of a run**,
+   because a guide can be about one weapon, one boss or one achievement, and **up to eight
+   sections** with the author's own headings past the four. An unanswered prompt is skipped when
+   the guide is read. The reader draws every section through `Prose`, takes the builds the guide
+   hands over as read with `learnMentioned`, so a guide costs **one request however many builds
+   it names**, and marks a build whose picks changed since it was written. A card's subjects are
+   counted out of its mentions. Checked in the running app against a seeded guide: one
+   Flame Strike logged took Every Pair from 24 picks to 23 and Hestia Pure from 5 to 4 inside the
+   guide's own sentences. Eleven deliberate breaks each failed the test written for them.
+   **Found on the way:** `loadPrefs` drops any field it does not name, so the side Guides was
+   left on was saved on every press and gone by the next reload. `src/state/prefs.test.ts` holds
+   it. **Not checked in a browser:** publishing and saving signed in, which needs a session the
+   local database does not have; the tests and the worker suite cover both
 5. **The seed guide, "How to beat the RNG". Waits on two names**: what the upgrade token and the
    Hermes shrine are called on screen, so both can be traced in the scripts
 6. ~~Figures.~~ **Done.** Charon's phone download was fixed in `45670df`. Schelemeus stands on
@@ -533,9 +545,9 @@ Where it stands, 17 September 2026, on the `worktree-guides` branch:
    `src/ui/Figures.tsx`. The pinned pane's width is `--pane-width` now, and a left-hand figure
    stands at `--pane-left`. Odysseus is 457 KB of PNG and Schelemeus 330, both measured against
    palette versions that showed rings or dither; `assets/README.md` has the numbers
-7. ~~The record.~~ **Done**, for what has shipped: this section, the roadmap entries, the
-   changelog, Help, `decisions/2026-09-13-guides.md`, and `REQUIREMENTS.md` 5, which records the
-   moderation answer as a reversal for guides only. The Guides screen will need its own entries
+7. ~~The record.~~ **Done**: this section, the roadmap entries, the changelog, the tour,
+   `decisions/2026-09-13-guides.md`, and `REQUIREMENTS.md` 5, which records the moderation answer
+   as a reversal for guides only
 
 ---
 

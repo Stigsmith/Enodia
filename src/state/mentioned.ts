@@ -152,6 +152,44 @@ async function ask(id: string): Promise<Mentioned> {
   }
 }
 
+/**
+ * What a guide already handed over, taken as read.
+ *
+ * Reading a guide returns every build it names in the same response, which is
+ * the whole reason `worker/guides.ts` gathers them: a guide naming twenty
+ * builds would otherwise spend twenty requests out of an address's budget of a
+ * hundred and twenty a minute. Writing them in here is what makes the mentions
+ * inside the guide draw without asking anybody.
+ *
+ * **Withdrawn and gone land in the same place, on purpose.** The server tells
+ * them apart and withholds a withdrawn build's payload either way, so there is
+ * no build here to draw. `BuildMention` draws both as withdrawn, with the name
+ * the author wrote and no link, which is exactly what is true of them.
+ */
+export async function learnMentioned(
+  named: readonly (
+    | { id: string; state: 'live'; name: string; payload: string }
+    | { id: string; state: 'withdrawn' | 'gone' }
+  )[],
+): Promise<void> {
+  await Promise.all(
+    named.map(async (one) => {
+      if (settled.has(one.id)) return
+      if (one.state !== 'live') {
+        settled.set(one.id, GONE)
+        return
+      }
+      const build = await unpackBuild(one.payload)
+      settled.set(
+        one.id,
+        build
+          ? { state: 'found', build: { ...build, name: one.name || build.name }, takenDown: false, local: null }
+          : GONE,
+      )
+    }),
+  )
+}
+
 /** Forget every answer. For tests, which each want a page that has asked nothing. */
 export function forgetMentioned(): void {
   settled.clear()

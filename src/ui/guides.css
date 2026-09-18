@@ -1,0 +1,378 @@
+/**
+ * Guides: the shelf, the card, reading one and writing one.
+ *
+ * Its own file rather than another section of `builds.css`, which is ten and a
+ * half thousand lines and is the build manager's. The shapes here are shared
+ * with it on purpose, though: `.sides`, `.sides-pane` and `.side-switch` are
+ * the same elements doing the same job one screen over, and they stay where
+ * they are.
+ *
+ * **The two rules that make room for a figure are not here either.** They live
+ * beside Charon's and Schelemeus's own rules in `builds.css`, where the
+ * arithmetic that produced the numbers is written, because the point of that
+ * section is that every figure's room is worked out the same way.
+ */
+
+.guides-shelf {
+  /**
+   * A figure is `position: fixed` and `z-index: 1`, and the pane around this
+   * is `position: relative` for the slide. Without a stacking order of its
+   * own the shelf draws under him, which on Builds is handled by the shelf
+   * already having one.
+   */
+  position: relative;
+  z-index: 2;
+}
+
+.guides-section {
+  margin-top: 1.6rem;
+}
+
+.guides-section h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--bone-dim);
+}
+
+/**
+ * One column wider than the build grid's 14rem.
+ *
+ * A build's card is a picture with a name on it and reads at any width. A
+ * guide's card is four lines of words, and at 14rem the opening line wraps
+ * every three of them.
+ */
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 0.9rem;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Above both lists, because it is the one thing on the screen waiting on
+   somebody. */
+.guides-draft {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--lit-dim);
+  border-radius: var(--r-soft);
+  background: color-mix(in srgb, var(--lit) 8%, transparent);
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+}
+
+.guides-new {
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------------------
+ * The card
+ *
+ * A plain plate, not the game's save slot art. A guide is not a build, and
+ * dressing it as one would say that it was.
+ * ------------------------------------------------------------------------ */
+
+.gcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 0.9rem 0.9rem;
+  border: 1px solid var(--div-1);
+  border-radius: var(--r-card);
+  background: var(--ink-900);
+}
+
+/* The title row is the hit area, as a build's whole card is: a card this size
+   with a twenty pixel target in it is a card you have to aim at. */
+.gcard-hit {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gcard-hit:focus-visible {
+  outline: 2px solid var(--lit-hot);
+  outline-offset: 3px;
+  border-radius: var(--r-hair);
+}
+
+.gcard-title {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  line-height: 1.3;
+  color: var(--bone);
+}
+
+.gcard-hit:hover .gcard-title {
+  color: var(--lit-hot);
+}
+
+.gcard-by {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+.gcard-dot {
+  padding: 0 0.35rem;
+}
+
+.gcard-mark {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--bone-dim);
+}
+
+/* The warning ramp, as `.acct-warn` uses it, because a hidden guide is a real
+   consequence rather than a note. */
+.gcard-mark.is-hidden {
+  color: var(--rim-magenta);
+}
+
+.gcard-open {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--bone-dim);
+}
+
+/**
+ * What the guide keeps naming, counted out of its own text.
+ *
+ * Drawn as a mention is drawn everywhere else, art and name, so the same thing
+ * looks like the same thing in a sentence and on a card. Not links: a card is
+ * one target, and a row of links inside it would be five.
+ */
+.gcard-about {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.5rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gcard-subject {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-pill);
+  font-size: 0.78rem;
+  color: var(--bone-dim);
+}
+
+.gcard-subject .mention-art {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* How often, and only past one. A column of ones is a column of nothing. */
+.gcard-times {
+  color: var(--bone-faint);
+  font-size: 0.72rem;
+}
+
+.gcard-counts,
+.guide-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--bone-faint);
+}
+
+/* ---------------------------------------------------------------------------
+ * Reading one
+ * ------------------------------------------------------------------------ */
+
+/**
+ * The box `.page` gives Help and the Roadmap: a reading measure, centred, with
+ * the page's own padding. The shelves sit in `.builds`, which pads them, and
+ * the first version of this left the reader and the editor with neither, so a
+ * guide's text ran hard against the window's left edge. Seen in the running
+ * app at 1280 wide, and invisible to every test.
+ */
+.guide,
+.guide-editor {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+}
+
+.guide-top {
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.guide-by {
+  margin: 0.1rem 0 0;
+  font-size: 0.8rem;
+  color: var(--bone-faint);
+}
+
+.guide-marks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.7rem;
+  margin: 0.9rem 0 0;
+  padding: 0.7rem 0 0.8rem;
+  border-top: 1px solid var(--div-1);
+  border-bottom: 1px solid var(--div-1);
+}
+
+/* Pressed, for the two that are a state rather than an act. `aria-pressed`
+   carries it for a screen reader and this carries it for everybody else. */
+.guide-marks .quiet.is-on {
+  border-color: var(--lit-dim);
+  color: var(--lit-hot);
+}
+
+.guide-said {
+  flex: 1 0 100%;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--bone-faint);
+}
+
+.guide-said.is-warn {
+  color: var(--rim-magenta);
+}
+
+.guide-report {
+  flex: 1 0 100%;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.guide-report label {
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+}
+
+.guide-report textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.guide-report-foot {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.guide-section {
+  margin-top: 1.5rem;
+}
+
+.guide-section h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--bone);
+}
+
+.guide-section p {
+  margin: 0 0 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--bone-dim);
+}
+
+/* ---------------------------------------------------------------------------
+ * Writing one
+ * ------------------------------------------------------------------------ */
+
+.guide-title-field {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 1rem;
+}
+
+.guide-title-field > span {
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.guide-title-field input {
+  font-family: var(--display);
+  font-size: 1.1rem;
+}
+
+.guide-field {
+  margin-top: 1.4rem;
+}
+
+.guide-field h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--bone);
+}
+
+/* The rest of the prompt. A question to the author, never a label on their
+   answer, which is why it is not part of the heading: `state/guides.ts`. */
+.guide-hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  color: var(--bone-faint);
+}
+
+.guide-heading-field input {
+  width: 100%;
+  margin-bottom: 0.35rem;
+  font-family: var(--display);
+  font-size: 1rem;
+}
+
+.guide-field textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.guide-field-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.74rem;
+  color: var(--bone-faint);
+}
+
+.guide-add {
+  margin-top: 1.1rem;
+}
+
+.guide-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--div-1);
+}
+
+.guide-foot .guide-hint {
+  margin: 0;
+}

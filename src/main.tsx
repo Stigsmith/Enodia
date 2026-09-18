@@ -7,6 +7,7 @@ import './ui/base.css'
 import './ui/surface.css'
 import './ui/sprites.css'
 import './ui/builds.css'
+import './ui/guides.css'
 import './ui/wiki.css'
 import { App } from './App.tsx'
 
