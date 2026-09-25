@@ -14,10 +14,10 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 889 in node across 55 files, and **180 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 896 in node across 56 files, and **180 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
-| **Guides** | **Under way on `worktree-guides`**, six of seven phases in: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, **the Guides screen and its editor**, the figures, and the record. The seed guide waits on two names. See the gap analysis below and `decisions/2026-09-13-guides.md` |
+| **Guides** | **Built on `worktree-guides`, all seven phases, not merged**: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide as a draft** in `guides/how-to-beat-the-rng.md`, whose Pom of Power and Shrine of Hermes rules are the owner's to write. See the gap analysis below and `decisions/2026-09-13-guides.md` |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -501,7 +501,7 @@ a guide type and a sectioned editor. `decisions/2026-09-13-guides.md` is the rec
 during a run, so a guide reads differently at the fourth Exit than at the Crossroads. Without
 that it would be a wiki article.
 
-Where it stands, 18 September 2026, on the `worktree-guides` branch:
+Where it stands, 25 September 2026, on the `worktree-guides` branch:
 
 1. ~~Build mentions with a live verdict.~~ **Done.** `b:` joins the mention kinds, keyed on the
    short id. `src/state/mentioned.ts` finds the build, library first, and only a 404 or a
@@ -538,8 +538,15 @@ Where it stands, 18 September 2026, on the `worktree-guides` branch:
    left on was saved on every press and gone by the next reload. `src/state/prefs.test.ts` holds
    it. **Not checked in a browser:** publishing and saving signed in, which needs a session the
    local database does not have; the tests and the worker suite cover both
-5. **The seed guide, "How to beat the RNG". Waits on two names**: what the upgrade token and the
-   Hermes shrine are called on screen, so both can be traced in the scripts
+5. ~~The seed guide, "How to beat the RNG".~~ **Drafted**, in `guides/how-to-beat-the-rng.md`.
+   The owner named the two things: **Pom of Power** and **the Shrine of Hermes**, which is
+   `SurfaceShop`. The four-Olympian section is written from the verified cap facts; the other two
+   are marked for the owner, with what was traced beside each. **The owner's recollection that
+   Charon's timed buffs are not sold at the Shrine of Hermes is right, and stronger than
+   remembered**: every Surface Region sets `WellShopSpawnChance = 0.0`, so the Well of Charon
+   never appears there. A file rather than an in-app draft, because the only way the app hands a
+   draft over is an import, and an import replaces everything. `src/data/seed-guide.test.ts`
+   reads it as the editor will, and seven deliberate breaks each failed the test for them
 6. ~~Figures.~~ **Done.** Charon's phone download was fixed in `45670df`. Schelemeus stands on
    your side of Builds and Odysseus on the Wiki, each with the game's own blink, in
    `src/ui/Figures.tsx`. The pinned pane's width is `--pane-width` now, and a left-hand figure
