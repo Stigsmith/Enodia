@@ -1,9 +1,9 @@
 /**
  * The seed guide, "How to beat the RNG", held to the game and to the editor.
  *
- * It lives as `guides/how-to-beat-the-rng.md` until the owner writes their two
- * sections and publishes it from the Guides editor, which is the only way a
- * guide goes up under their name. Nothing in the app reads the file, so
+ * It lives as `guides/how-to-beat-the-rng.md`, written in full, until the
+ * owner publishes it from the Guides editor, which is the only way a guide
+ * goes up under their name. Nothing in the app reads the file, so
  * nothing on screen would say it had gone wrong: a keepsake renamed in a patch,
  * a tenth Olympian, or a section grown past what the editor accepts would sit
  * there until the owner pasted it in and it broke. This reads it the way the
@@ -107,13 +107,37 @@ describe('what it names', () => {
   /**
    * "Every Olympian has one", followed by nine names. True only while the
    * game gives each of the nine a keepsake and the section names exactly
-   * those, so both halves are checked.
+   * those, so both halves are checked, in the section that makes the claim.
    */
-  it('names every Olympian’s keepsake, and nothing else', () => {
+  it('names every Olympian’s keepsake where it says every Olympian has one, and nothing else there', () => {
     expect(olympians).toHaveLength(9)
     const keepsakes = olympians.map((god) => keepsakeForGod.get(god))
     expect(keepsakes.every(Boolean)).toBe(true)
-    expect(new Set(mentions.map((one) => one.at.id))).toEqual(new Set(keepsakes))
+    const claim = doc.sections.find((one) => one.text.includes('Every Olympian has one'))
+    expect(claim).toBeDefined()
+    const named = parseProse(claim?.text ?? '').flatMap((bit) => ('at' in bit ? [bit.at.id] : []))
+    expect(new Set(named)).toEqual(new Set(keepsakes))
+  })
+})
+
+describe('as a finished guide', () => {
+  /**
+   * The owner asked for it written in full on 25 September 2026, so nothing
+   * in it is waiting on anybody. A placeholder published by accident would
+   * read as a guide somebody forgot to finish.
+   */
+  it('has something in every section, and no placeholder left', () => {
+    for (const section of doc.sections) {
+      expect(section.text.trim(), section.heading).not.toBe('')
+    }
+    expect(FILE).not.toMatch(/Yours to write/)
+  })
+
+  it('has the two sections past the prompts, under the game’s own names', () => {
+    expect(doc.sections.slice(PROMPTS.length).map((one) => one.heading)).toEqual([
+      'Pom of Power',
+      'Shrine of Hermes',
+    ])
   })
 })
 
