@@ -14,10 +14,10 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 896 in node across 56 files, and **180 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 898 in node across 56 files, and **180 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
-| **Guides** | **Built on `worktree-guides`, all seven phases, not merged**: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide as a draft** in `guides/how-to-beat-the-rng.md`, whose Pom of Power and Shrine of Hermes rules are the owner's to write. See the gap analysis below and `decisions/2026-09-13-guides.md` |
+| **Guides** | **Built on `worktree-guides`, all seven phases, not merged**: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide, written in full** in `guides/how-to-beat-the-rng.md` and waiting only to be published from the owner's account. See the gap analysis below and `decisions/2026-09-13-guides.md` |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on 12 September with everything below. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
@@ -538,15 +538,18 @@ Where it stands, 25 September 2026, on the `worktree-guides` branch:
    left on was saved on every press and gone by the next reload. `src/state/prefs.test.ts` holds
    it. **Not checked in a browser:** publishing and saving signed in, which needs a session the
    local database does not have; the tests and the worker suite cover both
-5. ~~The seed guide, "How to beat the RNG".~~ **Drafted**, in `guides/how-to-beat-the-rng.md`.
-   The owner named the two things: **Pom of Power** and **the Shrine of Hermes**, which is
-   `SurfaceShop`. The four-Olympian section is written from the verified cap facts; the other two
-   are marked for the owner, with what was traced beside each. **The owner's recollection that
-   Charon's timed buffs are not sold at the Shrine of Hermes is right, and stronger than
-   remembered**: every Surface Region sets `WellShopSpawnChance = 0.0`, so the Well of Charon
-   never appears there. A file rather than an in-app draft, because the only way the app hands a
-   draft over is an import, and an import replaces everything. `src/data/seed-guide.test.ts`
-   reads it as the editor will, and seven deliberate breaks each failed the test for them
+5. ~~The seed guide, "How to beat the RNG".~~ **Written in full**, in
+   `guides/how-to-beat-the-rng.md`, ready to paste into the editor and publish from the owner's
+   account. The owner named the two things, **Pom of Power** and **the Shrine of Hermes**
+   (`SurfaceShop`), then asked for the whole guide written with other guides online as
+   inspiration. Those were leads only: every claim was checked in the scripts, and two leads
+   were dropped, including one that Athena's and Dionysus's Boons scale with Poms, when **no
+   Encounter god's Boon can take a Pom in Hades II**. The owner's recollection that Charon's
+   timed buffs are not at the Shrine of Hermes is right and stronger than remembered: the Well
+   of Charon never appears on the Surface. The checking also corrected two things written the
+   day before, a Mystery Boon spending a keepsake and the Shrine's wait counting Encounters.
+   `src/data/seed-guide.test.ts` reads the file as the editor will, and ten deliberate breaks
+   each failed the test for them
 6. ~~Figures.~~ **Done.** Charon's phone download was fixed in `45670df`. Schelemeus stands on
    your side of Builds and Odysseus on the Wiki, each with the game's own blink, in
    `src/ui/Figures.tsx`. The pinned pane's width is `--pane-width` now, and a left-hand figure
