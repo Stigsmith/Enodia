@@ -14,13 +14,13 @@ Last updated 17 September 2026, game build `138174`.
 |---|---|
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 898 in node across 56 files, and **180 inside workerd** against a real D1. `npm test` runs both |
+| **Tests** | 898 in node across 56 files, and **183 inside workerd** against a real D1. `npm test` runs both |
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
 | **Guides** | **Live on enodia.me since 25 September 2026, merged into `master`**, all seven phases: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide, published** at `enodia.me/g/jEn4Tr1WOA` from `guides/how-to-beat-the-rng.md`. See the gap analysis below and `decisions/2026-09-13-guides.md` |
 | **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on **25 September with Guides**: version `79ac1346`, through `versions upload` and `versions deploy`, after migration `0012` was applied to the live database. Checked on the domain itself: `/api/guides` answers and the new bundle is served. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
-| **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers`, hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
+| **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers` for static files, and `nosniff` and `no-store` on every `/api/*` answer from `worker/index.ts`, which `_headers` never reaches. Hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
 
 **Phase 1 is complete.** Set up a run, log what each Exit gave, and the timeline records what

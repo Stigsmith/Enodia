@@ -87,6 +87,38 @@ if (!existsSync(DIST)) {
 }
 
 // ---------------------------------------------------------------------------
+// Nothing Vite emits may be an image
+// ---------------------------------------------------------------------------
+
+/**
+ * An image imported from code is emitted into `dist/assets/` with a hash in
+ * its name, and this build would break it twice.
+ *
+ * This scanner would delete it. `literal` below only knows paths that start
+ * with a shelf of `assets/`, and Vite's output directory is not one, so an
+ * emitted image counts as unreferenced whatever the bundle says. Measured on
+ * 26 September 2026: a referenced `dist/assets/probe-<hash>.png` was removed,
+ * and the run still ended "every path the bundle names still resolves".
+ *
+ * And a PNG, WebP or JPG there matches both `/assets/*` and `/*.png` in
+ * `assets/_headers`, which joins the two Cache-Control values with a comma:
+ * `public, max-age=31536000, immutable, public, max-age=3600, must-revalidate`,
+ * read off `wrangler dev`. `_headers` cannot exclude a path from `/*.png`, so
+ * no pattern change fixes that.
+ *
+ * Nothing imports an image today: the art is named by path from `assets/`. If
+ * that changes, both need an answer first, and this is where it is asked.
+ */
+const emitted = walk(join(DIST, 'assets')).filter((path) => ASSET.test(path))
+if (emitted.length) {
+  console.error('Vite emitted images into dist/assets/, which this build cannot ship:')
+  for (const path of emitted) console.error(`  ${relative(DIST, path).replace(/\\/g, '/')}`)
+  console.error('\nThis script would delete them, and assets/_headers would send them two Cache-Control')
+  console.error('values. See "Nothing Vite emits may be an image" in scripts/prune.ts.')
+  process.exit(1)
+}
+
+// ---------------------------------------------------------------------------
 // What the bundle asks for
 // ---------------------------------------------------------------------------
 
