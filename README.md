@@ -158,9 +158,10 @@ itself on. 60 requests a minute overall, 20 sign-in attempts per five minutes, 1
 hour, keyed on `cf-connecting-ip`. A Cloudflare rate limiting rule at the edge would be
 better still, since it rejects before a Worker runs, and is the owner's to add.
 
-**`worker/schema.ts` is generated, not written.** Use `npm run db:schema`, which runs
-`npx auth@latest`. Do not use the deprecated `@better-auth/cli`: it is pinned several minors
-behind and emits an `account` table with no `issuer` column, which is `NOT NULL`, so nothing
+**`worker/schema.ts` is generated, not written.** Use `npm run db:schema`, which runs the
+`auth` CLI at the exact version of better-auth in `node_modules`. The CLI generates from its
+own bundled core, so any other version, the deprecated `@better-auth/cli` and `auth@latest`
+alike, can disagree about the `account.issuer` column, which is `NOT NULL`, and nothing
 complains until the first sign-up fails.
 
 ---

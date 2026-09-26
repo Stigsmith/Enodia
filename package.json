@@ -28,7 +28,7 @@
     "artifact": "node scripts/artifact.ts",
     "fonts": "node scripts/fonts.ts",
     "deploy": "npm run build && wrangler deploy",
-    "db:schema": "npx auth@latest generate --config worker/auth.config.ts --output worker/schema.ts --y",
+    "db:schema": "node scripts/db-schema.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply enodia --local",
     "types": "wrangler types",
