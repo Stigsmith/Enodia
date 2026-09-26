@@ -15,6 +15,11 @@
 #    by trusting that it carried over.
 
 # Vite fingerprints what it emits, so those can never go stale.
+#
+# Only the bundle's JavaScript and CSS land here today. An image would also
+# match /*.png below and get both Cache-Control values, per note 1, measured
+# under wrangler dev on 26 September 2026. No pattern here can keep /*.png off
+# this path, so scripts/prune.ts fails the build if Vite ever emits one.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 

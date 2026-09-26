@@ -12,10 +12,12 @@ import { defineConfig } from 'drizzle-kit'
  * job, because only wrangler can reach a D1 binding.
  *
  * The schema itself is generated too, by `npm run db:schema`, and is not hand
- * written. Use the CLI that matches the installed better-auth: `npx auth@latest`
- * and NOT the deprecated `@better-auth/cli`, which is pinned three minors behind
- * and emits an `account` table with no `issuer` column. That column is NOT NULL,
- * so the mismatch does not surface until the first sign-up fails.
+ * written. `scripts/db-schema.ts` runs the `auth` CLI at exactly the installed
+ * better-auth's version, because the CLI generates from its own bundled core.
+ * The deprecated `@better-auth/cli` lags behind and omits the `account.issuer`
+ * column; `auth@latest`, which this comment used to recommend, was 1.7.6 on 25
+ * September 2026 and omits it too. That column is NOT NULL in the installed
+ * 1.7.2, so a mismatch does not surface until the first sign-up fails.
  */
 export default defineConfig({
   dialect: 'sqlite',
