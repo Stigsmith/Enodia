@@ -1,6 +1,9 @@
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$src  = "$PSScriptRoot\..\hades.fandom.com"
-$dest = "$PSScriptRoot\..\assets"
+# Both paths from where this script lives, so the repository can sit in any
+# folder.
+$repo = Split-Path $PSScriptRoot -Parent
+$src  = Join-Path $repo "hades.fandom.com"
+$dest = Join-Path $repo "assets"
 
 # Categories sourced from the game files via deppth2, NOT from the wiki zips.
 # This script must never delete them. See README "Refetching".
