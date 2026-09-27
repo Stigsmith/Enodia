@@ -1,6 +1,6 @@
 # **Enodia: Instructions**
 
-> The design and planning half of Enodia, an in-run build companion for Hades II. The code lives in a Claude Code session against the repo at `C:\Dev\Hades 2`. This project is where decisions get made before they cost code.
+> The design and planning half of Enodia, an in-run build companion for Hades II. The code lives in a Claude Code session against the repo at `C:\Dev\Enodia`. This project is where decisions get made before they cost code.
 
 ---
 
