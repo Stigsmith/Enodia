@@ -5,9 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // The image library is served as-is, so a manifest path like
-  // "boons/storm-ring.webp" is also its URL. 35 MB of it ships, 23 of which is
-  // Arcana card art that Phase 1 never renders and that wants downscaling
-  // before this is deployed for real.
+  // "boons/storm-ring.webp" is also its URL. A build copies all of it, and
+  // scripts/prune.ts then deletes whatever the app never references, which is
+  // what keeps the 39 MB of full-size Arcana PNGs out of dist/.
   publicDir: 'assets',
   build: {
     // dist/ is build output, and git ignores it. It once held the hand-authored
