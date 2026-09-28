@@ -10,14 +10,13 @@ extracted/
 
 node_modules/
 
-# Build output. Vite owns dist/ now.
-# The hand-authored page that used to live here is placeholder/index.html, still
-# in version control and still what Netlify is serving until `npm run deploy`
-# puts the real app on Cloudflare.
-# Serve it on 8777 with the `placeholder` config in .claude/launch.json.
+# Build output, written by `npm run build`.
 dist/
 
-# wrangler dev's local state and asset cache. Regenerated on every run.
+# wrangler dev's local state and asset cache. Not all of it regenerates: the
+# local D1 is under state/v3/d1, and deleting it loses every row in it.
+# `npm run db:migrate` brings back the tables and nothing else. The local seed
+# scripts for it sit at the top of the folder.
 .wrangler/
 # `npm run artifact` output: one self contained HTML file, rebuildable.
 dist-artifact/

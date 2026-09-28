@@ -37,8 +37,8 @@ target from the standing drawer and that pin is what the card leads with.
 one back replays the run from empty so everything after it is recomputed, deaths included.
 
 **The deploy target moved to Cloudflare.** `wrangler.jsonc` publishes `dist/` to Workers
-static assets, so the hand-authored `placeholder/index.html` is no longer what a deploy
-serves. Running it is the owner's, and the only step left: `npm run deploy`.
+static assets, and it has served `enodia.me` since 2 September 2026. The hand-authored
+`placeholder/index.html` was deleted on 11 September and `netlify.toml` on 28 September.
 
 **Netlify's rules were never actually live**, which is why this is not a like-for-like move.
 The CLI deploy never picked `netlify.toml` up, so the site ran on Netlify's defaults: no CSP,
