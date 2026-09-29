@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "description": "In-run build companion for Hades II",
+  "author": "Stigsmith",
+  "license": "UNLICENSED",
   "engines": {
     "node": ">=22"
   },

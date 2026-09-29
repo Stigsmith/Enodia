@@ -1,0 +1,18 @@
+Copyright (c) 2026 Stigsmith. All rights reserved.
+
+The source code, documentation and other original material in this repository
+are published so that they can be read. No permission is given to copy, modify,
+distribute or use any of it, in whole or in part, without written permission
+from the copyright holder.
+
+Not covered by the notice above, and not the copyright holder's to license:
+
+- Hades II, its art and its game data belong to Supergiant Games. That includes
+  the images under assets/ that come from the game, whether extracted from its
+  packages or saved from the Hades wiki, and the data under data/ that is
+  extracted or derived from its scripts and text files. Enodia is an
+  unofficial, non-commercial fan project, not affiliated with or endorsed by
+  Supergiant Games.
+- The typefaces under assets/fonts/ (Caesar Dressing, Inconsolata, Lato and
+  Spectral) are distributed by their authors under the SIL Open Font License,
+  Version 1.1.
