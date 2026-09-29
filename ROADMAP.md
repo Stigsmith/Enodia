@@ -18,7 +18,7 @@ Last updated 17 September 2026, game build `138174`.
 | **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
 | **Guides** | **Live on enodia.me since 25 September 2026, merged into `master`**, all seven phases: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide, published** at `enodia.me/g/jEn4Tr1WOA` from `guides/how-to-beat-the-rng.md`. See the gap analysis below and `decisions/2026-09-13-guides.md` |
-| **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on **26 September 2026**, version `d204292a`, which added `no-store` and `nosniff` to every API response (`2ec2107`). Guides went live the day before, version `79ac1346`, after migration `0012` was applied to the live database. Both through `versions upload` and `versions deploy`, and both checked on the domain itself. Also `enodia.stigly-official.workers.dev` |
+| **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on **26 September 2026**, version `d204292a`, which added `no-store` and `nosniff` to every API response (`f749725`). Guides went live the day before, version `79ac1346`, after migration `0012` was applied to the live database. Both through `versions upload` and `versions deploy`, and both checked on the domain itself. Also `enodia.stigly-official.workers.dev` |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers` for static files, and `nosniff` and `no-store` on every `/api/*` answer from `worker/index.ts`, which `_headers` never reaches. Hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
@@ -463,7 +463,7 @@ Exit card when the build is the run's target; and the evidence filter needs one 
    moves Stabbing Rush's fuse. The table **undercounts by design**, so the note states only the
    positive: what in the build is on the list, or that no pick's record says it is.
    `scripts/olympian.test.ts` pins all of it
-5. ~~"Under the hood" brought back from `de818c7^:placeholder/index.html`, re-verified. One of its
+5. ~~"Under the hood" brought back from `6900c00^:placeholder/index.html`, re-verified. One of its
    five entries states error 6.~~ **Done, 12 September.** It is a screen of the app now,
    `src/data/underhood.ts` behind `Pages.tsx`, reached from the menu beside the Wiki. **Seven
    entries in the three tiers**, every one re-read against the game, each citing the symbols it
@@ -491,7 +491,7 @@ lists and staff verification.
 ### Section 5 is superseded: collections became guides
 
 The analysis proposed **collections**, a named list of published builds with a note on each,
-deferred until notes and `@` mentions existed. They did from `6bf2695`. On 12 September the
+deferred until notes and `@` mentions existed. They did from `04d34cc`. On 12 September the
 owner redirected it: a list of builds adds little over the All shelf and its filters, which is
 the argument that retired the curated shelf on 8 September. What is worth building is a
 **guide**, sectioned prose with builds named inside it. That reverses two of the verdicts above,

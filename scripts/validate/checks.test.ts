@@ -774,10 +774,10 @@ describe('assets', () => {
     })
 
     it('fails an entry still describing the file before it was replaced', () => {
-      // characters/charon-coins.png from 7 to 17 September 2026. ca06c15
+      // characters/charon-coins.png from 7 to 17 September 2026. e5ca0ad
       // replaced the image and did not rerun npm run assets, so the row kept
-      // b27add0's size and hash for ten days and nothing noticed.
-      const coins = image('characters/charon-coins.png', 'the coins as ca06c15 drew them')
+      // ab411a4's size and hash for ten days and nothing noticed.
+      const coins = image('characters/charon-coins.png', 'the coins as e5ca0ad drew them')
       const stale = {
         ...row(coins),
         bytes: 188560,
