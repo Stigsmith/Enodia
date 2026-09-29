@@ -381,8 +381,8 @@ This doubles as the honest version of a wiki. Existing sites publish everything 
 the same volume, with no view on whether you wanted to know it yet.
 
 > **11 September 2026.** This shipped on the pre-app page, `placeholder/index.html`, and left
-> with it in `de818c7`. No screen carries it now, and nothing recorded that it had gone. The
-> five entries are recoverable with `git show de818c7^:placeholder/index.html`, and one of them
+> with it in `6900c00`. No screen carries it now, and nothing recorded that it had gone. The
+> five entries are recoverable with `git show 6900c00^:placeholder/index.html`, and one of them
 > needs rewriting before it returns: it says every other Olympian becomes impossible at the
 > fourth, which is `CLAUDE.md` error 6.
 >

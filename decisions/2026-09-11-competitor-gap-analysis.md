@@ -54,7 +54,7 @@ type, tier lists, and staff verification. Collections of builds get another look
 - **The game files**, including `Content/Game/Projectiles/`, which nothing here had read.
 - **Enodia**: `Peek.tsx`, `PieceCard`, `BuildEditor.tsx`, `data/builds.ts`, `state/transfer.ts`,
   the exchange and boards workers, the three design documents, and the placeholder page
-  deleted in `de818c7` that morning.
+  deleted in `6900c00` that morning.
 
 What Mobalytics has, measured rather than impressed by:
 
