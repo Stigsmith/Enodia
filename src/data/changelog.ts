@@ -20,13 +20,13 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-10-02',
-    title: 'A plain interface, as a switch in Settings',
-    say: 'The same tool with its buttons and panels drawn by the browser rather than taken from the game.',
+    title: 'Four ways to draw the interface, chosen in Settings',
+    say: 'The same tool with its buttons and panels taken from the game, or drawn by the browser in one of three looks.',
     points: [
-      'Settings has a new switch, Plain interface. Every button, menu row, tab, panel, tray, tooltip and divider is redrawn in CSS, and so are the plates behind a boon’s name, the highlight on an Arcana card, the circle behind a ring of choices and the ring round each bubble. The game’s own art stays the default.',
-      'Boon and god icons, the frames that say a boon’s rarity, portraits, Charon, Dora and the wallpapers are the same either way. They are the content, not the furniture.',
-      'Plain follows your theme all the way: Olympian’s edges are gold and Infernal’s copper, where the game’s art could only be tinted. A boon’s plate carries its rarity as a stripe in the colour the game gives it.',
-      'Nothing moves when you flip it. Every button is the size it was.',
+      'Settings has a new choice, How it is drawn: the game’s own art, which stays the default, or Hairline, Carved or Soft. Hairline is flat with thin lit edges. Carved has cut corners and double edges, in the game’s spirit without its art. Soft is filled, rounded blocks with no edges.',
+      'All three redraw every button, menu row, tab, panel, tray, tooltip and divider, the plates behind a boon’s name, the highlight on an Arcana card, the circle behind a ring of choices and the ring round each bubble. Their buttons and menu rows are shorter than the game’s, so more of the menu fits on a screen.',
+      'Boon and god icons, the frames that say a boon’s rarity, portraits, Charon, Dora and the wallpapers are the same in all four. They are the content, not the furniture.',
+      'The three CSS looks follow your theme all the way: Olympian’s edges are gold and Infernal’s copper, where the game’s art could only be tinted. A boon’s plate carries its rarity in the colour the game gives it.',
       'An empty caption under a ring of choices no longer draws its frame. It was meant to go when the caption was blank, and never did.',
     ],
   },

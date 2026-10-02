@@ -1,20 +1,22 @@
 /**
- * What the interface itself is drawn with: the game's own chrome art, or CSS.
+ * What the interface itself is drawn with: the game's own chrome art, or one
+ * of three looks drawn in CSS.
  *
- * **Only the furniture changes.** Buttons, panels, trays, tabs, toggles, the
- * rings round a bubble and the plates behind a boon's name are chrome, and
- * `plain.css` redraws every one of them out of the theme's tokens. Boon and god
- * icons, rarity frames on an icon, portraits, Charon, Dora and the wallpapers
- * are content or flavour and are the same in both.
+ * **Only the furniture changes.** Buttons, menu rows, panels, trays, tabs,
+ * toggles, the rings round a bubble and the plates behind a boon's name are
+ * chrome, and `skins.css` redraws every one of them. Boon and god icons, rarity
+ * frames on an icon, portraits, Charon, Dora and the wallpapers are content or
+ * flavour and are the same in all four.
  *
- * `applySkin` writes `data-skin` on the root, the same way `applyTheme` writes
- * `data-theme`, and `plain.css` keys every rule off it. The game's art stays the
- * default because it is what the tool has always looked like.
+ * `applySkin` writes two attributes on the root. `data-skin` names the look, and
+ * `data-chrome="css"` is on for every look that is not the game's, which is
+ * what the structural rules in `skins.css` key off: one set of rules takes the
+ * game's art away, and each look is only a block of values for them to read.
+ * A fourth CSS look is one more block.
  *
- * **The plain skin follows the theme all the way.** The game's chrome is fixed
- * art and a theme can only turn its hue (`--art-hue` in `tokens.css`); the CSS
- * version is made of `--metal`, `--lit` and the ink ramp, so Olympian gets gold
- * edges and Infernal gets copper ones rather than a rotated teal.
+ * **They follow the theme all the way.** The game's chrome is fixed art that a
+ * theme can only turn (`--art-hue` in `tokens.css`); these are made of `--lit`,
+ * `--metal` and the ink ramp, so Olympian's edges come out gold.
  */
 
 import { writeStamped } from '../state/stamps.ts'
@@ -22,11 +24,15 @@ import { writeStamped } from '../state/stamps.ts'
 export type SkinOption = {
   id: string
   name: string
+  /** one line, what it looks like */
+  say: string
 }
 
 export const SKINS: SkinOption[] = [
-  { id: 'game', name: 'The game’s own art' },
-  { id: 'plain', name: 'Plain' },
+  { id: 'game', name: 'The game’s art', say: 'Buttons and panels taken from the game itself.' },
+  { id: 'hairline', name: 'Hairline', say: 'Flat, with thin lit edges and almost no fill.' },
+  { id: 'carved', name: 'Carved', say: 'Cut corners and double edges, in the game’s spirit without its art.' },
+  { id: 'soft', name: 'Soft', say: 'Filled, rounded blocks with no edges.' },
 ]
 
 export const DEFAULT_SKIN = 'game'
@@ -53,5 +59,8 @@ export function writeSkin(id: string) {
 export function applySkin(id: string) {
   const found = SKINS.find((one) => one.id === id) ?? SKINS[0]
   if (!found) return
-  document.documentElement.dataset.skin = found.id
+  const root = document.documentElement
+  root.dataset.skin = found.id
+  if (found.id === DEFAULT_SKIN) delete root.dataset.chrome
+  else root.dataset.chrome = 'css'
 }

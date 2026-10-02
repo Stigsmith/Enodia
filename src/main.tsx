@@ -9,8 +9,8 @@ import './ui/sprites.css'
 import './ui/builds.css'
 import './ui/guides.css'
 import './ui/wiki.css'
-// Last, because every rule in it overrides one above, and only under the plain skin.
-import './ui/plain.css'
+// Last, because every rule in it overrides one above, and only under a CSS skin.
+import './ui/skins.css'
 import { App } from './App.tsx'
 
 const root = document.getElementById('root')
