@@ -1,11 +1,12 @@
 /**
- * The plain skin: the switch, and the stylesheet keeping up with the chrome.
+ * The skins: the switch, and the stylesheet keeping up with the chrome.
  *
- * The second half is the one that matters later. `plain.css` overrides rules
+ * The second half is the one that matters later. `skins.css` overrides rules
  * by name, so a new rule in `surface.css` or `builds.css` that draws the game's
- * chrome art would show that art under the plain skin too, and nothing on the
+ * chrome art would show that art under every CSS look too, and nothing on the
  * game skin would look wrong. This reads both stylesheets for every rule that
- * draws chrome and fails on any selector `plain.css` does not answer.
+ * draws chrome and fails on any selector `skins.css` does not answer, and it
+ * fails on a look that leaves out a value the structure reads.
  */
 
 // @vitest-environment jsdom
@@ -15,16 +16,17 @@ import { join } from 'node:path'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { gather } from '../state/sync.ts'
-import { DEFAULT_SKIN, applySkin, readSkin, writeSkin } from './skin.ts'
+import { DEFAULT_SKIN, SKINS, applySkin, readSkin, writeSkin } from './skin.ts'
 
 const UI = join(import.meta.dirname)
 /* Comments out first: a brace inside one would split a rule in the wrong place. */
 const read = (name: string) => readFileSync(join(UI, name), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
-const PLAIN = read('plain.css')
+const SKIN_CSS = read('skins.css')
 
 beforeEach(() => {
   window.localStorage.clear()
   delete document.documentElement.dataset.skin
+  delete document.documentElement.dataset.chrome
 })
 
 describe('the switch', () => {
@@ -33,25 +35,53 @@ describe('the switch', () => {
     expect(DEFAULT_SKIN).toBe('game')
   })
 
-  it('remembers plain, and drops a value that is not a skin', () => {
-    writeSkin('plain')
-    expect(readSkin()).toBe('plain')
+  it('remembers a look, and drops a value that is not one', () => {
+    writeSkin('carved')
+    expect(readSkin()).toBe('carved')
     window.localStorage.setItem('enodia.skin', 'chrome')
     expect(readSkin()).toBe('game')
   })
 
-  it('goes on the root, where every rule in plain.css looks for it', () => {
-    applySkin('plain')
-    expect(document.documentElement.dataset.skin).toBe('plain')
+  it('names the look on the root, and marks every look but the game’s as CSS', () => {
+    applySkin('soft')
+    expect(document.documentElement.dataset.skin).toBe('soft')
+    expect(document.documentElement.dataset.chrome).toBe('css')
+    applySkin('game')
+    expect(document.documentElement.dataset.skin).toBe('game')
+    expect(document.documentElement.dataset.chrome).toBeUndefined()
     applySkin('nonsense')
     expect(document.documentElement.dataset.skin).toBe('game')
   })
 
   /** A setting left off the sync list is kept faithfully on one device and nowhere else. */
   it('travels with the account like the theme does', () => {
-    writeSkin('plain')
+    writeSkin('hairline')
     const sent = gather().find((one) => one.kind === 'setting' && one.id === 'enodia.skin')
-    expect(sent?.payload).toBe('plain')
+    expect(sent?.payload).toBe('hairline')
+  })
+})
+
+/** The declarations block for one selector, the first time it opens a rule. */
+const blockOf = (css: string, head: string) => {
+  const at = css.indexOf(`${head} {`)
+  if (at < 0) return ''
+  return css.slice(at, css.indexOf('}', at))
+}
+
+describe('each look', () => {
+  const used = [...new Set([...SKIN_CSS.matchAll(/var\((--sk-[a-z-]+)\)/g)].map(([, name]) => name!))]
+  const looks = SKINS.filter((one) => one.id !== DEFAULT_SKIN)
+
+  it('has values to give, so this is checking something', () => {
+    expect(used.length).toBeGreaterThan(20)
+    expect(looks.length).toBe(3)
+  })
+
+  /** A look missing one value draws that part of the page with nothing at all. */
+  it.each(looks.map((one) => one.id))('%s gives every value the structure reads', (id) => {
+    const block = blockOf(SKIN_CSS, `:root[data-skin='${id}']`)
+    expect(block, `no block for ${id}`).not.toBe('')
+    for (const name of used) expect(block, `${id} has no ${name}`).toContain(`${name}:`)
   })
 })
 
@@ -77,9 +107,11 @@ const chromeSelectors = (css: string): string[] => {
   return out
 }
 
-/** Every selector `plain.css` scopes to the plain skin. */
+/** Every selector `skins.css` puts under the CSS chrome. */
 const answered = new Set(
-  [...PLAIN.matchAll(/:root\[data-skin='plain'\] ([^,{]+?)\s*[,{]/g)].map(([, one]) => one!.trim().replace(/\s+/g, ' ')),
+  [...SKIN_CSS.matchAll(/:root\[data-chrome='css'\] ([^,{]+?)\s*[,{]/g)].map(([, one]) =>
+    one!.trim().replace(/\s+/g, ' '),
+  ),
 )
 
 describe.each(['surface.css', 'builds.css'])('%s', (name) => {
@@ -89,21 +121,21 @@ describe.each(['surface.css', 'builds.css'])('%s', (name) => {
     expect(found.length).toBeGreaterThan(10)
   })
 
-  it.each(found)('%s has a plain counterpart', (selector) => {
-    expect(answered.has(selector), `plain.css has no rule for ${selector}`).toBe(true)
+  it.each(found)('%s has a CSS counterpart', (selector) => {
+    expect(answered.has(selector), `skins.css has no rule for ${selector}`).toBe(true)
   })
 })
 
 /**
  * The build's minifier writes `border-image: none` out as `border-image:` with
  * nothing after it, and the browser drops an empty declaration. Every
- * `border-image: none` in this plain skin vanished that way on its first build,
- * and so had the one in `surface.css` that was meant to take the frame off an
- * empty radial caption. The longhand survives. Measured in `dist/` on
+ * `border-image: none` in the first CSS skin vanished that way on its first
+ * build, and so had the one in `surface.css` that was meant to take the frame
+ * off an empty radial caption. The longhand survives. Measured in `dist/` on
  * 2 October 2026.
  */
 describe('what the minifier does to a shorthand', () => {
-  it.each(['surface.css', 'builds.css', 'guides.css', 'wiki.css', 'plain.css'])(
+  it.each(['surface.css', 'builds.css', 'guides.css', 'wiki.css', 'skins.css'])(
     '%s takes a border image off with the longhand',
     (name) => {
       expect(read(name)).not.toMatch(/border-image:\s*none/)
@@ -116,12 +148,12 @@ describe('the chrome that is an image in the markup', () => {
     for (const selector of ['.fear-arrow img', '.tour-arrow img', '.offer-selector']) {
       expect(answered.has(selector), selector).toBe(true)
     }
-    expect(PLAIN).toMatch(/\.offer-selector \{[^}]*object-position: 100vw 100vw/)
+    expect(SKIN_CSS).toMatch(/\.offer-selector \{[^}]*object-position: 100vw 100vw/)
   })
 
   it('turns off the hue rotation the game’s art needs, wherever it is set', () => {
     for (const selector of ['.quiet', '.tray-handle', '.radial-caption', '.objective-bar', '.bcard-hit::after']) {
-      expect(PLAIN, selector).toMatch(new RegExp(`${selector.replace(/[.:]/g, '\\$&')} \\{[^}]*filter: none`))
+      expect(SKIN_CSS, selector).toMatch(new RegExp(`${selector.replace(/[.:]/g, '\\$&')} \\{[^}]*filter: none`))
     }
   })
 })

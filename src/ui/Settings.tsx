@@ -32,7 +32,7 @@ import {
 import type { Manifest } from '../state/transfer.ts'
 import { NAME_LIMIT, readName, writeName } from '../state/identity.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
-import { applySkin, readSkin, writeSkin } from './skin.ts'
+import { SKINS, applySkin, readSkin, writeSkin } from './skin.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -150,23 +150,31 @@ export function Settings() {
           <section className="setting-block" data-tour="setting-skin">
             <h3 className="arcana-rule">How it is drawn</h3>
             <p className="setting-say">
-              Buttons, tabs, panels and trays are the game&rsquo;s own art. Plain draws them in
-              the browser instead, in your theme&rsquo;s colours. Boon icons, portraits and the
-              characters are the same either way.
+              Buttons, tabs, panels and trays. The game&rsquo;s own art, or one of three looks
+              drawn in the browser in your theme&rsquo;s colours. Boon icons, portraits and the
+              characters are the same in all four.
             </p>
-            <label className="setting-switch">
-              <input
-                type="checkbox"
-                checked={skin === 'plain'}
-                onChange={(event) => {
-                  const next = event.target.checked ? 'plain' : 'game'
-                  setSkin(next)
-                  applySkin(next)
-                  writeSkin(next)
-                }}
-              />
-              <span>Plain interface</span>
-            </label>
+            {/* The same control as Cards or List on Builds, so it answers to
+              * whichever look is on, including the one it is choosing. */}
+            <div className="builds-layout" role="radiogroup" aria-label="How the interface is drawn">
+              {SKINS.map((one) => (
+                <button
+                  key={one.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={skin === one.id}
+                  className={skin === one.id ? 'is-on' : ''}
+                  onClick={() => {
+                    setSkin(one.id)
+                    applySkin(one.id)
+                    writeSkin(one.id)
+                  }}
+                >
+                  {one.name}
+                </button>
+              ))}
+            </div>
+            <p className="setting-say">{SKINS.find((one) => one.id === skin)?.say}</p>
           </section>
 
           <section className="setting-block">

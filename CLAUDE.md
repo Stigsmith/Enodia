@@ -230,10 +230,16 @@ the play experience cannot see.
   the shorthand as `border-image:` with nothing after it, and the browser drops the declaration.
   It hid a real bug for weeks: an empty `.radial-caption` went on drawing its frame. Found on
   2 October 2026 by reading `dist/`; `src/ui/skin.test.ts` fails on the shorthand in any stylesheet
-- **The plain skin (`data-skin="plain"`, `src/ui/plain.css`) answers every rule that draws the
-  game's chrome art**, and `skin.test.ts` fails on a new chrome rule with no counterpart. A
-  nine-sliced plate keeps its thick transparent border in plain, so an inset `box-shadow` lands
-  a rem inside its edge: the edge there is an `outline` with `outline-offset: -1px`
+- **The CSS skins (`src/ui/skins.css`) answer every rule that draws the game's chrome art.**
+  `data-skin` names the look and `data-chrome="css"` is on for every look but the game's; the
+  structural rules key off the second and read `--sk-*` values, and each look is one block of
+  those values. `skin.test.ts` fails on a new chrome rule with no counterpart and on a look
+  missing a value. A nine-sliced plate keeps a transparent border, so an inset `box-shadow`
+  lands inside it: edges there are an `outline` with a negative offset
+- **Proton Drive is running on this machine and renamed a source file mid-edit** on 2 October
+  2026 (`Settings.tsx` became `Settings (# Name clash ... #).tsx`), and Vite's watcher then
+  served stale CSS until the dev server was restarted. If a file vanishes or the dev server
+  ignores an edit, check for a `Name clash` file and restart the server before debugging
 - **`loadPrefs` names every field it keeps, and drops the rest.** A field added to `Prefs` and
   not to `loadPrefs` is saved faithfully and gone by the next read. `guideSide` shipped that way
   and was caught in the running app, not by a test; `src/state/prefs.test.ts` holds it now

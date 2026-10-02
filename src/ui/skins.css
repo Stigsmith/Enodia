@@ -1,0 +1,859 @@
+/* ==========================================================================
+ * SKINS: the interface drawn in CSS instead of with the game's own chrome.
+ *
+ * `src/ui/skin.ts` writes `data-skin` on the root, naming the look, and
+ * `data-chrome="css"` for every look that is not the game's. Settings chooses.
+ * Under the game skin nothing in this file applies.
+ *
+ * **Two halves.** The first is three blocks of values, one per look, and
+ * nothing else. The second is the structure, keyed only on `data-chrome`: it
+ * takes the game's art off every rule that draws it and puts the current
+ * look's values in its place. A new look is a new block of values;
+ * `skin.test.ts` fails if a block leaves one out.
+ *
+ * **Only the furniture.** Buttons, menu rows, tabs, toggles, trays, panels,
+ * tooltips, dividers, bars, the plate behind a boon's name, the highlight on an
+ * Arcana card, the circle behind a radial and the ring round a bubble. Boon and
+ * god icons, the rarity frame on an icon, portraits, Charon, Dora, the status
+ * glyphs and the wallpapers are content or flavour and stay what they are.
+ *
+ * **Edges are outlines.** The game's plates are nine-sliced with
+ * `border-image`, so their borders are thick and transparent and an inset
+ * shadow lands a rem inside the edge, round the label. An outline with a
+ * negative offset sits just inside the box, follows the radius, and moves
+ * nothing, so every edge here is one.
+ *
+ * **Shorter than the game's.** Those thick borders made room for ornament the
+ * CSS looks do not draw, so `.quiet` and the menu rows thin them.
+ *
+ * **Made of the theme.** Edges are `--metal` and `--lit`, faces the ink ramp,
+ * so every look follows the theme; Olympian's edges come out gold. The hue
+ * rotation the game's art needs (`--art-hue`) is switched off, because rotating
+ * a colour that is already the theme's would make it somebody else's.
+ *
+ * `src/ui/skin.test.ts` fails if a rule in `surface.css` or `builds.css` draws
+ * chrome art and has no counterpart in this file.
+ * ========================================================================= */
+
+/* ============================================================ the looks */
+
+/* Hairline: flat, the way the Wiki already is. Thin lit edges, almost no fill. */
+:root[data-skin='hairline'] {
+  --sk-btn-bg: transparent;
+  --sk-btn-bg-hot: color-mix(in oklab, var(--lit) 12%, transparent);
+  --sk-btn-bg-down: color-mix(in oklab, var(--lit) 20%, transparent);
+  --sk-btn-bg-on: color-mix(in oklab, var(--lit) 14%, transparent);
+  --sk-btn-edge: var(--lit-dim);
+  --sk-btn-edge-hot: var(--lit);
+  --sk-btn-edge-on: var(--lit-hot);
+  --sk-btn-inset: -1px;
+  --sk-btn-radius: 6px;
+  --sk-btn-shape: none;
+
+  --sk-row-bg: transparent;
+  --sk-row-bg-hot: color-mix(in oklab, var(--lit) 8%, transparent);
+  --sk-row-bg-on: color-mix(in oklab, var(--lit-hot) 7%, transparent);
+  --sk-row-edge: transparent;
+  --sk-row-edge-hot: transparent;
+  --sk-row-edge-on: transparent;
+  --sk-row-bar: var(--lit-hot);
+  --sk-row-radius: 0;
+  --sk-row-shape: none;
+
+  --sk-tab-bg: transparent;
+  --sk-tab-bg-on: transparent;
+  --sk-tab-mark: inset 0 -1px 0 var(--div-3);
+  --sk-tab-mark-on: inset 0 -2px 0 var(--lit-hot);
+  --sk-tab-radius: 0;
+
+  --sk-panel-bg: var(--ink-900);
+  --sk-panel-edge: var(--div-4);
+  --sk-panel-inset: -1px;
+  --sk-panel-ring: none;
+  --sk-panel-radius: 8px;
+  --sk-panel-shape: none;
+
+  --sk-label-band: transparent;
+  --sk-label-line: var(--lit-dim);
+  --sk-side: var(--lit-dim);
+
+  --sk-rar-stripe: 2px;
+  --sk-rar-wash: 8%;
+
+  --sk-sigil:
+    radial-gradient(closest-side, transparent 0 97.4%, var(--lit-hot) 97.8% 98.6%, transparent 99%),
+    radial-gradient(
+      closest-side,
+      transparent 0 87.6%,
+      color-mix(in oklab, var(--lit-hot) 45%, transparent) 88% 88.5%,
+      transparent 88.9%
+    );
+  --sk-sigil-mask: radial-gradient(closest-side, #000 0 99.4%, transparent 99.6%);
+  --sk-ring: radial-gradient(
+    closest-side,
+    transparent 0 84.4%,
+    color-mix(in oklab, var(--lit-hot) 70%, transparent) 85% 86.2%,
+    transparent 86.8%
+  );
+}
+
+/* Carved: cut corners and double edges. The game's shapes, none of its art. */
+:root[data-skin='carved'] {
+  --sk-btn-bg: var(--ink-850);
+  --sk-btn-bg-hot: var(--ink-800);
+  --sk-btn-bg-down: var(--ink-900);
+  --sk-btn-bg-on: var(--ink-800);
+  --sk-btn-edge: var(--div-5);
+  --sk-btn-edge-hot: var(--metal);
+  --sk-btn-edge-on: var(--lit-hot);
+  --sk-btn-inset: -3px;
+  --sk-btn-radius: 0;
+  /* Pointed ends, where the game's plate has its caps. */
+  --sk-btn-shape: polygon(0.6rem 0, calc(100% - 0.6rem) 0, 100% 50%, calc(100% - 0.6rem) 100%, 0.6rem 100%, 0 50%);
+
+  --sk-row-bg: var(--ink-850);
+  --sk-row-bg-hot: var(--ink-800);
+  --sk-row-bg-on: var(--ink-800);
+  --sk-row-edge: var(--div-5);
+  --sk-row-edge-hot: var(--metal);
+  --sk-row-edge-on: var(--lit-hot);
+  --sk-row-bar: transparent;
+  --sk-row-radius: 0;
+  --sk-row-shape: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+
+  --sk-tab-bg: var(--ink-850);
+  --sk-tab-bg-on: var(--ink-800);
+  --sk-tab-mark: inset 0 1px 0 var(--div-5);
+  --sk-tab-mark-on: inset 0 1px 0 var(--lit-hot);
+  --sk-tab-radius: 0;
+
+  --sk-panel-bg: var(--ink-900);
+  --sk-panel-edge: color-mix(in oklab, var(--metal) 32%, transparent);
+  --sk-panel-inset: -5px;
+  --sk-panel-ring: inset 0 0 0 1px var(--div-4);
+  --sk-panel-radius: 0;
+  --sk-panel-shape: polygon(
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px),
+    0 12px
+  );
+
+  --sk-label-band: color-mix(in oklab, var(--ink-850) 90%, transparent);
+  --sk-label-line: color-mix(in oklab, var(--metal) 45%, transparent);
+  --sk-side: color-mix(in oklab, var(--metal) 40%, transparent);
+
+  --sk-rar-stripe: 3px;
+  --sk-rar-wash: 0%;
+
+  /* Two circles, and nine marks between them for the nonagram's nine points. */
+  --sk-sigil:
+    radial-gradient(closest-side, transparent 0 97.4%, var(--lit-hot) 97.8% 98.8%, transparent 99.2%),
+    radial-gradient(closest-side, transparent 0 87.6%, var(--lit-hot) 88% 88.8%, transparent 89.2%),
+    repeating-conic-gradient(from -1.5deg, var(--lit-hot) 0 3deg, transparent 3deg 40deg);
+  /* The marks stay between the circles rather than running to the middle. */
+  --sk-sigil-mask: radial-gradient(closest-side, transparent 0 87.4%, #000 87.6% 99.2%, transparent 99.4%);
+  --sk-ring:
+    radial-gradient(circle at 50% 2%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 50% 98%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 2% 50%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 98% 50%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(
+      closest-side,
+      transparent 0 95%,
+      color-mix(in oklab, var(--metal) 70%, transparent) 95.6% 96.8%,
+      transparent 97.4%
+    ),
+    radial-gradient(
+      closest-side,
+      transparent 0 84.2%,
+      color-mix(in oklab, var(--lit-hot) 60%, transparent) 84.8% 86.4%,
+      transparent 87%
+    );
+}
+
+/* Soft: filled, rounded blocks with no edges at all. */
+:root[data-skin='soft'] {
+  --sk-btn-bg: var(--ink-800);
+  --sk-btn-bg-hot: var(--ink-700);
+  --sk-btn-bg-down: var(--ink-850);
+  --sk-btn-bg-on: color-mix(in oklab, var(--ink-700) 68%, var(--lit) 32%);
+  --sk-btn-edge: transparent;
+  --sk-btn-edge-hot: transparent;
+  --sk-btn-edge-on: transparent;
+  --sk-btn-inset: -1px;
+  --sk-btn-radius: 8px;
+  --sk-btn-shape: none;
+
+  --sk-row-bg: transparent;
+  --sk-row-bg-hot: color-mix(in oklab, var(--ink-700) 60%, transparent);
+  --sk-row-bg-on: var(--ink-700);
+  --sk-row-edge: transparent;
+  --sk-row-edge-hot: transparent;
+  --sk-row-edge-on: transparent;
+  --sk-row-bar: transparent;
+  --sk-row-radius: 8px;
+  --sk-row-shape: none;
+
+  --sk-tab-bg: transparent;
+  --sk-tab-bg-on: var(--ink-700);
+  --sk-tab-mark: none;
+  --sk-tab-mark-on: none;
+  --sk-tab-radius: 6px;
+
+  --sk-panel-bg: var(--ink-850);
+  --sk-panel-edge: transparent;
+  --sk-panel-inset: -1px;
+  --sk-panel-ring: none;
+  --sk-panel-radius: 12px;
+  --sk-panel-shape: none;
+
+  --sk-label-band: var(--ink-800);
+  --sk-label-line: transparent;
+  --sk-side: transparent;
+
+  --sk-rar-stripe: 0px;
+  --sk-rar-wash: 18%;
+
+  /* A band of light rather than a line. */
+  --sk-sigil: radial-gradient(
+    closest-side,
+    transparent 0 84%,
+    color-mix(in oklab, var(--lit-hot) 45%, transparent) 92%,
+    transparent 100%
+  );
+  --sk-sigil-mask: radial-gradient(closest-side, #000 0 99.4%, transparent 99.6%);
+  --sk-ring: radial-gradient(
+    closest-side,
+    transparent 0 84%,
+    color-mix(in oklab, var(--lit) 40%, transparent) 87% 92%,
+    transparent 99%
+  );
+}
+
+/* ======================================================= the structure */
+
+/* No rarity until a row says otherwise. */
+:root[data-chrome='css'] {
+  --pl-rar: transparent;
+}
+
+/* ------------------------------------------------------------- buttons */
+
+/* The shared button. Thinner borders than the game's nine-slice, which made
+ * room for ornament that is not drawn here. */
+:root[data-chrome='css'] .quiet {
+  border-image-source: none;
+  border-color: transparent;
+  border-width: 0.6rem 1.3rem;
+  border-radius: var(--sk-btn-radius);
+  clip-path: var(--sk-btn-shape);
+  background: var(--sk-btn-bg);
+  outline: 1px solid var(--sk-btn-edge);
+  outline-offset: var(--sk-btn-inset);
+  box-shadow: none;
+  filter: none;
+  transition:
+    color var(--t-response) var(--e-response),
+    background-color var(--t-response) var(--e-response),
+    outline-color var(--t-response) var(--e-response);
+}
+
+/* Focus gets the same light as hover, which is what the game skin does too. */
+:root[data-chrome='css'] .quiet:hover,
+:root[data-chrome='css'] .quiet:focus-visible {
+  border-image-source: none;
+  background: var(--sk-btn-bg-hot);
+  outline: 1px solid var(--sk-btn-edge-hot);
+  outline-offset: var(--sk-btn-inset);
+}
+
+:root[data-chrome='css'] .quiet:active {
+  border-image-source: none;
+  background: var(--sk-btn-bg-down);
+  filter: none;
+}
+
+/* Back is the way out, and the game draws it red. The event colour rather
+ * than a rarity, because leaving is an event. */
+:root[data-chrome='css'] .picker-back {
+  border-image-source: none;
+  background: color-mix(in oklab, var(--rim-magenta) 12%, var(--sk-btn-bg));
+  outline-color: color-mix(in oklab, var(--rim-magenta) 55%, transparent);
+}
+
+:root[data-chrome='css'] .picker-back:hover,
+:root[data-chrome='css'] .picker-back:focus-visible {
+  border-image-source: none;
+  background: color-mix(in oklab, var(--rim-magenta) 22%, var(--sk-btn-bg));
+  outline-color: var(--rim-magenta);
+}
+
+/* The menu's rows, and the corner panel's, which are the same plate. */
+:root[data-chrome='css'] .menu-panel button,
+:root[data-chrome='css'] .you-panel button {
+  border-image-source: none;
+  border-color: transparent;
+  border-width: 0.55rem 1rem;
+  border-radius: var(--sk-row-radius);
+  clip-path: var(--sk-row-shape);
+  background: var(--sk-row-bg);
+  outline: 1px solid var(--sk-row-edge);
+  outline-offset: var(--sk-btn-inset);
+  box-shadow: none;
+}
+
+:root[data-chrome='css'] .menu-panel button:hover:not(:disabled):not(.is-here),
+:root[data-chrome='css'] .menu-panel button:focus-visible:not(.is-here),
+:root[data-chrome='css'] .you-panel button:hover,
+:root[data-chrome='css'] .you-panel button:focus-visible {
+  filter: none;
+  background: var(--sk-row-bg-hot);
+  outline: 1px solid var(--sk-row-edge-hot);
+  outline-offset: var(--sk-btn-inset);
+}
+
+/* Where you are. Hairline marks it with a bar down the leading edge, the
+ * others with the row's own light. */
+:root[data-chrome='css'] .menu-panel button.is-here {
+  border-image-source: none;
+  background:
+    linear-gradient(90deg, var(--sk-row-bar) 0 2px, transparent 2px),
+    var(--sk-row-bg-on);
+  background-origin: border-box;
+  outline: 1px solid var(--sk-row-edge-on);
+  outline-offset: var(--sk-btn-inset);
+}
+
+/* The small plated buttons in the build manager, the editor and the run log. */
+:root[data-chrome='css'] .builds-back,
+:root[data-chrome='css'] .editor-actions > button:not(.editor-delete),
+:root[data-chrome='css'] .vowscreen-foot button,
+:root[data-chrome='css'] .logrun-actions button,
+:root[data-chrome='css'] .logrun-yesno button,
+:root[data-chrome='css'] .logrun-three button,
+:root[data-chrome='css'] .logrun-ended button,
+:root[data-chrome='css'] .builds-layout button {
+  border-radius: var(--sk-btn-radius);
+  clip-path: var(--sk-btn-shape);
+  background: var(--sk-btn-bg);
+  outline: 1px solid var(--sk-btn-edge);
+  outline-offset: var(--sk-btn-inset);
+  box-shadow: none;
+}
+
+:root[data-chrome='css'] .builds-back:hover,
+:root[data-chrome='css'] .editor-actions > button:not(.editor-delete):hover:not(:disabled),
+:root[data-chrome='css'] .vowscreen-foot button:hover,
+:root[data-chrome='css'] .logrun-actions button:hover:not(:disabled),
+:root[data-chrome='css'] .logrun-yesno button:hover:not(.is-on),
+:root[data-chrome='css'] .logrun-three button:hover:not(.is-on),
+:root[data-chrome='css'] .logrun-ended button:hover:not(.is-on),
+:root[data-chrome='css'] .builds-layout button:hover:not(.is-on) {
+  filter: none;
+  background: var(--sk-btn-bg-hot);
+  outline-color: var(--sk-btn-edge-hot);
+}
+
+:root[data-chrome='css'] .builds-back:active,
+:root[data-chrome='css'] .editor-actions > button:not(.editor-delete):active:not(:disabled) {
+  filter: none;
+  background: var(--sk-btn-bg-down);
+}
+
+/* A chosen answer, and the chosen layout. Yes is lit; No takes the way-out
+ * colour, as the game's cancel plate does. */
+:root[data-chrome='css'] .logrun-three button.is-on,
+:root[data-chrome='css'] .logrun-ended button.is-on,
+:root[data-chrome='css'] .logrun-yesno button:first-child.is-on,
+:root[data-chrome='css'] .logrun-yesno button:first-child.is-on:hover,
+:root[data-chrome='css'] .builds-layout button.is-on {
+  background: var(--sk-btn-bg-on);
+  outline-color: var(--sk-btn-edge-on);
+}
+
+:root[data-chrome='css'] .logrun-yesno button:last-child.is-on,
+:root[data-chrome='css'] .logrun-yesno button:last-child.is-on:hover {
+  background: color-mix(in oklab, var(--rim-magenta) 24%, var(--sk-btn-bg));
+  outline-color: var(--rim-magenta);
+}
+
+/* The lamp in a layout toggle: a ring, lit when chosen. */
+:root[data-chrome='css'] .builds-layout button::before {
+  border-radius: 50%;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--bone-faint);
+}
+
+:root[data-chrome='css'] .builds-layout button.is-on::before {
+  background: radial-gradient(circle, var(--lit-hot) 0 36%, transparent 44%);
+  box-shadow: inset 0 0 0 1.5px var(--lit-hot);
+}
+
+/* Delete, the help mark and the tick are round in every look. A circle says
+ * "one thing" and suits all three. */
+:root[data-chrome='css'] .editor-delete {
+  position: relative;
+  border-radius: 50%;
+  clip-path: none;
+  background: var(--sk-panel-bg);
+  outline: 1px solid var(--div-5);
+  outline-offset: -1px;
+}
+
+:root[data-chrome='css'] .editor-delete::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bone-dim);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1.2 12H7.2L6 9zm3.2 2.5.5 7h1.5l-.4-7H9.2zm4.1 0-.4 7h1.5l.5-7h-1.6z'/%3E%3C/svg%3E") center / 46% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1.2 12H7.2L6 9zm3.2 2.5.5 7h1.5l-.4-7H9.2zm4.1 0-.4 7h1.5l.5-7h-1.6z'/%3E%3C/svg%3E") center / 46% no-repeat;
+}
+
+:root[data-chrome='css'] .editor-delete:hover {
+  background: color-mix(in oklab, var(--rim-magenta) 26%, var(--ink-900));
+  outline-color: var(--rim-magenta);
+}
+
+:root[data-chrome='css'] .editor-delete:hover::before {
+  background: var(--bone);
+}
+
+/* The tick on a step that is done: an empty ring until it is ticked, then
+ * filled with the light and the tick cut into it. */
+:root[data-chrome='css'] .editor-confirm input {
+  border-radius: 50%;
+  background: var(--sk-panel-bg);
+  box-shadow: inset 0 0 0 1px var(--div-5);
+  filter: none;
+}
+
+:root[data-chrome='css'] .editor-confirm input:checked {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23080d0f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / 66% no-repeat,
+    var(--lit-hot);
+  box-shadow: none;
+  filter: none;
+}
+
+:root[data-chrome='css'] .editor-confirm:hover input:not(:checked) {
+  filter: none;
+  box-shadow: inset 0 0 0 1px var(--lit);
+}
+
+/* The help mark, on a panel's ground so it reads over whatever it floats on. */
+:root[data-chrome='css'] .pagehelp-open {
+  border-radius: 50%;
+  background: var(--sk-panel-bg);
+  box-shadow: inset 0 0 0 1px var(--div-5);
+}
+
+:root[data-chrome='css'] .pagehelp-open::before {
+  content: '?';
+  content: '?' / '';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--metal);
+}
+
+:root[data-chrome='css'] .pagehelp-open:hover,
+:root[data-chrome='css'] .pagehelp-open:focus-visible {
+  background: var(--ink-800);
+  box-shadow: inset 0 0 0 1px var(--lit);
+}
+
+/* The stepper arrows on the Fear counter and in a tour. The game's arrow is an
+ * image in the markup, so it is pushed out of its own box and the element it
+ * leaves behind is cut into a chevron instead. */
+:root[data-chrome='css'] .fear-arrow img,
+:root[data-chrome='css'] .tour-arrow img {
+  object-position: 100vw 100vw;
+  background: var(--metal);
+}
+
+:root[data-chrome='css'] .fear-arrow:first-child img {
+  clip-path: polygon(50% 14%, 92% 86%, 50% 62%, 8% 86%);
+}
+
+:root[data-chrome='css'] .fear-arrow:last-child img {
+  clip-path: polygon(50% 86%, 8% 14%, 50% 38%, 92% 14%);
+}
+
+:root[data-chrome='css'] .tour-arrow:first-of-type img {
+  clip-path: polygon(22% 50%, 74% 12%, 56% 50%, 74% 88%);
+}
+
+:root[data-chrome='css'] .tour-arrow:last-of-type img {
+  clip-path: polygon(78% 50%, 26% 88%, 44% 50%, 26% 12%);
+}
+
+/* The offer card's selector, the same way: a chevron pointing at the card
+ * under the cursor. */
+:root[data-chrome='css'] .offer-selector {
+  object-position: 100vw 100vw;
+  background: var(--lit-hot);
+  clip-path: polygon(78% 50%, 26% 88%, 44% 50%, 26% 12%);
+}
+
+/* ---------------------------------------------------------------- tabs */
+
+:root[data-chrome='css'] .tab {
+  border-radius: var(--sk-tab-radius);
+  background: var(--sk-tab-bg);
+  box-shadow: var(--sk-tab-mark);
+}
+
+:root[data-chrome='css'] .tab.is-open {
+  background: var(--sk-tab-bg-on);
+  box-shadow: var(--sk-tab-mark-on);
+}
+
+/* ---------------------------------------------------------- the radial */
+
+/* What stands behind a ring of choices, where the game draws its sigil. */
+:root[data-chrome='css'] .radial-ring-area::before {
+  background: var(--sk-sigil);
+  -webkit-mask: var(--sk-sigil-mask);
+  mask: var(--sk-sigil-mask);
+}
+
+/* The ring round a bubble. The ring setting chooses between the game's own
+ * rings, so it has nothing to choose here and its select goes. */
+:root[data-chrome='css'] .radial-ring li::after {
+  width: 118%;
+  aspect-ratio: 1 / 1;
+  background: var(--sk-ring);
+  -webkit-mask: none;
+  mask: none;
+}
+
+:root[data-chrome='css'] .topbar-frame {
+  display: none;
+}
+
+/* The line under a radial saying what is under the cursor. */
+:root[data-chrome='css'] .radial-caption {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: var(--sk-panel-bg);
+  background-origin: border-box;
+  outline: 1px solid var(--sk-panel-edge);
+  outline-offset: var(--sk-panel-inset);
+  filter: none;
+}
+
+:root[data-chrome='css'] .radial-caption:empty {
+  clip-path: none;
+  background: none;
+  outline: none;
+}
+
+/* "What did this Exit give": a band that fades out at both ends, between two
+ * lines that do the same. */
+:root[data-chrome='css'] .picker-label {
+  border-image-source: none;
+  border-color: transparent;
+  background:
+    linear-gradient(90deg, transparent, var(--sk-label-line) 22% 78%, transparent) top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, var(--sk-label-line) 22% 78%, transparent) bottom / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, var(--sk-label-band) 18% 82%, transparent);
+  background-origin: border-box;
+}
+
+/* ---------------------------------------------------------- the plates */
+
+/* Rarity, as the game states it: a stripe down the leading edge and a wash of
+ * the same colour, in whatever widths the look gives them. */
+:root[data-chrome='css'] [data-rarity],
+:root[data-chrome='css'] .offer-card button {
+  --pl-rar: color-mix(in oklab, var(--rarity-common) 45%, transparent);
+}
+
+:root[data-chrome='css'] [data-rarity='rare'],
+:root[data-chrome='css'] .offer-card[data-plate='rare'] button {
+  --pl-rar: var(--rarity-rare);
+}
+
+:root[data-chrome='css'] [data-rarity='epic'],
+:root[data-chrome='css'] .offer-card[data-plate='epic'] button {
+  --pl-rar: var(--rarity-epic);
+}
+
+:root[data-chrome='css'] [data-rarity='heroic'],
+:root[data-chrome='css'] .offer-card[data-plate='heroic'] button {
+  --pl-rar: var(--rarity-heroic);
+}
+
+:root[data-chrome='css'] [data-rarity='duo'],
+:root[data-chrome='css'] [data-rarity='perfect'],
+:root[data-chrome='css'] .offer-card[data-plate='duo'] button {
+  --pl-rar: var(--rarity-duo);
+}
+
+:root[data-chrome='css'] [data-rarity='legendary'],
+:root[data-chrome='css'] .offer-card[data-plate='legendary'] button {
+  --pl-rar: var(--rarity-legendary);
+}
+
+/* An offer at an Exit. */
+:root[data-chrome='css'] .offer-card button {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background:
+    linear-gradient(90deg, var(--pl-rar) 0 var(--sk-rar-stripe), transparent var(--sk-rar-stripe)),
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) var(--sk-rar-wash), transparent), transparent 55%),
+    var(--sk-panel-bg);
+  background-origin: border-box;
+  outline: 1px solid var(--sk-panel-edge);
+  outline-offset: var(--sk-panel-inset);
+}
+
+:root[data-chrome='css'] .offer-card button::before {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: color-mix(in oklab, var(--lit) 10%, transparent);
+  outline: 1px solid var(--sk-btn-edge-hot);
+  outline-offset: var(--sk-panel-inset);
+}
+
+/* The rows of a boon list, in the editor and in the pickers. A row with no
+ * rarity has no plate, as it has none in the game skin. */
+:root[data-chrome='css'] .picklist-row,
+:root[data-chrome='css'] .bsort-row,
+:root[data-chrome='css'] .bsort-chip {
+  background-image:
+    linear-gradient(90deg, var(--pl-rar) 0 var(--sk-rar-stripe), transparent var(--sk-rar-stripe)),
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) var(--sk-rar-wash), transparent), transparent 55%);
+  background-size: auto;
+}
+
+:root[data-chrome='css'] .picklist-row:hover,
+:root[data-chrome='css'] .bsort-row:hover {
+  background-image:
+    linear-gradient(90deg, var(--pl-rar) 0 var(--sk-rar-stripe), transparent var(--sk-rar-stripe)),
+    linear-gradient(90deg, color-mix(in oklab, var(--lit) 12%, transparent), transparent 80%);
+  background-size: auto;
+  box-shadow: inset 0 0 0 1px var(--lit-dim);
+}
+
+:root[data-chrome='css'] .picklist-row.is-blocked:hover,
+:root[data-chrome='css'] .bsort-row.is-blocked:hover {
+  background-image:
+    linear-gradient(90deg, var(--pl-rar) 0 var(--sk-rar-stripe), transparent var(--sk-rar-stripe)),
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) var(--sk-rar-wash), transparent), transparent 55%);
+  box-shadow: none;
+}
+
+/* The run picker's own rows. A hammer, a Hex and anything else wear the metal,
+ * an Encounter wears the Duo colour, as the game's plates had it. */
+:root[data-chrome='css'] .plate,
+:root[data-chrome='css'] .boon {
+  --pl-rar: color-mix(in oklab, var(--rarity-common) 45%, transparent);
+  background:
+    linear-gradient(90deg, var(--pl-rar) 0 var(--sk-rar-stripe), transparent var(--sk-rar-stripe)),
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) var(--sk-rar-wash), transparent), transparent 55%),
+    var(--sk-panel-bg);
+}
+
+:root[data-chrome='css'] .plate.is-hammer,
+:root[data-chrome='css'] .plate.is-hex,
+:root[data-chrome='css'] .plate.is-other {
+  --pl-rar: var(--metal);
+}
+
+:root[data-chrome='css'] .plate.is-encounter {
+  --pl-rar: var(--rarity-duo);
+}
+
+/* --------------------------------------------------- cards and Arcana */
+
+/* A build card's plate, behind everything standing on it. */
+:root[data-chrome='css'] .bcard-hit::after {
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: var(--sk-panel-bg);
+  box-shadow: var(--sk-panel-ring);
+  outline: 1px solid var(--sk-panel-edge);
+  outline-offset: var(--sk-panel-inset);
+  filter: none;
+}
+
+/* Under the cursor: a little light over the card, and the look's hot edge. */
+:root[data-chrome='css'] .bcard-hit::before {
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: color-mix(in oklab, var(--lit) 7%, transparent);
+  outline: 1px solid var(--sk-btn-edge-hot);
+  outline-offset: var(--sk-panel-inset);
+  filter: none;
+}
+
+/* An Arcana card that is on, and one under the cursor. The game's art is
+ * larger than the card to make room for its glow; these sit on the card's
+ * own edge. */
+:root[data-chrome='css'] .arcana-art::after {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 4px;
+  background: none;
+  box-shadow:
+    0 0 0 2px var(--lit-hot),
+    0 0 0.9rem color-mix(in oklab, var(--lit) 60%, transparent);
+  filter: none;
+}
+
+:root[data-chrome='css'] .arcana-art::before,
+:root[data-chrome='css'] .poster-card::before {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: none;
+  box-shadow: 0 0 0 1px var(--lit);
+  filter: none;
+}
+
+/* --------------------------------------------------- trays and rails */
+
+:root[data-chrome='css'] .btray {
+  background:
+    linear-gradient(90deg, var(--sk-side) 0 1px, transparent 1px),
+    var(--ink-900);
+}
+
+/* Mirrored by the rule it overrides, so the edge lands on the right. */
+:root[data-chrome='css'] .editor-rail::before {
+  background: linear-gradient(90deg, var(--sk-side) 0 1px, transparent 1px);
+}
+
+@media (min-width: 60rem) {
+  :root[data-chrome='css'] .railbar {
+    background:
+      linear-gradient(270deg, var(--sk-side) 0 1px, transparent 1px),
+      var(--ink-950);
+  }
+}
+
+:root[data-chrome='css'] .rail-sheet::before {
+  background: none;
+}
+
+:root[data-chrome='css'] .tray-handle {
+  background: var(--sk-panel-bg);
+  box-shadow: inset 0 1px 0 var(--sk-side);
+  filter: none;
+}
+
+:root[data-chrome='css'] .objective-bar {
+  filter: none;
+}
+
+/* ------------------------------------------------- panels and words */
+
+/* The tooltip over a mark. */
+:root[data-chrome='css'] .peek.is-boon,
+:root[data-chrome='css'] .peek.is-other {
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: var(--sk-panel-bg);
+  box-shadow: var(--sk-panel-ring);
+  outline: 1px solid var(--sk-panel-edge);
+  outline-offset: var(--sk-panel-inset);
+}
+
+/* The run log and the vow sheet. The game's panels are pictures with a fixed
+ * ratio and an ornament that eats a fifth of each edge, which is what all the
+ * percentage padding in `builds.css` measures around. These have no ornament
+ * to clear, so they take their height from what is in them. */
+:root[data-chrome='css'] .logrun-box {
+  aspect-ratio: auto;
+  border-radius: var(--sk-panel-radius);
+  clip-path: var(--sk-panel-shape);
+  background: var(--sk-panel-bg);
+  box-shadow: var(--sk-panel-ring);
+  outline: 1px solid var(--sk-panel-edge);
+  outline-offset: var(--sk-panel-inset);
+}
+
+:root[data-chrome='css'] .logrun-box .logrun-inner {
+  height: auto;
+  max-height: 92vh;
+  padding: 2.4rem 2.6rem 2.2rem;
+}
+
+:root[data-chrome='css'] .logrun-box.is-vows {
+  aspect-ratio: auto;
+  background: var(--sk-panel-bg);
+}
+
+:root[data-chrome='css'] .logrun-box.is-vows .logrun-inner {
+  padding: 2.4rem 3rem 2.2rem;
+}
+
+/* Dora's lines and a tour's, on a shade that fades out at every edge. */
+:root[data-chrome='css'] .dora-says,
+:root[data-chrome='css'] .tour-say {
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.74), rgb(0 0 0 / 0.5) 62%, transparent);
+}
+
+/* A bar filling up, on the Roadmap. */
+:root[data-chrome='css'] .plan-bar {
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+  box-shadow: inset 0 0 0 1px var(--div-4);
+}
+
+:root[data-chrome='css'] .plan-bar-fill {
+  border-radius: inherit;
+  background: var(--lit);
+}
+
+/* ------------------------------------------------------------ dividers */
+
+:root[data-chrome='css'] .group-heading,
+:root[data-chrome='css'] .block-heading {
+  border-image: linear-gradient(90deg, var(--lit-dim), var(--div-5) 55%, transparent) 0 0 1 0 / 0 0 1px 0 stretch;
+}
+
+:root[data-chrome='css'] .builds-how,
+:root[data-chrome='css'] .builds-repeat {
+  background: linear-gradient(90deg, transparent, var(--lit-dim) 30% 70%, transparent) top center / 100% 1px no-repeat;
+}
+
+/* ------------------------------------------------- one look's own type */
+
+/* Carved sets its plates in the display face, the way the game sets its
+ * headings, which is half of what makes it read as carved. */
+:root[data-skin='carved'] .quiet,
+:root[data-skin='carved'] .menu-panel button,
+:root[data-skin='carved'] .you-panel button,
+:root[data-skin='carved'] .builds-back,
+:root[data-skin='carved'] .tab {
+  font-family: var(--display);
+  letter-spacing: 0.03em;
+}
