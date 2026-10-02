@@ -4,6 +4,11 @@ import react from '@vitejs/plugin-react'
 // One config for both. Vitest reads `test`, Vite ignores it.
 export default defineConfig({
   plugins: [react()],
+  // The preview pane hands the dev server a free port in PORT when 5173 is
+  // taken by another project's server. Vite does not read PORT itself, and
+  // nothing here needs 5173 in particular: sign-in and the API live on the
+  // Worker at 8787, not behind Vite.
+  server: { port: Number(process.env.PORT) || 5173 },
   // The image library is served as-is, so a manifest path like
   // "boons/storm-ring.webp" is also its URL. A build copies all of it, and
   // scripts/prune.ts then deletes whatever the app never references, which is
