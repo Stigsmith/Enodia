@@ -36,6 +36,15 @@ export type WikiSection = {
   part: string
   title: string
   entries: WikiEntry[]
+  /**
+   * Which family this section is, for `wiki-tree.ts` to hang it under the
+   * right tile: `olympian`, `god`, `duos`, `legendaries`, `hexes`, `godsent`,
+   * `stars`, `aspects`, `hammers`, `keepsakes`, `arcana`, `familiars`, `along`
+   * or `else`.
+   */
+  group: string
+  /** whose it is, where that matters: a god's source id, a weapon, a family */
+  owner?: string
 }
 
 /** The families `build-app-data.ts` assigns, and what each is called here. */
@@ -159,28 +168,31 @@ export function wikiSections(): WikiSection[] {
   }))
 
   const out: WikiSection[] = []
-  const add = (part: string, id: string, title: string, entries: WikiEntry[]) => {
-    if (entries.length) out.push({ part, id, title, entries })
+  const add = (part: string, id: string, title: string, entries: WikiEntry[], group: string, owner?: string) => {
+    if (entries.length) out.push({ part, id, title, entries, group, ...(owner ? { owner } : {}) })
   }
 
-  for (const { source, entries } of [...olympian, ...hermes, ...encounter, ...chaos]) {
-    add('Boons', `god-${source.id}`, source.name, entries)
+  for (const { source, entries } of olympian) add('Boons', `god-${source.id}`, source.name, entries, 'olympian', source.id)
+  for (const { source, entries } of [...hermes, ...encounter, ...chaos]) {
+    add('Boons', `god-${source.id}`, source.name, entries, 'god', source.id)
   }
-  add('Duos and legendaries', 'duos', 'Duos', duos.sort(byName))
-  add('Duos and legendaries', 'legendaries', 'Legendaries', legendaries.sort(byName))
-  add('Hexes', 'hexes', 'Hexes', hexes.sort(byName))
-  add('Hexes', 'godsent', 'Godsent Hexes', godsent.sort(byName))
-  add('Hexes', 'path-of-stars', 'Path of Stars', talents.sort(byName))
-  add('Arms', 'aspects', 'Aspects', aspects)
+  add('Duos and legendaries', 'duos', 'Duos', duos.sort(byName), 'duos')
+  add('Duos and legendaries', 'legendaries', 'Legendaries', legendaries.sort(byName), 'legendaries')
+  add('Hexes', 'hexes', 'Hexes', hexes.sort(byName), 'hexes')
+  add('Hexes', 'godsent', 'Godsent Hexes', godsent.sort(byName), 'godsent')
+  add('Hexes', 'path-of-stars', 'Path of Stars', talents.sort(byName), 'stars')
+  add('Arms', 'aspects', 'Aspects', aspects, 'aspects')
   for (const { source, entries } of hammers) {
     const arm = source.weapon ? (weaponById.get(source.weapon)?.arm ?? source.weapon) : source.name
-    add('Arms', `hammers-${source.weapon ?? source.id}`, `Daedalus Hammers for ${arm}`, entries)
+    add('Arms', `hammers-${source.weapon ?? source.id}`, `Daedalus Hammers for ${arm}`, entries, 'hammers', source.weapon)
   }
-  add('Before a run', 'keepsakes', 'Keepsakes', keepsakes)
-  add('Before a run', 'arcana', 'Arcana', cards)
-  add('Before a run', 'familiars', 'Familiars', pets)
-  for (const { family, entries } of families) add('Along the way', family.group, family.title, entries)
-  add('Everything else', 'everything-else', 'Everything else', rest)
+  add('Before a run', 'keepsakes', 'Keepsakes', keepsakes, 'keepsakes')
+  add('Before a run', 'arcana', 'Arcana', cards, 'arcana')
+  add('Before a run', 'familiars', 'Familiars', pets, 'familiars')
+  for (const { family, entries } of families) {
+    add('Along the way', family.group, family.title, entries, 'along', family.group)
+  }
+  add('Everything else', 'everything-else', 'Everything else', rest, 'else')
   return out
 }
 

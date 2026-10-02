@@ -13,8 +13,14 @@
 
 export type WikiKind = 'trait' | 'arcana' | 'familiar'
 
-/** A record, or null for the index. */
-export type WikiAt = { kind: WikiKind; id: string } | null
+/**
+ * A record, a section of the index, or null for the top of it.
+ *
+ * A section is `node`, and its id is its path through `wiki-tree.ts`,
+ * `olympians/zeus`, so `/wiki/c/olympians/zeus` reopens Zeus's page the way a
+ * record's address reopens the record.
+ */
+export type WikiAt = { kind: WikiKind; id: string } | { kind: 'node'; id: string } | null
 
 const SEGMENTS: Record<WikiKind, string> = { trait: 't', arcana: 'arcana', familiar: 'familiar' }
 
@@ -41,12 +47,21 @@ const decoded = (part: string): string | null => {
 export function wikiInUrl(pathname: string): { at: WikiAt } | null {
   const parts = pathname.split('/').filter(Boolean)
   if (parts[0] !== 'wiki') return null
+  if (parts[1] === NODE) {
+    const path = parts.slice(2).map(decoded)
+    return { at: path.length && path.every(Boolean) ? { kind: 'node', id: path.join('/') } : null }
+  }
   const kind = parts[1] ? KINDS.get(parts[1]) : undefined
   const id = parts[2] ? decoded(parts[2]) : null
   return { at: kind && id ? { kind, id } : null }
 }
 
-/** The path for a record, or for the index. */
+/** The path for a record, a section, or the index. */
 export function wikiPath(at: WikiAt): string {
-  return at ? `/wiki/${SEGMENTS[at.kind]}/${encodeURIComponent(at.id)}` : '/wiki'
+  if (!at) return '/wiki'
+  if (at.kind === 'node') return `/wiki/${NODE}/${at.id.split('/').map(encodeURIComponent).join('/')}`
+  return `/wiki/${SEGMENTS[at.kind]}/${encodeURIComponent(at.id)}`
 }
+
+/** The segment a section's address goes under, beside the records' kinds. */
+const NODE = 'c'

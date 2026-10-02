@@ -34,6 +34,8 @@ import { WikiLink } from './WikiLink.tsx'
 import { prerequisiteFor, wikiSections } from './wiki-index.ts'
 import type { WikiEntry, WikiSection } from './wiki-index.ts'
 import type { WikiAt } from './wiki-route.ts'
+import { pathOf, placeOf, trailTo, wikiTree } from './wiki-tree.ts'
+import type { WikiNode } from './wiki-tree.ts'
 
 export function Wiki({ at }: { at: WikiAt }) {
   const top = useRef<HTMLDivElement | null>(null)
@@ -50,7 +52,135 @@ export function Wiki({ at }: { at: WikiAt }) {
       {/* Odysseus, directly before what makes room for him: `.is-odysseus +
         * .wiki-shelf`. `Figures.tsx` says why. */}
       <OdysseusStand />
-      <div className="wiki-shelf">{at ? <Record at={at} /> : <Index />}</div>
+      <div className="wiki-shelf">
+        {at === null ? (
+          <Index />
+        ) : at.kind === 'node' ? (
+          <Section path={at.id} />
+        ) : (
+          <>
+            <Trail path={placeOf(at)} here={nameOf(at)} />
+            <Record at={at} />
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Walking it: the trail, the tiles, a section's page
+// ---------------------------------------------------------------------------
+
+/** What a record is called, for the end of its trail. */
+function nameOf(at: { kind: string; id: string }): string {
+  if (at.kind === 'arcana') return arcanaById.get(at.id)?.name ?? at.id
+  if (at.kind === 'familiar') return familiarById.get(at.id)?.name ?? at.id
+  return traits.get(at.id)?.name ?? at.id
+}
+
+/**
+ * Where you are: every section from the top down, each a way back, and the
+ * thing you are looking at last. The owner asked for this in so many words,
+ * "how deep you are, and easily click back".
+ */
+function Trail({ path, here }: { path: string | null; here?: string }) {
+  const trail = path === null ? [wikiTree()] : (trailTo(path) ?? [wikiTree()])
+  return (
+    <nav className="wiki-trail" aria-label="Where you are in the wiki">
+      <ol>
+        {trail.map((node, at) => {
+          const last = at === trail.length - 1 && !here
+          const to = pathOf(trail.slice(0, at + 1))
+          return (
+            <li key={to || 'top'} aria-current={last ? 'page' : undefined}>
+              {last ? node.title : <WikiLink at={to ? { kind: 'node', id: to } : null}>{node.title}</WikiLink>}
+            </li>
+          )
+        })}
+        {here ? <li aria-current="page">{here}</li> : null}
+      </ol>
+    </nav>
+  )
+}
+
+/**
+ * The tiles of a section, one per thing under it.
+ *
+ * Dim until the pointer or the keyboard is on one, then that one lights up and
+ * the rest dim further, which is the owner's description of it. Faces and
+ * weapons are drawn taller than the banners, because a portrait cut into a
+ * strip is a forehead.
+ */
+function Tiles({ trail }: { trail: WikiNode[] }) {
+  const node = trail[trail.length - 1]
+  if (!node?.children.length) return null
+  const tall = node.children.every((child) => child.art.kind === 'portrait' || child.art.kind === 'render')
+  return (
+    <ul className={`wiki-tiles${tall ? ' is-tall' : ''}`}>
+      {node.children.map((child) => (
+        <li key={child.slug}>
+          <WikiLink at={{ kind: 'node', id: pathOf([...trail, child]) }} className={`wiki-tile is-${child.art.kind}`}>
+            {child.art.kind === 'mosaic' ? (
+              <span className="wiki-tile-mosaic" aria-hidden="true">
+                {child.art.icons.map((icon) => (
+                  <img key={icon} src={`/${icon}`} alt="" loading="lazy" />
+                ))}
+              </span>
+            ) : (
+              <img className="wiki-tile-art" src={`/${child.art.src}`} alt="" loading="lazy" />
+            )}
+            <span className="wiki-tile-text">
+              <span className="wiki-tile-name">{child.title}</span>
+              <span className="wiki-tile-sub">{child.sub}</span>
+            </span>
+          </WikiLink>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** A section's page: where it is, what is under it, and its entries. */
+function Section({ path }: { path: string }) {
+  const trail = trailTo(path)
+  if (!trail) {
+    return (
+      <div className="wiki-record">
+        <Trail path="" />
+        <h2 className="wiki-name">No section by that name</h2>
+        <p className="wiki-text">The address names no part of the wiki. The top of it has everything it holds.</p>
+      </div>
+    )
+  }
+  const node = trail[trail.length - 1]!
+  /* A section heading only earns its place where there is more than one. */
+  const titled = node.sections.length > 1
+  return (
+    <div className="wiki-node">
+      <Trail path={path} />
+      <header className="builds-top wiki-node-head">
+        <h2>{node.title}</h2>
+        <span className="wiki-count">{node.sub}</span>
+      </header>
+      <Tiles trail={trail} />
+      {node.sections.map((section) => (
+        <section key={section.id} className="wiki-section">
+          {titled ? (
+            <h4 className="wiki-title">
+              {section.title}
+              <span className="wiki-count">{section.entries.length}</span>
+            </h4>
+          ) : null}
+          <ul className="wiki-entries">
+            {section.entries.map((one) => (
+              <li key={`${one.at.kind}:${one.at.id}`}>
+                <EntryLink entry={one} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   )
 }
@@ -59,8 +189,16 @@ export function Wiki({ at }: { at: WikiAt }) {
 // The index
 // ---------------------------------------------------------------------------
 
+/**
+ * The top of the wiki: the sections as banners, and a search over everything.
+ *
+ * It used to be every section on one page with a row of jump links over it,
+ * which the owner found hard to find anything in. Searching still searches the
+ * lot and lists what it finds in place of the tiles.
+ */
 function Index() {
   const sections = useMemo(() => wikiSections(), [])
+  const tree = useMemo(() => wikiTree(), [])
   const [query, setQuery] = useState('')
   const wanted = query.trim().toLowerCase()
 
@@ -95,16 +233,10 @@ function Index() {
           {found ? `${found} of ${total}` : 'Nothing by that name.'}
         </p>
       ) : (
-        <nav className="wiki-toc" aria-label="Sections">
-          {sections.map((section) => (
-            <a key={section.id} href={`#wiki-${section.id}`}>
-              {section.title}
-            </a>
-          ))}
-        </nav>
+        <Tiles trail={[tree]} />
       )}
 
-      {shown.map((section, index) => (
+      {(wanted ? shown : []).map((section, index) => (
         <section key={section.id} id={`wiki-${section.id}`} className="wiki-section">
           {/* The part's heading goes over the first section in it. */}
           {index === 0 || shown[index - 1]?.part !== section.part ? (
@@ -155,19 +287,9 @@ function Record({ at }: { at: NonNullable<WikiAt> }) {
   return <TraitRecord id={at.id} />
 }
 
-/** Back to the index, over every record. */
-function BackToIndex() {
-  return (
-    <p className="wiki-back">
-      <WikiLink at={null}>The whole wiki</WikiLink>
-    </p>
-  )
-}
-
 function Missing() {
   return (
     <div className="wiki-record">
-      <BackToIndex />
       <h2 className="wiki-name">Nothing here by that name</h2>
       <p className="wiki-text">
         The address names nothing in game build {gameVersion}. A patch can rename what the game
@@ -279,7 +401,6 @@ function TraitRecord({ id }: { id: TraitId }) {
 
   return (
     <article className="wiki-record">
-      <BackToIndex />
       <header className="wiki-head">
         {icon ? <img className="wiki-art" src={`/${icon}`} alt="" /> : null}
         <div>
@@ -444,7 +565,6 @@ function ArcanaRecord({ id }: { id: string }) {
   const conditional = Object.keys(card.requires ?? {}).length > 0
   return (
     <article className="wiki-record">
-      <BackToIndex />
       <header className="wiki-head is-card">
         {card.icon ? <img className="wiki-card" src={`/${card.icon}`} alt="" /> : null}
         <div>
@@ -479,7 +599,6 @@ function FamiliarRecord({ id }: { id: string }) {
   if (!one) return <Missing />
   return (
     <article className="wiki-record">
-      <BackToIndex />
       <header className="wiki-head">
         {one.icon ? <img className="wiki-art" src={`/${one.icon}`} alt="" /> : null}
         <div>

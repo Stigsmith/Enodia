@@ -333,10 +333,14 @@ the play experience cannot see.
   `LuaValue`. `StatDisplayN` and `NewTotalN` are the Nth extract value, dressed by
   `statDisplays`. `:P` and `:F` belong to the engine and were inferred from how the text uses
   them; `formatCode` says how, and one look in game would confirm it
-- **The wiki is the only screen with an address.** `/wiki` and `/wiki/<kind>/<id>` load through
-  `not_found_handling`, and `App.tsx` pushes history for them and follows `popstate`. Every
-  other view is state. A record is keyed by the game's internal id, never a display name,
-  because six aspects share one. `src/ui/wiki-route.ts`
+- **The wiki is the only screen with an address.** `/wiki`, `/wiki/<kind>/<id>` and, since
+  2 October 2026, `/wiki/c/<path>` for a section load through `not_found_handling`, and
+  `App.tsx` pushes history for them and follows `popstate`. Every other view is state. A record
+  is keyed by the game's internal id, never a display name, because six aspects share one.
+  `src/ui/wiki-route.ts`. The sections are a tree, `src/ui/wiki-tree.ts`, built over
+  `wikiSections`; `wiki-tree.test.ts` fails if walking it loses an entry the flat index listed.
+  Its banners are cut from Hades II art only by `npm run banners`; five of the theme
+  wallpapers are from the first game and must not front this one
 - **A mention is `@[Name](t:Id)` inside plain text**, with `a:` for an Arcana card, `f:` for
   a familiar and `b:` for a published build, whose id is its short id. `src/ui/mentions.ts`
   parses it and `Prose` and `ProseText` draw it. The id is the

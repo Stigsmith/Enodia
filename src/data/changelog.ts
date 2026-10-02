@@ -27,6 +27,8 @@ export const CHANGELOG: Release[] = [
       'Nothing went. Under the hood is a tab of the Wiki. Themes is the Appearance tab of Settings, with the choice of how the interface is drawn. What’s new, What’s coming and About are tabs of Help. The leaderboards are the Top shelf of the exchange, beside the builds they count. The three things that are not built yet are on the Roadmap, where things that are coming live.',
       'The Roadmap, Help, Under the hood and this Changelog fold: one line per thing, and opening one closes whichever was open, so each fits on one screen.',
       'Switching between your builds and the exchange, or between your guides and everybody’s, swipes the page across rather than nudging it.',
+      'The wiki is walked rather than scrolled. Its front is ten large pictures, one per section: Olympians, the other gods, duos and legendaries, Hexes, the arms, keepsakes, Arcana, familiars, what you find along the way, and everything else. Point at one and it lights up while the rest dim; click and you are in it. The Olympians are their portraits, the arms their weapons.',
+      'A line at the top of every wiki page says where you are, Wiki › Olympians › Zeus › Heaven Strike, and every step of it is a way back. Each section has an address of its own, so a link to Zeus’s boons opens Zeus’s boons. Searching still searches the whole wiki at once.',
     ],
   },
   {
