@@ -1,173 +1,135 @@
-# Enodia
+<p align="center">
+  <img src="assets/ui/dora-hardhat.webp" width="200" alt="Dora, the shade who shows you round Enodia, in a yellow hard hat with a clipboard">
+</p>
 
-An in-run build companion for **Hades II**. Not a build planner and not a wiki: it answers
-the question you have while standing at an Exit with fifteen seconds to decide.
+<h1 align="center">Enodia</h1>
 
-It is live at [enodia.me](https://enodia.me).
+<p align="center">
+  <b>A build companion for Hades II</b><br>
+  Put a build together, check it against the game's own rules, and send it to somebody.<br>
+  Then log a run Exit by Exit, and see which builds are still open after each pick.
+</p>
 
-**Start with [`ROADMAP.md`](ROADMAP.md)** for where the build is, then
-[`CLAUDE.md`](CLAUDE.md) for the rules that matter most.
+<p align="center">
+  <a href="https://enodia.me"><img alt="Live at enodia.me" src="https://img.shields.io/badge/live-enodia.me-3fb6a0?style=flat-square&labelColor=12201d"></a>
+  <img alt="Game build 138174" src="https://img.shields.io/badge/game%20build-138174-3fb6a0?style=flat-square&labelColor=12201d">
+  <img alt="Runs in the browser" src="https://img.shields.io/badge/platform-any%20browser-3fb6a0?style=flat-square&labelColor=12201d">
+  <img alt="Free" src="https://img.shields.io/badge/price-free-c9a227?style=flat-square&labelColor=12201d">
+</p>
 
----
+<p align="center">
+  <a href="#what-it-does">What it does</a> ·
+  <a href="#use-it">Use it</a> ·
+  <a href="#what-it-keeps-about-you">What it keeps about you</a> ·
+  <a href="#building-from-source">Building from source</a>
+</p>
 
-## The rule that matters most
+> *"Log each Exit as you take it. That is the whole job, and it is the only thing I will ask of you."*
+> Dora, your guide in the app
 
-The game ships its logic as **679,152 lines of plain-text Lua** in the Steam install. That is
-the first source, not the last resort. Wikis, guides and search results are leads to verify,
-never sources to cite. `CLAUDE.md` has the full version, including the errors that rule
-exists to prevent.
+![The Enodia landing page](docs/images/home.jpg)
 
----
+## What it does
 
-## Layout
+### Reads the game, not a wiki
 
-```
-CLAUDE.md          rules, verified mechanics, house style. loaded every session
-ROADMAP.md         the single status view. what is done, next, blocked
-REQUIREMENTS.md    why it exists, what it is, scope by phase
-DESIGN.md          architecture, the engines, the build order
-VISUAL.md          the visual language, every colour sourced from the game
-archive/           documents that did their job. Nothing current reads them
+Hades II ships its logic as plain-text Lua, and Enodia is built from those files and nothing else. So it knows
+that a filled slot blocks every other god's Boon for that slot, that a Heroic Boon locks its slot for good, that
+the four-Olympian cap only governs which gods an Exit offers at random, and what each Boon's numbers are at every
+rarity. When a game patch changes something, the data is read out again and the differences are checked before
+they ship.
 
-decisions/         dated decision records. applied to the docs, kept for the reasoning
-project/           config for the companion Claude.ai project, not for the product
+### Builds that hold up
 
-scripts/extract.mjs   runs the game's Lua, writes data/generated
-scripts/validate.ts   the validator, wired into prebuild. rules live in scripts/validate/
-data/generated/       extracted game data. never hand edited, checksummed
-data/curated/         hand-authored judgement, joined on id. see its README
-data/baseline.json    the structural counts the validator holds the extractor to
-src/                  the app. tokens.css is the source for every colour
-assets/               643 images and their manifest, see assets/README.md
-dist/                 build output. Vite owns it, git ignores it
+Pick the five slot Boons, what else you want beyond them, your Daedalus Hammer upgrades and your Arcana. The
+editor tells you what cannot happen together, and reads out how much luck the whole build needs and where that luck
+goes. A build that asks for two exact Hammer upgrades on one arm is lovely the once and less lovely on the tenth
+run, and it says so.
 
-wrangler.jsonc        how the site is served. Cloudflare Workers, and the API route
-assets/_headers       cache tiers and security headers, copied into dist/ by Vite
-worker/               Phase 4. The API under /api/*, accounts and nothing else
-migrations/           D1 schema, generated from worker/schema.ts, never hand written
-```
+![A published build: aspect, the five slots, and the Boons beyond them](docs/images/build.jpg)
 
-Two folders of art are kept out of version control on purpose. `extracted/` is 443 MB of
-`deppth2` output and can be regenerated. `reference/` is the owner's reference art for the
-mascot work, and no script makes it: none of it is a byte copy of anything in `extracted/`.
-It sits at the root and not in `assets/`, because everything in `assets/` is served, and
-`npm run validate` fails on any image there that git ignores.
+### Follows a run
 
----
+Set up a run with an arm, an aspect and a route, and log what each Exit gave. The timeline records what each pick
+closed, at the pick that closed it, not four Exits later. "Builds open" counts what is still reachable, and the
+latest entry says which god still feeds each one. Leave and come back, and a card says what you were chasing and
+where it stands. Took the wrong entry? Take it back, and everything after it is worked out again.
 
-## Commands
+![The run screen: pick what the Exit gave from the ring](docs/images/run.jpg)
 
-```bash
-npm run dev        # vite, port 5173
-npm run build      # validates first, then builds. a broken reference stops it
-npm run validate   # the validator on its own
-npm test           # vitest, both projects: 420 in node, 25 inside workerd
-npm run test:worker # just the backend, against a real local D1
-npm run extract    # re-read the game's Lua into data/generated
-npm run assets     # rebuild assets/manifest.json. --fill copies icons from extracted/
-npm run typecheck
-npm run fonts      # re-vendor the four typefaces. Not a build step, run by hand
-npm run deploy     # build, then wrangler deploy to Cloudflare
+### Share and compare
 
-npm run types        # regenerate worker Env types after editing wrangler.jsonc
-npm run db:schema    # better-auth options -> worker/schema.ts
-npm run db:generate  # worker/schema.ts -> a numbered migration in migrations/
-npm run db:migrate   # apply migrations to the local D1
-```
+Every build is a link, with no account needed. Sign in and publish it, and the link gets short enough for a
+Discord message. **The exchange** lists what everybody published, with how often people cleared it and at what
+Fear. Add friends by swapping a code, and see what they put up. There are leaderboards, and **guides**: writing
+with builds named inside it, which read differently in the middle of a run than at the start.
 
-`npm run extract` loads the game's Lua in a
-[wasmoon](https://www.npmjs.com/package/wasmoon) state and writes `data/generated/*.json`.
-Needs Hades II installed. Re-run it after a game patch, then read the validator's count
-diff as a patch note before accepting it with
-`npm run validate -- --update-baseline`.
+![The exchange: published builds as cards, with filters by arm, aspect and gods](docs/images/exchange.jpg)
 
-The old page is served by the `placeholder` config in `.claude/launch.json`, on port 8777.
-The `workers` config runs `wrangler dev` on 8787, which is the only way to see the real cache
-headers, the CSP and the SPA fallback before a deploy. A green build proves none of them.
+### And also
 
-`npm run fonts` vendors all 38 faces of Caesar Dressing, Inconsolata, Lato and Spectral SC
-into `assets/fonts/`, taking every subset Google returns rather than hand-picking `latin`.
-The page loads nothing from a third party, which is what lets the CSP say `default-src
-'self'` and mean it.
+- **A wiki of everything the tool knows about:** 597 Boons, Hammers, Arcana, keepsakes, familiars and more, each
+  with its own page and its numbers read from the game's files.
+- **The Arcana board** in the game's own positions, with your Grasp as the budget.
+- **Four looks:** the game's own art, or three styles the browser draws. Plus themes for colours, weather and
+  wallpaper. None of it changes how anything works.
+- **A tour on every page**, by Dora, who would like you to know she did not pick the hat.
 
-## Accounts and publishing
+![The wiki: every Boon by god, with its slot](docs/images/wiki.jpg)
 
-`worker/` is the API, on the same origin under `/api/*`, with accounts in D1 and
-[Better Auth](https://www.better-auth.com/). **The tool works entirely signed out** and an
-account is only needed to share or compete, so almost no visit touches any of it.
+## Use it
 
-**An account buys exactly one thing: a short link.** `linkFor` packs a whole build into a URL
-fragment, which is why sharing needs no server and always will not. It is also **1,588
-characters**, which Discord renders as a wall. Publishing stores the same payload under a
-random ten-character id, so the link becomes `enodia.me/b/aB3xK9pQmR`, about thirty.
+Open **[enodia.me](https://enodia.me)**. There is nothing to install, and no account is needed for anything
+except publishing, friends and keeping your library on more than one device. It works on a phone as well as a
+desktop.
 
-A published build has a random ten-character id, so nothing about the link is guessable. It
-is **listed** now, though: the exchange has an All shelf and the leaderboards name authors,
-both of which a signed-out stranger can read. `REQUIREMENTS.md` 5 wanted moderation designed
-before anything discoverable existed, and section 4 there records why that was reopened.
+## What it keeps about you
 
-**Friends is a code, not a search.** You cannot look anybody up: a display name is not
-unique so it cannot address anybody, and searching by email would let a stranger test whether
-any given address has an account here. You hand somebody an eight character code, they redeem
-it, and both directions are written at once. There are no handles to claim and therefore no
-handles to moderate.
+Enodia is built so you can check exactly what it does. In short:
 
-**Friends is still not discovery.** A friend sees what you published; there is no way to
-search for a person, so nobody can be found who did not want to be, and the moderation tool
-for it is removing somebody.
+| Where | What |
+|---|---|
+| Your browser | Your builds, your runs, your settings and your display name, in local storage. Nothing leaves the browser unless you sign in or send a link somewhere. **Settings → Export** writes all of it to one file, which is the only backup there is if you never sign in. |
+| An account, if you make one | Your email address and display name, to sign in. Your builds, runs and settings are synced between your devices. Builds and guides you publish are public until you take them down. |
+| A run against someone else's build | Whether you cleared it, and the Fear if you did, counted toward that build's listing. Your account is attached so nobody can count the same run twice, and it is never shown. A switch in **Settings** turns it off. |
+| Email | Only for a password reset you asked for, sent through Resend. |
+| Anybody else | Nothing. No analytics, no tracking, no third-party fonts or scripts. The Content Security Policy only lets the page talk to enodia.me itself. |
 
-**What is discoverable is the exchange's All shelf and the leaderboards**, both public. They
-ship with no report button and no hide button, which is the owner's call and worth stating
-rather than glossing. The argument for it is narrow: a listing carries a build name and an
-author's display name and no other text a stranger wrote, so there is nothing on either
-surface to moderate. The one removal lever is the author taking their own listing down.
-Adding a hide would be a nullable column on `published_build` and one clause in
-`worker/boards.ts`, because every board and every shelf reads through one file each.
+The code for this lives in [`worker/`](worker), the account and sync side, and
+[`assets/_headers`](assets/_headers), which carries the security policy.
 
-There **was** a curated shelf, hand-picked with a note on each build, and it was the default
-and the only thing a stranger could see. It was retired the same day All opened: a shelf
-somebody had read every item of answers "what is safe to land on", and All answers it by
-being browsable instead. One person reading everything does not scale past one person.
+## Building from source
 
-Publishing is a copy, not a move. The build in the browser stays the record and stays what
-the export writes. `ACCOUNTS_LIVE` in `src/state/account.ts` hides all of it until password
-reset works.
+Needs Node 22 or later. The game data is already extracted and checked in, so Hades II is only needed to read it
+out again after a patch.
 
-`wrangler dev` runs the whole thing, D1 included, against a local SQLite file under
-`.wrangler/`. No Cloudflare account is needed to develop or test it. A real deploy needs
-three things the owner does once:
-
-```bash
-wrangler login
-wrangler d1 create enodia          # paste the id into wrangler.jsonc
-wrangler secret put BETTER_AUTH_SECRET
+```sh
+npm ci
+npm run dev       # the app on port 5173
+npm test          # tests in node, and the backend inside workerd against a local database
+npm run build     # validates the game data first, then builds into dist/
 ```
 
-Locally the secret lives in `.dev.vars`, which is gitignored, along with the optional
-`RESEND_API_KEY` and `MAIL_FROM`. Without those two, `worker/auth.ts` does not offer password
-reset at all rather than silently sending nothing, and `/api/capabilities` says so, so the UI
-can grey it out and explain.
+| Path | What |
+|---|---|
+| `src/` | The app (React 19, TypeScript, Vite) |
+| `worker/` | The API under `/api/*`, on Cloudflare Workers with D1 |
+| `scripts/` | The extractor that runs the game's Lua, and the validator that checks what it read |
+| `data/` | Extracted game data, and the hand-written layer on top of it |
+| `assets/` | The image library, see [assets/README.md](assets/README.md) |
 
-**Changing `database_id` in `wrangler.jsonc` orphans the local database.** It is keyed by that
-id, so `wrangler dev` quietly starts on an empty one and the only symptom is a 500 on any
-request with a session cookie. Re-run `npm run db:migrate` after any change to it.
+More in [docs/development.md](docs/development.md). Where the project stands is in [ROADMAP.md](ROADMAP.md), and
+the rules it is built by are in [CLAUDE.md](CLAUDE.md).
 
-**Rate limiting is stated in `worker/auth.ts`, not defaulted**, because better-auth's default
-is `enabled: isProduction` and Workers sets no `NODE_ENV`, so it would never have switched
-itself on. 60 requests a minute overall, 20 sign-in attempts per five minutes, 10 sign-ups an
-hour, keyed on `cf-connecting-ip`. A Cloudflare rate limiting rule at the edge would be
-better still, since it rejects before a Worker runs, and is the owner's to add.
+## Feedback and support
 
-**`worker/schema.ts` is generated, not written.** Use `npm run db:schema`, which runs the
-`auth` CLI at the exact version of better-auth in `node_modules`. The CLI generates from its
-own bundled core, so any other version, the deprecated `@better-auth/cli` and `auth@latest`
-alike, can disagree about the `account.issuer` column, which is `NOT NULL`, and nothing
-complains until the first sign-up fails.
+Found a Boon with the wrong number, or a build it calls out of reach that you have put together?
+[Open an issue](https://github.com/Stigsmith/Enodia/issues).
 
----
+Enodia is free and staying free. If it has been any use, you can
+[buy us a Nectar on Ko-fi](https://ko-fi.com/stigsmith).
 
-## Licence and standing
+## Licence
 
-Unofficial fan project. Not affiliated with, endorsed by, or connected to Supergiant Games.
-Hades II and all game artwork are the property of Supergiant Games. Non-commercial and
-always free.
+All rights reserved, see [LICENSE](LICENSE). The source is published to be read. Enodia is an unofficial fan
+project, not affiliated with or endorsed by Supergiant Games. Hades II, its art and its text belong to them.
