@@ -73,6 +73,7 @@ import type { ShownBuild } from '../data/builds.ts'
 import { BuildFilters } from './BuildFilters.tsx'
 import { Counted } from './Counted.tsx'
 import { CharonStand } from './Figures.tsx'
+import { Leaderboards } from './Leaderboards.tsx'
 import { Card } from './variants/Card.tsx'
 import { Poster } from './variants/Poster.tsx'
 import { Page } from './Pages.tsx'
@@ -84,17 +85,26 @@ import { Prose } from './Prose.tsx'
 import { EMPTY_SELECTION, apply, choose, facets, sortBuilds } from './build-filter.ts'
 import type { FacetId, SortId } from './build-filter.ts'
 
-type Everybody = 'all' | 'friends'
+/**
+ * The shelves, and Top, which is the leaderboards.
+ *
+ * Top was a menu row of its own, counting what happens on this screen from
+ * somewhere else. It is the third shelf now: the same counts, beside the
+ * builds they count, and one row fewer in a menu the owner wanted short.
+ */
+type Everybody = 'all' | 'friends' | 'top'
 
 const SHELVES = [
   { id: 'all' as const, label: 'All' },
   { id: 'friends' as const, label: 'From friends' },
+  { id: 'top' as const, label: 'Top' },
 ]
 
 /** One line per shelf, saying what you are looking at rather than why. */
 const SCOPE: Record<Everybody, string> = {
   all: 'Everything anybody has published and not taken back down.',
   friends: 'Published by the people whose codes you swapped.',
+  top: 'What people have followed, played and got through, counted.',
 }
 
 export function Exchange({
@@ -147,6 +157,8 @@ export function Exchange({
   useEffect(() => {
     let live = true
     setListed(null)
+    // Top lists no builds; the boards fetch their own counts.
+    if (shelf === 'top') return
     void listShelf(shelf).then((rows) => {
       if (live) setListed(rows)
     })
@@ -306,7 +318,12 @@ export function Exchange({
         */}
       <p className="xchange-scope">{SCOPE[shelf]}</p>
 
-      {listed === null ? (
+      {shelf === 'top' ? (
+        /* Its own counts and its own Everybody or Your friends. "Go to your
+           builds" has nowhere to go from here: they are the other side of the
+           switch above. */
+        <Leaderboards embedded onGo={(to) => (to === 'builds' ? undefined : onGo?.(to))} />
+      ) : listed === null ? (
         <p className="acct-quiet">One moment.</p>
       ) : rows.length === 0 ? (
         <Empty shelf={shelf} onGo={onGo} />

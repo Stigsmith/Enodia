@@ -12,6 +12,9 @@
  * wallpaper belongs to a theme rather than to the app.
  */
 
+import { useState } from 'react'
+
+import { SKINS, applySkin, readSkin, writeSkin } from './skin.ts'
 import { NONE, THEMES, themeById, wallpaperOf } from './theme.ts'
 import type { Theme } from './theme.ts'
 
@@ -28,11 +31,15 @@ export function Themes({
 }) {
   const current = themeById(theme)
   const wearing = wallpaperOf(current, wallpapers)
+  const [skin, setSkin] = useState(readSkin)
 
   return (
     <div className="themes">
+      {/* Appearance now: the theme, its wallpaper, and how the buttons and
+        * panels are drawn, which lived in Settings for a day and is the same
+        * question as the other two. */}
       <header className="builds-top">
-        <h2>Themes</h2>
+        <h2>Appearance</h2>
       </header>
 
       <p className="themes-intro">
@@ -87,6 +94,36 @@ export function Themes({
           Swatches are shown at full strength. On the page they sit between four and fifteen
           percent, dimmed until nothing in them is brighter than a panel.
         </p>
+      </section>
+
+      <section className="themes-walls" data-tour="theme-skin">
+        <h3 className="arcana-rule">How it is drawn</h3>
+        <p className="themes-note">
+          Buttons, tabs, panels and trays. The game&rsquo;s own art, or one of three looks drawn in
+          the browser in this theme&rsquo;s colours. Boon icons, portraits and the characters are the
+          same in all four.
+        </p>
+        {/* The same control as Cards or List on Builds, so it answers to
+          * whichever look is on, including the one it is choosing. */}
+        <div className="builds-layout" role="radiogroup" aria-label="How the interface is drawn">
+          {SKINS.map((one) => (
+            <button
+              key={one.id}
+              type="button"
+              role="radio"
+              aria-checked={skin === one.id}
+              className={skin === one.id ? 'is-on' : ''}
+              onClick={() => {
+                setSkin(one.id)
+                applySkin(one.id)
+                writeSkin(one.id)
+              }}
+            >
+              {one.name}
+            </button>
+          ))}
+        </div>
+        <p className="themes-note">{SKINS.find((one) => one.id === skin)?.say}</p>
       </section>
     </div>
   )

@@ -148,25 +148,39 @@
   position: relative;
 }
 
+/**
+ * A swipe, and one that can be seen.
+ *
+ * It was the Response tier, 160ms over 1.5rem, and the owner switched sides
+ * without noticing anything had moved. A side is a whole page, so it travels
+ * like one: a quarter of a second longer, six times as far, and on a curve that
+ * arrives fast and settles, the way a page dragged by a thumb lands.
+ */
 .sides-pane.is-from-left {
-  animation: sides-from-left var(--t-response) var(--e-response);
+  animation: sides-from-left 0.38s cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
 .sides-pane.is-from-right {
-  animation: sides-from-right var(--t-response) var(--e-response);
+  animation: sides-from-right 0.38s cubic-bezier(0.16, 0.84, 0.3, 1);
 }
 
 @keyframes sides-from-left {
   from {
-    left: -1.5rem;
+    left: -9rem;
     opacity: 0;
+  }
+  40% {
+    opacity: 1;
   }
 }
 
 @keyframes sides-from-right {
   from {
-    left: 1.5rem;
+    left: 9rem;
     opacity: 0;
+  }
+  40% {
+    opacity: 1;
   }
 }
 
@@ -4399,30 +4413,14 @@ button.mark {
   }
 }
 
-/**
- * Two columns of reference, on a screen wide enough to hold them.
- *
- * CSS columns rather than a grid, because the sections are different heights
- * and there is no relationship between the one on the left and the one beside
- * it: the browser balancing them is exactly right, and a grid would leave gaps
- * under the short ones.
- *
- * `break-inside: avoid` on the section, so a heading never ends up at the foot
- * of one column with its paragraph at the head of the next.
- */
-@media (min-width: 78rem) {
-  .ref-cols {
-    columns: 2;
-    column-gap: 3rem;
-  }
+/* Help's sections are folds now, one line each, so the gap between them is the
+ * fold list's and not the section margin the open layout needed. */
+.ref-folds > .ref {
+  margin-top: 0;
+}
 
-  .ref-cols > .ref {
-    break-inside: avoid;
-    /* Columns do not collapse margins the way a block flow does, so the first
-     * section in each column would otherwise sit lower than its neighbour. */
-    margin-top: 0;
-    margin-bottom: 1.8rem;
-  }
+.ref-folds .fold-body {
+  padding-top: 0.4rem;
 }
 
 /* A column layout has no long tail to scroll past, so it does not need the
@@ -4525,20 +4523,9 @@ button.mark {
   color: var(--bone-dim);
 }
 
-.hood-entry {
+/* The entries are folds (`folds.css`), one open across the whole page. */
+.hood-folds {
   margin-top: 0.9rem;
-  border-top: 1px solid var(--div-2);
-  padding-top: 0.7rem;
-}
-
-.hood-entry summary {
-  cursor: pointer;
-  font-size: 0.95rem;
-  color: var(--lit-hot);
-}
-
-.hood-entry summary::marker {
-  color: var(--bone-faint);
 }
 
 .hood-body p {
@@ -4899,17 +4886,12 @@ button.mark {
     align-items: start;
   }
 
-  /* `display: block` first: `columns` is ignored on a grid container, and this
-     list is a grid everywhere else. The row gap comes back as a margin. */
-  .plan-stage.is-now .plan-list {
-    display: block;
-    columns: 2;
-    column-gap: 1.2rem;
-  }
-
-  .plan-stage.is-now .plan-list > li {
-    break-inside: avoid;
-    margin-bottom: 0.75rem;
+  /* Two sub-columns of folds in the double track. A grid rather than CSS
+     columns, because a column flow would push the cards below an opened one
+     across into the other column while it opened; a grid row only grows. */
+  .plan-stage.is-now .plan-folds {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
   }
 
   /* The line the stages sit on, so it reads as one progression rather than as
@@ -4979,33 +4961,18 @@ button.mark {
   color: var(--bone-faint);
 }
 
-.plan-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.75rem;
+/* Each item is a fold now (`folds.css`), so this only says what is different
+ * about a roadmap one: a tighter line, and the stage's dot leading it. */
+.plan-fold > summary {
+  min-height: 2.2rem;
+  padding: 0.35rem 0.75rem;
 }
 
-.plan-list > li {
-  display: grid;
-  gap: 0.2rem;
-  padding-left: 0.85rem;
-  border-left: 2px solid var(--div-3);
+.plan-fold > summary h4 {
+  font-size: 0.86rem;
 }
 
-.plan-stage.is-now .plan-list > li { border-left-color: var(--lit-dim); }
-.plan-stage.is-waiting .plan-list > li { border-left-color: color-mix(in oklab, var(--unbuilt) 45%, transparent); }
-
-.plan-list h4 {
-  margin: 0;
-  font-family: var(--body);
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--bone);
-}
-
-.plan-list p {
+.plan-fold .fold-body p {
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.5;
@@ -5824,6 +5791,41 @@ button.mark {
   margin: -0.15rem 0 0.4rem;
   padding-bottom: 0.55rem;
   border-bottom: 1px solid var(--div-2);
+}
+
+/**
+ * The tabs of a screen that took others in (`ScreenTabs.tsx`): centred over
+ * the page, clear of the menu button and the corner control, and without the
+ * rule under them, because the page's own heading is the next thing down.
+ */
+.screen-tabs {
+  display: flex;
+  justify-content: center;
+  padding: 0.85rem 4.5rem 0;
+}
+
+.screen-tabs .tabs {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+/* A screen's tabs are its navigation, not a form's sections, so they are
+ * read at body size rather than in the editor's small mono capitals. */
+.screen-tabs .tab {
+  padding: 0.5rem 1.15rem 0.58rem;
+  font-family: var(--body);
+  font-size: 0.84rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+/* The leaderboards as the exchange's Top shelf: the boards' own spacing,
+ * without the page around them. */
+.boards-embedded {
+  margin-top: 0.4rem;
 }
 
 .tab {
@@ -8145,26 +8147,10 @@ button.mark {
   color: var(--bone-faint);
 }
 
-/* A rail down the left of each stage, so the four read as one run of work
- * rather than four unrelated lists. */
-.plan-list {
-  position: relative;
-  padding-left: 1.1rem;
-  border-left: 1px solid var(--div-2);
-}
-
-.plan-list li {
-  position: relative;
-  display: flex;
-  gap: 0.6rem;
-}
-
-/* The state, on the rail. Filled for built, hollow for everything ahead, so
- * skimming the left edge gives the shape without reading a word. */
+/* The state, leading each fold's line. Filled for built, hollow for everything
+ * ahead, so skimming the left edge gives the shape without reading a word. */
 .plan-dot {
-  position: absolute;
-  left: -1.45rem;
-  top: 0.4rem;
+  flex: none;
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 50%;

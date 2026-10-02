@@ -32,7 +32,6 @@ import {
 import type { Manifest } from '../state/transfer.ts'
 import { NAME_LIMIT, readName, writeName } from '../state/identity.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
-import { SKINS, applySkin, readSkin, writeSkin } from './skin.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -45,7 +44,6 @@ export function Settings() {
 
   const [name, setName] = useState(readName)
   const [reportRuns, setReportRuns] = useState(() => loadPrefs().reportRuns)
-  const [skin, setSkin] = useState(readSkin)
 
   const since = daysSince(lastExport)
   const held = describe(collect())
@@ -144,39 +142,6 @@ export function Settings() {
         * were reading the question it is asking. */}
       <div className="setting-grid">
         <div className="setting-col">
-          {/* Here rather than beside the thing it changes, because it changes
-            * everything: the buttons on this very screen redraw the moment it
-            * is flipped, so the result is in front of you either way. */}
-          <section className="setting-block" data-tour="setting-skin">
-            <h3 className="arcana-rule">How it is drawn</h3>
-            <p className="setting-say">
-              Buttons, tabs, panels and trays. The game&rsquo;s own art, or one of three looks
-              drawn in the browser in your theme&rsquo;s colours. Boon icons, portraits and the
-              characters are the same in all four.
-            </p>
-            {/* The same control as Cards or List on Builds, so it answers to
-              * whichever look is on, including the one it is choosing. */}
-            <div className="builds-layout" role="radiogroup" aria-label="How the interface is drawn">
-              {SKINS.map((one) => (
-                <button
-                  key={one.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={skin === one.id}
-                  className={skin === one.id ? 'is-on' : ''}
-                  onClick={() => {
-                    setSkin(one.id)
-                    applySkin(one.id)
-                    writeSkin(one.id)
-                  }}
-                >
-                  {one.name}
-                </button>
-              ))}
-            </div>
-            <p className="setting-say">{SKINS.find((one) => one.id === skin)?.say}</p>
-          </section>
-
           <section className="setting-block">
             <h3 className="arcana-rule">Your name</h3>
             <p className="setting-say">

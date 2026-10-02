@@ -50,7 +50,18 @@ const SAYS: Record<Scope, string> = {
 /** Loading, needs an account, or the answer. Three states, so none is guessed. */
 type Showing = 'waiting' | 'signed-out' | Board[]
 
-export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends' | 'account') => void }) {
+export function Leaderboards({
+  onGo,
+  embedded = false,
+}: {
+  onGo?: (view: 'builds' | 'friends' | 'account') => void
+  /**
+   * Drawn as the Top shelf of the exchange, under its heading and switch,
+   * rather than as a page of its own. It was a menu row, and the owner wanted
+   * the menu short: a board is the exchange's own counts, so it lives there.
+   */
+  embedded?: boolean
+}) {
   const [scope, setScope] = useState<Scope>('global')
   const [showing, setShowing] = useState<Showing>('waiting')
 
@@ -70,12 +81,8 @@ export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends' | 'a
   const folk = boards.filter((one) => one.kind === 'person')
   const stuff = boards.filter((one) => one.kind === 'facet')
 
-  return (
-    <Page
-      measure="broad"
-      title="Leaderboards"
-      standfirst="What people have followed, played and got through, counted."
-    >
+  const body = (
+    <>
       {ACCOUNTS_LIVE ? (
         <Tabs tabs={SCOPES} open={scope} onOpen={setScope} label="Whose numbers" />
       ) : null}
@@ -121,6 +128,18 @@ export function Leaderboards({ onGo }: { onGo?: (view: 'builds' | 'friends' | 'a
           </p>
         </>
       )}
+    </>
+  )
+
+  if (embedded) return <div className="boards-embedded">{body}</div>
+
+  return (
+    <Page
+      measure="broad"
+      title="Leaderboards"
+      standfirst="What people have followed, played and got through, counted."
+    >
+      {body}
     </Page>
   )
 }

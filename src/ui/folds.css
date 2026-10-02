@@ -1,0 +1,158 @@
+/* ==========================================================================
+ * FOLDS: one line until opened, and one open at a time.
+ *
+ * The owner's rule for long pages: everything on one screen, each thing a
+ * single line, and opening one closes whichever was open. It is a native
+ * `<details>` with a `name`, which is what makes a group exclusive, so the
+ * browser owns the keyboard, the ARIA, find-in-page and the closing of the
+ * others. Nothing here needs state.
+ *
+ *   <div class="fold-list">
+ *     <details class="fold" name="roadmap">
+ *       <summary><h4>Title</h4><span class="fold-meta">meta</span></summary>
+ *       <div class="fold-body">...</div>
+ *     </details>
+ *   </div>
+ *
+ * **Frosted glass**, which the owner picked out in the pinned menu: a dark
+ * pane over the wallpaper with the picture blurred through it. The same
+ * treatment in every look, because a fold is new furniture rather than the
+ * game's.
+ *
+ * **The open is animated where the browser can animate to `auto`** (the
+ * `interpolate-size` block), and simply opens elsewhere. Reduced motion opens
+ * at once either way.
+ * ========================================================================= */
+
+.fold-list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fold {
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--ink-900) 62%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition:
+    border-color var(--t-response) var(--e-response),
+    background-color var(--t-response) var(--e-response);
+}
+
+.fold:hover {
+  border-color: var(--div-5);
+}
+
+.fold[open] {
+  border-color: var(--lit-dim);
+  background: color-mix(in oklab, var(--ink-850) 80%, transparent);
+}
+
+.fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  border-radius: inherit;
+}
+
+.fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The chevron, pushed to the far edge, pointing down when shut and up when
+ * open. */
+.fold > summary::after {
+  content: '';
+  flex: none;
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-left: auto;
+  border-right: 1.5px solid var(--bone-faint);
+  border-bottom: 1.5px solid var(--bone-faint);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform var(--t-response) var(--e-response);
+}
+
+.fold[open] > summary::after {
+  border-color: var(--lit-hot);
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.fold > summary:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: 2px;
+}
+
+/* Whatever heading a fold carries reads as one line. */
+.fold > summary :is(h3, h4) {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--bone);
+}
+
+.fold > summary:hover :is(h3, h4),
+.fold[open] > summary :is(h3, h4) {
+  color: var(--lit-hot);
+}
+
+/* Something small on the right of the line, before the chevron. */
+.fold-meta {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--bone-faint);
+  white-space: nowrap;
+}
+
+/* With a meta on the line it takes the free space, and the chevron sits
+ * straight after it instead of splitting the gap. */
+.fold > summary:has(.fold-meta)::after {
+  margin-left: 0.4rem;
+}
+
+.fold-body {
+  padding: 0.1rem 0.9rem 0.9rem;
+}
+
+.fold-body > :first-child {
+  margin-top: 0;
+}
+
+.fold-body > :last-child {
+  margin-bottom: 0;
+}
+
+@supports (interpolate-size: allow-keywords) {
+  .fold {
+    interpolate-size: allow-keywords;
+  }
+
+  .fold::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 0.26s var(--e-response),
+      content-visibility 0.26s allow-discrete;
+  }
+
+  .fold[open]::details-content {
+    block-size: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold::details-content {
+    transition: none;
+  }
+}

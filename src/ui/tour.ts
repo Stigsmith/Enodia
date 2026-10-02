@@ -204,15 +204,15 @@ export const TOURS: Record<string, Step[]> = {
   themes: [
     { at: 'theme-grid', say: 'Four looks. Colours, weather, wallpaper.' },
     {
-      say: 'They change nothing about how any of this works. That is the entire feature. I am not going to dress it up for you.',
+      at: 'theme-skin',
+      say: 'Four ways to draw the buttons and panels: the game’s own art, or three the browser draws. The pictures stay put. Try one and watch this page change.',
+    },
+    {
+      say: 'None of it changes how any of this works. That is the entire feature. I am not going to dress it up for you.',
     },
   ],
 
   settings: [
-    {
-      at: 'setting-skin',
-      say: 'Four ways to draw the buttons and panels: the game’s own art, or three the browser draws. The pictures stay put. Try one and watch this page change.',
-    },
     {
       at: 'setting-name',
       say: 'Your name. It travels with anything you share, so people know whose build they are looking at.',
