@@ -93,7 +93,9 @@ export function Changelog() {
       <ol className="log" data-tour="changelog-log">
         {CHANGELOG.map((release, at) => (
           <li key={`${release.date}-${release.title}`} className="log-entry">
-            <details className="log-fold" open={at === 0}>
+            {/* One open at a time, like every other fold: opening an older batch
+              * closes the newest rather than stacking up under it. */}
+            <details className="log-fold" name="changelog" open={at === 0}>
               {/* Title first, date after it and pushed to the right margin.
                 * A span rather than a paragraph for the date, because
                 * `<summary>` takes phrasing and heading content and a `<p>` is
@@ -166,20 +168,25 @@ export function Roadmap() {
                 <span className="plan-tally">{items.length}</span>
               </header>
               <p className="plan-say">{stage.say}</p>
-              <ul className="plan-list">
+              {/* One line each, and one open at a time across the whole page.
+                * Every item used to print its paragraph, which put the roadmap at
+                * two and a half screens; the owner asked for it on one. */}
+              <div className="fold-list plan-folds">
                 {items.map((one) => (
-                  <li key={one.title}>
-                    {/* The marker carries the state, so a reader skimming the
-                      * left edge gets the shape without reading the headings. */}
-                    <span className="plan-dot" aria-hidden="true" />
-                    <div>
+                  <details key={one.title} className="fold plan-fold" name="roadmap">
+                    <summary>
+                      {/* The marker carries the state, so a reader skimming the
+                        * left edge gets the shape without reading the headings. */}
+                      <span className="plan-dot" aria-hidden="true" />
                       <h4>{one.title}</h4>
+                    </summary>
+                    <div className="fold-body">
                       <p>{one.say}</p>
                       {one.on ? <p className="plan-on">{one.on}</p> : null}
                     </div>
-                  </li>
+                  </details>
                 ))}
-              </ul>
+              </div>
             </section>
           )
         })}
@@ -215,10 +222,13 @@ export function UnderHood() {
             <p>{tier.say}</p>
           </header>
 
+          <div className="fold-list hood-folds">
           {tier.entries.map((entry) => (
-            <details key={entry.summary} className="hood-entry">
-              <summary>{entry.summary}</summary>
-              <div className="hood-body">
+            <details key={entry.summary} className="fold hood-entry" name="underhood">
+              <summary>
+                <h4>{entry.summary}</h4>
+              </summary>
+              <div className="fold-body hood-body">
                 {entry.body.map((line) => (
                   <p key={line}>{line}</p>
                 ))}
@@ -233,6 +243,7 @@ export function UnderHood() {
               </div>
             </details>
           ))}
+          </div>
         </section>
       ))}
     </Page>

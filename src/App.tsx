@@ -65,6 +65,7 @@ import { FRAMES, applyFrame, readFrame, writeFrame } from './ui/frames.ts'
 import { applyTheme, readTheme, readWallpapers, writeTheme, writeWallpapers } from './ui/theme.ts'
 import { applyNav, readNav } from './ui/nav.ts'
 import { applySkin, readSkin } from './ui/skin.ts'
+import { ScreenTabs } from './ui/ScreenTabs.tsx'
 import type { View } from './ui/nav.ts'
 import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
@@ -649,6 +650,7 @@ export function App() {
   if (screen === 'wiki') {
     return frame(
       <div className="shell is-wide">
+        <ScreenTabs view={screen} onGo={go} />
         <Wiki at={wikiAt} />
       </div>,
     )
@@ -666,6 +668,9 @@ export function App() {
   if (Reading) {
     return frame(
       <div className="shell is-wide">
+        {/* Help, the Changelog and the Roadmap are tabs of one menu row, and
+          * Under the hood is a tab of the wiki's. `ScreenTabs.tsx`. */}
+        <ScreenTabs view={screen} onGo={go} />
         <Reading />
       </div>,
     )
@@ -729,6 +734,7 @@ export function App() {
   if (screen === 'settings') {
     return frame(
       <div className="shell is-wide">
+        <ScreenTabs view={screen} onGo={go} />
         <Settings />
       </div>,
     )
@@ -737,6 +743,7 @@ export function App() {
   if (screen === 'themes') {
     return frame(
       <div className="shell is-wide">
+        <ScreenTabs view={screen} onGo={go} />
         <Themes
           theme={theme}
           wallpapers={wallpapers}
@@ -766,6 +773,9 @@ export function App() {
        * 118px too tall to fit a screen. `is-wide` also scrolls itself rather
        * than the document, the way every other screen here does. */
       <div className="shell is-wide">
+        {/* About, once the landing has been seen: a tab of Help. On a first
+          * visit it stands alone, because there is nothing yet to be a tab of. */}
+        {loadPrefs().seenLanding ? <ScreenTabs view={screen} onGo={go} /> : null}
         <Landing onEnter={leaveLanding} />
       </div>,
     )

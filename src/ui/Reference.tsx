@@ -41,17 +41,18 @@ export function Help() {
 
   return (
     <Page
-      measure="broad"
       title="Help"
       standfirst="Where the numbers come from, and what each word on the screen means. These are the rules as the tool implements them, and the examples are live rather than drawn."
     >
-      {/* Two columns on a wide screen. Measured before any of it: a line of body
-        * copy here ran to 113 characters at 1600px, against the 45 to 75 a
-        * reader is comfortable with, so this is about the number of sections
-        * rather than the width of one. */}
-      <div className="ref-cols">
-        <section className="ref">
-          <h3 className="ref-rule">Where the numbers come from</h3>
+      {/* One line per question, and one open at a time. It was two columns of
+        * every section open at once, which made Help a page to scroll rather
+        * than a list to pick from; the owner asked for it on one screen. */}
+      <div className="fold-list ref-folds">
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>Where the numbers come from</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             Hades II ships its logic as plain-text Lua, and everything mechanical here is read out
             of those files rather than from a wiki or a guide: which boons occupy which slot, what
@@ -63,10 +64,14 @@ export function Help() {
             patches, the data is extracted again and the differences are reviewed rather than
             accepted. Every image is the game&rsquo;s own, used to point at the thing it depicts.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">The five slots, and why a boon closes</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>The five slots, and why a boon closes</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             This is the thing the tool exists for. Only 45 boons occupy a slot, nine per slot, one
             per Olympian, and each slot holds one for the whole run.
@@ -85,10 +90,14 @@ export function Help() {
             long odds, and only while what you hold can still be upgraded. A boon already at its
             best rarity locks its slot outright.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">What a boon&rsquo;s numbers mean</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>What a boon&rsquo;s numbers mean</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             A boon&rsquo;s tooltip in the game is its sentence plus the lines under it, and both are
             here. A build cannot know what rarity you will find a boon at, so where the number moves
@@ -106,10 +115,14 @@ export function Help() {
             the tool cannot read yet. There are eleven left, and a <span className="ref-mono">#</span>{' '}
             rather than a guess is deliberate.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">The four states</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>The four states</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             Every duo and legendary sits in one of four, judged against what you hold and how many
             Exits are left.
@@ -138,10 +151,14 @@ export function Help() {
               </dd>
             </div>
           </dl>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">Likely, possible, long shot</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>Likely, possible, long shot</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             A rough read on an open target before anything is simulated: twice as many Exits as
             picks and every god already seen is <strong>likely</strong>; enough Exits with little to
@@ -154,19 +171,27 @@ export function Help() {
             about what an Exit can offer, and reports how often that target came together. Only the
             closest handful get one, because each is real work.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">Builds open</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>Builds open</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             The number at the top of a run counts <strong>builds you could still finish</strong>,
             not duos. Nobody sits at an Exit chasing a prerequisite; they chase a build that happens
             to want one. Choosing an aspect settles most of the field before the first Exit.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">What a build can say</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>What a build can say</h3>
+          </summary>
+          <div className="fold-body">
           <dl className="ref-list">
             <div className="ref-item">
               <dt>Four keepsakes</dt>
@@ -206,10 +231,14 @@ export function Help() {
             short link you paste. While you are logging a run, a named build carries how that run
             stands with it, in the same words the run screen uses.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">The wiki, and Under the hood</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>The wiki, and Under the hood</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             Every boon, Hex, keepsake, aspect, Daedalus Hammer, Arcana card and familiar the tool
             knows has a record at its own address, so a link to one opens it. The records are
@@ -221,20 +250,28 @@ export function Help() {
             Under the hood is the other half: rules the game never states, sorted by how likely you
             were to find them yourself, and nothing opens unless you open it.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">Grasp, and the six free cards</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>Grasp, and the six free cards</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             Six Arcana cost nothing and switch themselves on when the rest of the board satisfies
             them. You choose what you pay Grasp for, the board works out the rest, and every card
             that stays dark says why. Two of them can never be on together: one wants three cards or
             fewer and the other wants at least five.
           </p>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">The exchange</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>The exchange</h3>
+          </summary>
+          <div className="fold-body">
           <dl className="ref-list">
             <div className="ref-item">
               <dt>Two sides of Builds</dt>
@@ -284,10 +321,14 @@ export function Help() {
               </dd>
             </div>
           </dl>
-        </section>
+          </div>
+        </details>
 
-        <section className="ref">
-          <h3 className="ref-rule">Leaderboards, and what they do not say</h3>
+        <details className="fold ref" name="help">
+          <summary>
+            <h3>Leaderboards, and what they do not say</h3>
+          </summary>
+          <div className="fold-body">
           <p className="ref-say">
             The same counts, put beside each other: followed most, played most, cleared most, at the
             highest Fear, everybody or just the people whose codes you swapped.
@@ -298,7 +339,8 @@ export function Help() {
             claim about how much evidence there is rather than about the builds. A board with
             nothing in it is not drawn, and there are no zeroes on any of them.
           </p>
-        </section>
+          </div>
+        </details>
       </div>
     </Page>
   )

@@ -9,6 +9,7 @@ import './ui/sprites.css'
 import './ui/builds.css'
 import './ui/guides.css'
 import './ui/wiki.css'
+import './ui/folds.css'
 // Last, because every rule in it overrides one above, and only under a CSS skin.
 import './ui/skins.css'
 import { App } from './App.tsx'

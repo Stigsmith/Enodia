@@ -5,10 +5,9 @@
  * like an overlay, and it returns you where you were, so it is never a place
  * the run navigates to.
  *
- * Most of what belongs in it does not exist yet. It is listed anyway, with the
- * phase it belongs to, because a menu that hides the shape of the product is
- * worse than one that admits it. The unbuilt entries are marked in the one
- * colour reserved for unbuilt things and they do nothing when pressed.
+ * It used to list what was not built as well, on the argument that a menu
+ * hiding the shape of the product is worse than one admitting it. That shape
+ * lives on the Roadmap now, under Help, and the menu lists places you can go.
  *
  * Starting a run is always here and always first, because that is what the tool
  * is for.
@@ -23,6 +22,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
+import { bundleOf } from './ScreenTabs.tsx'
 
 
 /**
@@ -127,134 +127,44 @@ export function Menu({
   }, [open, pinned])
 
   /**
-   * Builds first, and that is the whole reorganisation.
+   * One row to go somewhere, and the rest on the tabs of where it goes.
    *
-   * The run used to lead, because the run was the front door. Choosing a build
-   * and seeing which builds an aspect can still reach is what the tool is for,
-   * and a run is one thing you might do about it, so the run is a section like
-   * any other and only fills out while one is live.
+   * **This menu had sixteen rows**, and the owner said plainly that a stranger
+   * would be put off by it before pressing one. It had grown a row per page:
+   * the wiki and Under the hood, Themes beside Settings, Help beside the
+   * Roadmap, the Changelog and About, Leaderboards beside the exchange it
+   * counts, and three rows for things that are not built. Each family is one
+   * row now and its members are tabs at the top of the screen it opens
+   * (`ScreenTabs.tsx`); Leaderboards is the Top shelf of the exchange; the
+   * unbuilt three are on the Roadmap, which is where a reader looks for what
+   * is coming.
+   *
+   * A row is lit while you are anywhere in its family, so the pinned menu
+   * still says where you are.
    */
+  const go = (to: View) => () => {
+    onGo(to)
+    leave()
+  }
+  const inFamily = (home: View) => view === home || bundleOf(view)?.home === home
+
   const groups: { title: string; entries: Entry[] }[] = [
     {
-      title: 'Builds',
+      title: '',
       entries: [
-        /**
-         * Builds, which was the build manager and the build exchange. One row
-         * for one screen: which side of it you are on is the switch in its own
-         * heading, and a menu row that lands you on a particular side would be
-         * a second control saying the same thing from further away.
-         */
-        {
-          label: 'Builds',
-          here: view === 'builds',
-          action: () => {
-            onGo('builds')
-            leave()
-          },
-        },
-        {
-          label: 'Arcana',
-          here: view === 'arcana',
-          action: () => {
-            onGo('arcana')
-            leave()
-          },
-        },
-        /* Everything the tool knows, a record each. Beside the Arcana because
-         * both are reference rather than your own work. */
-        {
-          label: 'Wiki',
-          here: view === 'wiki',
-          action: () => {
-            onGo('wiki')
-            leave()
-          },
-        },
-        /* Beside the wiki, because it is the same material read the other way
-         * round: the wiki answers what a thing is, this answers what the game
-         * never says out loud. */
-        {
-          label: 'Under the hood',
-          here: view === 'underhood',
-          action: () => {
-            onGo('underhood')
-            leave()
-          },
-        },
-        /**
-         * Guides, in the row the build exchange held, which is the whole reason
-         * the exchange became a side of Builds: the menu is the same length it
-         * was. `decisions/2026-09-13-guides.md` item 5.
-         */
-        {
-          label: 'Guides',
-          here: view === 'guides',
-          action: () => {
-            onGo('guides')
-            leave()
-          },
-        },
-        /* After the exchange, because it is built on it: a board is the counts
-         * the exchange keeps, and it has nothing to show until something has
-         * been published and followed. */
-        {
-          label: 'Leaderboards',
-          here: view === 'leaderboards',
-          action: () => {
-            onGo('leaderboards')
-            leave()
-          },
-        },
-        /**
-         * What the roadmap promises and the tool does not have yet.
-         *
-         * Here rather than left off the menu, because a menu that only lists
-         * what exists hides the shape of the product, which is the argument
-         * this file opens with. Each one opens onto Dora's empty room saying
-         * what it will be. The mark beside the label is what says they are not
-         * built, and `Entry.unbuilt` is what draws it.
-         */
-        {
-          label: 'Builds by aspect',
-          here: view === 'byaspect',
-          unbuilt: true,
-          action: () => {
-            onGo('byaspect')
-            leave()
-          },
-        },
-        {
-          label: 'Play history',
-          here: view === 'playhistory',
-          unbuilt: true,
-          action: () => {
-            onGo('playhistory')
-            leave()
-          },
-        },
-        {
-          label: 'Suggested builds',
-          here: view === 'suggested',
-          unbuilt: true,
-          action: () => {
-            onGo('suggested')
-            leave()
-          },
-        },
+        /* Yours and the exchange, the switch in its heading saying which. */
+        { label: 'Builds', here: view === 'builds', action: go('builds') },
+        { label: 'Guides', here: view === 'guides', action: go('guides') },
+        { label: 'Arcana', here: view === 'arcana', action: go('arcana') },
+        /* The records, and Under the hood on the tab beside them. */
+        { label: 'Wiki', here: inFamily('wiki'), action: go('wiki') },
       ],
     },
     {
       title: 'This run',
       entries: hasRun
         ? [
-            {
-              label: 'Back to the run',
-              here: view === 'run',
-              action: () => {
-                onGo('run')
-                leave()
-              },
-            },
+            { label: 'Back to the run', here: view === 'run', action: go('run') },
             ...(onShowBriefing
               ? [
                   {
@@ -270,13 +180,7 @@ export function Menu({
              * Dying and stopping are different events, so they are different
              * entries. Both end the run and both keep it: `run.ts` archives
              * what was held and how far it got, tagged with which of the two it
-             * was. A run ended before today was simply discarded, and a history
-             * is the one thing that cannot be backfilled later.
-             *
-             * **The pair has to separate on outcome now that the notes are
-             * gone.** "End the run" and "Finished the run" would both read as
-             * endings, which is exactly the ambiguity the notes were covering,
-             * so the second says what actually happened instead.
+             * was.
              */
             {
               label: 'End the run',
@@ -294,90 +198,22 @@ export function Menu({
               },
             },
           ]
-        : [
-            {
-              label: 'Start a run',
-              here: view === 'setup',
-              action: () => {
-                onGo('setup')
-                leave()
-              },
-            },
-          ],
+        : [{ label: 'Start a run', here: view === 'setup', action: go('setup') }],
     },
     /**
-     * **Account and Friends are not here any more.** They live in the corner
-     * control, top right, with signing out: `src/ui/You.tsx` says why.
-     *
-     * The split is what makes two menus worth having rather than confusing.
-     * This one is where you go; that one is who you are. Mixing them was why
-     * this list had a group called "You" holding one thing that was about
-     * everybody.
-     *
-     * **Leaderboards stayed**, because it is a place about everyone rather than
-     * a fact about you, and it is a room like the exchange is a room. So it
-     * joins the rooms and the group it used to sit in dissolves.
+     * **Account and Friends are not here.** They live in the corner control,
+     * top right, with signing out: `src/ui/You.tsx` says why. This one is
+     * where you go; that one is who you are.
      */
     {
-      title: 'The tool',
+      title: '',
       entries: [
-        {
-          label: 'Themes',
-          here: view === 'themes',
-          action: () => {
-            onGo('themes')
-            leave()
-          },
-        },
-        {
-          label: 'Settings',
-          here: view === 'settings',
-          action: () => {
-            onGo('settings')
-            leave()
-          },
-        },
-        {
-          label: 'Help',
-          here: view === 'help',
-          action: () => {
-            onGo('help')
-            leave()
-          },
-        },
-        {
-          label: 'Roadmap',
-          here: view === 'roadmap',
-          action: () => {
-            onGo('roadmap')
-            leave()
-          },
-        },
-        {
-          label: 'Changelog',
-          here: view === 'changelog',
-          action: () => {
-            onGo('changelog')
-            leave()
-          },
-        },
-        {
-          /* The landing page shows itself once and then lives here. Somebody
-           * who skipped it, or who wants the line to send a friend, should
-           * still be able to get at it.
-           *
-           * It carries the About name now. This row sat under a separate About
-           * page for a while and the two had grown into the same page: one said
-           * what the tool is, the other said what the tool is and then repeated
-           * the landing page's own disclaimer back at you. Where the numbers
-           * come from was the only part worth keeping and it is in Help. */
-          label: 'About',
-          here: view === 'landing',
-          action: () => {
-            onGo('landing')
-            leave()
-          },
-        },
+        /* General, and Appearance: the theme, its wallpaper, and how the
+         * buttons are drawn. */
+        { label: 'Settings', here: inFamily('settings'), action: go('settings') },
+        /* How it works, what is new, what is coming, and About, which is the
+         * landing page once it has been seen. */
+        { label: 'Help', here: inFamily('help'), action: go('help') },
       ],
     },
   ]
@@ -421,9 +257,10 @@ export function Menu({
               </svg>
             </button>
           ) : null}
-          {groups.map((group) => (
-            <section key={group.title}>
-              <h2>{group.title}</h2>
+          {groups.map((group, at) => (
+            <section key={at}>
+              {/* A group with no title is set apart by its gap alone. */}
+              {group.title ? <h2>{group.title}</h2> : null}
               <ul>
                 {group.entries.map((entry) => (
                   <li key={entry.label}>

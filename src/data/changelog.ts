@@ -20,10 +20,21 @@ export type Release = {
 export const CHANGELOG: Release[] = [
   {
     date: '2026-10-02',
+    title: 'A menu of seven rows, and long pages that fold',
+    say: 'The menu had grown a row for every page. It has one for every place now.',
+    points: [
+      'The menu is seven rows: Builds, Guides, Arcana, Wiki, the run, Settings and Help. It fits on a laptop screen without scrolling.',
+      'Nothing went. Under the hood is a tab of the Wiki. Themes is the Appearance tab of Settings, with the choice of how the interface is drawn. What’s new, What’s coming and About are tabs of Help. The leaderboards are the Top shelf of the exchange, beside the builds they count. The three things that are not built yet are on the Roadmap, where things that are coming live.',
+      'The Roadmap, Help, Under the hood and this Changelog fold: one line per thing, and opening one closes whichever was open, so each fits on one screen.',
+      'Switching between your builds and the exchange, or between your guides and everybody’s, swipes the page across rather than nudging it.',
+    ],
+  },
+  {
+    date: '2026-10-02',
     title: 'Four ways to draw the interface, chosen in Settings',
     say: 'The same tool with its buttons and panels taken from the game, or drawn by the browser in one of three looks.',
     points: [
-      'Settings has a new choice, How it is drawn: the game’s own art, which stays the default, or Hairline, Carved or Soft. Hairline is flat with thin lit edges. Carved is square plates with double edges and small capitals. Soft is filled, rounded blocks with no edges.',
+      'Settings has a new choice, How it is drawn, on its Appearance tab: the game’s own art, which stays the default, or Hairline, Carved or Soft. Hairline is flat with thin lit edges. Carved is square plates with double edges and small capitals. Soft is filled, rounded blocks with no edges.',
       'All three redraw every button, menu row, tab, panel, tray, tooltip and divider, the plates behind a boon’s name and the highlight on an Arcana card. Their buttons and menu rows are shorter than the game’s, so more of the menu fits on a screen.',
       'Boon and god icons, the frames that say a boon’s rarity, portraits, Charon, Dora, the wallpapers, the circle behind a ring of choices, the ring round each bubble and the help mark are the same in all four. They are the content and the flavour, not the furniture.',
       'The help mark in the corner was easy to miss. It is at full strength now, glows in a colour chosen to stand out against each theme, and pings a few times when a screen opens.',
