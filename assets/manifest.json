@@ -1,10 +1,10 @@
 {
- "generated": "2026-09-17",
+ "generated": "2026-10-02",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1029,
+ "count": 1038,
  "categories": [
   {
    "name": "arcana",
@@ -24,6 +24,11 @@
    "source": "mixed",
    "wiki": 29,
    "game": 24
+  },
+  {
+   "name": "banners",
+   "count": 9,
+   "source": "wiki"
   },
   {
    "name": "biomes",
@@ -1638,6 +1643,87 @@
    "bytes": 9857,
    "sha256": "abf04f19771ad40ca3d8bf765d771f305dbb01629ad700249fc96a0b8e7a901e",
    "source": "game"
+  },
+  {
+   "id": "along",
+   "category": "banners",
+   "file": "banners/along.webp",
+   "bytes": 44030,
+   "sha256": "f0b8ba3ebbba78dda461719c1f6cc742e1ac3dfb6bf18146319958e6bfc5bb38",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "arcana",
+   "category": "banners",
+   "file": "banners/arcana.webp",
+   "bytes": 81328,
+   "sha256": "cac0856c2d95e3a2111c9051f66d6d05a711cd6ad3bff79f23ad05f322a8d1e9",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "arms",
+   "category": "banners",
+   "file": "banners/arms.webp",
+   "bytes": 45750,
+   "sha256": "4dce168a713dce56bd8cac08c409cafdd0592e0ffd5554c196c96c35c84140c9",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "duos",
+   "category": "banners",
+   "file": "banners/duos.webp",
+   "bytes": 31050,
+   "sha256": "66dca8a682c42df69673f0fe7cee57f0279f9a65a58167868b39fedf03b6975a",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "everything",
+   "category": "banners",
+   "file": "banners/everything.webp",
+   "bytes": 33770,
+   "sha256": "78dc07fc2e25398973c6fe90c1859a8b94a3df07eeacc0ac5ba9a4313f848171",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "gods",
+   "category": "banners",
+   "file": "banners/gods.webp",
+   "bytes": 37256,
+   "sha256": "536b6a3b15ead9a052ca0eb2d2c49a9a00abded603f2412227dc67d7d545809e",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hexes",
+   "category": "banners",
+   "file": "banners/hexes.webp",
+   "bytes": 45972,
+   "sha256": "7004bca62b4cf53d2a5f28e5f4b56e307d4ce53738e8e8092ec700c463057aa0",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "keepsakes",
+   "category": "banners",
+   "file": "banners/keepsakes.webp",
+   "bytes": 59184,
+   "sha256": "572d4830402aa9713ba31991610cdf14bea6bb2d432b6c2ca5b6e9579ad02192",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "olympians",
+   "category": "banners",
+   "file": "banners/olympians.webp",
+   "bytes": 37508,
+   "sha256": "0a200591ab36cb869626947b258e482adad11d19b7557d60b1eadf788f1d1ec2",
+   "source": "wiki",
+   "needsProvenance": true
   },
   {
    "id": "cauldron-olympus",

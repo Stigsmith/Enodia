@@ -35,23 +35,228 @@
   color: var(--bone-faint);
 }
 
-/* The sections, as a line of links that wraps. */
-.wiki-toc {
+/* -------------------------------------------------------------------------
+ * Walking it: the trail, the tiles, and a section's page
+ *
+ * The owner's brief: large pictures, a little dim until one is under the
+ * pointer, then that one lit with an edge of light and a glow and the rest
+ * dimmed further; click through to where you want to be; and a line at the
+ * top saying how deep you are. `wiki-tree.ts` is the shape.
+ * ---------------------------------------------------------------------- */
+
+.wiki-trail ol {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 0.9rem;
-  margin: 0 0 1.4rem;
-  font-size: 0.78rem;
+  align-items: baseline;
+  gap: 0.2rem 0.45rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+  color: var(--bone);
 }
 
-.wiki-toc a {
+.wiki-trail li + li::before {
+  content: '›';
+  margin-right: 0.45rem;
+  color: var(--div-5);
+}
+
+.wiki-trail a {
   color: var(--bone-dim);
   text-decoration: none;
 }
 
-.wiki-toc a:hover,
-.wiki-toc a:focus-visible {
+.wiki-trail a:hover,
+.wiki-trail a:focus-visible {
   color: var(--lit-hot);
+}
+
+/* A record keeps the reading measure, so its trail starts where it does. */
+.wiki-shelf > .wiki-trail {
+  max-width: 44rem;
+  margin: 1rem auto 0;
+}
+
+.wiki-node {
+  padding: 1rem 1rem 3rem;
+}
+
+@media (min-width: 60rem) {
+  .wiki-node {
+    padding: 1.25rem 2rem 3rem;
+  }
+}
+
+.wiki-node-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+
+.wiki-node-head .wiki-count {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wiki-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 0.9rem;
+  margin: 0.4rem 0 1.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* Faces and weapons stand up, and want a narrower, taller tile. */
+.wiki-tiles.is-tall {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+}
+
+.wiki-tile {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  aspect-ratio: 12 / 5;
+  overflow: hidden;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-card);
+  background: var(--ink-900);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.25s var(--e-response),
+    box-shadow 0.25s var(--e-response),
+    transform 0.25s var(--e-response);
+}
+
+.is-tall .wiki-tile {
+  aspect-ratio: 4 / 5;
+}
+
+/* The picture, a little dim at rest. */
+.wiki-tile-art,
+.wiki-tile-mosaic {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  filter: brightness(0.62) saturate(0.75);
+  transition:
+    filter 0.3s var(--e-response),
+    transform 0.5s var(--e-response);
+}
+
+.wiki-tile-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A face keeps its eyes in the tile. */
+.wiki-tile.is-portrait .wiki-tile-art {
+  object-position: center 22%;
+}
+
+/* A weapon is a cut-out, drawn whole above the name. */
+.wiki-tile.is-render .wiki-tile-art {
+  object-fit: contain;
+  padding: 10% 14% 30%;
+}
+
+/* A few of what is inside, laid edge to edge, for a tile with no picture. */
+.wiki-tile-mosaic {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.9rem 0.9rem 2.8rem;
+}
+
+.wiki-tile-mosaic img {
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: contain;
+}
+
+/* Dark at the foot, so the name reads over any picture. */
+.wiki-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 38%, rgb(0 0 0 / 0.8));
+  pointer-events: none;
+}
+
+.wiki-tile-text {
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.7rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.wiki-tile-name {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: var(--bone);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.9);
+}
+
+.wiki-tile-sub {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-dim);
+}
+
+/* Lit: the picture at full strength, an edge of light round the tile and a
+ * glow outside it. */
+.wiki-tile:hover,
+.wiki-tile:focus-visible {
+  border-color: var(--lit-hot);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--lit-hot) 45%, transparent),
+    0 0 1.6rem -0.2rem var(--lit);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.wiki-tile:hover :is(.wiki-tile-art, .wiki-tile-mosaic),
+.wiki-tile:focus-visible :is(.wiki-tile-art, .wiki-tile-mosaic) {
+  filter: none;
+  transform: scale(1.05);
+}
+
+.wiki-tile:hover .wiki-tile-name,
+.wiki-tile:focus-visible .wiki-tile-name {
+  color: var(--lit-hot);
+}
+
+/* And while one is lit, the others step back a little further. */
+.wiki-tiles:has(.wiki-tile:is(:hover, :focus-visible)) .wiki-tile:not(:hover, :focus-visible) :is(.wiki-tile-art, .wiki-tile-mosaic) {
+  filter: brightness(0.4) saturate(0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiki-tile,
+  .wiki-tile-art,
+  .wiki-tile-mosaic {
+    transition: none;
+  }
+
+  .wiki-tile:hover,
+  .wiki-tile:focus-visible,
+  .wiki-tile:hover :is(.wiki-tile-art, .wiki-tile-mosaic),
+  .wiki-tile:focus-visible :is(.wiki-tile-art, .wiki-tile-mosaic) {
+    transform: none;
+  }
 }
 
 .wiki-part {
@@ -156,12 +361,6 @@
   padding: 1rem 0 2rem;
 }
 
-.wiki-back {
-  margin: 0 0 1.2rem;
-  font-size: 0.8rem;
-}
-
-.wiki-back a,
 .wiki-facts a,
 .wiki-text a {
   color: var(--lit-hot);
