@@ -19,6 +19,18 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    date: '2026-10-02',
+    title: 'A plain interface, as a switch in Settings',
+    say: 'The same tool with its buttons and panels drawn by the browser rather than taken from the game.',
+    points: [
+      'Settings has a new switch, Plain interface. Every button, menu row, tab, panel, tray, tooltip and divider is redrawn in CSS, and so are the plates behind a boon’s name, the highlight on an Arcana card, the circle behind a ring of choices and the ring round each bubble. The game’s own art stays the default.',
+      'Boon and god icons, the frames that say a boon’s rarity, portraits, Charon, Dora and the wallpapers are the same either way. They are the content, not the furniture.',
+      'Plain follows your theme all the way: Olympian’s edges are gold and Infernal’s copper, where the game’s art could only be tinted. A boon’s plate carries its rarity as a stripe in the colour the game gives it.',
+      'Nothing moves when you flip it. Every button is the size it was.',
+      'An empty caption under a ring of choices no longer draws its frame. It was meant to go when the caption was blank, and never did.',
+    ],
+  },
+  {
     date: '2026-09-18',
     title: 'Guides, and a build named in one says how your run stands with it',
     say: 'The other half of the feature the last batch laid the ground for.',

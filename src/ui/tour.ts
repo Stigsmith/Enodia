@@ -210,6 +210,10 @@ export const TOURS: Record<string, Step[]> = {
 
   settings: [
     {
+      at: 'setting-skin',
+      say: 'Plain swaps the game’s buttons and panels for ones the browser draws. The pictures stay put. Flip it and watch this page change.',
+    },
+    {
       at: 'setting-name',
       say: 'Your name. It travels with anything you share, so people know whose build they are looking at.',
     },

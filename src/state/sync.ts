@@ -75,6 +75,7 @@ const SETTINGS = [
   'enodia.wallpaper',
   'enodia.nav',
   'enodia.frame',
+  'enodia.skin',
   'enodia.prefs',
   'enodia.exported',
   'enodia.run.active',

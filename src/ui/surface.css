@@ -2697,8 +2697,11 @@
   border-image: url('/shell/spell-slot.png') 46 fill / 0.85rem stretch;
 }
 
+/* The longhand, not `border-image: none`: the build's minifier writes that
+ * shorthand out as `border-image:` with nothing after it, which the browser
+ * throws away, so an empty caption went on drawing its frame. */
 .radial-caption:empty {
-  border-image: none;
+  border-image-source: none;
 }
 
 /* Sentence case, not shouted. The caption is a sentence about the thing under

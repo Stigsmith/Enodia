@@ -1,0 +1,783 @@
+/* ==========================================================================
+ * PLAIN: the interface drawn in CSS instead of with the game's own chrome.
+ *
+ * `src/ui/skin.ts` writes `data-skin` on the root and Settings flips it. Every
+ * rule here is scoped to `:root[data-skin='plain']`, so under the game skin
+ * this file draws nothing.
+ *
+ * **Only the furniture.** Buttons, menu rows, tabs, toggles, trays, panels,
+ * tooltips, dividers, bars, the plate behind a boon's name, the highlight on an
+ * Arcana card, the sigil behind a radial and the ring round a bubble. Boon and
+ * god icons, the rarity frame on an icon, portraits, Charon, Dora, the status
+ * glyphs and the wallpapers are content or flavour and stay what they are.
+ *
+ * **Geometry is kept.** The game's plates are nine-sliced with `border-image`,
+ * so their thick transparent borders are what sizes them. This skin keeps every
+ * border width and every padding and paints underneath instead, which is why
+ * so many rules here say `background-origin: border-box`: without it a gradient
+ * sizes itself to the padding box and tiles down the border as stripes.
+ * Switching skins moves nothing on the page.
+ *
+ * **Made of the theme.** Edges are `--metal`, light is `--lit`, faces are the
+ * ink ramp, so Olympian's plates are edged in gold and Infernal's in copper.
+ * The game's art can only be turned to a theme with `--art-hue`, and that
+ * rotation is switched off here: rotating a colour that was already the
+ * theme's own would make it somebody else's.
+ *
+ * `src/ui/skin.test.ts` fails if a rule in `surface.css` or `builds.css` draws
+ * chrome art and has no counterpart in this file.
+ * ========================================================================= */
+
+:root[data-skin='plain'] {
+  /* An edge, at rest and lit. */
+  --pl-edge: color-mix(in oklab, var(--metal) 40%, transparent);
+  --pl-edge-hot: color-mix(in oklab, var(--lit-hot) 80%, transparent);
+
+  /* The face of a raised thing, lit a little from above and settling into the
+   * ground at its foot. */
+  --pl-face: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ink-700) 72%, var(--lit-dim) 28%),
+    var(--ink-800) 46%,
+    var(--ink-900)
+  );
+  --pl-face-hot: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ink-700) 48%, var(--lit) 52%),
+    color-mix(in oklab, var(--ink-800) 74%, var(--lit-dim) 26%) 50%,
+    var(--ink-900)
+  );
+  --pl-face-down: linear-gradient(180deg, var(--ink-950), var(--ink-850));
+
+  /* The rim of a raised thing: its edge, a lit line along the top and a shadow
+   * along the foot. Hot adds the glow the game's highlight art carries.
+   *
+   * **For a thing with no border of its own.** An inset shadow is drawn inside
+   * the padding box, and the nine-sliced plates have a padding box a rem inside
+   * their edge, so on those this drew a rectangle round the label. They take
+   * `--pl-lines` and an outline instead; see `.quiet`. */
+  --pl-rim:
+    inset 0 0 0 1px var(--pl-edge),
+    inset 0 1px 0 color-mix(in oklab, var(--lit-hot) 20%, transparent),
+    inset 0 -1px 0 rgb(0 0 0 / 0.45);
+  --pl-rim-hot:
+    inset 0 0 0 1px var(--pl-edge-hot),
+    inset 0 1px 0 color-mix(in oklab, var(--lit-hot) 45%, transparent),
+    0 0 0.9rem -0.2rem color-mix(in oklab, var(--lit) 70%, transparent);
+
+  /* The same top light and foot shadow as a background layer, for a plate whose
+   * padding box is not its edge. Its own edge is an outline, which sits on the
+   * outside of the box, follows the radius, and moves nothing. */
+  --pl-lines: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--lit-hot) 20%, transparent) 0 1px,
+    transparent 1px calc(100% - 1px),
+    rgb(0 0 0 / 0.45) calc(100% - 1px)
+  );
+  --pl-lines-hot: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--lit-hot) 45%, transparent) 0 1px,
+    transparent 1px calc(100% - 1px),
+    rgb(0 0 0 / 0.45) calc(100% - 1px)
+  );
+  --pl-glow: 0 0 0.9rem -0.2rem color-mix(in oklab, var(--lit) 70%, transparent);
+
+  /* Two rivets, where the game's button carries its end caps. */
+  --pl-rivets:
+    radial-gradient(circle at 0.75rem 50%, var(--metal) 0 1.2px, transparent 1.9px),
+    radial-gradient(circle at calc(100% - 0.75rem) 50%, var(--metal) 0 1.2px, transparent 1.9px);
+
+  /* A panel you read against: the ground, lit faintly from its top edge. */
+  --pl-panel: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ink-850) 86%, var(--lit) 14%),
+    var(--ink-900) 32%,
+    var(--ink-950)
+  );
+  --pl-panel-rim:
+    inset 0 0 0 1px var(--div-4),
+    inset 0 1px 0 color-mix(in oklab, var(--lit-hot) 16%, transparent);
+  --pl-panel-shadow: 0 1.4rem 3rem -1rem rgb(0 0 0 / 0.7);
+
+  /* A lit edge down a sidebar, where the game draws `SideBars_01`. */
+  --pl-side: color-mix(in oklab, var(--lit) 34%, transparent);
+  --pl-side-glow: color-mix(in oklab, var(--lit) 8%, transparent);
+
+  /* No rarity until a row says otherwise. */
+  --pl-rar: transparent;
+}
+
+/* ============================================================== buttons */
+
+/* The shared button. Its border is a rem of transparent nine-slice that sizes
+ * it, kept as it is; the edge is an outline drawn just inside the box. */
+:root[data-skin='plain'] .quiet {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--r-pill);
+  background: var(--pl-rivets), var(--pl-lines), var(--pl-face);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge);
+  outline-offset: -1px;
+  box-shadow: none;
+  filter: none;
+  transition:
+    color var(--t-response) var(--e-response),
+    box-shadow var(--t-response) var(--e-response),
+    outline-color var(--t-response) var(--e-response);
+}
+
+/* Focus gets the same light as hover, which is what the game skin does too. */
+:root[data-skin='plain'] .quiet:hover,
+:root[data-skin='plain'] .quiet:focus-visible {
+  border-image-source: none;
+  background: var(--pl-rivets), var(--pl-lines-hot), var(--pl-face-hot);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge-hot);
+  outline-offset: -1px;
+  box-shadow: var(--pl-glow);
+}
+
+:root[data-skin='plain'] .quiet:active {
+  border-image-source: none;
+  background: var(--pl-rivets), var(--pl-lines), var(--pl-face-down);
+  background-origin: border-box;
+  outline-color: var(--pl-edge);
+  box-shadow: none;
+  filter: none;
+}
+
+/* Back is the way out, and the game draws it red. The rim colour is the event
+ * colour rather than a rarity, because leaving is an event. */
+:root[data-skin='plain'] .picker-back {
+  border-image-source: none;
+  outline-color: color-mix(in oklab, var(--rim-magenta) 55%, transparent);
+}
+
+:root[data-skin='plain'] .picker-back:hover,
+:root[data-skin='plain'] .picker-back:focus-visible {
+  border-image-source: none;
+  outline-color: var(--rim-magenta);
+  box-shadow: 0 0 0.9rem -0.2rem color-mix(in oklab, var(--rim-magenta) 70%, transparent);
+}
+
+/* The menu's rows, and the corner panel's, which are the same plate. Squarer
+ * than a pill: a stack of pills reads as a row of chips. */
+:root[data-skin='plain'] .menu-panel button,
+:root[data-skin='plain'] .you-panel button {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: 0.6rem;
+  background: var(--pl-lines), var(--pl-face);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge);
+  outline-offset: -1px;
+  box-shadow: none;
+}
+
+:root[data-skin='plain'] .menu-panel button:hover:not(:disabled):not(.is-here),
+:root[data-skin='plain'] .menu-panel button:focus-visible:not(.is-here),
+:root[data-skin='plain'] .you-panel button:hover,
+:root[data-skin='plain'] .you-panel button:focus-visible {
+  filter: none;
+  background: var(--pl-lines-hot), var(--pl-face-hot);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge-hot);
+  outline-offset: -1px;
+}
+
+/* Where you are: lit, and a bar of light down the leading edge. */
+:root[data-skin='plain'] .menu-panel button.is-here {
+  border-image-source: none;
+  background:
+    linear-gradient(90deg, var(--lit-hot) 0 3px, transparent 3px),
+    var(--pl-lines-hot),
+    var(--pl-face-hot);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge-hot);
+  outline-offset: -1px;
+  box-shadow: var(--pl-glow);
+}
+
+/* The small plated buttons in the build manager, the editor and the run log. */
+:root[data-skin='plain'] .builds-back,
+:root[data-skin='plain'] .editor-actions > button:not(.editor-delete),
+:root[data-skin='plain'] .vowscreen-foot button,
+:root[data-skin='plain'] .logrun-actions button,
+:root[data-skin='plain'] .logrun-yesno button,
+:root[data-skin='plain'] .logrun-three button,
+:root[data-skin='plain'] .logrun-ended button {
+  border-radius: var(--r-pill);
+  background: var(--pl-face);
+  box-shadow: var(--pl-rim);
+}
+
+:root[data-skin='plain'] .builds-back:hover,
+:root[data-skin='plain'] .editor-actions > button:not(.editor-delete):hover:not(:disabled),
+:root[data-skin='plain'] .vowscreen-foot button:hover,
+:root[data-skin='plain'] .logrun-actions button:hover:not(:disabled),
+:root[data-skin='plain'] .logrun-yesno button:hover:not(.is-on),
+:root[data-skin='plain'] .logrun-three button:hover:not(.is-on),
+:root[data-skin='plain'] .logrun-ended button:hover:not(.is-on) {
+  filter: none;
+  background: var(--pl-face-hot);
+  box-shadow: var(--pl-rim-hot);
+}
+
+:root[data-skin='plain'] .builds-back:active,
+:root[data-skin='plain'] .editor-actions > button:not(.editor-delete):active:not(:disabled) {
+  filter: none;
+  background: var(--pl-face-down);
+}
+
+/* A chosen answer in the run log. Yes is lit, No takes the way-out colour, and
+ * the three-way answers are lit, which is what the game's three plates say. */
+:root[data-skin='plain'] .logrun-three button.is-on,
+:root[data-skin='plain'] .logrun-ended button.is-on,
+:root[data-skin='plain'] .logrun-yesno button:first-child.is-on,
+:root[data-skin='plain'] .logrun-yesno button:first-child.is-on:hover {
+  background: var(--pl-face-hot);
+  box-shadow:
+    inset 0 0 0 1px var(--lit-hot),
+    0 0 0.9rem -0.2rem color-mix(in oklab, var(--lit) 70%, transparent);
+}
+
+:root[data-skin='plain'] .logrun-yesno button:last-child.is-on,
+:root[data-skin='plain'] .logrun-yesno button:last-child.is-on:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ink-700) 60%, var(--rim-magenta) 40%),
+    var(--ink-900)
+  );
+  box-shadow:
+    inset 0 0 0 1px var(--rim-magenta),
+    0 0 0.9rem -0.2rem color-mix(in oklab, var(--rim-magenta) 70%, transparent);
+}
+
+/* Cards or List, Poster or Constellation: a plate with a lamp in it. */
+:root[data-skin='plain'] .builds-layout button {
+  border-radius: var(--r-pill);
+  background: var(--pl-face);
+  box-shadow: var(--pl-rim);
+}
+
+:root[data-skin='plain'] .builds-layout button:hover:not(.is-on) {
+  filter: none;
+  background: var(--pl-face-hot);
+}
+
+:root[data-skin='plain'] .builds-layout button.is-on {
+  background: var(--pl-face-hot);
+  box-shadow: var(--pl-rim-hot);
+}
+
+:root[data-skin='plain'] .builds-layout button::before {
+  border-radius: 50%;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--bone-faint);
+}
+
+:root[data-skin='plain'] .builds-layout button.is-on::before {
+  background: radial-gradient(circle, var(--lit-hot) 0 36%, transparent 44%);
+  box-shadow:
+    inset 0 0 0 1.5px var(--lit-hot),
+    0 0 0.4rem var(--lit);
+}
+
+/* Delete, as a round plate with a bin drawn in it. */
+:root[data-skin='plain'] .editor-delete {
+  position: relative;
+  border-radius: 50%;
+  background: var(--pl-face);
+  box-shadow: var(--pl-rim);
+}
+
+:root[data-skin='plain'] .editor-delete::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bone-dim);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1.2 12H7.2L6 9zm3.2 2.5.5 7h1.5l-.4-7H9.2zm4.1 0-.4 7h1.5l.5-7h-1.6z'/%3E%3C/svg%3E") center / 46% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1.2 12H7.2L6 9zm3.2 2.5.5 7h1.5l-.4-7H9.2zm4.1 0-.4 7h1.5l.5-7h-1.6z'/%3E%3C/svg%3E") center / 46% no-repeat;
+}
+
+:root[data-skin='plain'] .editor-delete:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ink-700) 60%, var(--rim-magenta) 40%),
+    var(--ink-900)
+  );
+  box-shadow:
+    inset 0 0 0 1px var(--rim-magenta),
+    0 0 0.8rem -0.2rem var(--rim-magenta);
+}
+
+:root[data-skin='plain'] .editor-delete:hover::before {
+  background: var(--bone);
+}
+
+/* The tick on a step that is done. Dark and empty until it is ticked, then lit
+ * with the tick cut into the light. */
+:root[data-skin='plain'] .editor-confirm input {
+  border-radius: 50%;
+  background: var(--pl-face);
+  box-shadow: var(--pl-rim);
+  filter: none;
+}
+
+:root[data-skin='plain'] .editor-confirm input:checked {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23080d0f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / 66% no-repeat,
+    radial-gradient(circle, var(--lit-hot), var(--lit) 72%);
+  box-shadow:
+    inset 0 0 0 1px var(--lit-hot),
+    0 0 0.7rem var(--lit);
+  filter: none;
+}
+
+:root[data-skin='plain'] .editor-confirm:hover input:not(:checked) {
+  filter: none;
+  box-shadow: var(--pl-rim-hot);
+}
+
+/* The help mark, as a round plate with its question in the display face. */
+:root[data-skin='plain'] .pagehelp-open {
+  border-radius: 50%;
+  background: var(--pl-face);
+  box-shadow:
+    var(--pl-rim),
+    0 0.3rem 0.8rem -0.2rem rgb(0 0 0 / 0.6);
+}
+
+:root[data-skin='plain'] .pagehelp-open::before {
+  content: '?';
+  content: '?' / '';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--metal);
+}
+
+:root[data-skin='plain'] .pagehelp-open:hover,
+:root[data-skin='plain'] .pagehelp-open:focus-visible {
+  background: var(--pl-face-hot);
+  box-shadow: var(--pl-rim-hot);
+}
+
+/* The stepper arrows on the Fear counter and in a tour. The game's arrow is an
+ * image in the markup, so it is pushed out of its own box and the element it
+ * leaves behind is cut into a chevron instead. */
+:root[data-skin='plain'] .fear-arrow img,
+:root[data-skin='plain'] .tour-arrow img {
+  object-position: 100vw 100vw;
+  background: var(--metal);
+}
+
+:root[data-skin='plain'] .fear-arrow:first-child img {
+  clip-path: polygon(50% 14%, 92% 86%, 50% 62%, 8% 86%);
+}
+
+:root[data-skin='plain'] .fear-arrow:last-child img {
+  clip-path: polygon(50% 86%, 8% 14%, 50% 38%, 92% 14%);
+}
+
+:root[data-skin='plain'] .tour-arrow:first-of-type img {
+  clip-path: polygon(22% 50%, 74% 12%, 56% 50%, 74% 88%);
+}
+
+:root[data-skin='plain'] .tour-arrow:last-of-type img {
+  clip-path: polygon(78% 50%, 26% 88%, 44% 50%, 26% 12%);
+}
+
+/* The offer card's selector, the same way: a lit chevron pointing at the card
+ * under the cursor. */
+:root[data-skin='plain'] .offer-selector {
+  object-position: 100vw 100vw;
+  background: var(--lit-hot);
+  clip-path: polygon(78% 50%, 26% 88%, 44% 50%, 26% 12%);
+}
+
+/* ===================================================== tabs and toggles */
+
+:root[data-skin='plain'] .tab {
+  border-radius: var(--r-soft);
+  background: var(--pl-face);
+  box-shadow:
+    inset 0 0 0 1px var(--div-4),
+    inset 0 1px 0 color-mix(in oklab, var(--lit-hot) 14%, transparent);
+}
+
+/* The open tab is lit and underlined, which is the shape a tab has everywhere
+ * else in the world. */
+:root[data-skin='plain'] .tab.is-open {
+  background: var(--pl-face-hot);
+  box-shadow:
+    inset 0 0 0 1px var(--pl-edge-hot),
+    inset 0 -2px 0 var(--lit-hot);
+}
+
+/* ============================================================ the radial */
+
+/* The sigil behind a ring. The game's is a nonagram; this is a dial between
+ * two circles, with nine long marks for its nine points. */
+:root[data-skin='plain'] .radial-ring-area::before {
+  background:
+    radial-gradient(closest-side, transparent 0 96.6%, var(--lit-hot) 97% 98.3%, transparent 98.7%),
+    radial-gradient(closest-side, transparent 0 86.4%, var(--lit-hot) 86.8% 87.6%, transparent 88%),
+    repeating-conic-gradient(from -0.6deg, var(--lit-hot) 0 1.2deg, transparent 1.2deg 40deg),
+    repeating-conic-gradient(from -0.25deg, var(--lit-hot) 0 0.5deg, transparent 0.5deg 8deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 0 86%, #000 86.2% 99%, transparent 99.4%);
+  mask: radial-gradient(closest-side, transparent 0 86%, #000 86.2% 99%, transparent 99.4%);
+}
+
+/* The ring round a bubble: a hairline at the bubble's edge, a second further
+ * out, and four rivets on the outer one. The ring setting chooses between the
+ * game's own rings, so it has nothing to choose here and its select goes. */
+:root[data-skin='plain'] .radial-ring li::after {
+  width: 118%;
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(circle at 50% 2%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 50% 98%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 2% 50%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(circle at 98% 50%, var(--metal) 0 2px, transparent 2.7px),
+    radial-gradient(
+      closest-side,
+      transparent 0 95%,
+      color-mix(in oklab, var(--metal) 70%, transparent) 95.6% 96.8%,
+      transparent 97.4%
+    ),
+    radial-gradient(
+      closest-side,
+      transparent 0 84.2%,
+      color-mix(in oklab, var(--lit-hot) 60%, transparent) 84.8% 86.4%,
+      transparent 87%
+    );
+  -webkit-mask: none;
+  mask: none;
+}
+
+:root[data-skin='plain'] .topbar-frame {
+  display: none;
+}
+
+/* The line under a radial saying what is under the cursor. */
+:root[data-skin='plain'] .radial-caption {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--r-card);
+  background: var(--pl-panel);
+  background-origin: border-box;
+  outline: 1px solid var(--div-4);
+  outline-offset: -1px;
+  filter: none;
+}
+
+:root[data-skin='plain'] .radial-caption:empty {
+  background: none;
+  outline: none;
+}
+
+/* "What did this Exit give": a bar that fades out at both ends, between two
+ * hairlines that do the same. */
+:root[data-skin='plain'] .picker-label {
+  border-image-source: none;
+  border-color: transparent;
+  background:
+    linear-gradient(90deg, transparent, var(--pl-edge) 22% 78%, transparent) top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, var(--pl-edge) 22% 78%, transparent) bottom / 100% 1px no-repeat,
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--ink-800) 88%, var(--lit) 12%) 18% 82%,
+      transparent
+    );
+  background-origin: border-box;
+}
+
+/* ============================================================ the plates */
+
+/* Rarity, as the game states it. A plate carries its rarity as a stripe down
+ * its leading edge and a wash of the same colour fading across it, which is
+ * what the game's plate art does with a picture. */
+:root[data-skin='plain'] [data-rarity],
+:root[data-skin='plain'] .offer-card button {
+  --pl-rar: color-mix(in oklab, var(--rarity-common) 45%, transparent);
+}
+
+:root[data-skin='plain'] [data-rarity='rare'],
+:root[data-skin='plain'] .offer-card[data-plate='rare'] button {
+  --pl-rar: var(--rarity-rare);
+}
+
+:root[data-skin='plain'] [data-rarity='epic'],
+:root[data-skin='plain'] .offer-card[data-plate='epic'] button {
+  --pl-rar: var(--rarity-epic);
+}
+
+:root[data-skin='plain'] [data-rarity='heroic'],
+:root[data-skin='plain'] .offer-card[data-plate='heroic'] button {
+  --pl-rar: var(--rarity-heroic);
+}
+
+:root[data-skin='plain'] [data-rarity='duo'],
+:root[data-skin='plain'] [data-rarity='perfect'],
+:root[data-skin='plain'] .offer-card[data-plate='duo'] button {
+  --pl-rar: var(--rarity-duo);
+}
+
+:root[data-skin='plain'] [data-rarity='legendary'],
+:root[data-skin='plain'] .offer-card[data-plate='legendary'] button {
+  --pl-rar: var(--rarity-legendary);
+}
+
+/* An offer at an Exit. A nine-sliced plate like `.quiet`, so its stripe is a
+ * background layer and its edge an outline, for the reason given there. */
+:root[data-skin='plain'] .offer-card button {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--r-soft);
+  background:
+    linear-gradient(90deg, var(--pl-rar) 0 3px, transparent 3px),
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) 32%, transparent), transparent 46%),
+    var(--pl-panel);
+  background-origin: border-box;
+  outline: 1px solid var(--div-4);
+  outline-offset: -1px;
+}
+
+:root[data-skin='plain'] .offer-card button::before {
+  border-image-source: none;
+  border-color: transparent;
+  border-radius: var(--r-soft);
+  background: linear-gradient(90deg, color-mix(in oklab, var(--lit) 16%, transparent), transparent 60%);
+  background-origin: border-box;
+  outline: 1px solid var(--pl-edge-hot);
+  outline-offset: -1px;
+  box-shadow: 0 0 1rem -0.2rem color-mix(in oklab, var(--lit) 60%, transparent);
+}
+
+/* The rows of a boon list, in the editor and in the pickers. A row with no
+ * rarity has no plate, as it has none in the game skin. */
+:root[data-skin='plain'] .picklist-row,
+:root[data-skin='plain'] .bsort-row,
+:root[data-skin='plain'] .bsort-chip {
+  background-image: linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) 30%, transparent), transparent 42%);
+  background-size: auto;
+  box-shadow: inset 2px 0 0 var(--pl-rar);
+}
+
+:root[data-skin='plain'] .picklist-row:hover,
+:root[data-skin='plain'] .bsort-row:hover {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--pl-rar) 46%, transparent),
+    color-mix(in oklab, var(--lit) 10%, transparent) 72%
+  );
+  background-size: auto;
+  box-shadow:
+    inset 2px 0 0 var(--pl-rar),
+    inset 0 0 0 1px var(--pl-edge-hot);
+}
+
+:root[data-skin='plain'] .picklist-row.is-blocked:hover,
+:root[data-skin='plain'] .bsort-row.is-blocked:hover {
+  background-image: linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) 30%, transparent), transparent 42%);
+  box-shadow: inset 2px 0 0 var(--pl-rar);
+}
+
+/* The run picker's own rows. A hammer, a Hex and anything else wear the metal,
+ * an Encounter wears the Duo colour, as the game's plates had it. */
+:root[data-skin='plain'] .plate,
+:root[data-skin='plain'] .boon {
+  --pl-rar: color-mix(in oklab, var(--rarity-common) 45%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--pl-rar) 28%, transparent), transparent 50%),
+    var(--ink-900);
+  box-shadow: inset 2px 0 0 var(--pl-rar);
+}
+
+:root[data-skin='plain'] .plate.is-hammer,
+:root[data-skin='plain'] .plate.is-hex,
+:root[data-skin='plain'] .plate.is-other {
+  --pl-rar: var(--metal);
+}
+
+:root[data-skin='plain'] .plate.is-encounter {
+  --pl-rar: var(--rarity-duo);
+}
+
+/* ======================================================= cards and Arcana */
+
+/* A build card's plate, behind everything standing on it. */
+:root[data-skin='plain'] .bcard-hit::after {
+  border-radius: var(--r-card);
+  background:
+    radial-gradient(110% 55% at 50% 0%, color-mix(in oklab, var(--lit) 14%, transparent), transparent 70%),
+    var(--pl-panel);
+  box-shadow: var(--pl-panel-rim);
+  outline: 1px solid color-mix(in oklab, var(--metal) 22%, transparent);
+  outline-offset: -7px;
+  filter: none;
+}
+
+:root[data-skin='plain'] .bcard-hit::before {
+  border-radius: var(--r-card);
+  background: none;
+  box-shadow:
+    inset 0 0 0 1px var(--pl-edge-hot),
+    inset 0 0 1.4rem -0.4rem var(--lit);
+  filter: none;
+}
+
+/* An Arcana card that is on, and one under the cursor. The game's art is
+ * larger than the card to make room for its glow; these sit on the card's own
+ * edge and let the shadow make the glow. */
+:root[data-skin='plain'] .arcana-art::after {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 4px;
+  background: none;
+  box-shadow:
+    0 0 0 2px var(--lit-hot),
+    0 0 1.1rem 0.1rem color-mix(in oklab, var(--lit) 75%, transparent);
+  filter: none;
+}
+
+:root[data-skin='plain'] .arcana-art::before,
+:root[data-skin='plain'] .poster-card::before {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  background: none;
+  box-shadow:
+    0 0 0 1px var(--pl-edge-hot),
+    0 0 0 4px color-mix(in oklab, var(--lit) 22%, transparent);
+  filter: none;
+}
+
+/* ======================================================= trays and rails */
+
+:root[data-skin='plain'] .btray {
+  background:
+    linear-gradient(90deg, var(--pl-side) 0 1px, var(--pl-side-glow) 1px, transparent 9rem),
+    var(--ink-900);
+}
+
+/* Mirrored by the rule it overrides, so the lit edge lands on the right. */
+:root[data-skin='plain'] .editor-rail::before {
+  background: linear-gradient(90deg, var(--pl-side) 0 1px, var(--pl-side-glow) 1px, transparent 6rem);
+}
+
+@media (min-width: 60rem) {
+  :root[data-skin='plain'] .railbar {
+    background:
+      linear-gradient(270deg, var(--pl-side) 0 1px, var(--pl-side-glow) 1px, transparent 6rem),
+      var(--ink-950);
+  }
+}
+
+:root[data-skin='plain'] .rail-sheet::before {
+  background: radial-gradient(120% 60% at 0% 0%, var(--lit), transparent 70%);
+}
+
+:root[data-skin='plain'] .tray-handle {
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--lit) 22%, transparent), transparent 70%),
+    var(--ink-900);
+  box-shadow: inset 0 1px 0 var(--pl-edge);
+  filter: none;
+}
+
+:root[data-skin='plain'] .objective-bar {
+  filter: none;
+}
+
+/* ===================================================== panels and words */
+
+/* The tooltip over a mark. */
+:root[data-skin='plain'] .peek.is-boon,
+:root[data-skin='plain'] .peek.is-other {
+  border-radius: var(--r-soft);
+  background: var(--pl-panel);
+  box-shadow:
+    var(--pl-panel-rim),
+    0 0.8rem 2rem -0.6rem rgb(0 0 0 / 0.8);
+}
+
+:root[data-skin='plain'] .peek.is-boon {
+  box-shadow:
+    inset 2px 0 0 color-mix(in oklab, var(--lit) 70%, transparent),
+    var(--pl-panel-rim),
+    0 0.8rem 2rem -0.6rem rgb(0 0 0 / 0.8);
+}
+
+/* The run log and the vow sheet. The game's panels are pictures with a fixed
+ * ratio and an ornament that eats a fifth of each edge, which is what all the
+ * percentage padding in `builds.css` measures around. A CSS panel has no
+ * ornament to clear, so it takes its height from what is in it. */
+:root[data-skin='plain'] .logrun-box {
+  aspect-ratio: auto;
+  border-radius: var(--r-card);
+  background: var(--pl-panel);
+  box-shadow:
+    var(--pl-panel-rim),
+    var(--pl-panel-shadow);
+  outline: 1px solid color-mix(in oklab, var(--metal) 22%, transparent);
+  outline-offset: -8px;
+}
+
+:root[data-skin='plain'] .logrun-box .logrun-inner {
+  height: auto;
+  max-height: 92vh;
+  padding: 2.4rem 2.6rem 2.2rem;
+}
+
+:root[data-skin='plain'] .logrun-box.is-vows {
+  aspect-ratio: auto;
+  background: var(--pl-panel);
+}
+
+:root[data-skin='plain'] .logrun-box.is-vows .logrun-inner {
+  padding: 2.4rem 3rem 2.2rem;
+}
+
+/* Dora's lines and a tour's, on a shade that fades out at every edge. */
+:root[data-skin='plain'] .dora-says,
+:root[data-skin='plain'] .tour-say {
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.74), rgb(0 0 0 / 0.5) 62%, transparent);
+}
+
+/* Bars filling up, on Setup's plan. */
+:root[data-skin='plain'] .plan-bar {
+  border-radius: var(--r-pill);
+  background: var(--ink-950);
+  box-shadow:
+    inset 0 0 0 1px var(--div-4),
+    inset 0 1px 3px rgb(0 0 0 / 0.6);
+}
+
+:root[data-skin='plain'] .plan-bar-fill {
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--lit-hot), var(--lit) 55%, var(--lit-dim));
+  box-shadow: 0 0 0.6rem color-mix(in oklab, var(--lit) 60%, transparent);
+}
+
+/* ============================================================== dividers */
+
+:root[data-skin='plain'] .group-heading,
+:root[data-skin='plain'] .block-heading {
+  border-image: linear-gradient(90deg, var(--lit-dim), var(--div-5) 55%, transparent) 0 0 1 0 / 0 0 1px 0 stretch;
+}
+
+:root[data-skin='plain'] .builds-how,
+:root[data-skin='plain'] .builds-repeat {
+  background: linear-gradient(90deg, transparent, var(--lit-dim) 28%, var(--lit) 50%, var(--lit-dim) 72%, transparent)
+    top center / 100% 1px no-repeat;
+}
