@@ -103,6 +103,9 @@ export function PageHelp({ view }: { view: View }) {
         * highlight sprite can take over on hover the way it does in the game.
         * Both paths are literals, which is what `prune` reads. */}
       <button
+        /* Keyed on the topic so each screen gets a fresh button, which is what
+           replays the beacon's few pings there rather than only on the first. */
+        key={topic}
         ref={mark}
         type="button"
         className={`pagehelp-open${open ? ' is-away' : ''}`}

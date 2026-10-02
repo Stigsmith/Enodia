@@ -8797,14 +8797,57 @@ button.mark {
    * exactly the pair the game ships them as. */
   background: url('/shell/info-button.png') center / contain no-repeat;
   cursor: pointer;
-  opacity: 0.45;
-  transition: opacity 0.14s ease, transform 0.14s ease;
+  /**
+   * **Full strength, and lit in the beacon.** It sat at 45 percent in the
+   * theme's own light, which is how it was designed to be quiet and why the
+   * owner could not find it. The glow is a `drop-shadow`, so it follows the
+   * round mark rather than the square box it sits in.
+   */
+  opacity: 1;
+  filter: drop-shadow(0 0 0.35rem color-mix(in oklab, var(--beacon) 70%, transparent));
+  transition: opacity 0.14s ease, transform 0.14s ease, filter 0.14s ease;
+}
+
+/**
+ * A ping, five times when a screen opens and then never again until the next
+ * one: enough to be found, and not a light that blinks at you for the whole
+ * visit. The ring lives on `::after`, because the button's own `filter` would
+ * otherwise be what animates and the mark itself would throb.
+ */
+.pagehelp-open::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--beacon);
+  opacity: 0;
+  pointer-events: none;
+  animation: beacon-ping 2.4s ease-out 0.8s 5;
+}
+
+@keyframes beacon-ping {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.85);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagehelp-open::after {
+    animation: none;
+  }
 }
 
 .pagehelp-open:hover,
 .pagehelp-open:focus-visible {
   background-image: url('/shell/info-button-highlight.png');
   opacity: 1;
+  filter: drop-shadow(0 0 0.7rem var(--beacon));
   transform: translateY(-2px);
 }
 
