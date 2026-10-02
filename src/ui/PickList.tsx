@@ -232,6 +232,9 @@ function Rows({
            * a duo row is green, which is a second reading of the same fact the
            * frame gives. */
           style={one.rarity ? ({ '--plate': `url(/${PLATE[one.rarity]})` } as React.CSSProperties) : undefined}
+          /* The same fact for the plain skin, which draws the plate in CSS and
+           * cannot read a colour out of a picture. */
+          data-rarity={one.rarity?.toLowerCase()}
         >
           <Face option={one} />
           <span className="picklist-row-text">

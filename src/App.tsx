@@ -64,6 +64,7 @@ import { Standing } from './ui/Standing.tsx'
 import { FRAMES, applyFrame, readFrame, writeFrame } from './ui/frames.ts'
 import { applyTheme, readTheme, readWallpapers, writeTheme, writeWallpapers } from './ui/theme.ts'
 import { applyNav, readNav } from './ui/nav.ts'
+import { applySkin, readSkin } from './ui/skin.ts'
 import type { View } from './ui/nav.ts'
 import { useRun } from './state/run.ts'
 import type { RunContext } from './data/types.ts'
@@ -103,6 +104,10 @@ export function App() {
   // Pop-out or pinned pane, on a desktop. `nav.ts` explains why the CSS
   // ignores it below 60rem rather than this having to.
   useEffect(() => applyNav(readNav()), [])
+
+  // The game's chrome or plain CSS. Settings flips it and applies it there,
+  // so this is only the reload. `skin.ts` says what it changes.
+  useEffect(() => applySkin(readSkin()), [])
 
   /**
    * The re-entry card.
@@ -391,6 +396,9 @@ export function App() {
     setTheme(readTheme())
     setWallpapers(readWallpapers())
     setRing(readFrame())
+    // Not held in state, because nothing here draws differently for it: the
+    // attribute is the whole of it.
+    applySkin(readSkin())
   })
 
   useEffect(() => {

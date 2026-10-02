@@ -60,6 +60,11 @@
   --rarity-rare: rgb(0 138 255);
   --rarity-epic: rgb(157 18 255);
   --rarity-heroic: rgb(248 96 89);
+  /* The two the frame art carried alone until the plain skin needed them as
+   * colours. `BoonPatchDuo` and `BoonPatchLegendary`, ColorData.lua:216 and
+   * :218. `BoonPatchPerfect` at :219 is the Duo colour again. */
+  --rarity-duo: rgb(210 255 97);
+  --rarity-legendary: rgb(255 144 0);
 
   /* ---------------------------------------------------------------
    * THE LIVING LIGHT. Jade here, because the default theme is Unseen and

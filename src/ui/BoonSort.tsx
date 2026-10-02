@@ -523,6 +523,7 @@ function Rows({
           disabled={!!row.blocked}
           className={`bsort-row${row.blocked ? ' is-blocked' : ''}`}
           style={{ '--plate': `url(/${PLATE[row.rarity]})` } as React.CSSProperties}
+          data-rarity={row.rarity.toLowerCase()}
           title={row.blocked ?? `Add ${row.name} to ${where}, or drag it to either tray`}
           onClick={() => onMove(row.id, aim)}
           draggable={!row.blocked}
@@ -625,6 +626,7 @@ function TrayBox({
                 key={id}
                 className="bsort-chip"
                 style={{ '--plate': `url(/${PLATE[rarity]})` } as React.CSSProperties}
+                data-rarity={rarity.toLowerCase()}
                 draggable
                 onDragStart={(event) => {
                   event.dataTransfer.setData('text/plain', id)

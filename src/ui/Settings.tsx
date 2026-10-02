@@ -32,6 +32,7 @@ import {
 import type { Manifest } from '../state/transfer.ts'
 import { NAME_LIMIT, readName, writeName } from '../state/identity.ts'
 import { loadPrefs, savePrefs } from '../state/prefs.ts'
+import { applySkin, readSkin, writeSkin } from './skin.ts'
 
 /** What a file says it holds, once one has been chosen but not yet applied. */
 type Pending = { manifest: Manifest; text: string } | { error: string } | null
@@ -44,6 +45,7 @@ export function Settings() {
 
   const [name, setName] = useState(readName)
   const [reportRuns, setReportRuns] = useState(() => loadPrefs().reportRuns)
+  const [skin, setSkin] = useState(readSkin)
 
   const since = daysSince(lastExport)
   const held = describe(collect())
@@ -142,6 +144,31 @@ export function Settings() {
         * were reading the question it is asking. */}
       <div className="setting-grid">
         <div className="setting-col">
+          {/* Here rather than beside the thing it changes, because it changes
+            * everything: the buttons on this very screen redraw the moment it
+            * is flipped, so the result is in front of you either way. */}
+          <section className="setting-block" data-tour="setting-skin">
+            <h3 className="arcana-rule">How it is drawn</h3>
+            <p className="setting-say">
+              Buttons, tabs, panels and trays are the game&rsquo;s own art. Plain draws them in
+              the browser instead, in your theme&rsquo;s colours. Boon icons, portraits and the
+              characters are the same either way.
+            </p>
+            <label className="setting-switch">
+              <input
+                type="checkbox"
+                checked={skin === 'plain'}
+                onChange={(event) => {
+                  const next = event.target.checked ? 'plain' : 'game'
+                  setSkin(next)
+                  applySkin(next)
+                  writeSkin(next)
+                }}
+              />
+              <span>Plain interface</span>
+            </label>
+          </section>
+
           <section className="setting-block">
             <h3 className="arcana-rule">Your name</h3>
             <p className="setting-say">

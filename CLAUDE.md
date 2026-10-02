@@ -226,6 +226,14 @@ the play experience cannot see.
   `/api/g/<id>` returned to `learnMentioned` before drawing a word, so no mention inside it asks
   `/api/b/<id>`. Draw a guide's text any other way and every build mention spends a read from
   the address's budget. `GuideReader.test.tsx` counts the requests
+- **Write `border-image-source: none`, never `border-image: none`.** The build's minifier emits
+  the shorthand as `border-image:` with nothing after it, and the browser drops the declaration.
+  It hid a real bug for weeks: an empty `.radial-caption` went on drawing its frame. Found on
+  2 October 2026 by reading `dist/`; `src/ui/skin.test.ts` fails on the shorthand in any stylesheet
+- **The plain skin (`data-skin="plain"`, `src/ui/plain.css`) answers every rule that draws the
+  game's chrome art**, and `skin.test.ts` fails on a new chrome rule with no counterpart. A
+  nine-sliced plate keeps its thick transparent border in plain, so an inset `box-shadow` lands
+  a rem inside its edge: the edge there is an `outline` with `outline-offset: -1px`
 - **`loadPrefs` names every field it keeps, and drops the rest.** A field added to `Prefs` and
   not to `loadPrefs` is saved faithfully and gone by the next read. `guideSide` shipped that way
   and was caught in the running app, not by a test; `src/state/prefs.test.ts` holds it now
