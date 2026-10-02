@@ -136,6 +136,19 @@
   --rim-magenta: #c96aa8;
   --rim-cyan: #5ad4d4;
 
+  /* ---------------------------------------------------------------
+   * THE BEACON. One thing on every screen has to be found by somebody who
+   * has never been here: the help mark. It was the game's info button at
+   * 45 percent, in the theme's own light, and the owner could not see it.
+   *
+   * So it takes the colour furthest from the theme it sits in. Orange
+   * against Unseen's jade, blue against Olympian's gold, violet against
+   * Infernal's orange, gold against Cthonic's violet. A judgement, not a
+   * sample, and nothing else may borrow it: a second beacon would make
+   * neither of them one.
+   * ------------------------------------------------------------- */
+  --beacon: #f0a04b;
+
   /* TEXT. */
   --bone: #ede7da;
   --bone-dim: #a8b3ae;
@@ -249,6 +262,7 @@
   --on-plate: #ede7da;
   --metal: #a0d0d0;
   --art-hue: 0deg;
+  --beacon: #f0a04b;
 }
 
 [data-theme='olympian'] {
@@ -270,6 +284,7 @@
   --on-plate: #151810;
   --metal: #d8c060;
   --art-hue: -140deg;
+  --beacon: #7fb3f2;
 }
 
 [data-theme='infernal'] {
@@ -291,6 +306,7 @@
   --on-plate: #ede7da;
   --metal: #c8834a;
   --art-hue: -162deg;
+  --beacon: #b98cf2;
 }
 
 [data-theme='cthonic'] {
@@ -312,4 +328,5 @@
   --on-plate: #ede7da;
   --metal: #d3b969;
   --art-hue: 96deg;
+  --beacon: #e3c56a;
 }

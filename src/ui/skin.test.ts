@@ -89,15 +89,19 @@ describe('each look', () => {
  * The selectors of every rule that draws chrome art, from one stylesheet.
  *
  * Chrome is the game's interface art: `shell/`, the name plates in `frames/`
- * and the Arcana highlights. Icons are not chrome, and the two sync glyphs in
- * `shell/` are icons in a stylesheet rather than furniture, so they stay.
+ * and the Arcana highlights. Some of `shell/` is not furniture and every look
+ * keeps it: the two sync glyphs and the help mark are icons, and the sorcery
+ * circle behind a radial is flavour. The owner caught the first CSS look
+ * drawing those over, so they are named here rather than answered.
  */
+const KEPT = /(cloudsuccess|cloudfail|info-button|info-button-highlight|sorcery-circle)\.png/
+
 const chromeSelectors = (css: string): string[] => {
   const out: string[] = []
   const rule = /([^{}]+)\{([^{}]*)\}/g
   for (const [, head, body] of css.matchAll(rule)) {
     if (!/url\(['"]?\/(shell|frames\/plate-|arcana)\//.test(body!)) continue
-    if (/cloud(success|fail)\.png/.test(body!)) continue
+    if (KEPT.test(body!)) continue
     const selectors = head!
       .split(',')
       .map((one) => one.trim().replace(/\s+/g, ' '))
@@ -141,6 +145,14 @@ describe('what the minifier does to a shorthand', () => {
       expect(read(name)).not.toMatch(/border-image:\s*none/)
     },
   )
+})
+
+describe('what every look keeps', () => {
+  it('leaves the sigil, the bubble rings and the help mark to the game’s art', () => {
+    for (const selector of ['.radial-ring-area::before', '.radial-ring li::after', '.pagehelp-open', '.topbar-frame']) {
+      expect(answered.has(selector), `skins.css redraws ${selector}`).toBe(false)
+    }
+  })
 })
 
 describe('the chrome that is an image in the markup', () => {
