@@ -102,9 +102,11 @@ export function Menu({
    * for the screen you are on is showing.
    */
   const [fold, setFold] = useState<View | null>(() => bundleOf(view)?.home ?? null)
+  /* Follows the page: arriving in a family opens its fold, and leaving for a
+   * screen outside every family closes it, so a fold opened on the Intro does
+   * not stay open over Builds. */
   useEffect(() => {
-    const home = bundleOf(view)?.home
-    if (home) setFold(home)
+    setFold(bundleOf(view)?.home ?? null)
   }, [view])
 
   /**
