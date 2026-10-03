@@ -34,9 +34,9 @@
   // tool answers on and only one origin holding a session cookie.
   "routes": [{ "pattern": "enodia.me", "custom_domain": true }],
 
-  // Kept as a fallback while the domain settles. Worth turning off once
-  // enodia.me is serving, so the tool has one address rather than two.
-  "workers_dev": true,
+  // Off since 3 October 2026. It was a fallback while the domain settled, and
+  // enodia.me has served since 2 September, so the tool has one address.
+  "workers_dev": false,
 
   "assets": {
     "directory": "./dist",
