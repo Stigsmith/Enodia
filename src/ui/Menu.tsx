@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { PANE_QUERY, applyNav, readNav, writeNav } from './nav.ts'
 import type { View } from './nav.ts'
-import { bundleOf } from './ScreenTabs.tsx'
+import { BUNDLES, bundleOf } from './ScreenTabs.tsx'
 
 
 /**
@@ -56,6 +56,17 @@ type Entry = {
    * different facts and the row needs both.
    */
   unbuilt?: boolean
+  /**
+   * A row that folds open onto these rather than going anywhere itself.
+   *
+   * The owner, 3 October 2026: the members of a family had gone to tabs at the
+   * top of the screen the row opened, and nobody could see from the menu that
+   * Under the hood or the Roadmap existed. So the row is a fold again: press
+   * it and its members drop open underneath, each going to its own screen.
+   */
+  fold?: Entry[]
+  /** the family a fold opens, which is what says whether it is open */
+  home?: View
 }
 
 export function Menu({
@@ -84,6 +95,17 @@ export function Menu({
     return () => query.removeEventListener('change', sync)
   }, [])
   const panel = useRef<HTMLDivElement>(null)
+
+  /**
+   * Which fold is open, by its home view. One at a time, so the menu never
+   * grows past a screen, and it starts on the family you are in so the row
+   * for the screen you are on is showing.
+   */
+  const [fold, setFold] = useState<View | null>(() => bundleOf(view)?.home ?? null)
+  useEffect(() => {
+    const home = bundleOf(view)?.home
+    if (home) setFold(home)
+  }, [view])
 
   /**
    * Pinned open, so nothing that closes a pop-out applies: not a click outside
@@ -148,7 +170,19 @@ export function Menu({
   }
   const inFamily = (home: View) => view === home || bundleOf(view)?.home === home
 
-  const groups: { title: string; entries: Entry[] }[] = [
+  /** A family's row, folding open onto one row per member. */
+  const family = (home: View): Entry => {
+    const bundle = BUNDLES.find((one) => one.home === home)
+    return {
+      label: bundle?.label ?? home,
+      home,
+      here: inFamily(home),
+      action: () => setFold((was) => (was === home ? null : home)),
+      fold: (bundle?.tabs ?? []).map((tab) => ({ label: tab.label, here: view === tab.id, action: go(tab.id) })),
+    }
+  }
+
+  const groups: { title: string; entries: Entry[]; foot?: boolean }[] = [
     {
       title: '',
       entries: [
@@ -156,8 +190,8 @@ export function Menu({
         { label: 'Builds', here: view === 'builds', action: go('builds') },
         { label: 'Guides', here: view === 'guides', action: go('guides') },
         { label: 'Arcana', here: view === 'arcana', action: go('arcana') },
-        /* The records, and Under the hood on the tab beside them. */
-        { label: 'Wiki', here: inFamily('wiki'), action: go('wiki') },
+        /* The records, and Under the hood. */
+        family('wiki'),
       ],
     },
     {
@@ -207,13 +241,16 @@ export function Menu({
      */
     {
       title: '',
+      /* Settings and About sit at the foot of a pinned pane, out of the way
+       * of the places you go. */
+      foot: true,
       entries: [
         /* General, and Appearance: the theme, its wallpaper, and how the
          * buttons are drawn. */
-        { label: 'Settings', here: inFamily('settings'), action: go('settings') },
-        /* How it works, what is new, what is coming, and About, which is the
-         * landing page once it has been seen. */
-        { label: 'Help', here: inFamily('help'), action: go('help') },
+        family('settings'),
+        /* How it works, the Changelog, the Roadmap, and the Intro, which is
+         * the landing page once it has been seen. */
+        family('help'),
       ],
     },
   ]
@@ -258,24 +295,28 @@ export function Menu({
             </button>
           ) : null}
           {groups.map((group, at) => (
-            <section key={at}>
+            <section key={at} className={group.foot ? 'menu-foot' : undefined}>
               {/* A group with no title is set apart by its gap alone. */}
               {group.title ? <h2>{group.title}</h2> : null}
               <ul>
-                {group.entries.map((entry) => (
+                {group.entries.map((entry) => {
+                  const folded = entry.home ? fold !== entry.home : false
+                  return (
                   <li key={entry.label}>
                     <button
                       type="button"
                       role="menuitem"
                       /* Where you already are, which a pinned pane has to say
-                         because it is on screen the whole time. */
-                      aria-current={entry.here ? 'page' : undefined}
+                         because it is on screen the whole time. A fold is
+                         never the page itself, only the family it is in. */
+                      aria-current={entry.here && !entry.fold ? 'page' : undefined}
+                      aria-expanded={entry.fold ? !folded : undefined}
                       /* The mark beside an unbuilt entry is a glyph drawn by
                          CSS, so it says nothing to a screen reader and nothing
                          on hover. It used to read "not built" in words. This is
                          where those words went. */
                       title={entry.unbuilt ? 'Not built yet' : undefined}
-                      className={`${entry.unbuilt ? 'is-unbuilt' : ''}${entry.here ? ' is-here' : ''}`}
+                      className={`${entry.unbuilt ? 'is-unbuilt' : ''}${entry.here && !(entry.fold && !folded) ? ' is-here' : ''}${entry.fold ? ' menu-fold' : ''}`}
                       onClick={entry.action}
                       disabled={!entry.action}
                     >
@@ -284,10 +325,29 @@ export function Menu({
                           <img className="menu-entry-icon" src={`/${entry.icon}`} alt="" />
                         ) : null}
                         {entry.label}
+                        {entry.fold ? <span className="menu-chevron" aria-hidden="true" /> : null}
                       </span>
                     </button>
+                    {entry.fold && !folded ? (
+                      <ul className="menu-sub">
+                        {entry.fold.map((sub) => (
+                          <li key={sub.label}>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className={`menu-subrow${sub.here ? ' is-here' : ''}`}
+                              aria-current={sub.here ? 'page' : undefined}
+                              onClick={sub.action}
+                            >
+                              <span className="menu-label">{sub.label}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </section>
           ))}

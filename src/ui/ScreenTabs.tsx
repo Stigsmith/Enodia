@@ -27,12 +27,14 @@ export type Bundle = {
 export const BUNDLES: Bundle[] = [
   {
     home: 'help',
-    label: 'Help',
+    /* About, with the Intro under it: the owner's names, 3 October 2026. The
+     * Intro is the landing page, which used to be the row called About. */
+    label: 'About',
     tabs: [
       { id: 'help', label: 'How it works' },
-      { id: 'changelog', label: 'What’s new' },
-      { id: 'roadmap', label: 'What’s coming' },
-      { id: 'landing', label: 'About' },
+      { id: 'changelog', label: 'Changelog' },
+      { id: 'roadmap', label: 'Roadmap' },
+      { id: 'landing', label: 'Intro' },
     ],
   },
   {

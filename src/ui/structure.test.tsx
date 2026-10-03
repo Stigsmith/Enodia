@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Menu } from './Menu.tsx'
 import { Changelog, Roadmap, UnderHood } from './Pages.tsx'
 import { Help } from './Reference.tsx'
-import { BUNDLES, bundleOf } from './ScreenTabs.tsx'
+import { BUNDLES } from './ScreenTabs.tsx'
 import type { View } from './nav.ts'
 
 /** A narrow window, so the menu is the pop-out and Dora stays off the Roadmap. */
@@ -36,36 +36,65 @@ beforeEach(() => {
 
 afterEach(cleanup)
 
-/** Every screen the menu reaches, one press of each row. */
-function menuReaches(hasRun: boolean): { rows: string[]; reached: View[] } {
+/**
+ * Every screen the menu reaches: one press of each row, and for a row that
+ * folds open, one press of each member it shows.
+ */
+function menuReaches(hasRun: boolean): { rows: string[]; folds: Record<string, string[]>; reached: View[] } {
   const onGo = vi.fn<(view: View) => void>()
   render(<Menu view="builds" hasRun={hasRun} onGo={onGo} onEndRun={() => undefined} />)
-  fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
-  const rows = screen.getAllByRole('menuitem')
-  const labels = rows.map((row) => row.textContent ?? '')
-  for (const row of rows) {
+  const reopen = () => {
     if (!screen.queryByRole('menu')) fireEvent.click(screen.getByRole('button', { name: 'Menu' }))
-    fireEvent.click(screen.getByRole('menuitem', { name: row.textContent ?? '' }))
   }
-  return { rows: labels, reached: onGo.mock.calls.map(([view]) => view) }
+  reopen()
+  const labels = screen.getAllByRole('menuitem').map((row) => row.textContent ?? '')
+  const folds: Record<string, string[]> = {}
+  for (const label of labels) {
+    reopen()
+    const row = screen.getByRole('menuitem', { name: label })
+    fireEvent.click(row)
+    if (row.getAttribute('aria-expanded') !== 'true') continue
+    const members = [...row.parentElement!.querySelectorAll('.menu-sub [role=menuitem]')].map((one) => one.textContent ?? '')
+    folds[label] = members
+    for (const member of members) {
+      reopen()
+      if (screen.getByRole('menuitem', { name: label }).getAttribute('aria-expanded') !== 'true') {
+        fireEvent.click(screen.getByRole('menuitem', { name: label }))
+      }
+      fireEvent.click(screen.getByRole('menuitem', { name: member }))
+    }
+  }
+  return { rows: labels, folds, reached: onGo.mock.calls.map(([view]) => view) }
 }
 
 describe('the menu', () => {
   it('is seven rows with no run, which is the length the owner asked for', () => {
     const { rows } = menuReaches(false)
-    expect(rows).toEqual(['Builds', 'Guides', 'Arcana', 'Wiki', 'Start a run', 'Settings', 'Help'])
+    expect(rows).toEqual(['Builds', 'Guides', 'Arcana', 'Wiki', 'Start a run', 'Settings', 'About'])
   })
 
   /**
-   * Every screen a reader could reach before is one press of a row, or one
-   * press of a row and then one tab. Account and Friends are in the corner
-   * control, the run is the run, and the three unbuilt rooms are on the
-   * Roadmap, so none of those is asked of the menu.
+   * The owner, 3 October 2026: a family's row folds open onto its members, so
+   * the menu lists every page again without being sixteen rows long.
    */
-  it('still reaches every screen, through a row or the tabs of one', () => {
+  it('folds Wiki, Settings and About open onto their members', () => {
+    const { folds } = menuReaches(false)
+    expect(folds).toEqual({
+      Wiki: ['Records', 'Under the hood'],
+      Settings: ['General', 'Appearance'],
+      About: ['How it works', 'Changelog', 'Roadmap', 'Intro'],
+    })
+  })
+
+  /**
+   * Every screen a reader could reach before is one press of a row, or a row
+   * and then one of its members, from the menu alone. Account and Friends are
+   * in the corner control, the run is the run, and the three unbuilt rooms
+   * are on the Roadmap, so none of those is asked of the menu.
+   */
+  it('still reaches every screen from the menu alone', () => {
     const { reached } = menuReaches(false)
-    const viaTabs = reached.flatMap((view) => bundleOf(view)?.tabs.map((tab) => tab.id) ?? [])
-    const all = new Set<View>([...reached, ...viaTabs])
+    const all = new Set<View>(reached)
     for (const view of [
       'builds',
       'guides',

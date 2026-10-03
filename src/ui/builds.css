@@ -4044,7 +4044,9 @@ button.mark {
  * ========================================================================= */
 
 .settings {
-  max-width: 46rem;
+  /* Wide on a desktop, which the owner asked for on 3 October 2026: at 74rem a
+     1440 screen kept a quarter of its width as empty sides. */
+  max-width: 92rem;
   margin: 0 auto;
   padding: 1rem 1rem 4rem;
 }
@@ -4100,17 +4102,29 @@ button.mark {
 .setting-stat.is-off strong { color: var(--bone-faint); }
 
 /**
- * Two columns of blocks above 78rem, and the split is written into the markup
+ * Two columns of blocks wherever two fit, and the split is written into the markup
  * rather than balanced by the browser. `Settings.tsx` says why: the import
  * block grows a confirmation panel, and a balanced flow would move the other
  * blocks between columns while that question was on screen.
  *
  * `align-items: start` so the shorter column does not stretch its last block
  * down to meet the taller one.
+ *
+ * **Measured from the space it has, not the window.** It was a 78rem media
+ * query, so a pinned menu took 200px and the page stayed one narrow column
+ * with room on both sides. `auto-fit` over the two columns asks the grid
+ * itself.
+ *
+ * **The margin is what keeps it off the readout.** There was none, so the
+ * stats ended on the exact pixel the first block began, and every look that
+ * draws an outline or a ring past its box drew it over the other.
  */
 .setting-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  align-items: start;
   gap: 1.6rem;
+  margin-top: 1.6rem;
 }
 
 .setting-col {
@@ -4119,14 +4133,6 @@ button.mark {
   align-content: start;
 }
 
-@media (min-width: 78rem) {
-  .settings { max-width: 74rem; }
-
-  .setting-grid {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
 
 .setting-block {
   display: grid;
@@ -4797,7 +4803,7 @@ button.mark {
 }
 
 /* Two borders and a rotation: pointing right when closed, down when open. */
-.log-title::before {
+.log-version::before {
   content: '';
   display: inline-block;
   width: 0.4rem;
@@ -4809,20 +4815,59 @@ button.mark {
   transition: transform 0.15s ease;
 }
 
-.log-fold[open] .log-title::before {
+.log-fold[open] .log-version::before {
   transform: translateY(-0.2rem) rotate(45deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .log-title::before { transition: none; }
+  .log-version::before { transition: none; }
 }
 
-.log-say {
-  margin: 0 0 0.3rem;
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: var(--bone);
-  text-wrap: pretty;
+/* The version, a stamp in front of the title in the same mono as the date. */
+.log-version {
+  flex: 0 0 auto;
+  min-width: 4.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--lit-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.log-head:hover .log-version,
+.log-head:focus-visible .log-version,
+.log-fold[open] .log-version { color: var(--lit); }
+
+/**
+ * Across the width on a desktop, which the owner asked for on 3 October 2026.
+ *
+ * Closed releases sit two to a row, newest at the top left, so the list is
+ * half as long. The open one takes the whole row and lays its points out in
+ * two columns, so a release reads across the page rather than down a strip of
+ * it. `.page.is-broad` only widens above 78rem, so this starts at the same
+ * width and a phone keeps the single column.
+ */
+@media (min-width: 78rem) {
+  .log {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 3rem;
+    align-items: start;
+  }
+
+  .log-entry:has(> .log-fold[open]) {
+    grid-column: 1 / -1;
+  }
+
+  .log-fold[open] .log-points {
+    display: block;
+    columns: 2;
+    column-gap: 3rem;
+  }
+
+  .log-fold[open] .log-points li {
+    break-inside: avoid;
+    margin-bottom: 0.4rem;
+  }
 }
 
 .log-points {
