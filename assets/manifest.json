@@ -1,10 +1,10 @@
 {
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1038,
+ "count": 1059,
  "categories": [
   {
    "name": "arcana",
@@ -106,6 +106,11 @@
   {
    "name": "keepsakes",
    "count": 33,
+   "source": "wiki"
+  },
+  {
+   "name": "portraits",
+   "count": 21,
    "source": "wiki"
   },
   {
@@ -8156,6 +8161,195 @@
    "file": "keepsakes/yarn-of-ariadne.webp",
    "bytes": 8970,
    "sha256": "0e5ccf245cc5c88b01a6db082ed7e503145cb3993ea9349df79a4f6c3934c7fd",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "aphrodite",
+   "category": "portraits",
+   "file": "portraits/aphrodite.webp",
+   "bytes": 34024,
+   "sha256": "3ec435a22dfd56690c4473bd90e4df786154d62bc1d667f3a0bf6ff2fbf2e1d7",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "apollo",
+   "category": "portraits",
+   "file": "portraits/apollo.webp",
+   "bytes": 33694,
+   "sha256": "a8fe1f1f024a446644c0159b7cd47d41420613b0fa9d0f8bc351eda822725475",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "ares",
+   "category": "portraits",
+   "file": "portraits/ares.webp",
+   "bytes": 23980,
+   "sha256": "8832bd815a39173e6cc79824f0deeef3822e9c399b77ca1a3de7b3c5a9c67193",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "artemis",
+   "category": "portraits",
+   "file": "portraits/artemis.webp",
+   "bytes": 20572,
+   "sha256": "550709a788243b5a8547eefaf6a1fd213d21bf042d938b94fc363ac49424b33f",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "athena",
+   "category": "portraits",
+   "file": "portraits/athena.webp",
+   "bytes": 26234,
+   "sha256": "6cf6f3ffc0711730a9c08a6470d93798389c6f17d115096c08e052d1cd0f9571",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "chaos",
+   "category": "portraits",
+   "file": "portraits/chaos.webp",
+   "bytes": 24304,
+   "sha256": "f2cdeb565109753a0303914f5ced35bcf9fb0127c2fa226a653df32ee68e2105",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "circe",
+   "category": "portraits",
+   "file": "portraits/circe.webp",
+   "bytes": 21120,
+   "sha256": "c083aa96792baaa3c4b5c1b1dc182e875a7bc21cedc470205d594b7de636f812",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "demeter",
+   "category": "portraits",
+   "file": "portraits/demeter.webp",
+   "bytes": 31714,
+   "sha256": "b5941861ed1afdddcd03bc05fc48cfb191b68a2e3f1f27cbbf983686cb7a9e87",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "dionysus",
+   "category": "portraits",
+   "file": "portraits/dionysus.webp",
+   "bytes": 21572,
+   "sha256": "65fd239dcf0ceaea1509fb7a716f0f203d01321356f1be0dc375e30333ac6f5a",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "echo",
+   "category": "portraits",
+   "file": "portraits/echo.webp",
+   "bytes": 24032,
+   "sha256": "a0dd8a147abb5913e6b955db2fa833cde321ad13c0e7e35dc52ce4ec3765dc4c",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hades",
+   "category": "portraits",
+   "file": "portraits/hades.webp",
+   "bytes": 23966,
+   "sha256": "6bd0d8b5376ebb8756c92f0d2e41f176ea0f0e2f0aa8c0d8dbe53012ec6cd568",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hephaestus",
+   "category": "portraits",
+   "file": "portraits/hephaestus.webp",
+   "bytes": 25694,
+   "sha256": "f656d93a07648017d7055acbbb0995da5764ab284af94ca0fdbeae0c04b5f53e",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hera",
+   "category": "portraits",
+   "file": "portraits/hera.webp",
+   "bytes": 26684,
+   "sha256": "b171645a2b12b03acf9e8e69ca2571a97b77efdf433a4446e4b110788bdb07d7",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hermes",
+   "category": "portraits",
+   "file": "portraits/hermes.webp",
+   "bytes": 27156,
+   "sha256": "22c2558f3cf5aaac9e582f20eea4e8a725e6f0c083b78b6bcf723f84c147d4e0",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "hestia",
+   "category": "portraits",
+   "file": "portraits/hestia.webp",
+   "bytes": 24470,
+   "sha256": "58f68a4d5eaff991d3d392948c61becf8f260786560e873e0fd85dbfcc58e11e",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "icarus",
+   "category": "portraits",
+   "file": "portraits/icarus.webp",
+   "bytes": 21140,
+   "sha256": "0161bee50f61c08530bf3857718310302e962663c64d11b75fbc523c5f5c1422",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "medea",
+   "category": "portraits",
+   "file": "portraits/medea.webp",
+   "bytes": 19832,
+   "sha256": "27c5ff8f9e291a1ce3d8a1bea3774d2b3fc0f171e1fb572a9792cd0bbaa89b97",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "narcissus",
+   "category": "portraits",
+   "file": "portraits/narcissus.webp",
+   "bytes": 28026,
+   "sha256": "9bfcca972cc088961bd3a97b9ad7e18aca6d4139f6d3222c6b3a9c8521770864",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "poseidon",
+   "category": "portraits",
+   "file": "portraits/poseidon.webp",
+   "bytes": 31446,
+   "sha256": "fb523f6f23b73f52efa325bec740dd94c9cfbeeb7b85ea74b8ed0cf48386076e",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "selene",
+   "category": "portraits",
+   "file": "portraits/selene.webp",
+   "bytes": 34968,
+   "sha256": "62ca0e0d4597b2d45dbc446586cf71ccb1bd874ff22ec59b9b8065949dd7ad6b",
+   "source": "wiki",
+   "needsProvenance": true
+  },
+  {
+   "id": "zeus",
+   "category": "portraits",
+   "file": "portraits/zeus.webp",
+   "bytes": 30400,
+   "sha256": "b9cb7bb14e3a2e5f3efd557e901c3febf4c394ad38a088dedcb902ff435349d3",
    "source": "wiki",
    "needsProvenance": true
   },

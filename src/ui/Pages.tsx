@@ -88,11 +88,12 @@ export function Changelog() {
   return (
     <Page
       title="Changelog"
-      standfirst="What has changed in the app, newest first. The latest batch is open, and the rest open when you want them."
+      standfirst="What has changed in the app, newest first. The latest release is open, and the rest open when you want them."
+      measure="broad"
     >
       <ol className="log" data-tour="changelog-log">
         {CHANGELOG.map((release, at) => (
-          <li key={`${release.date}-${release.title}`} className="log-entry">
+          <li key={release.version} className="log-entry">
             {/* One open at a time, like every other fold: opening an older batch
               * closes the newest rather than stacking up under it. */}
             <details className="log-fold" name="changelog" open={at === 0}>
@@ -101,12 +102,12 @@ export function Changelog() {
                 * `<summary>` takes phrasing and heading content and a `<p>` is
                 * neither. */}
               <summary className="log-head">
+                <span className="log-version">{release.version}</span>
                 <h3 className="log-title">{release.title}</h3>
                 <span className="log-when">
                   <time dateTime={release.date}>{when(release.date)}</time>
                 </span>
               </summary>
-              <p className="log-say">{release.say}</p>
               <ul className="log-points">
                 {release.points.map((point) => (
                   <li key={point}>{point}</li>

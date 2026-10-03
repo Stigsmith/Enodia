@@ -64,24 +64,24 @@ const BANNER = {
   everything: 'banners/everything.webp',
 } as const
 
-/** A god's portrait, by the source id `sources` gives them. */
+/** A god's Codex portrait, cut by `scripts/portraits.ts`, by the source id `sources` gives them. */
 const GOD_ART: Record<string, string> = {
-  Aphrodite: 'gods/aphrodite.webp',
-  Apollo: 'gods/apollo.webp',
-  Ares: 'gods/ares.webp',
-  Demeter: 'gods/demeter.webp',
-  Hephaestus: 'gods/hephaestus.webp',
-  Hera: 'gods/hera.webp',
-  Hestia: 'gods/hestia.webp',
-  Poseidon: 'gods/poseidon.webp',
-  Zeus: 'gods/zeus.webp',
-  Hermes: 'gods/hermes.webp',
-  Chaos: 'gods/chaos.webp',
-  Selene: 'gods/selene.webp',
-  NPC_Artemis: 'gods/artemis.webp',
-  NPC_Athena: 'gods/athena.webp',
-  NPC_Dionysus: 'gods/dionysus.webp',
-  NPC_Hades: 'gods/hades.webp',
+  Aphrodite: 'portraits/aphrodite.webp',
+  Apollo: 'portraits/apollo.webp',
+  Ares: 'portraits/ares.webp',
+  Demeter: 'portraits/demeter.webp',
+  Hephaestus: 'portraits/hephaestus.webp',
+  Hera: 'portraits/hera.webp',
+  Hestia: 'portraits/hestia.webp',
+  Poseidon: 'portraits/poseidon.webp',
+  Zeus: 'portraits/zeus.webp',
+  Hermes: 'portraits/hermes.webp',
+  Chaos: 'portraits/chaos.webp',
+  Selene: 'portraits/selene.webp',
+  NPC_Artemis: 'portraits/artemis.webp',
+  NPC_Athena: 'portraits/athena.webp',
+  NPC_Dionysus: 'portraits/dionysus.webp',
+  NPC_Hades: 'portraits/hades.webp',
 }
 
 /** Each arm's full render, the art Setup's ring is drawn from. */
@@ -94,13 +94,13 @@ const ARM_ART: Record<string, string> = {
   WeaponSuit: 'weapons/coat.png',
 }
 
-/** The people who hand things out along the way, by family. */
+/** The people who hand things out along the way, by family. Codex portraits too. */
 const FAMILY_ART: Record<string, string> = {
-  circe: 'characters/circe.webp',
-  echo: 'characters/echo.webp',
-  icarus: 'characters/icarus.webp',
-  medea: 'characters/medea.webp',
-  narcissus: 'characters/narcissus.webp',
+  circe: 'portraits/circe.webp',
+  echo: 'portraits/echo.webp',
+  icarus: 'portraits/icarus.webp',
+  medea: 'portraits/medea.webp',
+  narcissus: 'portraits/narcissus.webp',
 }
 
 const slugOf = (title: string) =>

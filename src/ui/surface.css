@@ -1372,6 +1372,12 @@
   :root[data-nav='pane'] .app-view {
     min-width: 0;
   }
+
+  /* Settings and About at the foot of a pinned pane, below the places you go.
+   * The pane is a full-height column, so an auto margin is the whole job. */
+  :root[data-nav='pane'] .menu-panel > .menu-foot {
+    margin-top: auto;
+  }
 }
 
 /* Where you already are. A pinned pane is on screen the whole time, so it has
@@ -2235,6 +2241,78 @@
    * next time somebody adds an icon.
    */
   line-height: 1.35;
+}
+
+/**
+ * A row that folds open: Wiki, Settings and About.
+ *
+ * The row keeps its plate and gains a chevron that turns when it is open. Its
+ * members hang underneath as plain lines on a rule rather than plates of their
+ * own, so a fold reads as one row with its contents showing, not as five more
+ * rows of the same weight. The member you are on is lit, and the rule beside it.
+ */
+.menu-panel .menu-fold .menu-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.menu-chevron {
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-right: 0.15rem;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  opacity: 0.7;
+  transform: translateY(-0.12rem) rotate(45deg);
+  transition: transform 0.2s var(--e-response);
+}
+
+.menu-panel .menu-fold:not([aria-expanded='true']) .menu-chevron {
+  transform: rotate(-45deg);
+}
+
+.menu-panel .menu-sub {
+  margin: 0.2rem 0 0.35rem 0.9rem;
+  padding: 0;
+  border-left: 1px solid var(--div-3);
+}
+
+/* Specific enough to beat every look's row rule in skins.css, because a member
+ * is a line and not a plate in all four. */
+.menu-panel .menu-sub li > button.menu-subrow {
+  border: 0;
+  border-image-source: none;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  background: none;
+  margin-left: -1px;
+  padding: 0.32rem 0.5rem 0.32rem 0.75rem;
+  border-left: 1px solid transparent;
+}
+
+.menu-panel .menu-sub li > button.menu-subrow .menu-label {
+  font-size: 0.84rem;
+  color: var(--bone-dim);
+}
+
+.menu-panel .menu-sub li > button.menu-subrow:hover .menu-label,
+.menu-panel .menu-sub li > button.menu-subrow:focus-visible .menu-label {
+  color: var(--bone);
+}
+
+.menu-panel .menu-sub li > button.menu-subrow.is-here {
+  border-left-color: var(--lit);
+}
+
+.menu-panel .menu-sub li > button.menu-subrow.is-here .menu-label {
+  color: var(--lit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-chevron { transition: none; }
 }
 
 /* The frame and wallpaper swatches used to live in this menu and their rules

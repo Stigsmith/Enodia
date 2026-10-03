@@ -103,23 +103,25 @@
 
 .wiki-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
-  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  gap: 1rem;
   margin: 0.4rem 0 1.4rem;
   padding: 0;
   list-style: none;
 }
 
-/* Faces and weapons stand up, and want a narrower, taller tile. */
+/* Faces and weapons stand up, and want a narrower, taller tile. The faces are
+   the game's Codex portraits, 3 by 4 at twice this size, so the tile takes
+   their shape. */
 .wiki-tiles.is-tall {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
 }
 
 .wiki-tile {
   position: relative;
   isolation: isolate;
   display: block;
-  aspect-ratio: 12 / 5;
+  aspect-ratio: 2 / 1;
   overflow: hidden;
   border: 1px solid var(--div-3);
   border-radius: var(--r-card);
@@ -133,7 +135,7 @@
 }
 
 .is-tall .wiki-tile {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
 }
 
 /* The picture, a little dim at rest. */

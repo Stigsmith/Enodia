@@ -1,6 +1,6 @@
 {
   "name": "enodia",
-  "version": "0.0.0",
+  "version": "0.33.0",
   "private": true,
   "type": "module",
   "description": "In-run build companion for Hades II",
@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "assets": "node scripts/assets.ts",
     "banners": "node scripts/banners.ts",
+    "portraits": "node scripts/portraits.ts",
     "data": "node scripts/build-app-data.ts",
     "sprites": "node scripts/sprites.ts",
     "chrome": "node scripts/chrome.ts",
