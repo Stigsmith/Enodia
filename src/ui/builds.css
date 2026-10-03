@@ -3659,7 +3659,9 @@ button.mark {
  * ========================================================================= */
 
 .themes {
-  max-width: 78rem;
+  /* The same width as General beside it, `.settings`, so switching tabs does
+     not move the page's edges. */
+  max-width: 92rem;
   margin: 0 auto;
   padding: 1rem 1rem 4rem;
 }
@@ -3682,7 +3684,20 @@ button.mark {
   padding: 0;
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  /* One, two or four across, never three: four themes in three columns leaves
+     one on a row of its own. Asked of the page's own width, because a pinned
+     menu takes 200px the window still counts. */
+  grid-template-columns: 1fr;
+}
+
+.themes { container-type: inline-size; }
+
+@container (min-width: 34rem) {
+  .theme-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@container (min-width: 64rem) {
+  .theme-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 .theme-card {
@@ -4753,11 +4768,13 @@ button.mark {
  * browser's own triangle, which lands on the first line and takes no styling
  * worth having. The one below is drawn from two borders instead.
  */
+/* Three columns, version, title and date, so a long title wraps inside its own
+   column and never pushes the other two onto lines of their own. */
 .log-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: 4.6rem minmax(0, 1fr) auto;
   align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.2rem 0.7rem;
+  column-gap: 0.8rem;
   cursor: pointer;
   list-style: none;
 }
