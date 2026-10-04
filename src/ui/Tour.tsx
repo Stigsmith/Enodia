@@ -35,6 +35,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import type { Step } from './tour.ts'
+import { NectarLink } from './Nectar.tsx'
 
 /** Breathing space around the lit element, so the ring is not on its edge. */
 const HALO = 10
@@ -378,6 +379,14 @@ export function Tour({ steps, onClose }: { steps: Step[]; onClose: () => void })
             <img src="/shell/settings-arrow-right.png" alt="" aria-hidden="true" />
           </button>
         </div>
+
+        {/* The owner's ask, 4 October 2026: the last step of every tour ends
+          * on the Nectar. Only the last, and not while she is roaring. */}
+        {last && !roaring ? (
+          <div className="tour-nectar">
+            <NectarLink />
+          </div>
+        ) : null}
       </div>
     </div>
   )

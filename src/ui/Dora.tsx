@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { kofiUrl } from '../data/kofi.ts'
+import { NectarLink } from './Nectar.tsx'
 
 /**
  * Dora, in a hard hat, standing where a screen is not built yet.
@@ -432,10 +433,8 @@ export function DoraAsking() {
         </p>
         {url ? (
           <p className="dora-ask-do">
-            <a href={url} target="_blank" rel="noopener noreferrer">
-              Buy us a Nectar
-            </a>{' '}
-            if the tool has been any use. It stays free either way.
+            <NectarLink />
+            <span>If the tool has been any use. It stays free either way.</span>
           </p>
         ) : null}
       </div>
