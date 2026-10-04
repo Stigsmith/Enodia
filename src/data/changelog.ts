@@ -25,6 +25,16 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '0.35.0',
+    date: '2026-10-04',
+    title: 'A Nectar, if you are offering',
+    points: [
+      'Buy us a Nectar glows now, in the game’s own Nectar bottle.',
+      'Every help tour ends on it, and the bottle sits beside Sign in.',
+      'It is a plain link to Ko-fi. The tool stays free either way.',
+    ],
+  },
+  {
     version: '0.34.0',
     date: '2026-10-04',
     title: 'Guides are written in one rich field',

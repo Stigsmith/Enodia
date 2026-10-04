@@ -1,10 +1,10 @@
 {
- "generated": "2026-10-03",
+ "generated": "2026-10-04",
  "source": "hades.fandom.com saved-page archives, plus deppth2 extraction of the game packages",
  "generatedBy": "scripts/assets.ts, the only writer of this file",
  "gamePatch": "UNVERIFIED",
  "license": "Game art (c) Supergiant Games. Unofficial fan project, non-commercial, not affiliated with or endorsed by Supergiant Games.",
- "count": 1059,
+ "count": 1060,
  "categories": [
   {
    "name": "arcana",
@@ -95,7 +95,7 @@
   },
   {
    "name": "icons",
-   "count": 16,
+   "count": 17,
    "source": "game"
   },
   {
@@ -7675,6 +7675,14 @@
    "file": "icons/mystery.png",
    "bytes": 38554,
    "sha256": "6b511ee176899cf8012b938f38ff9fdb9545ff4b7ac66a46dcb04af1386bcf93",
+   "source": "game"
+  },
+  {
+   "id": "nectar",
+   "category": "icons",
+   "file": "icons/nectar.png",
+   "bytes": 7037,
+   "sha256": "c7da0a55fc217cebe95affe29ddd348fb91c2fd62b543ba6f6145ab0f3f9e117",
    "source": "game"
   },
   {

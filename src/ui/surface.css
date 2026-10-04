@@ -4846,3 +4846,88 @@
     padding: 0.3rem;
   }
 }
+
+/* ------------------------------------------------------------------ nectar --
+ * Buy us a Nectar, `Nectar.tsx`. The plate is `.quiet.is-call`, so it glows and
+ * pings the way every screen's main button does; this only seats the bottle in
+ * it. The corner bottle glows on its own, in the theme's light rather than the
+ * beacon, which `tokens.css` keeps for the help mark.
+ * ------------------------------------------------------------------------- */
+
+.nectar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nectar-bottle {
+  width: 1.45rem;
+  height: 1.45rem;
+  margin: -0.3rem 0;
+  object-fit: contain;
+}
+
+/* The landing's own link rule underlines every anchor in that line, and this
+   one is a plate, not a link in a sentence. */
+.dora-ask-do a.nectar {
+  color: var(--lit-hot);
+  text-decoration: none;
+}
+
+.dora-ask-do:has(.nectar) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+
+.tour-nectar {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.7rem;
+}
+
+/* The bottle beside Sign in. Round, so the glow follows the bottle. */
+.you {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nectar-mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 0.35rem color-mix(in oklab, var(--lit) 70%, transparent));
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+
+.nectar-mark img {
+  width: 1.75rem;
+  height: 1.75rem;
+  object-fit: contain;
+}
+
+.nectar-mark:hover,
+.nectar-mark:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 0.7rem var(--lit));
+  transform: translateY(-2px) rotate(-8deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nectar-mark {
+    transition: none;
+  }
+
+  .nectar-mark:hover,
+  .nectar-mark:focus-visible {
+    transform: none;
+  }
+}
