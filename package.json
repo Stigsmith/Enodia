@@ -1,6 +1,6 @@
 {
   "name": "enodia",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "private": true,
   "type": "module",
   "description": "In-run build companion for Hades II",
@@ -39,6 +39,15 @@
     "test:worker": "vitest run --config vitest.worker.config.ts"
   },
   "dependencies": {
+    "@tiptap/core": "3.31.4",
+    "@tiptap/extension-highlight": "3.31.4",
+    "@tiptap/extension-mention": "3.31.4",
+    "@tiptap/extension-table": "3.31.4",
+    "@tiptap/extensions": "3.31.4",
+    "@tiptap/pm": "3.31.4",
+    "@tiptap/react": "3.31.4",
+    "@tiptap/starter-kit": "3.31.4",
+    "@tiptap/suggestion": "3.31.4",
     "better-auth": "^1.7.2",
     "drizzle-orm": "^0.45.2",
     "react": "^19.2.8",

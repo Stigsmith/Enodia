@@ -341,11 +341,11 @@ export const TOURS: Record<string, Step[]> = {
       say: 'Title first. It is the only bit that is not optional, that and writing something somewhere.',
     },
     {
-      at: 'guide-add',
-      say: 'Four prompts, and four more of your own if you want them. Leave the ones you have nothing to say about. Empty ones are skipped when anybody reads it.',
+      at: 'guide-body',
+      say: 'One field, and it is all yours. Type a slash for headings, lists, tables, tips and spoilers. The buttons along the top do the rest.',
     },
     {
-      say: 'Type an at sign to name a boon, a card, or a build. Paste a build link and it turns into one. That is the part that does the clever thing later.',
+      say: 'Type an at sign to tag a boon, a god, a card or a build. Paste a build link and it turns into one. That is the part that does the clever thing later.',
     },
   ],
 

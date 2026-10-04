@@ -15,7 +15,7 @@ import { pieceOf } from './build-pieces.ts'
 import type { Piece } from './build-pieces.ts'
 import { parseProse } from './mentions.ts'
 import type { WikiAt } from './wiki-route.ts'
-import { MentionFace } from './ProseText.tsx'
+import { MentionFace, PlaceFace } from './ProseText.tsx'
 import { WikiLink } from './WikiLink.tsx'
 
 export function Prose({ text }: { text: string }) {
@@ -24,6 +24,7 @@ export function Prose({ text }: { text: string }) {
       {parseProse(text).map((bit, at) => {
         if (!('at' in bit)) return <Fragment key={at}>{bit.text}</Fragment>
         if (bit.at.kind === 'build') return <BuildMention key={at} id={bit.at.id} name={bit.name} linked />
+        if (bit.at.kind === 'place') return <PlaceMention key={at} id={bit.at.id} name={bit.name} />
         const piece = pieceOf(bit.at)
         return piece ? <Mention key={at} at={bit.at} piece={piece} /> : <Fragment key={at}>{bit.name}</Fragment>
       })}
@@ -31,7 +32,16 @@ export function Prose({ text }: { text: string }) {
   )
 }
 
-function Mention({ at, piece }: { at: NonNullable<WikiAt>; piece: Piece }) {
+/** A section of the wiki, linked to its page. No tooltip: a section is not one thing. */
+export function PlaceMention({ id, name }: { id: string; name: string }) {
+  return (
+    <WikiLink className="mention" at={{ kind: 'node', id }}>
+      <PlaceFace id={id} name={name} />
+    </WikiLink>
+  )
+}
+
+export function Mention({ at, piece }: { at: NonNullable<WikiAt>; piece: Piece }) {
   const peek = usePiecePeek(piece)
 
   /**

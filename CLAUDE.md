@@ -342,7 +342,9 @@ the play experience cannot see.
   Its banners are cut from Hades II art only by `npm run banners`; five of the theme
   wallpapers are from the first game and must not front this one
 - **A mention is `@[Name](t:Id)` inside plain text**, with `a:` for an Arcana card, `f:` for
-  a familiar and `b:` for a published build, whose id is its short id. `src/ui/mentions.ts`
+  a familiar, `b:` for a published build, whose id is its short id, and `w:` for a section of
+  the wiki, whose id is its path (`w:olympians/zeus`). **A god is tagged as a section**: no god
+  is a record, every god is a page. `src/ui/mentions.ts`
   parses it and `Prose` and `ProseText` draw it. The id is the
   meaning and the name only a fallback: a mention is drawn with the current display name,
   never the stored one, so it cannot relabel anything. **A build mention carries its verdict
@@ -355,6 +357,14 @@ the play experience cannot see.
   case writes How it works and If the run goes your way as words.** Eight mentions at the
   front of those two fields reach 2022 with boons and 2035 with builds, measured on 17
   September 2026. Four builds in the notes reach 1979 to 1998
+- **A guide's body is a tree, never HTML.** `src/state/rich.ts` is ProseMirror's JSON with a
+  whitelist: `clean` keeps the node types, marks and attributes it lists and drops the rest,
+  on the way out and on the way in, and `RichView.tsx` draws it with React. A link survives
+  only as `http` or `https` and goes out `nofollow ugc`. A mention there is a node with the
+  same three facts as the token. The editor, `RichEditor.tsx` on Tiptap, is lazily loaded, so
+  nobody who only reads downloads it. **Guides from before 4 October 2026 are sections**, and
+  `asGuide` converts them when they are read, from a payload or a draft; the seed guide is one
+  and `seed-guide.test.ts` reads it that way
 - **The Olympian damage table is traced out of each trait's own record**, in
   `scripts/olympian.ts`: a stat line reading a listed projectile (`ExtractValues` with
   `BaseType` `Projectile`), a function argument spawning one, or a `PropertyChanges` entry

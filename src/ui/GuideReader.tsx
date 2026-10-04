@@ -39,31 +39,17 @@ import {
   reportGuide,
   takeDownGuide,
   unpackGuide,
-  written,
 } from '../state/guides.ts'
 import type { GuideDoc, GuideRead } from '../state/guides.ts'
 import { ChangedProvider } from './BuildMention.tsx'
 import { useHelpTopic } from './PageHelp.tsx'
-import { Prose } from './Prose.tsx'
+import { RichView } from './RichView.tsx'
 
 /** As `MAX_REASON` in the worker, so the box stops where the route would refuse. */
 const MAX_REASON = 500
 
 const when = (at: number) =>
   new Date(at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
-
-/**
- * A blank line starts a paragraph, and that is the whole of the formatting.
- *
- * The field is a plain textarea for the reason `MentionField` gives: a rich
- * editor stores markup, and markup somebody else wrote has to be cleaned before
- * a stranger reads it. A blank line is what a person types anyway.
- */
-const paragraphs = (text: string): string[] =>
-  text
-    .split(/\n\s*\n/)
-    .map((one) => one.trim())
-    .filter(Boolean)
 
 export function GuideReader({
   id,
@@ -162,16 +148,7 @@ export function GuideReader({
           <Reader guide={guide} signedIn={signedIn} onChanged={onChanged} />
         )}
 
-        {written(doc).map((section, at) => (
-          <section className="guide-section" key={`${at}:${section.heading}`}>
-            <h3>{section.heading}</h3>
-            {paragraphs(section.text).map((para, index) => (
-              <p key={index}>
-                <Prose text={para} />
-              </p>
-            ))}
-          </section>
-        ))}
+        <RichView doc={doc.body} />
       </article>
     </ChangedProvider>
   )

@@ -3,23 +3,23 @@
  *
  * ## What a guide is
  *
- * A title and a few sections of plain text, with builds named inside the text
- * as `b:` mentions. Nothing else. The builds a guide is about are whatever it
- * names, in the order it names them, so there is no second list for anybody to
- * keep in step with the writing.
+ * A title and one body of rich text, `state/rich.ts`, with builds named inside
+ * it as mentions of kind `build`. Nothing else. The builds a guide is about
+ * are whatever it names, in the order it names them, so there is no second
+ * list for anybody to keep in step with the writing.
  *
  * **It does not have to be about a run.** The owner's list: how to play a
  * weapon, how to beat one boss, how to unlock an achievement, how to build the
- * stupidest thing that still works, how to run at maximum Fear. So the four
- * prompts below name no part of a run and assume no shape.
+ * stupidest thing that still works, how to run at maximum Fear. So the
+ * editor offers no outline and assumes no shape.
  *
- * ## The headings are stored, not looked up
+ * ## Guides from before the rich body
  *
- * A published guide keeps the headings it was written under, inside its
- * payload. `PROMPTS` is what a new guide starts with and what the editor
- * labels the first four fields with; it is not consulted when a guide is
- * drawn. So changing the wording here changes what the next guide starts with
- * and leaves every published guide saying what its author saw.
+ * Were four prompted sections and up to four more, `GuideSection`. The owner
+ * asked on 4 October 2026 for one field instead, headings of the author's own
+ * and a line from Dora in it until they start. Old guides are read as they
+ * always were: `asGuide` turns the sections into a body on the way in, from a
+ * payload or from a draft, and nothing else in the app sees the old shape.
  *
  * ## The payload is opaque to the server
  *
@@ -32,75 +32,37 @@
 import { fingerprint, shapeOf } from './exchange.ts'
 import { fetchMentioned, fromLibrary } from './mentioned.ts'
 import { packText, unpackText } from './transfer.ts'
-import { nameOfMention, parseProse } from '../ui/mentions.ts'
+import { nameOfMention } from '../ui/mentions.ts'
 import type { MentionAt } from '../ui/mentions.ts'
+import { MAX_RICH_TEXT, clean, emptyDoc, fromSections, hasWriting, mentionsIn, plainText, textLength } from './rich.ts'
+import type { RichNode } from './rich.ts'
 
-/** One section: the heading a reader sees, and what was written under it. */
+/** One section of a guide written before the rich body: a heading and plain text. */
 export type GuideSection = { heading: string; text: string }
 
-export type GuideDoc = { title: string; sections: GuideSection[] }
-
-/**
- * The four a guide starts with, in the owner's own words.
- *
- * The heading is what a reader sees. The hint is the rest of the prompt, shown
- * in the editor beside the field and never published: a heading reading "What
- * this is (and who it is for)" on every guide there is would be furniture, and
- * the parenthetical is a question to the author rather than a label on their
- * answer.
- *
- * An empty one is skipped when the guide is read, so a guide that is one long
- * section is written by filling in one field.
- */
-export const PROMPTS: readonly { heading: string; hint: string }[] = [
-  { heading: 'What this is', hint: 'and who it is for' },
-  { heading: 'What you need', hint: 'unlocks, Arcana, weapon, Fear, anything assumed' },
-  { heading: 'How it goes', hint: 'the guide itself' },
-  { heading: 'What to watch for', hint: 'mistakes, and what to do when it goes wrong' },
-]
-
-/**
- * Sections in all, the four prompts included, so an author gets four of their
- * own. The owner's number. Past this an outline is a table of contents and the
- * thing being written is a book.
- */
-export const MAX_SECTIONS = 8
-
-/** A long section, and the number `worker/guides.ts` sized its payload cap from. */
-export const MAX_SECTION = 3000
+export type GuideDoc = { title: string; body: RichNode }
 
 /** As the worker's, so the field stops where the route would refuse. */
 export const MAX_GUIDE_TITLE = 120
 
-/** A heading somebody types. Long enough for a sentence, short enough to be one. */
-export const MAX_HEADING = 60
-
 /** As `MAX_GUIDE_BUILDS` in the worker. Anything past it is dropped there too. */
 const MAX_NAMED = 40
 
-export const blankGuide = (): GuideDoc => ({
-  title: '',
-  sections: PROMPTS.map((one) => ({ heading: one.heading, text: '' })),
-})
+export const blankGuide = (): GuideDoc => ({ title: '', body: emptyDoc() })
 
-/** What a reader is shown: the sections with something in them. */
-export const written = (doc: GuideDoc): GuideSection[] =>
-  doc.sections.filter((one) => one.text.trim() !== '')
+/** Whether a body is past what a guide may hold. */
+export const tooLong = (doc: GuideDoc): boolean => textLength(doc.body) > MAX_RICH_TEXT
 
 /** Whether there is enough of a guide to publish: a title, and a word somewhere. */
 export const enough = (doc: GuideDoc): boolean =>
-  doc.title.trim() !== '' && written(doc).length > 0
+  doc.title.trim() !== '' && hasWriting(doc.body) && !tooLong(doc)
 
 // ---------------------------------------------------------------------------
 // What the text names
 // ---------------------------------------------------------------------------
 
 /** Every mention in the guide, in the order they were written. */
-function mentions(doc: GuideDoc): { at: MentionAt; name: string }[] {
-  return doc.sections.flatMap((section) =>
-    parseProse(section.text).flatMap((bit) => ('at' in bit ? [{ at: bit.at, name: bit.name }] : [])),
-  )
-}
+const mentions = (doc: GuideDoc): { at: MentionAt; name: string }[] => mentionsIn(doc.body)
 
 /** The published builds a guide names, each once, in the order it names them. */
 export function namedBuilds(doc: GuideDoc): string[] {
@@ -139,19 +101,14 @@ export function counted(doc: GuideDoc, limit = 3): Counted[] {
 /**
  * The opening of a guide, for a card.
  *
- * The first section with anything in it, with its mentions flattened to their
- * current names. A card is a summary and a mention drawn inside one would be a
- * link inside a link, but the name still has to be the thing's own: see
- * `nameOfMention`.
+ * The writing from the top, without its headings, with its mentions flattened
+ * to their current names. A card is a summary and a mention drawn inside one
+ * would be a link inside a link, but the name still has to be the thing's
+ * own: see `nameOfMention`. What a spoiler hides stays hidden.
  */
 export function opening(doc: GuideDoc, max = 180): string {
-  const first = written(doc)[0]
-  if (!first) return ''
-  const words = parseProse(first.text)
-    .map((bit) => ('at' in bit ? nameOfMention(bit.at, bit.name) : bit.text))
-    .join('')
-    .replace(/\s+/g, ' ')
-    .trim()
+  const words = plainText(doc.body, nameOfMention, false, false).replace(/\s+/g, ' ').trim()
+  if (!words) return ''
   if (words.length <= max) return words
   const cut = words.slice(0, max)
   const space = cut.lastIndexOf(' ')
@@ -162,33 +119,42 @@ export function opening(doc: GuideDoc, max = 180): string {
 // Packing
 // ---------------------------------------------------------------------------
 
-export const packGuide = (doc: GuideDoc): Promise<string> => packText(JSON.stringify(doc))
+/** Packed with the body cleaned first, so nothing goes up that a reader would drop. */
+export const packGuide = (doc: GuideDoc): Promise<string> =>
+  packText(JSON.stringify({ title: doc.title, body: clean(doc.body) ?? emptyDoc() }))
 
 export async function unpackGuide(payload: string): Promise<GuideDoc | null> {
   const json = await unpackText(payload)
   if (json === null) return null
   try {
-    const parsed: unknown = JSON.parse(json)
-    return looksLikeGuide(parsed) ? parsed : null
+    return asGuide(JSON.parse(json))
   } catch {
     return null
   }
 }
 
 /**
- * The same shallow check `transfer.ts` gives a build, and for the same reason:
- * a guide written by a newer version of the tool is still a guide, and refusing
- * to draw it because it carries a field this copy has never heard of would be
- * this copy deciding somebody's writing is invalid.
+ * A guide out of whatever was stored, or null for something that is not one.
+ *
+ * A body is cleaned on the way in, so a reader is only ever handed what
+ * `rich.ts` lists. A guide from before the body, sections and all, becomes
+ * one here. Anything else on the record is ignored rather than refused: a
+ * guide written by a newer version of the tool is still a guide.
  */
-function looksLikeGuide(value: unknown): value is GuideDoc {
-  if (typeof value !== 'object' || value === null) return false
-  const doc = value as Partial<GuideDoc>
-  return (
-    typeof doc.title === 'string' &&
-    Array.isArray(doc.sections) &&
-    doc.sections.every((one) => typeof one?.heading === 'string' && typeof one?.text === 'string')
-  )
+export function asGuide(value: unknown): GuideDoc | null {
+  if (typeof value !== 'object' || value === null) return null
+  const raw = value as { title?: unknown; body?: unknown; sections?: unknown }
+  if (typeof raw.title !== 'string') return null
+  if (raw.body !== undefined) return { title: raw.title, body: clean(raw.body) ?? emptyDoc() }
+  if (
+    Array.isArray(raw.sections) &&
+    raw.sections.every(
+      (one: { heading?: unknown; text?: unknown }) => typeof one?.heading === 'string' && typeof one?.text === 'string',
+    )
+  ) {
+    return { title: raw.title, body: fromSections(raw.sections as GuideSection[]) }
+  }
+  return null
 }
 
 /**
@@ -404,9 +370,10 @@ export function loadDraft(): Draft | null {
     if (!raw) return null
     const parsed: unknown = JSON.parse(raw)
     if (typeof parsed !== 'object' || parsed === null) return null
-    const draft = parsed as Partial<Draft>
-    if (!looksLikeGuide(draft.doc)) return null
-    return { of: typeof draft.of === 'string' ? draft.of : null, doc: draft.doc }
+    const draft = parsed as { of?: unknown; doc?: unknown }
+    const doc = asGuide(draft.doc)
+    if (!doc) return null
+    return { of: typeof draft.of === 'string' ? draft.of : null, doc }
   } catch {
     return null
   }

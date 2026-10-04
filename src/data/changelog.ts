@@ -25,6 +25,17 @@ export type Release = {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '0.34.0',
+    date: '2026-10-04',
+    title: 'Guides are written in one rich field',
+    points: [
+      'One field in place of the prompted boxes: headings, bold, italic, underline, highlight, links, lists, quotes, tables, tips and warnings, and spoilers a reader opens on purpose.',
+      'Type / for a menu of blocks, and @ to tag a boon, a card, a familiar, a build, and now a god, an arm or anybody you meet along the way.',
+      'Dora keeps the empty field company until you start. Guides written before read exactly as they did.',
+      'Text fields wear the theme everywhere, and the button each screen is asking for, like Write a guide or Publish, glows the way the help mark does.',
+    ],
+  },
+  {
     version: '0.33.0',
     date: '2026-10-03',
     title: 'The menu folds open, and the wiki’s pictures are bigger',

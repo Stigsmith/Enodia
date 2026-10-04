@@ -19,7 +19,7 @@ import { act, cleanup, render } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { packGuide } from '../state/guides.ts'
+import { asGuide, packGuide } from '../state/guides.ts'
 import type { GuideListing } from '../state/guides.ts'
 import { forgetMentioned } from '../state/mentioned.ts'
 import type { GuideSide } from '../state/prefs.ts'
@@ -33,10 +33,12 @@ async function listing(over: Partial<GuideListing> = {}): Promise<GuideListing> 
   return {
     id: 'Guide12345',
     title: 'How to beat the RNG',
-    payload: await packGuide({
-      title: 'How to beat the RNG',
-      sections: [{ heading: 'How it goes', text: 'Take @[Hestia’s Boon](t:HestiaWeaponBoon) twice.' }],
-    }),
+    payload: await packGuide(
+      asGuide({
+        title: 'How to beat the RNG',
+        sections: [{ heading: 'How it goes', text: 'Take @[Hestia’s Boon](t:HestiaWeaponBoon) twice.' }],
+      })!,
+    ),
     by: 'Ana',
     createdAt: Date.UTC(2026, 8, 18),
     updatedAt: null,

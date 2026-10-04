@@ -18,8 +18,7 @@ import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import { saveBuild } from './builds.ts'
 import { fingerprint, shapeOf } from './exchange.ts'
 import {
-  MAX_SECTIONS,
-  PROMPTS,
+  asGuide,
   blankGuide,
   clearDraft,
   counted,
@@ -33,15 +32,18 @@ import {
   saveDraft,
   shapesFor,
   unpackGuide,
-  written,
 } from './guides.ts'
 import type { GuideDoc } from './guides.ts'
 import { forgetMentioned } from './mentioned.ts'
+import { MAX_RICH_TEXT } from './rich.ts'
 
-const guide = (sections: string[], title = 'How to beat the RNG'): GuideDoc => ({
-  title,
-  sections: sections.map((text, at) => ({ heading: PROMPTS[at]?.heading ?? `Mine ${at}`, text })),
-})
+/**
+ * A guide from sections of plain text, the way one was written before the rich
+ * body. Built through `asGuide`, so every test below also runs the conversion
+ * a guide published before 4 October 2026 goes through when it is read.
+ */
+const guide = (sections: string[], title = 'How to beat the RNG'): GuideDoc =>
+  asGuide({ title, sections: sections.map((text, at) => ({ heading: `Part ${at + 1}`, text })) })!
 
 const HESTIA = '@[Hestia’s Boon](t:HestiaWeaponBoon)'
 const ZEUS = '@[Zeus’s Boon](t:ZeusWeaponBoon)'
@@ -57,10 +59,9 @@ afterEach(() => {
 })
 
 describe('the shape of a new one', () => {
-  it('starts as the four prompts, each with its heading and nothing written', () => {
+  it('starts as one empty field, with no outline', () => {
     const fresh = blankGuide()
-    expect(fresh.sections.map((one) => one.heading)).toEqual(PROMPTS.map((one) => one.heading))
-    expect(written(fresh)).toEqual([])
+    expect(fresh.body).toEqual({ type: 'doc', content: [{ type: 'paragraph' }] })
     expect(enough(fresh)).toBe(false)
   })
 
@@ -70,8 +71,25 @@ describe('the shape of a new one', () => {
     expect(enough(guide(['', '', 'Something.'], '   '))).toBe(false)
   })
 
-  it('leaves room for four sections of the author’s own', () => {
-    expect(MAX_SECTIONS - PROMPTS.length).toBe(4)
+  it('will not go up longer than a guide can be', () => {
+    expect(enough(guide(['x'.repeat(MAX_RICH_TEXT)]))).toBe(false)
+    expect(enough(guide(['x'.repeat(MAX_RICH_TEXT - 200)]))).toBe(true)
+  })
+})
+
+describe('a guide written as sections', () => {
+  it('reads as a heading per section with something in it, and its paragraphs under it', () => {
+    const doc = guide(['For anybody.', '   ', 'One.\n\nTwo, with a\nline break.'])
+    expect(doc.body.content?.map((one) => one.type)).toEqual(['heading', 'paragraph', 'heading', 'paragraph', 'paragraph'])
+    expect(doc.body.content?.[4]?.content?.map((one) => one.type)).toEqual(['text', 'hardBreak', 'text'])
+  })
+
+  it('keeps its mentions as mentions', () => {
+    const doc = guide([`Take ${HESTIA}.`])
+    expect(doc.body.content?.[1]?.content?.[1]).toEqual({
+      type: 'mention',
+      attrs: { kind: 'trait', id: 'HestiaWeaponBoon', label: 'Hestia’s Boon' },
+    })
   })
 })
 
@@ -139,9 +157,24 @@ describe('the opening line, for a card', () => {
    * while the subjects beside it drew the record's was one card disagreeing
    * with itself, and `nameOfMention` is the one rule both go through now.
    */
-  it('is the first section with anything in it, mentions flattened to their current names', () => {
+  it('is the writing from the top without its headings, mentions flattened to their current names', () => {
     expect(traits.get('HestiaWeaponBoon')?.name).toBe('Flame Strike')
     expect(opening(guide(['', '', `Take ${HESTIA} early.`]))).toBe('Take Flame Strike early.')
+  })
+
+  it('gives away nothing a spoiler hides', () => {
+    const doc: GuideDoc = {
+      title: 'x',
+      body: {
+        type: 'doc',
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'Open.' }] },
+          { type: 'spoiler', attrs: { title: 'End' }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Secret.' }] }] },
+          { type: 'paragraph', content: [{ type: 'text', text: 'After.' }] },
+        ],
+      },
+    }
+    expect(opening(doc)).toBe('Open. After.')
   })
 
   it('stops on a word rather than mid one, and says it was cut', () => {
@@ -166,7 +199,7 @@ describe('packing', () => {
   it('refuses anything that is not a guide, rather than drawing half of one', async () => {
     expect(await unpackGuide('znonsense')).toBeNull()
     expect(await unpackGuide('')).toBeNull()
-    expect(await unpackGuide(`p${btoa('{"title":"No sections"}')}`)).toBeNull()
+    expect(await unpackGuide(`p${btoa('{"title":"Neither a body nor sections"}')}`)).toBeNull()
     expect(await unpackGuide(`p${btoa('{"title":"x","sections":[{"heading":1}]}')}`)).toBeNull()
   })
 })
