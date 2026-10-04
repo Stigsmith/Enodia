@@ -280,6 +280,78 @@
 }
 
 /**
+ * The one thing a screen is asking you to do: Write a guide, Edit it, Publish.
+ *
+ * The owner, 4 October 2026: these should be as easy to find as the help mark.
+ * So it borrows the help mark's treatment, a glow and a ping when the screen
+ * opens, **in the theme's own light rather than the beacon.** `tokens.css`
+ * keeps the beacon for the help mark alone, because a second one would make
+ * neither of them one.
+ *
+ * In the game's art it wears the lit plate the game ships for hover all the
+ * time, so it reads as already pressed toward. The glow is a `drop-shadow`, so
+ * it follows the plate's chamfer rather than its box. `skins.css` draws the
+ * same thing for the CSS looks.
+ */
+.quiet.is-call {
+  position: relative;
+  border-image-source: url('/shell/button-highlight.png');
+  border-image-outset: 0.1rem 0.32rem;
+  color: var(--lit-hot);
+  font-weight: 600;
+  filter: drop-shadow(0 0 0.4rem color-mix(in oklab, var(--lit) 55%, transparent));
+}
+
+.quiet.is-call:hover,
+.quiet.is-call:focus-visible {
+  color: var(--bone);
+  filter: drop-shadow(0 0 0.75rem var(--lit));
+}
+
+/* Not a call while it cannot be answered: Publish before there is a title. */
+.quiet.is-call:disabled {
+  border-image-source: url('/shell/button.png');
+  border-image-outset: 0;
+  color: var(--bone-faint);
+  filter: none;
+  cursor: not-allowed;
+}
+
+.quiet.is-call:disabled::after {
+  content: none;
+}
+
+/* Three pings when the screen opens, then still: found, not flashing. */
+.quiet.is-call::after {
+  content: '';
+  position: absolute;
+  inset: -0.85rem -1.3rem;
+  border: 2px solid var(--lit);
+  border-radius: 0.7rem;
+  opacity: 0;
+  pointer-events: none;
+  animation: call-ping 2.4s ease-out 0.6s 3;
+}
+
+@keyframes call-ping {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet.is-call::after {
+    animation: none;
+  }
+}
+
+/**
  * Back, in the game's own cancel plate.
  *
  * `Shell/ButtonCancel` is the red one it puts on a way out, and Back is the

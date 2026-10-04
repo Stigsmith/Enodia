@@ -184,7 +184,12 @@ export function GuideEditor({
       )}
 
       <footer className="guide-foot">
-        <button type="button" disabled={!enough(doc) || sending} onClick={() => void publish()}>
+        <button
+          type="button"
+          className="quiet is-call"
+          disabled={!enough(doc) || sending}
+          onClick={() => void publish()}
+        >
           {of.current ? 'Replace what people are reading' : 'Publish it'}
         </button>
         {/* Why the button is off, rather than a button that does nothing and

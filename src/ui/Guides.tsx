@@ -99,7 +99,7 @@ export function Guides({ signedIn, onMode }: { signedIn: boolean; onMode: (mode:
             Guides you wrote, and guides you kept. A guide is a few sections of writing with builds
             named inside it.
           </p>
-          <button type="button" className="guides-new" data-tour="guides-new" onClick={write}>
+          <button type="button" className="quiet is-call guides-new" data-tour="guides-new" onClick={write}>
             Write a guide
           </button>
         </div>

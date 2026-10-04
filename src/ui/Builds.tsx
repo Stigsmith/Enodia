@@ -379,7 +379,7 @@ export function Builds({
               Log run
             </button>
             {open.by === 'owner' ? (
-              <button type="button" className="quiet builds-edit" onClick={() => setEditing(open)}>
+              <button type="button" className="quiet is-call builds-edit" onClick={() => setEditing(open)}>
                 Edit
               </button>
             ) : null}
@@ -554,7 +554,7 @@ export function Builds({
         </p>
         <button
           type="button"
-          className="quiet builds-new"
+          className="quiet is-call builds-new"
           data-tour="builds-new"
           onClick={() => setEditing('new')}
         >

@@ -22,6 +22,34 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/**
+ * Every text field, at no specificity.
+ *
+ * The guide editor's fields had no rule of their own and came out in the
+ * browser's white, which the owner caught on 4 October 2026. `:where` keeps
+ * this at zero, so every field that already has its own look keeps it and
+ * one that has none is never white again.
+ */
+:where(input:not([type]), input[type='text'], input[type='search'], input[type='email'], input[type='password'], input[type='url'], input[type='number'], textarea) {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+:where(input, textarea)::placeholder {
+  color: var(--bone-faint);
+}
+
+:where(input:not([type]), input[type='text'], input[type='search'], input[type='email'], input[type='password'], input[type='url'], input[type='number'], textarea):focus {
+  outline: none;
+  border-color: var(--lit);
+}
+
 .shell {
   max-width: 46rem;
   margin: 0 auto;
