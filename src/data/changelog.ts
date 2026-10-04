@@ -30,7 +30,7 @@ export const CHANGELOG: Release[] = [
     title: 'A Nectar, if you are offering',
     points: [
       'Buy us a Nectar glows now, in the game’s own Nectar bottle.',
-      'Every help tour ends on it, and the bottle sits beside Sign in.',
+      'Every help tour ends on it, and the bottle sits in its own circle beside the help mark.',
       'It is a plain link to Ko-fi. The tool stays free either way.',
     ],
   },

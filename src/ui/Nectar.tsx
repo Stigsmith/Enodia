@@ -2,8 +2,9 @@
  * Buy us a Nectar: the one ask, drawn the same wherever it appears.
  *
  * The owner, 4 October 2026: make it glow, put it after every help tour, and
- * put the Nectar itself beside Sign in. The bottle is the game's own:
- * `ResourceData.GiftPoints`, whose display name is Nectar, draws
+ * put the Nectar itself in a circle the help mark's size, right beside it.
+ *
+ * The bottle is the game's own: `ResourceData.GiftPoints`, whose display name is Nectar, draws
  * `TextIconPath = "Items\\Resources\\Other\\GiftDrop_Text"`, the small one it
  * puts inline in text. Not `GiftPointsRare` or `GiftPointsEpic`, which are Bath
  * Salts and Twin Lures, whatever the file names suggest.
@@ -28,13 +29,17 @@ export function NectarLink({ say = 'Buy us a Nectar' }: { say?: string }) {
   )
 }
 
-/** The bottle alone, for the corner beside Sign in. */
-export function NectarMark() {
+/**
+ * The bottle alone, in a circle beside the help mark. `beside` is false on a
+ * screen with no mark, where it takes the mark's corner; `away` hides it while
+ * a tour runs, as the mark is hidden, since the tour ends on the Nectar.
+ */
+export function NectarMark({ beside, away = false }: { beside: boolean; away?: boolean }) {
   const url = kofiUrl()
   if (!url) return null
   return (
     <a
-      className="nectar-mark"
+      className={`nectar-mark${beside ? ' is-beside' : ''}${away ? ' is-away' : ''}`}
       href={url}
       target="_blank"
       rel="noopener noreferrer"

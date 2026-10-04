@@ -4889,36 +4889,60 @@
   margin-top: 0.7rem;
 }
 
-/* The bottle beside Sign in. Round, so the glow follows the bottle. */
-.you {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
+/**
+ * The bottle beside the help mark, in a circle the mark's size: 2.4rem, fixed
+ * in the same corner, one mark and a gap to its left. On a screen with no help
+ * mark it takes the mark's own place. Its glow is the theme's light rather
+ * than the beacon, which `tokens.css` keeps for the help mark alone, so the
+ * two read as a pair without the Nectar borrowing the mark's colour.
+ */
 .nectar-mark {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  /* The help mark's own layer, so whatever covers the mark covers this too. */
+  z-index: 12;
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 2px solid color-mix(in oklab, var(--lit) 55%, var(--div-4));
   border-radius: 50%;
-  filter: drop-shadow(0 0 0.35rem color-mix(in oklab, var(--lit) 70%, transparent));
+  background: radial-gradient(circle at 50% 40%, var(--ink-800), var(--ink-950));
+  box-shadow: 0 0 0.55rem color-mix(in oklab, var(--lit) 45%, transparent);
   transition:
-    filter 0.15s ease,
-    transform 0.15s ease;
+    box-shadow 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.nectar-mark.is-beside {
+  right: calc(1rem + 2.4rem + 0.6rem);
 }
 
 .nectar-mark img {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.65rem;
+  height: 1.65rem;
   object-fit: contain;
 }
 
 .nectar-mark:hover,
 .nectar-mark:focus-visible {
   outline: none;
-  filter: drop-shadow(0 0 0.7rem var(--lit));
-  transform: translateY(-2px) rotate(-8deg);
+  border-color: var(--lit);
+  box-shadow: 0 0 0.9rem var(--lit);
+  transform: translateY(-2px);
+}
+
+.nectar-mark:hover img,
+.nectar-mark:focus-visible img {
+  transform: rotate(-10deg);
+}
+
+/* Out of the way while a tour runs, as the help mark is. */
+.nectar-mark.is-away {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4927,7 +4951,9 @@
   }
 
   .nectar-mark:hover,
-  .nectar-mark:focus-visible {
+  .nectar-mark:focus-visible,
+  .nectar-mark:hover img,
+  .nectar-mark:focus-visible img {
     transform: none;
   }
 }
