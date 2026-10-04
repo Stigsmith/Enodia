@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 import { counted, opening, unpackGuide } from '../state/guides.ts'
 import type { GuideDoc, GuideListing } from '../state/guides.ts'
 import { pieceOf } from './build-pieces.ts'
-import { MentionFace } from './ProseText.tsx'
+import { MentionFace, PlaceFace } from './ProseText.tsx'
 
 /**
  * Every guide in a list, unpacked.
@@ -99,11 +99,13 @@ export function GuideCard({
       {subjects.length ? (
         <ul className="gcard-about">
           {subjects.map((one) => {
-            const piece = one.at.kind === 'build' ? null : pieceOf(one.at)
+            const piece = one.at.kind === 'build' || one.at.kind === 'place' ? null : pieceOf(one.at)
             return (
               <li key={`${one.at.kind}:${one.at.id}`} className="gcard-subject">
                 {piece ? (
                   <MentionFace piece={piece} />
+                ) : one.at.kind === 'place' ? (
+                  <PlaceFace id={one.at.id} name={one.name} />
                 ) : (
                   <span className="mention-name">{one.name}</span>
                 )}

@@ -18,19 +18,21 @@ import { olympians, traits } from '../data/app.ts'
 import { FIRST_BUILD } from '../data/builds.fixture.ts'
 import type { RunContext } from '../data/types.ts'
 import { verdictForShown } from '../engine/build-run.ts'
-import { packGuide } from '../state/guides.ts'
-import type { GuideDoc, GuideRead, NamedBuild } from '../state/guides.ts'
+import type { GuideRead, NamedBuild } from '../state/guides.ts'
 import { forgetMentioned } from '../state/mentioned.ts'
-import { packBuild } from '../state/transfer.ts'
+import type { RichNode } from '../state/rich.ts'
+import { packBuild, packText } from '../state/transfer.ts'
 import { LiveRunProvider } from './BuildMention.tsx'
 import { GuideReader } from './GuideReader.tsx'
 
 const MENTION = '@[Old Name](b:aB3xK9pQmR)'
 
-const doc = (sections: { heading: string; text: string }[]): GuideDoc => ({
-  title: 'How to beat the RNG',
-  sections,
-})
+/**
+ * A guide as it was stored before the rich body: sections of plain text. Packed
+ * in that shape on purpose, so every test here also says that a guide
+ * published before 4 October 2026 still reads.
+ */
+const doc = (sections: { heading: string; text: string }[]) => ({ title: 'How to beat the RNG', sections })
 
 const runContext = (over: Partial<RunContext> = {}): RunContext => ({
   weapon: null,
@@ -48,7 +50,11 @@ const runContext = (over: Partial<RunContext> = {}): RunContext => ({
 const asked: string[] = []
 
 /** A server holding one guide, answering `/api/g/<id>` and nothing else. */
-async function aGuide(over: Partial<GuideRead> = {}, sections = [{ heading: 'How it goes', text: `Go for ${MENTION}.` }]) {
+async function aGuide(
+  over: Partial<GuideRead> = {},
+  sections = [{ heading: 'How it goes', text: `Go for ${MENTION}.` }],
+  body?: RichNode,
+) {
   const named: NamedBuild[] = over.named ?? [
     {
       id: 'aB3xK9pQmR',
@@ -62,7 +68,7 @@ async function aGuide(over: Partial<GuideRead> = {}, sections = [{ heading: 'How
   const guide: GuideRead = {
     id: 'Guide12345',
     title: 'How to beat the RNG',
-    payload: await packGuide(doc(sections)),
+    payload: await packText(JSON.stringify(body ? { title: 'How to beat the RNG', body } : doc(sections))),
     by: 'Ana',
     createdAt: Date.UTC(2026, 8, 18),
     updatedAt: null,
@@ -130,7 +136,7 @@ describe('a build named in a sentence', () => {
     await vi.waitFor(() => expect(verdict()).not.toBeNull())
     const expected = verdictForShown({ ...FIRST_BUILD, name: 'Killer Current' }, ctx, traits)
     const said = expected.why.slice('Killer Current '.length, -1)
-    expect(document.querySelector('.guide-section p')?.textContent).toBe(`Go for Killer Current (${said}).`)
+    expect(document.querySelector('.rich > p')?.textContent).toBe(`Go for Killer Current (${said}).`)
   })
 
   it('says withdrawn, with no payload ever handed over, and asks nobody', async () => {
@@ -160,7 +166,7 @@ describe('a build named in a sentence', () => {
   })
 })
 
-describe('the sections', () => {
+describe('a guide written as sections, before the rich body', () => {
   it('skips the prompts nobody answered, and keeps the ones they did', async () => {
     await aGuide({}, [
       { heading: 'What this is', text: 'For anybody on the Staff.' },
@@ -168,13 +174,96 @@ describe('the sections', () => {
       { heading: 'How it goes', text: 'First paragraph.\n\nSecond paragraph.' },
     ])
     open()
-    await vi.waitFor(() => expect(document.querySelectorAll('.guide-section')).toHaveLength(2))
-    expect([...document.querySelectorAll('.guide-section h3')].map((one) => one.textContent)).toEqual([
+    await vi.waitFor(() => expect(document.querySelectorAll('.rich .rich-h2')).toHaveLength(2))
+    expect([...document.querySelectorAll('.rich .rich-h2')].map((one) => one.textContent)).toEqual([
       'What this is',
       'How it goes',
     ])
-    /* A blank line is a paragraph, which is the whole of the formatting. */
-    expect(document.querySelectorAll('.guide-section')[1]?.querySelectorAll('p')).toHaveLength(2)
+    /* A blank line was a paragraph, which was the whole of the formatting. */
+    expect([...document.querySelectorAll('.rich > p')].map((one) => one.textContent)).toEqual([
+      'For anybody on the Staff.',
+      'First paragraph.',
+      'Second paragraph.',
+    ])
+  })
+})
+
+describe('a rich body', () => {
+  const text = (value: string, marks?: RichNode['marks']): RichNode => ({
+    type: 'text',
+    text: value,
+    ...(marks ? { marks } : {}),
+  })
+  const para = (...content: RichNode[]): RichNode => ({ type: 'paragraph', content })
+
+  it('draws its blocks, and keeps a spoiler closed until it is opened', async () => {
+    await aGuide({}, [], {
+      type: 'doc',
+      content: [
+        { type: 'heading', attrs: { level: 2 }, content: [text('The cap')] },
+        para(text('Bold', [{ type: 'bold' }]), text(' and '), text('marked', [{ type: 'highlight' }])),
+        { type: 'callout', attrs: { tone: 'warn' }, content: [para(text('Careful.'))] },
+        { type: 'spoiler', attrs: { title: 'The ending' }, content: [para(text('Hidden.'))] },
+        {
+          type: 'table',
+          content: [
+            { type: 'tableRow', content: [{ type: 'tableHeader', content: [para(text('God'))] }] },
+            { type: 'tableRow', content: [{ type: 'tableCell', content: [para(text('Zeus'))] }] },
+          ],
+        },
+      ],
+    })
+    open()
+    await vi.waitFor(() => expect(document.querySelector('.rich-h2')?.textContent).toBe('The cap'))
+    expect(document.querySelector('.rich strong')?.textContent).toBe('Bold')
+    expect(document.querySelector('.rich mark')?.textContent).toBe('marked')
+    expect(document.querySelector('.rich-callout.is-warn')?.textContent).toContain('Careful.')
+    const spoiler = document.querySelector('details.rich-spoiler') as HTMLDetailsElement | null
+    expect(spoiler?.open).toBe(false)
+    expect(spoiler?.querySelector('summary')?.textContent).toBe('The ending')
+    expect([...document.querySelectorAll('.rich th, .rich td')].map((one) => one.textContent)).toEqual(['God', 'Zeus'])
+  })
+
+  it('sends a link out as somebody else’s, and drops one that is not a web address', async () => {
+    await aGuide({}, [], {
+      type: 'doc',
+      content: [
+        para(
+          text('a video', [{ type: 'link', attrs: { href: 'https://example.com/run' } }]),
+          text(' and '),
+          text('a trap', [{ type: 'link', attrs: { href: 'javascript:alert(1)' } }]),
+        ),
+      ],
+    })
+    open()
+    await vi.waitFor(() => expect(document.querySelectorAll('.rich a.rich-link')).toHaveLength(1))
+    const link = document.querySelector('.rich a.rich-link')
+    expect(link?.getAttribute('href')).toBe('https://example.com/run')
+    expect(link?.getAttribute('rel')).toBe('nofollow ugc noopener noreferrer')
+    expect(document.querySelector('.rich')?.textContent).toContain('a trap')
+  })
+
+  it('never draws markup it was sent, whatever node it claimed to be', async () => {
+    await aGuide({}, [], {
+      type: 'doc',
+      content: [
+        { type: 'html', attrs: { html: '<img src=x onerror=alert(1)>' }, content: [para(text('<b>kept as text</b>'))] },
+      ],
+    })
+    open()
+    await vi.waitFor(() => expect(document.querySelector('.rich')?.textContent).toContain('<b>kept as text</b>'))
+    expect(document.querySelector('.rich img, .rich b')).toBeNull()
+  })
+
+  it('names a god by the section of the wiki the god is', async () => {
+    await aGuide({}, [], {
+      type: 'doc',
+      content: [para(text('Ask '), { type: 'mention', attrs: { kind: 'place', id: 'olympians/zeus', label: 'Zeus' } })],
+    })
+    open()
+    await vi.waitFor(() => expect(document.querySelector('.rich a.mention')).not.toBeNull())
+    expect(document.querySelector('.rich a.mention')?.getAttribute('href')).toBe('/wiki/c/olympians/zeus')
+    expect(document.querySelector('.rich a.mention .mention-name')?.textContent).toBe('Zeus')
   })
 })
 

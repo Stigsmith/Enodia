@@ -19,7 +19,7 @@ import { Fragment } from 'react'
 import { BuildMention } from './BuildMention.tsx'
 import { pieceOf } from './build-pieces.ts'
 import type { Piece } from './build-pieces.ts'
-import { parseProse } from './mentions.ts'
+import { parseProse, placeOf } from './mentions.ts'
 
 /** The inside of a mention, shared with `Prose` so the two draw it the same. */
 export function MentionFace({ piece }: { piece: Piece }) {
@@ -31,12 +31,34 @@ export function MentionFace({ piece }: { piece: Piece }) {
   )
 }
 
+/**
+ * A section of the wiki named in a mention: a god, an arm, a person. Drawn with
+ * the section's current title and its picture, or the name it was written with
+ * when the section is gone.
+ */
+export function PlaceFace({ id, name }: { id: string; name: string }) {
+  const place = placeOf(id)
+  return (
+    <>
+      {place?.icon ? <img className="mention-art is-place" src={`/${place.icon}`} alt="" loading="lazy" /> : null}
+      <span className="mention-name">{place?.name ?? name}</span>
+    </>
+  )
+}
+
 export function ProseText({ text }: { text: string }) {
   return (
     <>
       {parseProse(text).map((bit, at) => {
         if (!('at' in bit)) return <Fragment key={at}>{bit.text}</Fragment>
         if (bit.at.kind === 'build') return <BuildMention key={at} id={bit.at.id} name={bit.name} linked={false} />
+        if (bit.at.kind === 'place') {
+          return (
+            <span key={at} className="mention">
+              <PlaceFace id={bit.at.id} name={bit.name} />
+            </span>
+          )
+        }
         const piece = pieceOf(bit.at)
         return piece ? (
           <span key={at} className="mention">

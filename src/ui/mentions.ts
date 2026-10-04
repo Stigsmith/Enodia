@@ -18,7 +18,13 @@
  *
  * The letter in front of the id says which kind of record it names: the three
  * kinds the wiki has, `t` for a trait, `a` for an Arcana card and `f` for a
- * familiar, and `b` for a published build.
+ * familiar, `b` for a published build, and `w` for a section of the wiki.
+ *
+ * **A section is how a god is named**, and an arm, and the people met along
+ * the way: none of them is a record, all of them are a page of the wiki with
+ * an address of its own, `@[Zeus](w:olympians/zeus)`. The owner asked on 4
+ * October 2026 for `@` to tag gods as well as items, and the section is the one
+ * id a god has that opens something.
  *
  * **A build is the one kind with no wiki record.** Its id is the short id it
  * was published under, `@[Killer Current](b:aB3xK9pQmR)`, because that is the
@@ -34,21 +40,32 @@ import type { ShownBuild } from '../data/builds.ts'
 import { isPublishedId, publishedInUrl } from '../state/publish.ts'
 import { wikiSections } from './wiki-index.ts'
 import type { WikiKind } from './wiki-route.ts'
+import { wikiTree } from './wiki-tree.ts'
+import type { WikiNode } from './wiki-tree.ts'
 
-/** What a mention can name: a wiki record, or a published build. */
-export type MentionKind = WikiKind | 'build'
+/** What a mention can name: a wiki record, a section of the wiki, or a published build. */
+export type MentionKind = WikiKind | 'build' | 'place'
 
 /**
  * A mention's meaning. A union rather than one type with a wider `kind`, so a
  * check for `'build'` leaves the rest typed as what the wiki can open.
  */
-export type MentionAt = { kind: WikiKind; id: string } | { kind: 'build'; id: string }
+export type MentionAt =
+  | { kind: WikiKind; id: string }
+  | { kind: 'build'; id: string }
+  | { kind: 'place'; id: string }
 
-const CODE: Record<MentionKind, string> = { trait: 't', arcana: 'a', familiar: 'f', build: 'b' }
-const KIND: Record<string, MentionKind> = { t: 'trait', a: 'arcana', f: 'familiar', b: 'build' }
+const CODE: Record<MentionKind, string> = { trait: 't', arcana: 'a', familiar: 'f', build: 'b', place: 'w' }
+const KIND: Record<string, MentionKind> = { t: 'trait', a: 'arcana', f: 'familiar', b: 'build', w: 'place' }
 
-/** One mention as stored. Global, so `parseProse` walks every one. */
-const TOKEN = /@\[([^\]\n]{1,80})\]\(([tafb]):([A-Za-z0-9_]{1,80})\)/g
+/** The kinds a mention can be, for anything that has to check one it was handed. */
+export const MENTION_KINDS: readonly MentionKind[] = ['trait', 'arcana', 'familiar', 'build', 'place']
+
+/**
+ * One mention as stored. Global, so `parseProse` walks every one. A section's
+ * id is a path, so `/` and `-` are allowed in an id as well.
+ */
+const TOKEN = /@\[([^\]\n]{1,80})\]\(([tafbw]):([A-Za-z0-9_/-]{1,80})\)/g
 
 /** A name without the four characters the token is made of, or a line break. */
 const clean = (name: string) => name.replace(/[[\]()\n]/g, '').trim().slice(0, 80)
@@ -139,16 +156,47 @@ let every: Mentionable[] | null = null
  * to every named trait, card and familiar exactly once.
  */
 function mentionables(): Mentionable[] {
-  every ??= wikiSections().flatMap((section) =>
-    section.entries.map((entry) => ({
-      ...entry.at,
-      name: entry.name,
-      icon: entry.icon,
-      sub: entry.sub ?? section.title,
-      folded: fold(entry.name),
-    })),
-  )
+  every ??= [
+    ...wikiSections().flatMap((section) =>
+      section.entries.map((entry) => ({
+        ...entry.at,
+        name: entry.name,
+        icon: entry.icon,
+        sub: entry.sub ?? section.title,
+        folded: fold(entry.name),
+      })),
+    ),
+    ...places(),
+  ]
   return every
+}
+
+/** The picture a section is drawn with in the wiki, as one icon for a mention. */
+export function artOfNode(node: WikiNode): string | null {
+  return node.art.kind === 'mosaic' ? (node.art.icons[0] ?? null) : node.art.src
+}
+
+/**
+ * Every section of the wiki below its front page, by path: the gods, the arms,
+ * the people along the way, and the big sections themselves.
+ */
+function places(): Mentionable[] {
+  const out: Mentionable[] = []
+  const walk = (node: WikiNode, path: string, parent: string | null) => {
+    for (const child of node.children) {
+      const id = path ? `${path}/${child.slug}` : child.slug
+      out.push({ kind: 'place', id, name: child.title, icon: artOfNode(child), sub: parent ?? 'Wiki', folded: fold(child.title) })
+      walk(child, id, child.title)
+    }
+  }
+  walk(wikiTree(), '', null)
+  return out
+}
+
+/** A section a mention names, with its current title and art, or null. */
+export function placeOf(id: string): { name: string; icon: string | null } | null {
+  const found = mentionables().find((one) => one.kind === 'place' && one.id === id)
+  return found ? { name: found.name, icon: found.icon } : null
 }
 
 /**

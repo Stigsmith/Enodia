@@ -276,25 +276,6 @@
   gap: 0.6rem;
 }
 
-.guide-section {
-  margin-top: 1.5rem;
-}
-
-.guide-section h3 {
-  margin: 0 0 0.4rem;
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--bone);
-}
-
-.guide-section p {
-  margin: 0 0 0.7rem;
-  font-size: 0.92rem;
-  line-height: 1.7;
-  color: var(--bone-dim);
-}
-
 /* ---------------------------------------------------------------------------
  * Writing one
  * ------------------------------------------------------------------------ */
@@ -317,36 +298,12 @@
   font-size: 1.1rem;
 }
 
-.guide-field {
-  margin-top: 1.4rem;
-}
-
-.guide-field h3 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--bone);
-}
-
 /* The rest of the prompt. A question to the author, never a label on their
    answer, which is why it is not part of the heading: `state/guides.ts`. */
 .guide-hint {
   margin: 0 0 0.35rem;
   font-size: 0.78rem;
   color: var(--bone-faint);
-}
-
-.guide-heading-field input {
-  width: 100%;
-  margin-bottom: 0.35rem;
-  font-family: var(--display);
-  font-size: 1rem;
-}
-
-.guide-field textarea {
-  width: 100%;
-  resize: vertical;
 }
 
 .guide-field-foot {
@@ -357,10 +314,6 @@
   margin: 0.2rem 0 0;
   font-size: 0.74rem;
   color: var(--bone-faint);
-}
-
-.guide-add {
-  margin-top: 1.1rem;
 }
 
 .guide-foot {
@@ -375,4 +328,420 @@
 
 .guide-foot .guide-hint {
   margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Rich text: the guide's body, read and written
+ *
+ * One set of rules for both, so what an author sees while writing is what a
+ * reader gets. `.rich` is the body in `RichView` and the editable area in
+ * `RichEditor`. The reader's sizes are the ones the old sections used.
+ * ------------------------------------------------------------------------ */
+
+.rich {
+  margin-top: 1.2rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--bone-dim);
+  overflow-wrap: anywhere;
+}
+
+.rich > :first-child {
+  margin-top: 0;
+}
+
+.rich p {
+  margin: 0 0 0.7rem;
+}
+
+.rich .rich-h2,
+.rich h2 {
+  margin: 1.5rem 0 0.45rem;
+  font-family: var(--display);
+  font-size: 1.12rem;
+  font-weight: 500;
+  color: var(--bone);
+}
+
+.rich .rich-h3,
+.rich h3 {
+  margin: 1.1rem 0 0.35rem;
+  font-family: var(--display);
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--lit-hot);
+}
+
+.rich strong {
+  color: var(--bone);
+}
+
+.rich mark {
+  padding: 0 0.15em;
+  border-radius: 0.2em;
+  background: color-mix(in oklab, var(--lit) 32%, transparent);
+  color: var(--bone);
+}
+
+.rich code {
+  padding: 0.05em 0.3em;
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+  font-family: var(--mono);
+  font-size: 0.85em;
+  color: var(--bone);
+}
+
+.rich pre {
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.85rem;
+  overflow-x: auto;
+  border: 1px solid var(--div-2);
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+}
+
+.rich pre code {
+  padding: 0;
+  background: none;
+}
+
+.rich a.rich-link,
+.rich-editable a {
+  color: var(--lit-hot);
+  text-decoration: underline;
+  text-decoration-color: var(--lit-dim);
+  text-underline-offset: 0.15em;
+}
+
+.rich ul,
+.rich ol {
+  margin: 0 0 0.8rem;
+  padding-left: 1.35rem;
+}
+
+.rich li > p {
+  margin-bottom: 0.25rem;
+}
+
+.rich li::marker {
+  color: var(--lit-dim);
+}
+
+.rich blockquote {
+  margin: 0 0 0.8rem;
+  padding: 0.1rem 0 0.1rem 0.9rem;
+  border-left: 2px solid var(--lit-dim);
+  color: var(--bone);
+  font-style: italic;
+}
+
+.rich hr {
+  margin: 1.4rem 0;
+  border: 0;
+  border-top: 1px solid var(--div-3);
+}
+
+/* A spoiler: closed for a reader until they open it, open while writing. */
+.rich-spoiler {
+  margin: 0 0 0.8rem;
+  border: 1px dashed var(--div-4);
+  border-radius: var(--r-soft);
+  background: color-mix(in oklab, var(--ink-900) 80%, transparent);
+}
+
+.rich-spoiler > summary,
+.rich-spoiler-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--display);
+  font-size: 0.9rem;
+  color: var(--bone);
+  cursor: pointer;
+}
+
+.rich-spoiler > summary::before {
+  content: 'Spoiler';
+}
+
+.rich-spoiler > summary::before,
+.rich-spoiler-title > span {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rim-magenta);
+}
+
+.rich-spoiler-title input {
+  flex: 1;
+  padding: 0.2rem 0.4rem;
+  font-family: var(--display);
+  font-size: 0.9rem;
+}
+
+.rich-spoiler-body {
+  padding: 0 0.75rem 0.35rem;
+}
+
+/* A callout, in one of three tones. The tone is a word as well as a colour,
+   so it does not rest on colour alone. */
+.rich-callout {
+  margin: 0 0 0.8rem;
+  padding: 0.55rem 0.85rem 0.15rem;
+  border: 1px solid var(--div-3);
+  border-left-width: 3px;
+  border-radius: var(--r-hair);
+  background: var(--ink-900);
+}
+
+.rich-callout.is-tip {
+  border-color: color-mix(in oklab, var(--lit) 45%, var(--div-3));
+  border-left-color: var(--lit);
+}
+
+.rich-callout.is-warn {
+  border-color: color-mix(in oklab, var(--rim-magenta) 45%, var(--div-3));
+  border-left-color: var(--rim-magenta);
+}
+
+.rich-callout-says {
+  display: block;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-faint);
+}
+
+.rich-callout.is-tip .rich-callout-says { color: var(--lit-hot); }
+.rich-callout.is-warn .rich-callout-says { color: var(--rim-magenta); }
+
+/* In the editor the tone is a button that cycles it. */
+button.rich-callout-says {
+  cursor: pointer;
+}
+
+button.rich-callout-says:hover {
+  color: var(--bone);
+}
+
+.rich-table {
+  margin: 0 0 0.9rem;
+  overflow-x: auto;
+}
+
+.rich table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.rich th,
+.rich td {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--div-3);
+  vertical-align: top;
+  text-align: left;
+}
+
+.rich th {
+  background: var(--ink-900);
+  font-family: var(--display);
+  font-weight: 500;
+  color: var(--bone);
+}
+
+.rich th > p,
+.rich td > p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------- the editor */
+
+.rich-editor {
+  margin-top: 1.1rem;
+}
+
+.rich-editor.is-loading {
+  min-height: 18rem;
+  padding: 1rem;
+  border: 1px solid var(--div-3);
+  border-radius: var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone-faint);
+  font-size: 0.85rem;
+}
+
+.rich-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid var(--div-3);
+  border-bottom: 0;
+  border-radius: var(--r-hair) var(--r-hair) 0 0;
+  background: color-mix(in oklab, var(--ink-950) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.rich-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.rich-tool-gap {
+  width: 1px;
+  height: 1.3rem;
+  margin: 0 0.3rem;
+  background: var(--div-3);
+}
+
+.rich-tool {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.45rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-hair);
+  background: none;
+  color: var(--bone-dim);
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rich-tool:hover:not(:disabled) {
+  border-color: var(--div-4);
+  color: var(--bone);
+}
+
+.rich-tool.is-on {
+  border-color: var(--lit-dim);
+  background: color-mix(in oklab, var(--lit) 18%, transparent);
+  color: var(--lit-hot);
+}
+
+.rich-tool:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Each glyph shows its own effect, the way a word processor's do. */
+.rich-tool[aria-label='Italic'] span { font-style: italic; }
+.rich-tool[aria-label='Underline'] span { text-decoration: underline; }
+.rich-tool[aria-label='Strikethrough'] span { text-decoration: line-through; }
+.rich-tool[aria-label='Inline code'] span { font-family: var(--mono); }
+.rich-tool[aria-label='Subheading'] span { font-size: 0.75rem; }
+.rich-tool[aria-label='Highlight'] span { color: var(--lit); }
+
+.rich-tools.is-table {
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.rich-tools.is-table .rich-tool {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+
+.rich-link-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--div-2);
+}
+
+.rich-link-form input {
+  flex: 1 1 16rem;
+}
+
+.rich-editor .rich-editable {
+  min-height: 22rem;
+  margin: 0;
+  padding: 0.9rem 1rem 1.2rem;
+  border: 1px solid var(--div-3);
+  border-radius: 0 0 var(--r-hair) var(--r-hair);
+  background: var(--ink-850);
+  color: var(--bone);
+  outline: none;
+}
+
+.rich-editor .rich-editable:focus {
+  border-color: var(--lit-dim);
+}
+
+.rich-editable p {
+  color: var(--bone);
+}
+
+/* Dora, in the empty field. Tiptap marks the empty paragraph and the line is
+   drawn from its attribute, so it is never part of the text. */
+.rich-editable p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--bone-faint);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.rich-editable .rich-mention {
+  padding: 0 0.15em;
+  border-radius: 0.25em;
+  background: color-mix(in oklab, var(--lit) 12%, transparent);
+}
+
+.rich-editable td,
+.rich-editable th {
+  position: relative;
+}
+
+.rich-editable .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--lit) 16%, transparent);
+  pointer-events: none;
+}
+
+.rich-editor kbd {
+  padding: 0 0.3em;
+  border: 1px solid var(--div-4);
+  border-radius: 0.25em;
+  font-family: var(--mono);
+  font-size: 0.85em;
+  color: var(--bone);
+}
+
+.guide-field-foot .is-over {
+  color: var(--rim-magenta);
+}
+
+/* The `@` and `/` lists hang in a fixed box under the caret, so the list
+   inside it does not position itself the way the plain field's list does. */
+.rich-suggest {
+  position: static;
+  max-height: 18rem;
+}
+
+.rich-suggest.is-empty {
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--bone-faint);
 }
