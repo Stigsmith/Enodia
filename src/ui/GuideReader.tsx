@@ -270,6 +270,7 @@ function Reader({
           <div className="guide-report-foot">
             <button
               type="button"
+              className="quiet"
               onClick={() => {
                 void reportGuide(guide.id, reason).then((answer) => {
                   if (answer.ok) setReported(true)
@@ -326,7 +327,7 @@ function Author({
   return (
     <div className="guide-marks">
       {onEdit ? (
-        <button type="button" onClick={onEdit}>
+        <button type="button" className="quiet is-call" onClick={onEdit}>
           Edit it
         </button>
       ) : null}

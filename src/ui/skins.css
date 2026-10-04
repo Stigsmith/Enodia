@@ -197,6 +197,42 @@
     outline-color var(--t-response) var(--e-response);
 }
 
+/* The screen's one call to action, lit in the theme and glowing past its
+ * edge. `surface.css` says why it is not the beacon. */
+:root[data-chrome='css'] .quiet.is-call {
+  border-image-source: none;
+  background: var(--sk-btn-bg-hot);
+  outline: 1px solid var(--lit);
+  outline-offset: var(--sk-btn-inset);
+  box-shadow:
+    var(--sk-btn-ring),
+    0 0 0.9rem color-mix(in oklab, var(--lit) 45%, transparent);
+  color: var(--lit-hot);
+  filter: none;
+}
+
+:root[data-chrome='css'] .quiet.is-call:hover,
+:root[data-chrome='css'] .quiet.is-call:focus-visible {
+  border-image-source: none;
+  color: var(--bone);
+  box-shadow:
+    var(--sk-btn-ring),
+    0 0 1.3rem color-mix(in oklab, var(--lit) 70%, transparent);
+}
+
+:root[data-chrome='css'] .quiet.is-call:disabled {
+  border-image-source: none;
+  background: var(--sk-btn-bg);
+  outline: 1px solid var(--sk-btn-edge);
+  box-shadow: var(--sk-btn-ring);
+  color: var(--bone-faint);
+}
+
+:root[data-chrome='css'] .quiet.is-call::after {
+  inset: -0.6rem -1.3rem;
+  border-radius: var(--sk-btn-radius);
+}
+
 /* Focus gets the same light as hover, which is what the game skin does too. */
 :root[data-chrome='css'] .quiet:hover,
 :root[data-chrome='css'] .quiet:focus-visible {
