@@ -28,6 +28,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { Tour } from './Tour.tsx'
 import { TOURS } from './tour.ts'
 import type { View } from './nav.ts'
+import { NectarMark } from './Nectar.tsx'
 
 /** Views that share a topic rather than owning one. */
 const ALIAS: Partial<Record<View, string>> = {
@@ -95,10 +96,14 @@ export function PageHelp({ view }: { view: View }) {
   // No tour for a screen means no mark. A help control that opens an empty
   // panel is worse than no control, which is the lesson the unbuilt menu rows
   // already taught.
-  if (!steps?.length) return null
+  /* The Nectar sits beside the mark, in a circle the mark's size: the owner,
+   * 4 October 2026. It shows on every screen, so where there is no mark it
+   * takes the mark's place in the corner rather than leaving a gap. */
+  if (!steps?.length) return <NectarMark beside={false} />
 
   return (
     <>
+      <NectarMark beside away={open} />
       {/* The art is the background rather than an `img`, so the game's own
         * highlight sprite can take over on hover the way it does in the game.
         * Both paths are literals, which is what `prune` reads. */}

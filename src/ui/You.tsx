@@ -47,7 +47,6 @@ import { useEffect, useRef, useState } from 'react'
 
 import { ACCOUNT_CHANGED, currentAccount, signOut } from '../state/account.ts'
 import type { Account } from '../state/account.ts'
-import { NectarMark } from './Nectar.tsx'
 
 export function You({ onGo }: { onGo: (view: 'account' | 'friends') => void }) {
   const [who, setWho] = useState<Account | null>(null)
@@ -123,7 +122,6 @@ export function You({ onGo }: { onGo: (view: 'account' | 'friends') => void }) {
   if (!who) {
     return (
       <div className="you" ref={root}>
-        <NectarMark />
         <button type="button" className="you-in" onClick={() => go('account')}>
           Sign in
         </button>
@@ -133,7 +131,6 @@ export function You({ onGo }: { onGo: (view: 'account' | 'friends') => void }) {
 
   return (
     <div className="you" ref={root}>
-      <NectarMark />
       <button
         type="button"
         className={`you-name${open ? ' is-open' : ''}`}
