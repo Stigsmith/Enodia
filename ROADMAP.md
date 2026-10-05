@@ -4,7 +4,7 @@
 elsewhere and is linked, never duplicated: this file says *where things stand*, the others
 say *what the thing is*.
 
-Last updated 17 September 2026, game build `138174`.
+Last updated 5 October 2026, game build `138174`.
 
 ---
 
@@ -12,13 +12,14 @@ Last updated 17 September 2026, game build `138174`.
 
 | | |
 |---|---|
+| **Release** | **Public since 4 October 2026, version 0.35.0.** The repository is public at `github.com/Stigsmith/Enodia` with a README for players, the changelog carries version numbers, and the site is live. **The next phase is listening**: feedback from the first users, through GitHub issues and wherever the launch is posted, decides what is built next. Nothing new is planned until it arrives |
 | **Phase** | 1, "The Exit". **Complete.** Phase 4: stages 1 to 3 built, **accounts are open** since 4 September 2026, the **exchange loop closes** since the 4th, and **leaderboards** landed on the 8th |
 | **Build order step** | **11 of 11.** Step 8 was the first shippable point and it was passed three steps ago |
-| **Tests** | 898 in node across 56 files, and **183 inside workerd** against a real D1. `npm test` runs both |
-| **Validator** | 0 failures, 2 warnings, across 12 checks. This row said 10 while `runAllChecks` ran 12 |
+| **Tests** | 1016 in node across 61 files, and **183 inside workerd** against a real D1. `npm test` runs both |
+| **Validator** | 0 failures, 2 warnings, across 25 generated files, 3 curated files, 141 source files and 1060 images |
 | **Build** | `dist/` is **30 MB and 689 files**, and it runs from a plain static server |
 | **Guides** | **Live on enodia.me since 25 September 2026, merged into `master`**, all seven phases: build mentions with a live verdict, Builds as one screen with two sides, the backend with reports and a hide, the Guides screen and its editor, the figures, the record, and **the seed guide, published** at `enodia.me/g/jEn4Tr1WOA` from `guides/how-to-beat-the-rng.md`. See the gap analysis below and `decisions/2026-09-13-guides.md` |
-| **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on **2 October 2026**, version `aef832ca`: the four ways to draw the interface, the seven-row menu with tabs and folds, and the wiki walked by banner tiles (`cf73034`). No migration was pending. Before that, 26 September, version `d204292a`, which added `no-store` and `nosniff` to every API response (`f749725`), and Guides the day before, version `79ac1346`, after migration `0012`. All through `versions upload` and `versions deploy`, and all checked on the domain itself. The workers.dev address is off since 3 October 2026, so `enodia.me` is the only one |
+| **Live** | **`enodia.me`**, on Cloudflare Workers, since 2 September 2026, deployed last on **4 October 2026**, version `131a004a`, app 0.35.0 (`2a5b322`): Buy us a Nectar, the rich guide editor (0.34.0), the folding menu, versioned changelog and Codex portraits (0.33.0). The workers.dev address is off, so `enodia.me` is the only one. Deployed through `versions upload` and `versions deploy` from a fresh build, and checked on the domain itself |
 | **Mail** | `dora@enodia.me` through Resend, DKIM signed, SPF and DMARC aligned. Proton receives on the same domain and its own DKIM is separate |
 | **Deploy** | `wrangler.jsonc` publishes `dist/` to Cloudflare Workers. Cache tiers and security headers in `assets/_headers` for static files, and `nosniff` and `no-store` on every `/api/*` answer from `worker/index.ts`, which `_headers` never reaches. Hashed assets immutable, a CSP that says the page fetches nothing but itself and now actually means it |
 | **Stack** | Vite 8, React 19, TypeScript 7, Vitest 4 |
