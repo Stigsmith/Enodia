@@ -1331,7 +1331,7 @@ export function checkAssets(bundle: Bundle): Finding[] {
   }
 
   //    And each entry has to describe the file it names. Matching names is not
-  //    enough: e5ca0ad replaced characters/charon-coins.png and did not rerun
+  //    enough: 133324b replaced characters/charon-coins.png and did not rerun
   //    npm run assets, so its entry kept the old size and hash for ten days.
   //    The writer always records both, so an entry missing either disagrees
   //    too. An entry with no file on disk is already reported above.
