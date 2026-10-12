@@ -350,8 +350,7 @@ working around it.
 
 ## Two things this brief does not cover
 
-Raised in the same conversation, both needing a document change rather than code, and both
-running through `project/workflow-decision.md`:
+Raised in the same conversation, both needing a document change rather than code:
 
 1. **The run surfaces are now one timeline, not four screens.** `DESIGN.md` 8 lists Setup,
    Exit, Targets, Held and Briefing. The design conversation replaced that with a single

@@ -32,3 +32,8 @@ enodia-*.json
 # wrangler dev secrets. Production uses `wrangler secret put`.
 .dev.vars
 .dev.vars.*
+
+# Working notes kept on this machine only: the companion Claude.ai project's
+# instructions and the seed this repository grew out of.
+/project/
+/archive/

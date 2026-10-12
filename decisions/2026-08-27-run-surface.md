@@ -1,7 +1,6 @@
 # Decision: the run is one surface
 
-27 August 2026. Produced from a design conversation in the Claude.ai project, run through
-`project/workflow-decision.md`.
+27 August 2026. Produced from a design conversation in the Claude.ai project.
 
 Everything below the routing table is replacement text for `DESIGN.md`, written in that
 document's own register. Paste it in, or hand this file to Claude Code to apply.

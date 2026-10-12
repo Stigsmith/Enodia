@@ -3,8 +3,8 @@
  * THIS FILE IS THE SOURCE. dist/index.html inlines a copy because no build
  * exists yet. When they disagree, this one is right.
  *
- * Every value is sampled from the game, and project/briefs/visual-language.md
- * names the file each one came from. Do not invent a colour here.
+ * Every value is sampled from the game, and VISUAL.md names the file each
+ * one came from. Do not invent a colour here.
  *
  * Ramps are POSITIONAL, never literal. --lit-hot means "the brightest living
  * light", not "#8fd4c4". That is what lets a per-god theme swap one ramp
